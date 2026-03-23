@@ -43,7 +43,11 @@ export function SVGClick() {
     const handleCircleClick = (e: React.MouseEvent<SVGGElement>, p: Point) => {
         e.stopPropagation();
         if (drawEdgeFrom !== null) {
-            setEdges((prev) => [...prev, {from: drawEdgeFrom, to: p}]);
+            if(edges.every((edge) =>
+                !(edge.from.id === drawEdgeFrom.id && edge.to.id === p.id) &&
+                !(edge.to.id === drawEdgeFrom.id && edge.from.id === p.id))) {
+                setEdges((prev) => [...prev, {from: drawEdgeFrom, to: p}]);
+            }
             setDrawEdgeFrom(null);
             setDrawEdgeTo(null);
             return;
@@ -76,7 +80,8 @@ export function SVGClick() {
     };
 
     return (
-        <svg
+        <>
+            <svg
             height={800}
             style={{ border: "1px solid black" }}
             onClick={handleCanvasClick}
@@ -109,9 +114,9 @@ export function SVGClick() {
                 stroke="black"
                 strokeWidth={2}
             /> : <></>}
-            {points.map((p, i) => (
+            {points.map((p) => (
                 <g
-                    key={i}
+                    key={p.id}
                     onMouseDown={(e) => {
                         e.stopPropagation();
                         setDraggingPointId(p.id);
@@ -145,5 +150,19 @@ export function SVGClick() {
                 </g>
             ))}
         </svg>
+        <button type={"button"} onClick={() => {
+            setPoints([])
+            setEdges([])
+        }}>reset</button>
+            <button type={"button"} onClick={() => {
+                const url = "http://localhost:8080/test";
+                fetch(url, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ points: points, edges: edges }),
+                }).then(response => response.json())
+                    .then((json) => console.log(json));
+            }}>submit</button>
+        </>
     );
 }
