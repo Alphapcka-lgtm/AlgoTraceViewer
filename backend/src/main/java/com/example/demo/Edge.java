@@ -1,9 +1,3 @@
 package com.example.demo;
 
-import lombok.Data;
-
-@Data
-public class Edge {
-    public final Point from;
-    public final Point to;
-}
+public record Edge (Point from, Point to, long id) {}
