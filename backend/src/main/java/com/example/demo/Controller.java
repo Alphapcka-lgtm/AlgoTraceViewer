@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @CrossOrigin(
@@ -27,7 +27,7 @@ public class Controller {
     }
 
     @PostMapping("/random")
-    public ResponseEntity<List<Point>> randomVertexCover(@RequestBody Graph graph) {
+    public ResponseEntity<Set<Node>> randomVertexCover(@RequestBody Graph graph) {
         return ResponseEntity.ok(randomVertexCover.solve(graph));
     }
 }

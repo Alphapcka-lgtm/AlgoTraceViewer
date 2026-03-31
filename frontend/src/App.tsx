@@ -1,11 +1,7 @@
 import {SVGInput} from "./SVGInput.tsx";
-import {SVGAnimation} from "./SVGAnimation.tsx";
 
 function App() {
-  return <>
-    <SVGInput/>
-    <SVGAnimation/>
-    </>
+  return <SVGInput/>
 }
 
 export default App

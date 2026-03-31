@@ -1,180 +1,148 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import {Edges, PreviewEdge} from "./Edges";
+import type {Node} from "./Nodes";
+import type {Edge} from "./Edges";
+import {Nodes} from "./Nodes";
 
-type Point = { x: number; y: number; id: number };
-type Edge = { from: Point; to: Point, id: number };
+type Interaction =
+    | { type: "idle" }
+    | { type: "dragging"; nodeId: number }
+    | { type: "drawing-edge"; fromId: number; to?: { x: number; y: number } };
 
 export function SVGInput() {
-    const [points, setPoints] = useState<Point[]>([]);
+    const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
-    const [drawEdgeFrom, setDrawEdgeFrom] = useState<Point | null>(null);
-    const [drawEdgeTo, setDrawEdgeTo] = useState<Point | null>(null);
-    const [draggingPointId, setDraggingPointId] = useState<number | null>(null);
-    const [wasDragging, setWasDragging] = useState<boolean>(false);
+    const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
+    const didNodeMove = useRef(false);
 
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
-        const svg = e.currentTarget;
-        const rect = svg.getBoundingClientRect();
-
+        const rect = e.currentTarget.getBoundingClientRect();
         return {
             x: e.clientX - rect.left,
             y: e.clientY - rect.top,
         };
     };
 
+    const getNodeById = (id: number) => nodes.find((n) => n.id === id)!;
+
+    const edgeExists = (a: number, b: number) =>
+        edges.some(
+            (e) =>
+                (e.fromId === a && e.toId === b) ||
+                (e.fromId === b && e.toId === a)
+        );
+
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
-        if (wasDragging) {
-            setWasDragging(false);
-            setDrawEdgeFrom(null);
+        if (interaction.type !== "idle") {
+            setInteraction({ type: "idle" });
             return;
         }
-        if (drawEdgeFrom !== null) {
-            setDrawEdgeFrom(null);
-            setDrawEdgeTo(null);
-            return;
-        }
+
         const { x, y } = getMousePos(e);
-
-        setPoints((prev) => {
-            return [...prev, { x, y, id: Date.now() }];
-        });
-    }
-
-    const handleCircleClick = (e: React.MouseEvent<SVGGElement>, p: Point) => {
-        e.stopPropagation();
-        if (drawEdgeFrom !== null) {
-            if(edges.every((edge) =>
-                !(edge.from.id === drawEdgeFrom.id && edge.to.id === p.id) &&
-                !(edge.to.id === drawEdgeFrom.id && edge.from.id === p.id)))
-            {
-                setEdges((prev) => [...prev, {from: drawEdgeFrom, to: p, id: Date.now()}]);
-            }
-            setDrawEdgeFrom(null);
-            setDrawEdgeTo(null);
-            return;
-        }
-        if(wasDragging) {
-            setWasDragging(false);
-            return;
-        }
-        setDrawEdgeFrom(p)
-    }
+        setNodes((prev) => [...prev, { x, y, id: Date.now() }]);
+    };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-        if (drawEdgeFrom !== null) {
-            const { x, y } = getMousePos(e);
-            setDrawEdgeTo({ x, y, id: -1 });
+        const pos = getMousePos(e);
+
+        setInteraction((prev) => {
+            switch (prev.type) {
+                case "drawing-edge":
+                    return { ...prev, to: pos };
+
+                case "dragging":
+                    didNodeMove.current = true;
+                    setNodes((nodes) =>
+                        nodes.map((n) =>
+                            n.id === prev.nodeId ? { ...n, ...pos } : n
+                        )
+                    );
+                    return prev;
+
+                default:
+                    return prev;
+            }
+        });
+    };
+
+    const handleNodeClick = (node: Node) => {
+        if (didNodeMove.current) {
+            didNodeMove.current = false;
+            return;
         }
-        if (draggingPointId !== null) {
-            const { x, y } = getMousePos(e);
-            setPoints((prev) =>
-                prev.map((point) => {
-                    if (point.id === draggingPointId) {
-                        point.x = x;
-                        point.y = y;
-                    }
-                    return point;
-                })
-            );
-            setWasDragging(true);
+
+        setInteraction((prev) => {
+            if (prev.type === "drawing-edge") {
+                if (!edgeExists(prev.fromId, node.id)) {
+                    setEdges((edges) => [
+                        ...edges,
+                        { fromId: prev.fromId, toId: node.id, id: Date.now() },
+                    ]);
+                }
+                return { type: "idle" };
+            }
+
+            return { type: "drawing-edge", fromId: node.id };
+        });
+    };
+
+    const handleNodeMouseDown = (nodeId: number) => {
+        if (interaction.type === "idle") {
+            didNodeMove.current = false;
+            setInteraction({ type: "dragging", nodeId });
         }
+    };
+
+    const handleNodeMouseUp = () => {
+        if (interaction.type === "dragging") {
+            setInteraction({ type: "idle" });
+        }
+    };
+
+    const handleNodeDoubleClick = (nodeId: number) => {
+        setNodes((nodes) => nodes.filter((n) => n.id !== nodeId));
+        setEdges((edges) =>
+            edges.filter((e) => e.fromId !== nodeId && e.toId !== nodeId)
+        );
+        setInteraction({ type: "idle" });
     };
 
     return (
         <>
             <svg
-            height={500}
-            style={{ border: "1px solid black" }}
-            onClick={handleCanvasClick}
-            onMouseMove={handleMouseMove}
-        >
-            {getEdgeSVGElements(edges)}
-            {drawEdgeFrom !== null && drawEdgeTo !== null ? <line
-                key={-1}
-                x1={drawEdgeFrom.x}
-                y1={drawEdgeFrom.y}
-                x2={drawEdgeTo.x}
-                y2={drawEdgeTo.y}
-                stroke="black"
-                strokeWidth={2}
-            /> : <></>}
-            {getPointSVGElements(points)}
-        </svg>
-        <button type={"button"} onClick={reset}>reset</button>
-        <button type={"button"} onClick={submit}>submit</button>
+                height={500}
+                style={{ border: "1px solid black", borderRadius: "30px" }}
+                onClick={handleCanvasClick}
+                onMouseMove={handleMouseMove}
+            >
+                <Edges edges={edges} getNode={getNodeById} />
+
+                <PreviewEdge interaction={interaction} getNode={getNodeById} />
+
+                <Nodes
+                    nodes={nodes}
+                    onClick={handleNodeClick}
+                    onMouseDown={handleNodeMouseDown}
+                    onMouseUp={handleNodeMouseUp}
+                    onDoubleClick={handleNodeDoubleClick}
+                />
+            </svg>
+
+            <button onClick={() => {
+                setNodes([]);
+                setEdges([]);
+                setInteraction({ type: "idle" });
+            }}>reset</button>
+
+            <button onClick={() => {
+                fetch("http://localhost:8080/test", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nodes, edges }),
+                })
+                    .then((r) => r.json())
+                    .then(console.log);
+            }}>submit</button>
         </>
     );
-
-    function getEdgeSVGElements(edges: Edge[]) {
-        return edges.map((e, i) => (
-            <g
-                key={i}
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-            >
-                <line
-                    key={i}
-                    x1={e.from.x}
-                    y1={e.from.y}
-                    x2={e.to.x}
-                    y2={e.to.y}
-                    stroke="black"
-                    strokeWidth={2}
-                />
-            </g>
-        ));
-    }
-
-    function getPointSVGElements(points: Point[]) {
-        return points.map((p, i) => (
-            <g
-                id={p.id.toString(10)}
-                onMouseDown={(e) => {
-                    e.stopPropagation();
-                    setDraggingPointId(p.id);
-                }}
-                onMouseUp={(e) => {
-                    e.stopPropagation();
-                    setDraggingPointId(null);
-                }}
-                onDoubleClick={(e) => {
-                    e.stopPropagation();
-                    setPoints(points.filter((point) => point.id !== p.id));
-                    setEdges(edges.filter((edge) => edge.from.id !== p.id && edge.to.id !== p.id));
-                    setDrawEdgeFrom(null)
-                }}
-                onClick={(e) => {
-                    handleCircleClick(e, p);
-                }}
-            >
-                <circle cx={p.x} cy={p.y} r={10} fill="black" />
-                <text
-                    x={p.x}
-                    y={p.y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fill="white"
-                    fontSize="10"
-                    pointerEvents="none"
-                >
-                    {i}
-                </text>
-            </g>
-        ));
-    }
-
-    function submit() {
-        const url = "http://localhost:8080/test";
-        fetch(url, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ points: points, edges: edges }),
-        }).then(response => response.json())
-            .then((json) => console.log(json));
-    }
-
-    function reset(){
-        setPoints([]);
-        setEdges([]);
-    }
 }
