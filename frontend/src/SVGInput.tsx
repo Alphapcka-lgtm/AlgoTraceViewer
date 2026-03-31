@@ -17,10 +17,7 @@ export function SVGInput() {
 
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        };
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
 
     const getNodeById = (id: number) => nodes.find((n) => n.id === id)!;
@@ -84,7 +81,6 @@ export function SVGInput() {
                 });
                 return { type: "idle" };
             }
-
             return { type: "drawing-edge", fromId: node.id };
         });
     };
