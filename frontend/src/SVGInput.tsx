@@ -40,6 +40,7 @@ export function SVGInput() {
 
         const { x, y } = getMousePos(e);
         setNodes((prev) => [...prev, { x, y, id: Date.now() }]);
+        console.log(nodes);
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -84,6 +85,7 @@ export function SVGInput() {
 
             return { type: "drawing-edge", fromId: node.id };
         });
+        console.log(edges);
     };
 
     const handleNodeMouseDown = (nodeId: number) => {
