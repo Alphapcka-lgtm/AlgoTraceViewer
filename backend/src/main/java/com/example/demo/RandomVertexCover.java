@@ -16,14 +16,14 @@ public class RandomVertexCover {
             Edge randomEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
-                            edge.from() == randomEdge.from() ||
-                            edge.to() == randomEdge.from() ||
-                            edge.from()== randomEdge.to() ||
-                            edge.to() == randomEdge.to())
+                            edge.fromId() == randomEdge.fromId() ||
+                            edge.toId() == randomEdge.fromId() ||
+                            edge.fromId()== randomEdge.toId() ||
+                            edge.toId() == randomEdge.toId())
                     .toList();
             remainingEdges.removeAll(incidentEdges);
-            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.from()));
-            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.to()));
+            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.fromId()));
+            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.toId()));
         }
         return chosenNodes;
     }

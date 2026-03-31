@@ -25,7 +25,7 @@ export function SVGInput() {
 
     const getNodeById = (id: number) => nodes.find((n) => n.id === id)!;
 
-    const edgeExists = (a: number, b: number) =>
+    const edgeExists = (a: number, b: number, edges: Edge[]) =>
         edges.some(
             (e) =>
                 (e.fromId === a && e.toId === b) ||
@@ -40,7 +40,6 @@ export function SVGInput() {
 
         const { x, y } = getMousePos(e);
         setNodes((prev) => [...prev, { x, y, id: Date.now() }]);
-        console.log(nodes);
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -50,16 +49,18 @@ export function SVGInput() {
             switch (prev.type) {
                 case "drawing-edge":
                     return { ...prev, to: pos };
-
                 case "dragging":
                     didNodeMove.current = true;
                     setNodes((nodes) =>
-                        nodes.map((n) =>
-                            n.id === prev.nodeId ? { ...n, ...pos } : n
-                        )
+                        nodes.map((n) => {
+                            if (n.id === prev.nodeId) {
+                                return { ...n, ...pos };
+                            } else {
+                                return n;
+                            }
+                        })
                     );
                     return prev;
-
                 default:
                     return prev;
             }
@@ -74,18 +75,18 @@ export function SVGInput() {
 
         setInteraction((prev) => {
             if (prev.type === "drawing-edge") {
-                if (!edgeExists(prev.fromId, node.id)) {
-                    setEdges((edges) => [
-                        ...edges,
-                        { fromId: prev.fromId, toId: node.id, id: Date.now() },
-                    ]);
-                }
+                setEdges((edges) => {
+                    if(edgeExists(prev.fromId, node.id, edges)) {
+                        return edges;
+                    } else {
+                        return [...edges, { fromId: prev.fromId, toId: node.id, id: Date.now() }];
+                    }
+                });
                 return { type: "idle" };
             }
 
             return { type: "drawing-edge", fromId: node.id };
         });
-        console.log(edges);
     };
 
     const handleNodeMouseDown = (nodeId: number) => {

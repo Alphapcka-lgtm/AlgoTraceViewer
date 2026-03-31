@@ -1,3 +1,3 @@
 package com.example.demo;
 
-public record Edge (long from, long to, long id) {}
+public record Edge (long fromId, long toId, long id) {}
