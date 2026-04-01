@@ -1,4 +1,3 @@
-
 export type Edge = { fromId: number; toId: number; id: number };
 
 export function Edges({ edges, getNode }: any) {

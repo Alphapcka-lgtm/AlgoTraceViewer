@@ -1,5 +1,8 @@
+import type {Edge} from "./Edges";
 
 export type Node = { x: number; y: number; id: number };
+
+export type Graph = {nodes: Node[], edges: Edge[]};
 
 export function Nodes({ nodes, onClick, onMouseDown, onMouseUp, onDoubleClick }: any) {
     return nodes.map((n: Node, i: number) => (

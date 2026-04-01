@@ -1,15 +1,17 @@
-import React, { useState, useRef } from "react";
+import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
-import type {Node} from "./Nodes";
+import type {Graph, Node} from "./Nodes";
 import type {Edge} from "./Edges";
 import {Nodes} from "./Nodes";
+
+type Props = {submit: (graph: Graph) => void, mode: string};
 
 type Interaction =
     | { type: "idle" }
     | { type: "dragging"; nodeId: number }
     | { type: "drawing-edge"; fromId: number; to?: { x: number; y: number } };
 
-export function SVGInput() {
+export function SVGInput(props: Props) {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
@@ -106,7 +108,7 @@ export function SVGInput() {
         setInteraction({ type: "idle" });
     };
 
-    return (
+    return props.mode == "input" ? (
         <>
             <svg
                 height={500}
@@ -133,15 +135,7 @@ export function SVGInput() {
                 setInteraction({ type: "idle" });
             }}>reset</button>
 
-            <button onClick={() => {
-                fetch("http://localhost:8080/test", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nodes, edges }),
-                })
-                    .then((r) => r.json())
-                    .then(console.log);
-            }}>submit</button>
+            <button onClick={() => {props.submit({nodes, edges})}}>submit</button>
         </>
-    );
+    ) : <></>;
 }
