@@ -1,17 +1,13 @@
-import {Edges, type Edge} from "./Edges.tsx";
-import {Nodes, type Graph} from "./Nodes.tsx";
+import {Edges} from "./Edges.tsx";
+import {Nodes} from "./Nodes.tsx";
 
-type State = {chosenEdge: Edge, chosenNodes: Node[], incidentEdges: Edge[]}
-export type Animation = {initialState: Graph, intermediateStates: State[]}
-type Props = {onChangeInput: () => void, mode: string, output: Animation};
+import type {SVGOutputProps} from "./Types.tsx";
 
-export function SVGOutput(props: Props) {
-
-    const getNodeById = (id: number) => props.output.initialState.nodes.find((n) => n.id === id)!;
+export function SVGOutput(props: SVGOutputProps) {
 
     return props.mode == "output" ? <>
         <svg height={500} style={{ border: "1px solid black", borderRadius: "30px" }}>
-            <Edges edges={props.output.initialState.edges} getNode={getNodeById} />
+            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} />
             <Nodes nodes={props.output.initialState.nodes} />
         </svg>
         <button onClick={props.onChangeInput}>Change Input</button>

@@ -1,17 +1,10 @@
 import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
-import type {Graph, Node} from "./Nodes";
-import type {Edge} from "./Edges";
 import {Nodes} from "./Nodes";
 
-type Props = {onSubmit: (graph: Graph) => void, mode: string};
+import type {SVGInputProps, Interaction, Node, Edge} from "./Types.tsx";
 
-type Interaction =
-    | { type: "idle" }
-    | { type: "dragging"; nodeId: number }
-    | { type: "drawing-edge"; fromId: number; to?: { x: number; y: number } };
-
-export function SVGInput(props: Props) {
+export function SVGInput(props: SVGInputProps) {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
@@ -21,8 +14,6 @@ export function SVGInput(props: Props) {
         const rect = e.currentTarget.getBoundingClientRect();
         return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-
-    const getNodeById = (id: number) => nodes.find((n) => n.id === id)!;
 
     const edgeExists = (a: number, b: number, edges: Edge[]) =>
         edges.some(
@@ -116,9 +107,9 @@ export function SVGInput(props: Props) {
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
             >
-                <Edges edges={edges} getNode={getNodeById} />
+                <Edges nodes={nodes} edges={edges} />
 
-                <PreviewEdge interaction={interaction} getNode={getNodeById} />
+                <PreviewEdge interaction={interaction} nodes={nodes} />
 
                 <Nodes
                     nodes={nodes}

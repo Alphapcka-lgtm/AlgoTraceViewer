@@ -1,28 +1,24 @@
-import type {Edge} from "./Edges";
+import type {Node, NodesProps} from "./Types";
 
-export type Node = { x: number; y: number; id: number };
-
-export type Graph = {nodes: Node[], edges: Edge[]};
-
-export function Nodes({ nodes, onClick, onMouseDown, onMouseUp, onDoubleClick }: any) {
-    return nodes.map((n: Node, i: number) => (
+export function Nodes(props: NodesProps) {
+    return props.nodes.map((n: Node, i: number) => (
         <g
             key={n.id}
             onMouseDown={(e) => {
                 e.stopPropagation();
-                onMouseDown(n.id);
+                props.onMouseDown(n.id);
             }}
             onMouseUp={(e) => {
                 e.stopPropagation();
-                onMouseUp();
-            }}
-            onDoubleClick={(e) => {
-                e.stopPropagation();
-                onDoubleClick(n.id);
+                props.onMouseUp();
             }}
             onClick={(e) => {
                 e.stopPropagation();
-                onClick(n);
+                props.onClick(n);
+            }}
+            onDoubleClick={(e) => {
+                e.stopPropagation();
+                props.onDoubleClick(n.id);
             }}
         >
             <circle cx={n.x} cy={n.y} r={11} fill="black" />
