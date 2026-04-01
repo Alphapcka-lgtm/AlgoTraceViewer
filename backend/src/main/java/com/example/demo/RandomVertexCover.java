@@ -6,29 +6,41 @@ import java.util.*;
 
 @Service
 public class RandomVertexCover {
-    public Set<Node> solve(Graph graph, Long seed) {
+
+
+
+    public VertexCoverAnimation solve(Graph graph, Long seed) {
+        List<VertexCoverState> states = new ArrayList<>();
+
         Random randomGenerator = seed == null ? new Random() : new Random(seed);
 
         List<Edge> remainingEdges = new ArrayList<>(graph.edges());
-        Set<Node> chosenNodes = new HashSet<>(graph.nodes().size());
 
         while (!remainingEdges.isEmpty()) {
-            Edge randomEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
+            Edge chosenEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
+            remainingEdges.remove(chosenEdge);
+
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
-                            edge.fromId() == randomEdge.fromId() ||
-                            edge.toId() == randomEdge.fromId() ||
-                            edge.fromId()== randomEdge.toId() ||
-                            edge.toId() == randomEdge.toId())
+                            edge.fromId() == chosenEdge.fromId() ||
+                            edge.toId() == chosenEdge.fromId() ||
+                            edge.fromId()== chosenEdge.toId() ||
+                            edge.toId() == chosenEdge.toId())
                     .toList();
             remainingEdges.removeAll(incidentEdges);
-            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.fromId()));
-            chosenNodes.add(getNodeById(graph.nodes(), randomEdge.toId()));
+
+            states.add(VertexCoverState.builder()
+                    .chosenEdge(chosenEdge)
+                    .incidentEdges(incidentEdges)
+                    .chosenNodes(List.of(getNodeById(graph.nodes(), chosenEdge.fromId()), getNodeById(graph.nodes(), chosenEdge.toId())))
+                    .build()
+            );
         }
-        return chosenNodes;
+
+        return VertexCoverAnimation.builder().states(states).build();
     }
 
-    public Set<Node> solve(Graph graph) {
+    public VertexCoverAnimation solve(Graph graph) {
         return solve(graph, null);
     }
 

@@ -27,7 +27,7 @@ public class Controller {
     }
 
     @PostMapping("/random")
-    public ResponseEntity<Set<Node>> randomVertexCover(@RequestBody Graph graph) {
+    public ResponseEntity<VertexCoverAnimation> randomVertexCover(@RequestBody Graph graph) {
         return ResponseEntity.ok(randomVertexCover.solve(graph));
     }
 }
