@@ -1,8 +1,7 @@
 import {SVGInput} from "./SVGInput.tsx";
 import {SVGOutput} from "./SVGOutput.tsx";
 import {useState} from "react";
-import type {Graph} from "./Nodes.tsx";
-import type {Animation} from "./SVGOutput.tsx"
+import type {Graph, Animation} from "./Types.tsx";
 
 function App() {
   const [modeState, setModeState] = useState("input");

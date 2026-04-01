@@ -1,6 +1,6 @@
 import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
-import {Nodes} from "./Nodes";
+import {DynamicNodes} from "./Nodes";
 
 import type {SVGInputProps, Interaction, Node, Edge} from "./Types.tsx";
 
@@ -111,7 +111,7 @@ export function SVGInput(props: SVGInputProps) {
 
                 <PreviewEdge interaction={interaction} nodes={nodes} />
 
-                <Nodes
+                <DynamicNodes
                     nodes={nodes}
                     onClick={handleNodeClick}
                     onMouseDown={handleNodeMouseDown}

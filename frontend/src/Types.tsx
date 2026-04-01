@@ -10,13 +10,17 @@ export type Interaction =
     | { type: "dragging"; nodeId: number }
     | { type: "drawing-edge"; fromId: number; to?: { x: number; y: number } };
 
-export type NodesProps = {
+export type DynamicNodesProps = {
     nodes: Node[],
     onMouseDown: (i: number) => void,
     onMouseUp: () => void,
     onClick: (node: Node) => void,
     onDoubleClick: (i: number) => void
-} | {nodes: Node[]};
+};
+
+export type StaticNodesProps = {
+    nodes: Node[]
+};
 
 export type SVGInputProps = {
     onSubmit: (graph: Graph) => void,
