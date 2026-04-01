@@ -11,10 +11,4 @@ public class VertexCoverState {
     public final Edge chosenEdge;
     public final List<Node> chosenNodes;
     public final List<Edge> incidentEdges;
-
-    VertexCoverState(Edge chosenEdge, List<Node> chosenNodes, List<Edge> incidentEdges){
-        this.chosenEdge = chosenEdge;
-        this.chosenNodes = chosenNodes;
-        this.incidentEdges = incidentEdges;
-    }
 }

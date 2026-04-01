@@ -4,7 +4,7 @@ import type {Graph, Node} from "./Nodes";
 import type {Edge} from "./Edges";
 import {Nodes} from "./Nodes";
 
-type Props = {submit: (graph: Graph) => void, mode: string};
+type Props = {onSubmit: (graph: Graph) => void, mode: string};
 
 type Interaction =
     | { type: "idle" }
@@ -135,7 +135,7 @@ export function SVGInput(props: Props) {
                 setInteraction({ type: "idle" });
             }}>reset</button>
 
-            <button onClick={() => {props.submit({nodes, edges})}}>submit</button>
+            <button onClick={() => {props.onSubmit({nodes, edges})}}>submit</button>
         </>
     ) : <></>;
 }

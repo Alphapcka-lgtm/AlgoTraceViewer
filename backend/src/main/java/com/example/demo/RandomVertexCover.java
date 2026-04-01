@@ -10,7 +10,7 @@ public class RandomVertexCover {
 
 
     public VertexCoverAnimation solve(Graph graph, Long seed) {
-        List<VertexCoverState> states = new ArrayList<>();
+        List<VertexCoverState> intermediateStates = new ArrayList<>();
 
         Random randomGenerator = seed == null ? new Random(0) : new Random(seed);
 
@@ -29,7 +29,7 @@ public class RandomVertexCover {
                     .toList();
             remainingEdges.removeAll(incidentEdges);
 
-            states.add(VertexCoverState.builder()
+            intermediateStates.add(VertexCoverState.builder()
                     .chosenEdge(chosenEdge)
                     .incidentEdges(incidentEdges)
                     .chosenNodes(List.of(getNodeById(graph.nodes(), chosenEdge.fromId()), getNodeById(graph.nodes(), chosenEdge.toId())))
@@ -37,7 +37,7 @@ public class RandomVertexCover {
             );
         }
 
-        return VertexCoverAnimation.builder().states(states).build();
+        return VertexCoverAnimation.builder().initialState(graph).intermediateStates(intermediateStates).build();
     }
 
     public VertexCoverAnimation solve(Graph graph) {
