@@ -12,7 +12,7 @@ public class RandomVertexCover {
     public VertexCoverAnimation solve(Graph graph, Long seed) {
         List<VertexCoverState> states = new ArrayList<>();
 
-        Random randomGenerator = seed == null ? new Random() : new Random(seed);
+        Random randomGenerator = seed == null ? new Random(0) : new Random(seed);
 
         List<Edge> remainingEdges = new ArrayList<>(graph.edges());
 
