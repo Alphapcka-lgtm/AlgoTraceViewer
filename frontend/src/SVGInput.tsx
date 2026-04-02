@@ -15,7 +15,7 @@ export function SVGInput(props: SVGInputProps) {
         return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
 
-    const edgeExists = (a: number, b: number, edges: Edge[]) =>
+    const edgeExists = (a: string, b: string, edges: Edge[]) =>
         edges.some(
             (e) =>
                 (e.fromId === a && e.toId === b) ||
@@ -29,7 +29,7 @@ export function SVGInput(props: SVGInputProps) {
         }
 
         const { x, y } = getMousePos(e);
-        setNodes((prev) => [...prev, { x, y, id: Date.now() }]);
+        setNodes((prev) => [...prev, { x, y, id: "i" + Date.now().toString() }]);
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -69,7 +69,7 @@ export function SVGInput(props: SVGInputProps) {
                     if(edgeExists(prev.fromId, node.id, edges)) {
                         return edges;
                     } else {
-                        return [...edges, { fromId: prev.fromId, toId: node.id, id: Date.now() }];
+                        return [...edges, { fromId: prev.fromId, toId: node.id, id: "i" + Date.now().toString() }];
                     }
                 });
                 return { type: "idle" };
@@ -78,7 +78,7 @@ export function SVGInput(props: SVGInputProps) {
         });
     };
 
-    const handleNodeMouseDown = (nodeId: number) => {
+    const handleNodeMouseDown = (nodeId: string) => {
         if (interaction.type === "idle") {
             didNodeMove.current = false;
             setInteraction({ type: "dragging", nodeId });
@@ -91,7 +91,7 @@ export function SVGInput(props: SVGInputProps) {
         }
     };
 
-    const handleNodeDoubleClick = (nodeId: number) => {
+    const handleNodeDoubleClick = (nodeId: string) => {
         setNodes((nodes) => nodes.filter((n) => n.id !== nodeId));
         setEdges((edges) =>
             edges.filter((e) => e.fromId !== nodeId && e.toId !== nodeId)
@@ -102,7 +102,7 @@ export function SVGInput(props: SVGInputProps) {
     return props.mode == "input" ? (
         <>
             <svg
-                height={500}
+                height={props.height}
                 style={{ border: "1px solid black", borderRadius: "30px" }}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}

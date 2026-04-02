@@ -3,6 +3,7 @@ import type {Node, DynamicNodesProps, StaticNodesProps} from "./Types";
 export function DynamicNodes(props: DynamicNodesProps) {
     return props.nodes.map((n: Node, i: number) => (
         <g
+            id={n.id.toString(10)}
             key={n.id}
             onMouseDown={(e) => {
                 e.stopPropagation();
@@ -41,6 +42,7 @@ export function DynamicNodes(props: DynamicNodesProps) {
 export function StaticNodes(props: StaticNodesProps) {
     return props.nodes.map((n: Node, i: number) => (
         <g
+            id={n.id.toString(10)}
             key={n.id}
         >
             <circle cx={n.x} cy={n.y} r={11} fill="black"/>

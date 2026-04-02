@@ -8,6 +8,7 @@ export function Edges(props: Graph) {
 
         return (
             <line
+                id={e.id.toString(10)}
                 key={e.id}
                 x1={from.x}
                 y1={from.y}
