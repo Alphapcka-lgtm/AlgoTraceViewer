@@ -2,23 +2,45 @@ import gsap from "gsap";
 import {Edges} from "./Edges.tsx";
 import {StaticNodes} from "./Nodes.tsx";
 
-import type {SVGOutputProps} from "./Types.tsx";
+import type {Node, Edge, SVGOutputProps} from "./Types.tsx";
 import {useGSAP} from "@gsap/react";
 import {useRef, useState} from "react";
+
+type NodeTranslation = {node: Node, x: number, y: number};
+type EdgeTranslation = {edge: Edge, x1: number, x2: number, y1: number, y2: number};
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const tlRef = useRef<gsap.core.Timeline>(null);
 
+    const getEdgeTranslations = (edges: Edge[], nodeTranslations: NodeTranslation[]) => edges.map(edge => {
+        const firstNodeTranslation: NodeTranslation = nodeTranslations.find(nt => nt.node.id === edge.fromId)!;
+        const secondNodeTranslation: NodeTranslation = nodeTranslations.find(nt => nt.node.id === edge.toId)!;
+
+        return {
+            edge: edge,
+            x1: firstNodeTranslation ? firstNodeTranslation.x : 0,
+            y1: firstNodeTranslation ? firstNodeTranslation.y : 0,
+            x2: secondNodeTranslation ? secondNodeTranslation.x : 0,
+            y2: secondNodeTranslation ? secondNodeTranslation.y : 0
+        };
+
+    });
+
     useGSAP(() => {
         tlRef.current = gsap.timeline({ paused: true });
 
-        props.output.initialState.nodes.forEach((node) => {
-            const el = document.getElementById(node.id);
-            if(el) {
-                const rand = Math.random() - 0.5;
-                tlRef.current?.to(el, {x: 100 * rand, duration: 2, repeat: -1, yoyo: true}, "test");
-            }
+        const nodeTranslations: NodeTranslation[] = props.output.initialState.nodes.map(node => {return {node: node, x: 20, y: 20};});
+        const edgeTranslations : EdgeTranslation[] = getEdgeTranslations(props.output.initialState.edges, nodeTranslations);
+
+        nodeTranslations.forEach(translation => {
+            const el = document.getElementById(translation.node.id);
+            if(el) {tlRef.current?.to(el, {x: translation.x, y: translation.y, duration: 2, repeat: -1, yoyo: true}, "test")}
+        });
+
+        edgeTranslations.forEach(translation => {
+            const el = document.getElementById(translation.edge.id);
+            if(el) {tlRef.current?.to(el, {x: 10, y: 10, x2: translation.x2, y2: translation.y2, duration: 2, repeat: -1, yoyo: true}, "test")}
         });
 
     }, [props.output.initialState]);
