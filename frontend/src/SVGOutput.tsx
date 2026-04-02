@@ -19,7 +19,7 @@ export function SVGOutput(props: SVGOutputProps) {
                 const rand = Math.random() - 0.5;
                 tlRef.current?.to(el, {x: 100 * rand, duration: 2, repeat: -1, yoyo: true}, "test");
             }
-        })
+        });
 
     }, [props.output.initialState]);
 
