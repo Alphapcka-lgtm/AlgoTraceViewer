@@ -119,12 +119,13 @@ export function SVGInput(props: SVGInputProps) {
                     onDoubleClick={handleNodeDoubleClick}
                 />
             </svg>
-
-            <button onClick={() => {
-                setNodes([]);
-                setEdges([]);
-                setInteraction({ type: "idle" });
-            }}>reset</button>
+            <div>
+                <button style={{width: "100%"}} onClick={() => {
+                    setNodes([]);
+                    setEdges([]);
+                    setInteraction({ type: "idle" });
+                }}>reset</button>
+            </div>
 
             <button onClick={() => {props.onSubmit({nodes, edges})}}>submit</button>
         </>

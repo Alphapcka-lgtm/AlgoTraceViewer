@@ -22,10 +22,10 @@ public class RandomVertexCover {
 
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
-                            edge.fromId() == chosenEdge.fromId() ||
-                            edge.toId() == chosenEdge.fromId() ||
-                            edge.fromId()== chosenEdge.toId() ||
-                            edge.toId() == chosenEdge.toId())
+                            edge.fromId().equals(chosenEdge.fromId()) ||
+                            edge.toId().equals(chosenEdge.fromId()) ||
+                            edge.fromId().equals(chosenEdge.toId()) ||
+                            edge.toId().equals(chosenEdge.toId()))
                     .toList();
             remainingEdges.removeAll(incidentEdges);
 
@@ -44,8 +44,8 @@ public class RandomVertexCover {
         return solve(graph, null);
     }
 
-    private static Node getNodeById(List<Node> nodes, long id) {
-        return nodes.stream().filter(node -> node.id() == id).findFirst().orElseThrow();
+    private static Node getNodeById(List<Node> nodes, String id) {
+        return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
     }
 
 }
