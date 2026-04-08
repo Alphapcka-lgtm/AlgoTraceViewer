@@ -1,19 +1,18 @@
-import type {Edge, Node, Graph, Interaction} from "./Types.tsx";
+import type {Edge, PreviewEdgeProps, EdgesProps, NormalizedEdgesProps} from "./Types.tsx";
 import {getNodeById} from "./Utils.tsx";
 
-export function Edges(props: Graph) {
+export function Edges(props: EdgesProps) {
     return props.edges.map((e: Edge) => {
         const from = getNodeById(props.nodes, e.fromId);
         const to = getNodeById(props.nodes, e.toId);
 
+        const p = "M " + (from.x) + " " + (from.y) + " L " + (to.x) + " " + (to.y);
+
         return (
-            <line
-                id={e.id.toString()}
+            <path
+                id={props.idPrefix + e.id.toString()}
                 key={e.id}
-                x1={from.x}
-                y1={from.y}
-                x2={to.x}
-                y2={to.y}
+                d={p}
                 stroke="black"
                 strokeWidth={1}
             />
@@ -21,7 +20,55 @@ export function Edges(props: Graph) {
     });
 }
 
-type PreviewEdgeProps = {interaction: Interaction, nodes: Node[]};
+export function NormalizedEdges(props: NormalizedEdgesProps) {
+    return props.edges.map((e: Edge, i: number) => {
+        const from = getNodeById(props.nodes, e.fromId);
+        const to = getNodeById(props.nodes, e.toId);
+
+        const itemsPerRow = Math.floor(props.width / props.itemSize);
+        const gridSize = props.width / itemsPerRow;
+
+        const x0 = props.x + (i % itemsPerRow) * gridSize;
+        const y0 = props.y + Math.floor(i / itemsPerRow) * gridSize;
+
+        const length = Math.sqrt( (to.x - from.x) * (to.x - from.x) + (to.y - from.y) * (to.y - from.y) );
+        const angle = Math.acos( Math.abs(to.x - from.x) / length );
+
+        let fromX = 0;
+        let fromY = 0;
+        let toX = (to.x - from.x) * (props.itemSize / length);
+        let toY = (to.y - from.y) * (props.itemSize / length);
+
+        if (toX >= 0) {
+            fromX = x0 + fromX + 0.5 * (gridSize - Math.cos(angle) * gridSize);
+            toX = x0 + toX + 0.5 * (gridSize - Math.cos(angle) * gridSize);
+        } else {
+            fromX = x0 + fromX + 0.5 * (gridSize + Math.cos(angle) * gridSize);
+            toX = x0 + toX + 0.5 * (gridSize + Math.cos(angle) * gridSize);
+        }
+
+        if(toY >= 0) {
+            fromY = y0 + fromY + 0.5 * (gridSize - Math.sin(angle) * gridSize);
+            toY = y0 + toY + 0.5 * (gridSize - Math.sin(angle) * gridSize);
+        } else {
+            fromY = y0 + fromY + 0.5 * (gridSize + Math.sin(angle) * gridSize);
+            toY = y0 + toY + 0.5 * (gridSize + Math.sin(angle) * gridSize);
+        }
+
+        const p = "M " + (fromX) + " " + (fromY) + " L " + (toX) + " " + (toY);
+
+        return (
+            <path
+                id={props.idPrefix + e.id.toString()}
+                key={e.id}
+                d={p}
+                stroke="black"
+                strokeWidth={1}
+                style={{display:"none"}}
+            />
+        );
+    });
+}
 
 export function PreviewEdge(props: PreviewEdgeProps) {
     if (props.interaction.type !== "drawing-edge" || !props.interaction.to) return null;

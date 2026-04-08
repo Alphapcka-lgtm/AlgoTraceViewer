@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import MorphSVGPlugin from "gsap/MorphSVGPlugin";
-import {Edges} from "./Edges.tsx";
+import {Edges, NormalizedEdges} from "./Edges.tsx";
 import {StaticNodes} from "./Nodes.tsx";
 
 import type {SVGOutputProps} from "./Types.tsx";
@@ -18,19 +18,25 @@ export function SVGOutput(props: SVGOutputProps) {
     useGSAP(() => {
         tlRef.current = gsap.timeline({ paused: true } );
 
+        tlRef.current?.from("#i1", {duration: 2, drawSVG: "50% 50%"}, "step0010")
 
-        tlRef.current?.from("#i1", {duration: 2, drawSVG: "50% 50%"}, "step1")
+        tlRef.current?.to("#i1", {duration: 1, morphSVG: "#i2"}, "step0011")
 
-        tlRef.current?.to("#i1", {duration: 2, morphSVG: "#i2"})
+        props.output.initialState.edges.forEach((e) => {
+            tlRef.current?.to("#d" + e.id, {duration: 1, morphSVG: "#u" + e.id}, "step0012")
+        })
+
 
     }, [props.output.initialState]);
 
     return props.mode === "output" ? <>
         <svg height={props.height} style={{ border: "1px solid black", borderRadius: "30px" }}>
-            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} />
+            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""}/>
+            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"d"}/>
+            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} itemSize={40}/>
             <StaticNodes nodes={props.output.initialState.nodes} />
             <path id="i1" d={getContainerPath(100, 400,800, 0, 20)} style={{stroke: "black", fill: "none"}}/>
-            <path id="i2" d={getContainerPath(100, 400,800, 20, 20)} style={{display: "none"}}/>
+            <path id="i2" d={getContainerPath(100, 400,800, 40, 20)} style={{display: "none"}}/>
         </svg>
         <div>
             <button style={{width: "50%"}} onClick={() => {

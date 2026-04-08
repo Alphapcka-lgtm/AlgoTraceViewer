@@ -107,7 +107,7 @@ export function SVGInput(props: SVGInputProps) {
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
             >
-                <Edges nodes={nodes} edges={edges} />
+                <Edges nodes={nodes} edges={edges} idPrefix={""} />
 
                 <PreviewEdge interaction={interaction} nodes={nodes} />
 
