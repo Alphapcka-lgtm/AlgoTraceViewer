@@ -31,12 +31,12 @@ export function SVGOutput(props: SVGOutputProps) {
 
     return props.mode === "output" ? <>
         <svg height={props.height} style={{ border: "1px solid black", borderRadius: "30px" }}>
-            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""}/>
-            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"d"}/>
-            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} itemSize={40}/>
+            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
+            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"d"} />
             <StaticNodes nodes={props.output.initialState.nodes} />
-            <path id="i1" d={getContainerPath(100, 400,800, 0, 20)} style={{stroke: "black", fill: "none"}}/>
-            <path id="i2" d={getContainerPath(100, 400,800, 40, 20)} style={{display: "none"}}/>
+            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} itemSize={40} />
+            <path id="i1" d={getContainerPath(100, 400,800, 0, 20)} style={{stroke: "black", fill: "none"}} />
+            <path id="i2" d={getContainerPath(100, 400,800, 40, 20)} style={{display: "none"}} />
         </svg>
         <div>
             <button style={{width: "50%"}} onClick={() => {

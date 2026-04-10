@@ -2,7 +2,7 @@ import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
 import {DynamicNodes} from "./Nodes";
 
-import type {SVGInputProps, Interaction, Node, Edge} from "./Types.tsx";
+import type {SVGInputProps, Interaction, Node, Edge, Graph} from "./Types.tsx";
 
 export function SVGInput(props: SVGInputProps) {
     const [nodes, setNodes] = useState<Node[]>([]);
@@ -29,7 +29,7 @@ export function SVGInput(props: SVGInputProps) {
         }
 
         const { x, y } = getMousePos(e);
-        setNodes((prev) => [...prev, { x, y, id: "i" + Date.now().toString() }]);
+        setNodes((prev) => [...prev, { x, y, id: getRandomId() }]);
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -69,7 +69,7 @@ export function SVGInput(props: SVGInputProps) {
                     if(edgeExists(prev.fromId, node.id, edges)) {
                         return edges;
                     } else {
-                        return [...edges, { fromId: prev.fromId, toId: node.id, id: "i" + Date.now().toString() }];
+                        return [...edges, { fromId: prev.fromId, toId: node.id, id: getRandomId() }];
                     }
                 });
                 return { type: "idle" };
@@ -99,10 +99,17 @@ export function SVGInput(props: SVGInputProps) {
         setInteraction({ type: "idle" });
     };
 
+    const setFullyInterconnectedGraph = (e: HTMLInputElement) => {
+        const graph: Graph = getFullyConnectedGraph(e.valueAsNumber, props.width, props.height);
+        setNodes(graph.nodes);
+        setEdges(graph.edges);
+    };
+
     return props.mode == "input" ? (
         <>
             <svg
                 height={props.height}
+                width={props.width}
                 style={{ border: "1px solid black", borderRadius: "30px" }}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
@@ -127,7 +134,38 @@ export function SVGInput(props: SVGInputProps) {
                 }}>reset</button>
             </div>
 
-            <button onClick={() => {props.onSubmit({nodes, edges})}}>submit</button>
+            <button onClick={() => {props.onSubmit({nodes, edges})}}>Submit</button>
+            <div>
+                <input id={"input123"} type={"number"} style={{width: "49%"}} />
+                <button style={{width: "50%"}} onClick={() => {
+                    const e = document.getElementById("input123")! as HTMLInputElement;
+                    setFullyInterconnectedGraph(e);
+                }}>Load Fully Connected</button>
+            </div>
+            <input type={"range"} min={0} max={50} step={1} onInput={(e) => setFullyInterconnectedGraph(e.currentTarget)}/>
         </>
     ) : <></>;
+}
+
+function getFullyConnectedGraph(n: number, w: number, h: number) : Graph {
+
+    const graph: Graph = {nodes: [], edges: []};
+
+    for (let i = 0; i < n; i++) {
+        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * w * 0.45);
+        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.35);
+        graph.nodes.push({ x: xCoordinate, y: yCoordinate, id: getRandomId() })
+
+    }
+
+    for (let i = 0; i < graph.nodes.length; i++) {
+        for (let j = i+1; j < graph.nodes.length; j++) {
+            graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId() });
+        }
+    }
+    return graph;
+}
+
+function getRandomId(): string{
+    return "i" + Math.floor(Date.now() * Math.random()).toString()
 }
