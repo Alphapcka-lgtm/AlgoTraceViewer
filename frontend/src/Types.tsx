@@ -7,7 +7,7 @@ export type Graph = {nodes: Node[], edges: Edge[]};
 
 export type EdgesProps = {nodes: Node[], edges: Edge[], idPrefix: string};
 
-export type NormalizedEdgesProps = {nodes: Node[], edges: Edge[], idPrefix: string, x: number, y: number, width: number, itemSize: number};
+export type NormalizedEdgesProps = {nodes: Node[], edges: Edge[], idPrefix: string, x: number, y: number, width: number, height: number, itemSize: number};
 
 export type PreviewEdgeProps = {interaction: Interaction, nodes: Node[]};
 

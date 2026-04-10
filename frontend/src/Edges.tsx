@@ -25,7 +25,15 @@ export function NormalizedEdges(props: NormalizedEdgesProps) {
         const from = getNodeById(props.nodes, e.fromId);
         const to = getNodeById(props.nodes, e.toId);
 
-        const itemsPerRow = Math.floor(props.width / props.itemSize);
+        let itemSize: number;
+
+        if(props.itemSize * props.itemSize * props.edges.length > props.width * props.height){
+            itemSize = Math.sqrt( (props.width * props.height) / props.edges.length);
+        } else {
+            itemSize = props.itemSize;
+        }
+
+        const itemsPerRow = Math.floor(props.width / itemSize);
         const gridSize = props.width / itemsPerRow;
 
         const x0 = props.x + (i % itemsPerRow) * gridSize;
@@ -36,8 +44,8 @@ export function NormalizedEdges(props: NormalizedEdgesProps) {
 
         let fromX = 0;
         let fromY = 0;
-        let toX = (to.x - from.x) * (props.itemSize / length);
-        let toY = (to.y - from.y) * (props.itemSize / length);
+        let toX = (to.x - from.x) * (itemSize / length);
+        let toY = (to.y - from.y) * (itemSize / length);
 
         if (toX >= 0) {
             fromX = x0 + fromX + 0.5 * (gridSize - Math.cos(angle) * gridSize);

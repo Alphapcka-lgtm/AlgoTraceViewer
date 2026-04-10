@@ -12,6 +12,8 @@ export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const tlRef = useRef<gsap.core.Timeline>(null);
 
+    const finalSetHeight = 80;
+
     gsap.registerPlugin(DrawSVGPlugin);
     gsap.registerPlugin(MorphSVGPlugin);
 
@@ -34,7 +36,7 @@ export function SVGOutput(props: SVGOutputProps) {
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"d"} />
             <StaticNodes nodes={props.output.initialState.nodes} />
-            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} itemSize={40} />
+            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} height={finalSetHeight} itemSize={40} />
             <path id="i1" d={getContainerPath(100, 400,800, 0, 20)} style={{stroke: "black", fill: "none"}} />
             <path id="i2" d={getContainerPath(100, 400,800, 40, 20)} style={{display: "none"}} />
         </svg>
