@@ -15,7 +15,23 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
+export type StaticNodesProps = {
+    nodes: Node[];
+};
+
+//was SVGInput alles von App bekommt
 export type SVGInputProps = {
     height: number;
     width: number;
+    mode: string;
+
+    nodes: Node[];
+
+    onAddNode: (node: Node) => void;
+    onMoveNode: (id: string, x: number, y: number) => void;
+    onDeleteNode: (id: string) => void;
+    onReset: () => void;
+
+    onSubmit: (nodes: Node[]) => void;
+    onChangeInput: () => void;
 };
