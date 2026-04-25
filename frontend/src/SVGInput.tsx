@@ -112,7 +112,7 @@ export function SVGInput(props: SVGInputProps) {
         <>
             <svg
                 height={props.height}
-                style={{ border: "1px solid black", borderRadius: "30px" }}
+                style={{ border: "2px solid black", borderRadius: "30px"}}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
             >
@@ -128,17 +128,26 @@ export function SVGInput(props: SVGInputProps) {
                     onDoubleClick={handleNodeDoubleClick}
                 />
             </svg>
-            <div style={{display: "flex"}}>
-                <button style={{flex: 1}} onClick={() => {
+            <div style={{display: "flex", flexDirection: "column", gap: 3, padding: 3}}>
+                <button id={"reset"} style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     setNodes([]);
                     setEdges([]);
                     setInteraction({ type: "idle" });
-                }}>reset</button>
+                }}>Reset</button>
+                <button id={"submit"} style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
+                    props.onSubmit({nodes, edges});
+                }}>Submit</button>
+                <div style={{display: "flex", gap: 3}}>
+                    <div style={{display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center"}}>
+                        <label htmlFor={"graphSize"}>Number of Nodes</label>
+                        <input id={"graphSize"} type={"range"} style={{width: "90%"}} min={0} max={50} step={1} onInput={() => setFullyInterconnectedGraph()}/>
+                    </div>
+                    <div style={{display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center"}}>
+                        <label htmlFor={"graphDensity"}>Density Factor</label>
+                        <input id={"graphDensity"} type={"range"} style={{width: "90%"}} min={0} max={1} step={0.01} onInput={() => setFullyInterconnectedGraph()}/>
+                    </div>
+                </div>
             </div>
-
-            <button onClick={() => {props.onSubmit({nodes, edges})}}>Submit</button>
-            <input id={"graphSize"} type={"range"} min={0} max={100} step={1} onInput={() => setFullyInterconnectedGraph()}/>
-            <input id={"graphDensity"} type={"range"} min={0} max={1} step={0.01} onInput={() => setFullyInterconnectedGraph()}/>
         </>
     ) : <></>;
 }
