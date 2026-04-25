@@ -103,7 +103,7 @@ export function SVGInput(props: SVGInputProps) {
     const setFullyInterconnectedGraph = () => {
         const size = document.getElementById("graphSize") as HTMLInputElement;
         const density = document.getElementById("graphDensity") as HTMLInputElement;
-        const graph: Graph = getFullyConnectedGraph(size.valueAsNumber, density.valueAsNumber, 1150, props.height);
+        const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber, 1150, props.height);
         setNodes(graph.nodes);
         setEdges(graph.edges);
     };
@@ -152,7 +152,7 @@ export function SVGInput(props: SVGInputProps) {
     ) : <></>;
 }
 
-function getFullyConnectedGraph(n: number, d: number, w: number, h: number) : Graph {
+function getRandomGraph(n: number, d: number, w: number, h: number) : Graph {
 
     const graph: Graph = {nodes: [], edges: []};
 

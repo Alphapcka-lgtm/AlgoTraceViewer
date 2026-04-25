@@ -34,6 +34,7 @@ export function SVGOutput(props: SVGOutputProps) {
             });
         })
 
+        setCurrentProgress(0);
         tlRef.current = timeline;
 
     }, [props.output.initialState]);
@@ -52,12 +53,12 @@ export function SVGOutput(props: SVGOutputProps) {
                     setCurrentProgress(tlRef.current.progress());
                 }}>Previous Step</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    if (isPlaying) {
+                    if(isPlaying){
                         tlRef.current.pause();
                         setIsPlaying(false);
                         setCurrentProgress(tlRef.current.progress());
-                    } else {
-                        if(currentProgress == 1) {
+                    }else{
+                        if(currentProgress == 1){
                             tlRef.current.play(0);
                         } else {
                             tlRef.current.play();
@@ -84,7 +85,7 @@ export function SVGOutput(props: SVGOutputProps) {
                     props.onChangeInput();
                 }}>Change Input</button>
             </div>
-            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress} onInput={ (e) => {
+            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress} onInput={(e) => {
                 tlRef.current.progress(e.currentTarget.valueAsNumber);
             }}/>
         </div>
