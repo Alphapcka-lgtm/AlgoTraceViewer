@@ -18,7 +18,7 @@ export function SVGOutput(props: SVGOutputProps) {
     gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
-        const timeline = gsap.timeline({ paused: true});
+        const timeline = gsap.timeline({ paused: true, onUpdate: () => setCurrentProgress(tlRef.current.progress()), onComplete: () => setIsPlaying(false)});
 
         props.output.intermediateStates.forEach((intermediateState) => {
             const pickRandomEdge = getRandomId();
@@ -57,7 +57,11 @@ export function SVGOutput(props: SVGOutputProps) {
                         setIsPlaying(false);
                         setCurrentProgress(tlRef.current.progress());
                     } else {
-                        tlRef.current.play();
+                        if(currentProgress == 1) {
+                            tlRef.current.play(0);
+                        } else {
+                            tlRef.current.play();
+                        }
                         setIsPlaying(true);
                     }
                 }}>{isPlaying ? "Pause" : "Play"}</button>
@@ -80,9 +84,8 @@ export function SVGOutput(props: SVGOutputProps) {
                     props.onChangeInput();
                 }}>Change Input</button>
             </div>
-            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress}/>
-            <input id={"progress2"} type={"range"} min={0} max={1} step={"any"} onInput={ (e) => {
-                tlRef.current.seek(e.currentTarget.valueAsNumber * tlRef.current.duration());
+            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress} onInput={ (e) => {
+                tlRef.current.progress(e.currentTarget.valueAsNumber);
             }}/>
         </div>
     </> : <></>;
