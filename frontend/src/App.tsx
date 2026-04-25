@@ -7,7 +7,7 @@ function App() {
   const [modeState, setModeState] = useState("input");
   const [outputState, setOutputState] = useState<Animation>({initialState: {nodes: [], edges: []}, intermediateStates: []});
 
-  const svgHeight = 500;
+  const svgHeight = 800;
 
   const submitInputAndFetchAnimation = (graph: Graph) => {
     fetch("http://localhost:8080/random", {

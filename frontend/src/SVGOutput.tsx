@@ -17,8 +17,6 @@ export function SVGOutput(props: SVGOutputProps) {
     gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
-
-
         const timeline = gsap.timeline({ paused: true } );
 
         props.output.intermediateStates.forEach((intermediateState) => {
@@ -60,8 +58,12 @@ export function SVGOutput(props: SVGOutputProps) {
             }}>Reset</button>
         </div>
         <div style={{display: "flex"}}>
-            <button style={{flex: 1}} onClick={() => {tlRef.current?.seek(tlRef.current?.previousLabel(tlRef.current?.time() - 0.01))}}>&lt;</button>
-            <button style={{flex: 1}} onClick={() => {tlRef.current?.seek(tlRef.current?.nextLabel())}}>&gt;</button>
+            <button style={{flex: 1}} onClick={() => {
+                tlRef.current?.seek(tlRef.current?.previousLabel(tlRef.current?.time() - 0.01 < 0 ? 0.01 : tlRef.current?.time() - 0.01))}
+            }>&lt;</button>
+            <button style={{flex: 1}} onClick={() => {
+                tlRef.current?.seek(tlRef.current?.nextLabel())}
+            }>&gt;</button>
         </div>
         <button onClick={() => {
             tlRef.current?.pause(0);
