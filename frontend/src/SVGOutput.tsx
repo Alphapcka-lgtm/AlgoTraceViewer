@@ -81,6 +81,9 @@ export function SVGOutput(props: SVGOutputProps) {
                 }}>Change Input</button>
             </div>
             <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress}/>
+            <input id={"progress2"} type={"range"} min={0} max={1} step={"any"} onInput={ (e) => {
+                tlRef.current.seek(e.currentTarget.valueAsNumber * tlRef.current.duration());
+            }}/>
         </div>
     </> : <></>;
 }
