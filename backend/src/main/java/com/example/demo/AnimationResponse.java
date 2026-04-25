@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class VertexCoverAnimation {
+public class AnimationResponse {
     public final Graph initialState;
-    public final List<VertexCoverState> intermediateStates;
+    public final List<AnimationState> intermediateStates;
+    public final Long randomSeed;
 }

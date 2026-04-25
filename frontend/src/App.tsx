@@ -1,34 +1,35 @@
 import {SVGInput} from "./SVGInput.tsx";
 import {SVGOutput} from "./SVGOutput.tsx";
 import {useState} from "react";
-import type {Graph, Animation} from "./Types.tsx";
+import type {Graph, AnimationResponse} from "./Types.tsx";
 
 function App() {
-  const [modeState, setModeState] = useState("input");
-  const [outputState, setOutputState] = useState<Animation>({initialState: {nodes: [], edges: []}, intermediateStates: []});
+  const [mode, setMode] = useState<"input" | "output">("input");
+  const [output, setOutput] = useState<AnimationResponse>({initialState: {nodes: [], edges: []}, intermediateStates: [], randomSeed: 0});
 
   const svgHeight = 500;
 
   const submitInputAndFetchAnimation = (graph: Graph) => {
+      console.log(JSON.stringify({graph: graph, randomSeed: output.randomSeed}));
     fetch("http://localhost:8080/random", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(graph),
+      body: JSON.stringify({graph: graph, randomSeed: output.randomSeed}),
     }).then((response) => response.json())
       .then((json) => {
-        setOutputState(json as Animation);
-        setModeState("output");
+        setOutput(json as AnimationResponse);
+        setMode("output");
       });
   }
 
   const returnToInputMask = () => {
-    setModeState("input");
+    setMode("input");
   }
 
   return (
       <>
-        <SVGInput onSubmit={submitInputAndFetchAnimation} mode={modeState} height={svgHeight} />
-        <SVGOutput onChangeInput={returnToInputMask} mode={modeState} output={outputState} height={svgHeight} />
+        <SVGInput onSubmit={submitInputAndFetchAnimation} mode={mode} height={svgHeight} />
+        <SVGOutput onChangeInput={returnToInputMask} mode={mode} output={output} height={svgHeight} />
       </>
     )
 }

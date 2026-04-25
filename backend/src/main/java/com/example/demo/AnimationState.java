@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class VertexCoverState {
+public class AnimationState {
     public final Edge chosenEdge;
     public final List<Node> chosenNodes;
     public final List<Edge> incidentEdges;

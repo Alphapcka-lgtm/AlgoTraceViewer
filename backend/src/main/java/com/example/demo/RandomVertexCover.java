@@ -7,10 +7,8 @@ import java.util.*;
 @Service
 public class RandomVertexCover {
 
-
-
-    public VertexCoverAnimation solve(Graph graph, Long seed) {
-        List<VertexCoverState> intermediateStates = new ArrayList<>();
+    public AnimationResponse solve(Graph graph, Long seed) {
+        List<AnimationState> intermediateStates = new ArrayList<>();
 
         Random randomGenerator = new Random(seed);
 
@@ -29,25 +27,23 @@ public class RandomVertexCover {
                     .toList();
             remainingEdges.removeAll(incidentEdges);
 
-            intermediateStates.add(VertexCoverState.builder()
+            intermediateStates.add(AnimationState.builder()
                     .chosenEdge(chosenEdge)
                     .incidentEdges(incidentEdges)
                     .chosenNodes(List.of(getNodeById(graph.nodes(), chosenEdge.fromId()), getNodeById(graph.nodes(), chosenEdge.toId())))
                     .build()
             );
         }
-
-        return VertexCoverAnimation.builder().initialState(graph).intermediateStates(intermediateStates).build();
+        return AnimationResponse.builder().initialState(graph).intermediateStates(intermediateStates).randomSeed(seed).build();
     }
 
-    public VertexCoverAnimation solve(Graph graph) {
+    public AnimationResponse solve(Graph graph) {
         return solve(graph, System.nanoTime());
     }
 
     private static Node getNodeById(List<Node> nodes, String id) {
         return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
     }
-
 }
 
 

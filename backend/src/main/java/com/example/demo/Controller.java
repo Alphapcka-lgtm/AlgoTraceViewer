@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-
 @RestController
 @CrossOrigin(
         origins = "http://localhost:5173",
@@ -21,13 +19,12 @@ public class Controller {
         this.randomVertexCover = randomVertexCover;
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<Graph> sayHello(@RequestBody Graph graph) {
-        return ResponseEntity.ok(graph);
-    }
-
     @PostMapping("/random")
-    public ResponseEntity<VertexCoverAnimation> randomVertexCover(@RequestBody Graph graph) {
-        return ResponseEntity.ok(randomVertexCover.solve(graph));
+    public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
+        if(request.randomSeed() == 0){
+            return ResponseEntity.ok(randomVertexCover.solve(request.graph()));
+        } else {
+            return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
+        }
     }
 }

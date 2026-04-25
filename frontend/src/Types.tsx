@@ -1,15 +1,42 @@
 
-export type Node = { x: number; y: number; id: string };
+export type Node = {
+    x: number,
+    y: number,
+    id: string,
+};
 
-export type Edge = { fromId: string; toId: string; id: string };
+export type Edge = {
+    fromId: string,
+    toId: string,
+    id: string,
+};
 
-export type Graph = {nodes: Node[], edges: Edge[]};
+export type Graph = {
+    nodes: Node[],
+    edges: Edge[],
+};
 
-export type EdgesProps = {nodes: Node[], edges: Edge[], idPrefix: string};
+export type EdgesProps = {
+    nodes: Node[],
+    edges: Edge[],
+    idPrefix: string,
+};
 
-export type NormalizedEdgesProps = {nodes: Node[], edges: Edge[], idPrefix: string, x: number, y: number, width: number, height: number, itemSize: number};
+export type NormalizedEdgesProps = {
+    nodes: Node[],
+    edges: Edge[],
+    idPrefix: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    itemSize: number,
+};
 
-export type PreviewEdgeProps = {interaction: Interaction, nodes: Node[]};
+export type PreviewEdgeProps = {
+    interaction: Interaction,
+    nodes: Node[],
+};
 
 export type Interaction =
     | { type: "idle" }
@@ -21,7 +48,7 @@ export type DynamicNodesProps = {
     onMouseDown: (i: string) => void,
     onMouseUp: () => void,
     onClick: (node: Node) => void,
-    onDoubleClick: (i: string) => void
+    onDoubleClick: (i: string) => void,
 };
 
 export type StaticNodesProps = {
@@ -31,15 +58,29 @@ export type StaticNodesProps = {
 export type SVGInputProps = {
     onSubmit: (graph: Graph) => void,
     mode: string,
-    height: number
+    height: number,
 };
 
 export type SVGOutputProps = {
     onChangeInput: () => void,
     mode: string,
-    output: Animation,
-    height: number
+    output: AnimationResponse,
+    height: number,
 };
 
-export type State = {chosenEdge: Edge, chosenNodes: Node[], incidentEdges: Edge[]}
-export type Animation = {initialState: Graph, intermediateStates: State[]}
+export type AnimationResponse = {
+    initialState: Graph,
+    intermediateStates: AnimationState[],
+    randomSeed: number,
+};
+
+export type AnimationState = {
+    chosenEdge: Edge,
+    chosenNodes: Node[],
+    incidentEdges: Edge[],
+};
+
+export type AnimationRequest = {
+    graph: Graph,
+    randomSeed: number,
+}
