@@ -144,7 +144,7 @@ export function SVGInput(props: SVGInputProps) {
                     </div>
                     <div style={{display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center"}}>
                         <label htmlFor={"graphDensity"}>Density Factor</label>
-                        <input id={"graphDensity"} type={"range"} style={{width: "90%"}} min={0} max={1} step={0.01} onInput={() => setFullyInterconnectedGraph()}/>
+                        <input id={"graphDensity"} type={"range"} style={{width: "90%"}} min={0} max={1} step={"any"} onInput={() => setFullyInterconnectedGraph()}/>
                     </div>
                 </div>
             </div>
