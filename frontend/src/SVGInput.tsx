@@ -1,7 +1,7 @@
 import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
 import {DynamicNodes} from "./Nodes";
-import {getRandomId} from "./Utils.tsx";
+import {getRandomGraph, getRandomId} from "./Utils.tsx";
 
 import type {SVGInputProps, Interaction, Node, Edge, Graph} from "./Types.tsx";
 
@@ -150,25 +150,4 @@ export function SVGInput(props: SVGInputProps) {
             </div>
         </>
     ) : <></>;
-}
-
-function getRandomGraph(n: number, d: number, w: number, h: number) : Graph {
-
-    const graph: Graph = {nodes: [], edges: []};
-
-    for (let i = 0; i < n; i++) {
-        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * w * 0.45);
-        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.45);
-        graph.nodes.push({ x: xCoordinate, y: yCoordinate, id: getRandomId() })
-
-    }
-
-    for (let i = 0; i < graph.nodes.length; i++) {
-        for (let j = i+1; j < graph.nodes.length; j++) {
-            if(Math.random() < d) {
-                graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId() });
-            }
-        }
-    }
-    return graph;
 }
