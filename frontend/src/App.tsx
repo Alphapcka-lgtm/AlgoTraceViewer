@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SVGInput } from "./SVGInput";
+import { sendInputPointsToBackend } from "./Api";
 import type { Node } from "./Types";
 
 export default function App() {
@@ -27,9 +28,17 @@ export default function App() {
         setNodes([]);
     };
 
-    const handleSubmit = (nodes: Node[]) => {
+    const handleSubmit = async (nodes: Node[]) => {
         console.log("Submitted:", nodes);
         setModeState("output");
+
+        try {
+            const result = await sendInputPointsToBackend(nodes);
+            console.log(result);
+        } catch (err) {
+            console.error(err);
+        }
+
     };
 
     const handleChangeInput = () => {
