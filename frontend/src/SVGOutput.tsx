@@ -47,10 +47,9 @@ export function SVGOutput(props: SVGOutputProps) {
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause();
-                    tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
-
-                    setCurrentProgress(tlRef.current.progress());
                     setIsPlaying(false);
+                    tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
+                    setCurrentProgress(tlRef.current.progress());
                 }}>Previous Step</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     if (isPlaying) {
@@ -64,16 +63,16 @@ export function SVGOutput(props: SVGOutputProps) {
                 }}>{isPlaying ? "Pause" : "Play"}</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause();
-                    tlRef.current.seek(tlRef.current.nextLabel());
-                    setCurrentProgress(() => tlRef.current.progress());
                     setIsPlaying(false);
+                    tlRef.current.seek(tlRef.current.nextLabel());
+                    setCurrentProgress(tlRef.current.progress());
                 }}>Next Step</button>
             </div>
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause(0);
-                    setIsPlaying(false);
                     setCurrentProgress(0);
+                    setIsPlaying(false);
                 }}>Reset</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause(0);
