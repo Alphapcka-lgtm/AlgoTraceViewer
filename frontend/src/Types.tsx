@@ -83,4 +83,10 @@ export type AnimationState = {
 export type AnimationRequest = {
     graph: Graph,
     randomSeed: number,
+};
+
+export type ExportImport = {
+    graph: Graph,
+    randomSeed: number,
+    initialProgress: number,
 }

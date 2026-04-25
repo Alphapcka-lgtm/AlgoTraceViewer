@@ -28,7 +28,7 @@ export function getRandomGraph(n: number, d: number, w: number, h: number) : Gra
     return graph;
 }
 
-export async function compressString(str: string) {
+export async function compressAndEncode(str: string) {
     const cs = new CompressionStream("gzip");
     const writer = cs.writable.getWriter();
     writer.write(new TextEncoder().encode(str));
@@ -50,7 +50,7 @@ function byteArrayToBase64(data: ArrayBuffer){
     return btoa(binary)
 }
 
-export async function decompressString(str: string) {
+export async function decodeAndDecompress(str: string) {
     const dcs = new DecompressionStream("gzip");
     const writer = dcs.writable.getWriter();
     writer.write(base64ToByteArray(str));
