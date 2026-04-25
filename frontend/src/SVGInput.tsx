@@ -30,7 +30,6 @@ export function SVGInput(props: SVGInputProps) {
         }
 
         const { x, y } = getMousePos(e);
-        console.log(x, y);
         setNodes((prev) => [...prev, { x, y, id: getRandomId() }]);
     };
 

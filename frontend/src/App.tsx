@@ -10,7 +10,6 @@ function App() {
   const svgHeight = 500;
 
   const submitInputAndFetchAnimation = (graph: Graph) => {
-      console.log(graph);
     fetch("http://localhost:8080/random", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -19,7 +18,6 @@ function App() {
       .then((json) => {
         setOutputState(json as Animation);
         setModeState("output");
-        console.log(outputState)
       });
   }
 
