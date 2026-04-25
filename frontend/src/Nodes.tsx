@@ -23,7 +23,7 @@ export function DynamicNodes(props: DynamicNodesProps) {
             }}
         >
             <circle cx={n.x} cy={n.y} r={11} fill="black" />
-            <circle cx={n.x} cy={n.y} r={10} fill="white" />
+            <circle cx={n.x} cy={n.y} r={9} fill="white" />
             <text
                 x={n.x}
                 y={n.y}
@@ -46,7 +46,7 @@ export function StaticNodes(props: StaticNodesProps) {
             key={n.id}
         >
             <circle cx={n.x} cy={n.y} r={11} fill="black"/>
-            <circle cx={n.x} cy={n.y} r={10} fill="white"/>
+            <circle cx={n.x} cy={n.y} r={9} fill="white"/>
             <text
                 x={n.x}
                 y={n.y}

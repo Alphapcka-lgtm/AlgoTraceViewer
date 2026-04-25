@@ -14,7 +14,7 @@ export function Edges(props: EdgesProps) {
                 key={e.id}
                 d={p}
                 stroke="black"
-                strokeWidth={1}
+                strokeWidth={2}
             />
         );
     });

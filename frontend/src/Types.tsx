@@ -31,16 +31,14 @@ export type StaticNodesProps = {
 export type SVGInputProps = {
     onSubmit: (graph: Graph) => void,
     mode: string,
-    height: number,
-    width: number
+    height: number
 };
 
 export type SVGOutputProps = {
     onChangeInput: () => void,
     mode: string,
     output: Animation,
-    height: number,
-    width: number
+    height: number
 };
 
 export type State = {chosenEdge: Edge, chosenNodes: Node[], incidentEdges: Edge[]}

@@ -1,6 +1,7 @@
 import React, {useState, useRef} from "react";
 import {Edges, PreviewEdge} from "./Edges";
 import {DynamicNodes} from "./Nodes";
+import {getRandomId} from "./Utils.tsx";
 
 import type {SVGInputProps, Interaction, Node, Edge, Graph} from "./Types.tsx";
 
@@ -29,6 +30,7 @@ export function SVGInput(props: SVGInputProps) {
         }
 
         const { x, y } = getMousePos(e);
+        console.log(x, y);
         setNodes((prev) => [...prev, { x, y, id: getRandomId() }]);
     };
 
@@ -99,8 +101,10 @@ export function SVGInput(props: SVGInputProps) {
         setInteraction({ type: "idle" });
     };
 
-    const setFullyInterconnectedGraph = (e: HTMLInputElement) => {
-        const graph: Graph = getFullyConnectedGraph(e.valueAsNumber, props.width, props.height);
+    const setFullyInterconnectedGraph = () => {
+        const size = document.getElementById("graphSize") as HTMLInputElement;
+        const density = document.getElementById("graphDensity") as HTMLInputElement;
+        const graph: Graph = getFullyConnectedGraph(size.valueAsNumber, density.valueAsNumber, 1150, props.height);
         setNodes(graph.nodes);
         setEdges(graph.edges);
     };
@@ -109,7 +113,6 @@ export function SVGInput(props: SVGInputProps) {
         <>
             <svg
                 height={props.height}
-                width={props.width}
                 style={{ border: "1px solid black", borderRadius: "30px" }}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
@@ -126,8 +129,8 @@ export function SVGInput(props: SVGInputProps) {
                     onDoubleClick={handleNodeDoubleClick}
                 />
             </svg>
-            <div>
-                <button style={{width: "100%"}} onClick={() => {
+            <div style={{display: "flex"}}>
+                <button style={{flex: 1}} onClick={() => {
                     setNodes([]);
                     setEdges([]);
                     setInteraction({ type: "idle" });
@@ -135,37 +138,29 @@ export function SVGInput(props: SVGInputProps) {
             </div>
 
             <button onClick={() => {props.onSubmit({nodes, edges})}}>Submit</button>
-            <div>
-                <input id={"input123"} type={"number"} style={{width: "49%"}} />
-                <button style={{width: "50%"}} onClick={() => {
-                    const e = document.getElementById("input123")! as HTMLInputElement;
-                    setFullyInterconnectedGraph(e);
-                }}>Load Fully Connected</button>
-            </div>
-            <input type={"range"} min={0} max={50} step={1} onInput={(e) => setFullyInterconnectedGraph(e.currentTarget)}/>
+            <input id={"graphSize"} type={"range"} min={0} max={100} step={1} onInput={() => setFullyInterconnectedGraph()}/>
+            <input id={"graphDensity"} type={"range"} min={0} max={1} step={0.01} onInput={() => setFullyInterconnectedGraph()}/>
         </>
     ) : <></>;
 }
 
-function getFullyConnectedGraph(n: number, w: number, h: number) : Graph {
+function getFullyConnectedGraph(n: number, d: number, w: number, h: number) : Graph {
 
     const graph: Graph = {nodes: [], edges: []};
 
     for (let i = 0; i < n; i++) {
         const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * w * 0.45);
-        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.35);
+        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.45);
         graph.nodes.push({ x: xCoordinate, y: yCoordinate, id: getRandomId() })
 
     }
 
     for (let i = 0; i < graph.nodes.length; i++) {
         for (let j = i+1; j < graph.nodes.length; j++) {
-            graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId() });
+            if(Math.random() < d) {
+                graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId() });
+            }
         }
     }
     return graph;
-}
-
-function getRandomId(): string{
-    return "i" + Math.floor(Date.now() * Math.random()).toString()
 }

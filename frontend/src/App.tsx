@@ -8,9 +8,9 @@ function App() {
   const [outputState, setOutputState] = useState<Animation>({initialState: {nodes: [], edges: []}, intermediateStates: []});
 
   const svgHeight = 500;
-  const svgWidth = 1123;
 
   const submitInputAndFetchAnimation = (graph: Graph) => {
+      console.log(graph);
     fetch("http://localhost:8080/random", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -29,8 +29,8 @@ function App() {
 
   return (
       <>
-        <SVGInput onSubmit={submitInputAndFetchAnimation} mode={modeState} height={svgHeight} width={svgWidth} />
-        <SVGOutput onChangeInput={returnToInputMask} mode={modeState} output={outputState} height={svgHeight} width={svgWidth} />
+        <SVGInput onSubmit={submitInputAndFetchAnimation} mode={modeState} height={svgHeight} />
+        <SVGOutput onChangeInput={returnToInputMask} mode={modeState} output={outputState} height={svgHeight} />
       </>
     )
 }

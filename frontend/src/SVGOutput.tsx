@@ -1,47 +1,51 @@
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import MorphSVGPlugin from "gsap/MorphSVGPlugin";
-import {Edges, NormalizedEdges} from "./Edges.tsx";
+import {Edges} from "./Edges.tsx";
 import {StaticNodes} from "./Nodes.tsx";
 
 import type {SVGOutputProps} from "./Types.tsx";
 import {useGSAP} from "@gsap/react";
 import {useRef, useState} from "react";
+import {getRandomId} from "./Utils.tsx";
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const tlRef = useRef<gsap.core.Timeline>(null);
 
-    const finalSetHeight = 80;
-
     gsap.registerPlugin(DrawSVGPlugin);
     gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
-        tlRef.current = gsap.timeline({ paused: true } );
 
-        tlRef.current?.from("#i1", {duration: 2, drawSVG: "50% 50%"}, "step0010")
 
-        tlRef.current?.to("#i1", {duration: 1, morphSVG: "#i2"}, "step0011")
+        const timeline = gsap.timeline({ paused: true } );
 
-        props.output.initialState.edges.forEach((e) => {
-            tlRef.current?.to("#d" + e.id, {duration: 1, morphSVG: "#u" + e.id}, "step0012")
+        props.output.intermediateStates.forEach((intermediateState) => {
+            const randomEdgeLabel = getRandomId();
+            const incidentEdgeLabel = getRandomId();
+            const tweenVars1 = {filter: "drop-shadow(0px 0px 3px red)", duration: 1};
+            const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", duration: 1};
+            timeline.to("#" + intermediateState.chosenEdge.id, tweenVars1, randomEdgeLabel);
+            timeline.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, randomEdgeLabel);
+            timeline.to("#" + intermediateState.chosenEdge.toId, tweenVars1, randomEdgeLabel);
+
+            intermediateState.incidentEdges.forEach((incidentEdge) => {
+                timeline.to("#" + incidentEdge.id, tweenVars2, incidentEdgeLabel);
+            });
         })
 
+        tlRef.current = timeline;
 
     }, [props.output.initialState]);
 
     return props.mode === "output" ? <>
-        <svg height={props.height} style={{ border: "1px solid black", borderRadius: "30px" }}>
+        <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px" }}>
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
-            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"d"} />
             <StaticNodes nodes={props.output.initialState.nodes} />
-            <NormalizedEdges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={"u"} x={100} y={400} width={800} height={finalSetHeight} itemSize={40} />
-            <path id="i1" d={getContainerPath(100, 400,800, 0, 20)} style={{stroke: "black", fill: "none"}} />
-            <path id="i2" d={getContainerPath(100, 400,800, 40, 20)} style={{display: "none"}} />
         </svg>
-        <div>
-            <button style={{width: "50%"}} onClick={() => {
+        <div style={{display: "flex"}}>
+            <button style={{flex: 1}} onClick={() => {
                 if (isPlaying) {
                     tlRef.current?.pause();
                     setIsPlaying(false);
@@ -50,11 +54,14 @@ export function SVGOutput(props: SVGOutputProps) {
                     setIsPlaying(true);
                 }
             }}>{isPlaying ? "Pause" : "Play"}</button>
-
-            <button style={{width: "50%"}} onClick={() => {
+            <button style={{flex: 1}} onClick={() => {
                 tlRef.current?.pause(0);
                 setIsPlaying(false);
             }}>Reset</button>
+        </div>
+        <div style={{display: "flex"}}>
+            <button style={{flex: 1}} onClick={() => {tlRef.current?.seek(tlRef.current?.previousLabel(tlRef.current?.time() - 0.01))}}>&lt;</button>
+            <button style={{flex: 1}} onClick={() => {tlRef.current?.seek(tlRef.current?.nextLabel())}}>&gt;</button>
         </div>
         <button onClick={() => {
             tlRef.current?.pause(0);
@@ -62,18 +69,4 @@ export function SVGOutput(props: SVGOutputProps) {
             props.onChangeInput()
         }}>Change Input</button>
     </> : <></>;
-}
-
-function getContainerPath(x: number, y: number, w: number, h: number, r: number) : string {
-    let z = "";
-    z = z + "M " + (x+r) + " " + (y) + " ";
-    z = z + "L " + (x+r+w) + " " + (y) + " ";
-    z = z + "A " + (r) + " " + (r) + " 0 0 1 " + (x+r+w+r) + " " + (y+r) + " ";
-    z = z + "L " + (x+r+w+r) + " " + (y+r+h) + " ";
-    z = z + "A " + (r) + " " + (r) + " 0 0 1 " + (x+r+w) + " " + (y+r+h+r) + " ";
-    z = z + "L " + (x+r) + " " + (y+r+h+r) + " ";
-    z = z + "A " + (r) + " " + (r) + " 0 0 1 " + (x) + " " + (y+r+h) + " ";
-    z = z + "L " + (x) + " " + (y+r) + " ";
-    z = z + "A " + (r) + " " + (r) + " 0 0 1 " + (x+r) + " " + (y) + " ";
-    return z;
 }

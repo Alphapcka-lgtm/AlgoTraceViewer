@@ -1,3 +1,3 @@
 package com.example.demo;
 
-public record Node(long x, long y, String id) {}
+public record Node(double x, double y, String id) {}
