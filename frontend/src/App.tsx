@@ -11,7 +11,7 @@ function App() {
   const svgHeight = 500;
 
   const submitInputAndFetchAnimation = (graph: Graph) => {
-    fetch("http://localhost:8080/random", {
+    fetch("http://localhost:8080/vertexcover/random", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({graph: graph, randomSeed: output.randomSeed}),
@@ -20,6 +20,16 @@ function App() {
         setOutput(json as AnimationResponse);
         setMode("output");
       });
+
+      fetch("http://localhost:8080/vertexcover/optimal", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({graph: graph, randomSeed: output.randomSeed}),
+      }).then((response) => response.json())
+          .then((json) => {
+              const response = json as AnimationResponse;
+              console.log(response.initialState);
+          });
   }
 
   const returnToInputMask = () => {
