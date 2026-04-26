@@ -3,6 +3,9 @@ package com.example.demo;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @Service
 public class RandomVertexCover {
@@ -43,6 +46,56 @@ public class RandomVertexCover {
 
     private static Node getNodeById(List<Node> nodes, String id) {
         return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
+    }
+
+    static void main(String[] args) {
+        for (Iterator<Long> it = getSubsetIterator(7, 6); it.hasNext(); ) {
+            Long l = it.next();
+            System.out.println(Long.toBinaryString(l));
+        }
+    }
+
+    public static Iterator<Long> getSubsetIterator(long n, long k){
+        if(k == 1){
+            return new Iterator<>() {
+                private long x = 1L;
+
+                @Override
+                public boolean hasNext() {
+                    return x < (1L << n);
+                }
+
+                public Long next() {
+                    long current = x;
+                    x = x << 1;
+                    return current;
+                }
+            };
+        } else {
+            return new Iterator<>() {
+                private Iterator<Long> i = getSubsetIterator(n-1, k-1);
+                private long x = (1L << (k-1));
+                private long base = i.next();
+
+                @Override
+                public boolean hasNext() {
+                    return x < (1L << n) || i.hasNext();
+                }
+
+                public Long next() {
+                    if(x >= (1L << n)){
+                        base = i.next();
+                        while((x & base) == 0){
+                            x = x >> 1;
+                        }
+                        x = x << 1;
+                    }
+                    long current = x | base;
+                    x = x << 1;
+                    return current;
+                }
+            };
+        }
     }
 }
 
