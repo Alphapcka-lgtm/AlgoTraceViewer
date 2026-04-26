@@ -11,6 +11,8 @@ import java.util.stream.IntStream;
 public class RandomVertexCover {
 
     public AnimationResponse solve(Graph graph, Long seed) {
+        seed = seed == 0 ? System.nanoTime() : seed;
+
         List<AnimationState> intermediateStates = new ArrayList<>();
 
         Random randomGenerator = new Random(seed);
@@ -38,10 +40,6 @@ public class RandomVertexCover {
             );
         }
         return AnimationResponse.builder().initialState(graph).intermediateStates(intermediateStates).randomSeed(seed).build();
-    }
-
-    public AnimationResponse solve(Graph graph) {
-        return solve(graph, System.nanoTime());
     }
 
     private static Node getNodeById(List<Node> nodes, String id) {

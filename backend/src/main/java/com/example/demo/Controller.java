@@ -25,11 +25,7 @@ public class Controller {
 
     @PostMapping("/vertexcover/random")
     public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
-        if(request.randomSeed() == 0){
-            return ResponseEntity.ok(randomVertexCover.solve(request.graph()));
-        } else {
-            return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
-        }
+        return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
     }
 
     @PostMapping("/vertexcover/optimal")

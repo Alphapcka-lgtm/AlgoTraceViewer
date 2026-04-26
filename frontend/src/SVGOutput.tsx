@@ -11,14 +11,13 @@ import {getRandomId} from "./Utils.tsx";
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const [currentProgress, setCurrentProgress] = useState<number>(0);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
 
     gsap.registerPlugin(DrawSVGPlugin);
     gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
-        const timeline = gsap.timeline({ paused: true, onUpdate: () => setCurrentProgress(tlRef.current.progress()), onComplete: () => setIsPlaying(false)});
+        const timeline = gsap.timeline({ paused: true, onUpdate: () => props.setCurrentProgress(tlRef.current.progress()), onComplete: () => setIsPlaying(false)});
 
         props.output.intermediateStates.forEach((intermediateState) => {
             const pickRandomEdge = getRandomId();
@@ -34,31 +33,30 @@ export function SVGOutput(props: SVGOutputProps) {
             });
         })
 
-        setCurrentProgress(0);
         tlRef.current = timeline;
+        tlRef.current.progress(props.currentProgress);
 
-    }, [props.output.initialState]);
+    }, [props.output]);
 
-    return props.mode === "output" ? <>
+    return <>
         <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px"}}>
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
             <StaticNodes nodes={props.output.initialState.nodes} />
         </svg>
-        <div style={{display: "flex", flexDirection: "column", gap: 3, padding: 3}}>
+        <div style={{display: "flex", flexDirection: "column", gap: 3}}>
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause();
                     setIsPlaying(false);
                     tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
-                    setCurrentProgress(tlRef.current.progress());
+                    props.setCurrentProgress(tlRef.current.progress());
                 }}>Previous Step</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     if(isPlaying){
                         tlRef.current.pause();
                         setIsPlaying(false);
-                        setCurrentProgress(tlRef.current.progress());
                     }else{
-                        if(currentProgress == 1){
+                        if(props.currentProgress == 1){
                             tlRef.current.play(0);
                         } else {
                             tlRef.current.play();
@@ -70,24 +68,19 @@ export function SVGOutput(props: SVGOutputProps) {
                     tlRef.current.pause();
                     setIsPlaying(false);
                     tlRef.current.seek(tlRef.current.nextLabel());
-                    setCurrentProgress(tlRef.current.progress());
+                    props.setCurrentProgress(tlRef.current.progress());
                 }}>Next Step</button>
             </div>
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause(0);
-                    setCurrentProgress(0);
+                    props.setCurrentProgress(0);
                     setIsPlaying(false);
                 }}>Reset</button>
-                <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    tlRef.current.pause(0);
-                    setIsPlaying(false);
-                    props.onChangeInput();
-                }}>Change Input</button>
             </div>
-            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={currentProgress} onInput={(e) => {
+            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={props.currentProgress} onInput={(e) => {
                 tlRef.current.progress(e.currentTarget.valueAsNumber);
             }}/>
         </div>
-    </> : <></>;
+    </>;
 }

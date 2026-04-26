@@ -1,52 +1,47 @@
 import {SVGInput} from "./SVGInput.tsx";
 import {SVGOutput} from "./SVGOutput.tsx";
 import {useState} from "react";
-import type {Graph, AnimationResponse, ExportImport} from "./Types.tsx";
+import type {AnimationResponse, ExportImport, AnimationRequest} from "./Types.tsx";
 import {compressAndEncode, decodeAndDecompress} from "./Utils.tsx";
 
 function App() {
-  const [mode, setMode] = useState<"input" | "output">("input");
-  const [output, setOutput] = useState<AnimationResponse>({initialState: {nodes: [], edges: []}, intermediateStates: [], randomSeed: 0});
+    const [modeState, setModeState] = useState<"Input" | "Output">("Input");
+    const [inputState, setInputState] = useState<AnimationRequest>({graph: {nodes: [], edges: []}, densityFactor: 0.2, randomSeed: 10});
+    const [outputState, setOutputState] = useState<AnimationResponse>({initialState: {nodes: [], edges: []}, intermediateStates: [], randomSeed: 0});
+    const [currentProgressState, setCurrentProgressState] = useState<number>(0);
 
-  const svgHeight = 500;
+    const svgHeight = 500;
 
-  const submitInputAndFetchAnimation = (graph: Graph) => {
-    fetch("http://localhost:8080/vertexcover/random", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({graph: graph, randomSeed: output.randomSeed}),
-    }).then((response) => response.json())
-      .then((json) => {
-        setOutput(json as AnimationResponse);
-        setMode("output");
-      });
-
-      fetch("http://localhost:8080/vertexcover/optimal", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({graph: graph, randomSeed: output.randomSeed}),
-      }).then((response) => response.json())
-          .then((json) => {
-              const response = json as AnimationResponse;
-              console.log(response.initialState);
-          });
-  }
-
-  const returnToInputMask = () => {
-    setMode("input");
-  }
+    const submitInputAndFetchAnimation = () => {
+        fetch("http://localhost:8080/vertexcover/random", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(inputState),
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                setOutputState(json as AnimationResponse);
+                setModeState("Output");
+            });
+    }
 
   return (
-      <>
-          <SVGInput onSubmit={submitInputAndFetchAnimation} mode={mode} height={svgHeight} />
-          <SVGOutput onChangeInput={returnToInputMask} mode={mode} output={output} height={svgHeight} />
+      <div style={{display: "flex", flexDirection: "column", gap: 3, padding: 3}}>
+          <div style={{display: "flex", gap: 3}}>
+              {modeState === "Output" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => setModeState("Input")}>Change Input</button> : <></>}
+              <p style={{flex: 3, border: "2px solid black", borderRadius: "30px"}}>{modeState}</p>
+              {modeState === "Input" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => submitInputAndFetchAnimation()}>Submit</button> : <></>}
+          </div>
+          {modeState === "Input"
+              ? <SVGInput height={svgHeight} input={inputState} setInput={setInputState} />
+              : <SVGOutput height={svgHeight} output={outputState} currentProgress={currentProgressState} setCurrentProgress={setCurrentProgressState} />
+          }
           <div style={{display: "flex", gap: 3}}>
 
               <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                   compressAndEncode(JSON.stringify({
-                      graph: output.initialState,
-                      randomSeed: output.randomSeed,
-                      initialProgress: 0,
+                      input: inputState,
+                      initialProgress: currentProgressState,
                   })).then((ex) => {
                       navigator.clipboard.writeText(ex);
                       const el = document.getElementById("exportImport") as HTMLInputElement;
@@ -59,14 +54,15 @@ function App() {
               <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                   const el = document.getElementById("exportImport") as HTMLInputElement;
                   decodeAndDecompress(el.value).then((im) => {
+                      setModeState("Input");
                       const state = JSON.parse(im) as ExportImport;
-                      output.randomSeed = state.randomSeed;
-                      submitInputAndFetchAnimation(state.graph);
+                      setCurrentProgressState(state.initialProgress);
+                      setInputState(() => state.input);
+                      submitInputAndFetchAnimation();
                   })
               }}>Import</button>
-
           </div>
-      </>
+      </div>
     )
 }
 

@@ -1,3 +1,4 @@
+import type {Dispatch, SetStateAction} from "react";
 
 export type Node = {
     x: number,
@@ -56,16 +57,16 @@ export type StaticNodesProps = {
 };
 
 export type SVGInputProps = {
-    onSubmit: (graph: Graph) => void,
-    mode: string,
+    input: AnimationRequest,
+    setInput: Dispatch<SetStateAction<AnimationRequest>>,
     height: number,
 };
 
 export type SVGOutputProps = {
-    onChangeInput: () => void,
-    mode: string,
     output: AnimationResponse,
     height: number,
+    currentProgress: number,
+    setCurrentProgress:  Dispatch<SetStateAction<number>>,
 };
 
 export type AnimationResponse = {
@@ -82,11 +83,11 @@ export type AnimationState = {
 
 export type AnimationRequest = {
     graph: Graph,
+    densityFactor: number,
     randomSeed: number,
 };
 
 export type ExportImport = {
-    graph: Graph,
-    randomSeed: number,
+    input: AnimationRequest,
     initialProgress: number,
 }
