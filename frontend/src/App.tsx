@@ -21,9 +21,7 @@ function App() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInputState((prev) => {
-                    return {...prev, randomSeed: output.randomSeed}
-                });
+                setInputState({...input, randomSeed: output.randomSeed});
                 setOutputState(output);
             });
     }
@@ -42,10 +40,8 @@ function App() {
                   setModeState("Output");
               }}>Submit</button> : <></>}
           </div>
-          {modeState === "Input"
-              ? <SVGInput height={svgHeight} input={inputState} setInput={setInputState} />
-              : <SVGOutput height={svgHeight} output={outputState} currentProgress={currentProgressState} setCurrentProgress={setCurrentProgressState} />
-          }
+          <SVGInput height={svgHeight} input={inputState} setInput={setInputState} mode={modeState} />
+          <SVGOutput height={svgHeight} output={outputState} currentProgress={currentProgressState} setCurrentProgress={setCurrentProgressState} mode={modeState} />
           <div style={{display: "flex", gap: 3}}>
 
               <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {

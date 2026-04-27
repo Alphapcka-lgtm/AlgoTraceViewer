@@ -59,11 +59,13 @@ export type StaticNodesProps = {
 export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
+    mode: string,
     height: number,
 };
 
 export type SVGOutputProps = {
     output: AnimationResponse,
+    mode: string,
     height: number,
     currentProgress: number,
     setCurrentProgress:  Dispatch<SetStateAction<number>>,

@@ -108,7 +108,7 @@ export function SVGInput(props: SVGInputProps) {
         });
     };
 
-    return <>
+    return props.mode === "Output" ? <></> : <>
             <svg
                 height={props.height}
                 style={{ border: "2px solid black", borderRadius: "30px"}}

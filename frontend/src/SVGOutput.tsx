@@ -32,13 +32,11 @@ export function SVGOutput(props: SVGOutputProps) {
                 timeline.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
             });
         })
-
         tlRef.current = timeline;
         tlRef.current.progress(props.currentProgress);
-
     }, [props.output.timestamp]);
 
-    return <>
+    return props.mode === "Input" ? <></> : <>
         <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px"}}>
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
             <StaticNodes nodes={props.output.initialState.nodes} />
@@ -46,8 +44,10 @@ export function SVGOutput(props: SVGOutputProps) {
         <div style={{display: "flex", flexDirection: "column", gap: 3}}>
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    tlRef.current.pause();
-                    setIsPlaying(false);
+                    if(isPlaying){
+                        tlRef.current.pause();
+                        setIsPlaying(false);
+                    }
                     tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
                     props.setCurrentProgress(tlRef.current.progress());
                 }}>Previous Step</button>
@@ -65,16 +65,20 @@ export function SVGOutput(props: SVGOutputProps) {
                     }
                 }}>{isPlaying ? "Pause" : "Play"}</button>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    tlRef.current.pause();
-                    setIsPlaying(false);
+                    if(isPlaying){
+                        tlRef.current.pause();
+                        setIsPlaying(false);
+                    }
                     tlRef.current.seek(tlRef.current.nextLabel());
                     props.setCurrentProgress(tlRef.current.progress());
                 }}>Next Step</button>
             </div>
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
+                    if(isPlaying){
+                        setIsPlaying(false);
+                    }
                     tlRef.current.pause(0);
-                    setIsPlaying(false);
                     props.setCurrentProgress(0);
                 }}>Reset</button>
             </div>
