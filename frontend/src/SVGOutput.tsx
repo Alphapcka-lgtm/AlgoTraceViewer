@@ -22,8 +22,8 @@ export function SVGOutput(props: SVGOutputProps) {
         props.output.intermediateStates.forEach((intermediateState) => {
             const pickRandomEdge = getRandomId();
             const markIncidentEdges = getRandomId();
-            const tweenVars1 = {filter: "drop-shadow(0px 0px 3px red)", ease: "power4",  duration: 2};
-            const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 2};
+            const tweenVars1 = {filter: "drop-shadow(0px 0px 3px red)", ease: "power4",  duration: 0.1};
+            const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 0.1};
             timeline.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
             timeline.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
             timeline.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
@@ -36,7 +36,8 @@ export function SVGOutput(props: SVGOutputProps) {
         tlRef.current = timeline;
         tlRef.current.progress(props.currentProgress);
 
-    }, [props.output]);
+
+    }, [props.output.timestamp]);
 
     return <>
         <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px"}}>
@@ -74,8 +75,8 @@ export function SVGOutput(props: SVGOutputProps) {
             <div style={{display: "flex", gap: 3}}>
                 <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     tlRef.current.pause(0);
-                    props.setCurrentProgress(0);
                     setIsPlaying(false);
+                    props.setCurrentProgress(0);
                 }}>Reset</button>
             </div>
             <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={props.currentProgress} onInput={(e) => {

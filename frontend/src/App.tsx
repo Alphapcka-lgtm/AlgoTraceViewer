@@ -6,22 +6,24 @@ import {compressAndEncode, decodeAndDecompress} from "./Utils.tsx";
 
 function App() {
     const [modeState, setModeState] = useState<"Input" | "Output">("Input");
-    const [inputState, setInputState] = useState<AnimationRequest>({graph: {nodes: [], edges: []}, densityFactor: 0.2, randomSeed: 10});
-    const [outputState, setOutputState] = useState<AnimationResponse>({initialState: {nodes: [], edges: []}, intermediateStates: [], randomSeed: 0});
+    const [inputState, setInputState] = useState<AnimationRequest>({graph: {nodes: [], edges: []}, densityFactor: 0.2, randomSeed: 0, timestamp: 1});
+    const [outputState, setOutputState] = useState<AnimationResponse>({initialState: {nodes: [], edges: []}, intermediateStates: [], randomSeed: 0, timestamp: 0});
     const [currentProgressState, setCurrentProgressState] = useState<number>(0);
 
     const svgHeight = 500;
 
-    const submitInputAndFetchAnimation = () => {
+    const fetchAnimationAndSetMode = (input: AnimationRequest, mode: "Input" | "Output") => {
         fetch("http://localhost:8080/vertexcover/random", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(inputState),
+            body: JSON.stringify(input),
         })
             .then((response) => response.json())
             .then((json) => {
-                setOutputState(json as AnimationResponse);
-                setModeState("Output");
+                const output = json as AnimationResponse;
+                setOutputState(output);
+                setInputState({...input, randomSeed: output.randomSeed});
+                setModeState(mode);
             });
     }
 
@@ -30,7 +32,14 @@ function App() {
           <div style={{display: "flex", gap: 3}}>
               {modeState === "Output" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => setModeState("Input")}>Change Input</button> : <></>}
               <p style={{flex: 3, border: "2px solid black", borderRadius: "30px"}}>{modeState}</p>
-              {modeState === "Input" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => submitInputAndFetchAnimation()}>Submit</button> : <></>}
+              {modeState === "Input" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
+                  if(inputState.timestamp > outputState.timestamp) {
+                      fetchAnimationAndSetMode(inputState, "Output");
+                      setCurrentProgressState(0);
+                  } else {
+                      setModeState("Output");
+                  }
+              }}>Submit</button> : <></>}
           </div>
           {modeState === "Input"
               ? <SVGInput height={svgHeight} input={inputState} setInput={setInputState} />
@@ -54,11 +63,10 @@ function App() {
               <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                   const el = document.getElementById("exportImport") as HTMLInputElement;
                   decodeAndDecompress(el.value).then((im) => {
-                      setModeState("Input");
                       const state = JSON.parse(im) as ExportImport;
                       setCurrentProgressState(state.initialProgress);
-                      setInputState(() => state.input);
-                      submitInputAndFetchAnimation();
+                      setInputState(state.input);
+                      fetchAnimationAndSetMode(state.input, timestamp: Date.now()}, modeState);
                   })
               }}>Import</button>
           </div>

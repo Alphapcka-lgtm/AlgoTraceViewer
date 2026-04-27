@@ -39,7 +39,12 @@ public class RandomVertexCover {
                     .build()
             );
         }
-        return AnimationResponse.builder().initialState(graph).intermediateStates(intermediateStates).randomSeed(seed).build();
+        return AnimationResponse.builder()
+                .initialState(graph)
+                .intermediateStates(intermediateStates)
+                .randomSeed(seed)
+                .timestamp(System.currentTimeMillis())
+                .build();
     }
 
     private static Node getNodeById(List<Node> nodes, String id) {

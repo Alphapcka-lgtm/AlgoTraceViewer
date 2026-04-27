@@ -29,7 +29,7 @@ export function SVGInput(props: SVGInputProps) {
 
         const { x, y } = getMousePos(e);
         props.setInput((prev) => {
-            return {...prev, graph: {...prev.graph, nodes: [...prev.graph.nodes, { x, y, id: getRandomId() }]}};
+            return {...prev, graph: {...prev.graph, nodes: [...prev.graph.nodes, { x, y, id: getRandomId() }]}, timestamp: Date.now()};
         });
     };
 
@@ -49,7 +49,7 @@ export function SVGInput(props: SVGInputProps) {
                             } else {
                                 return node;
                             }
-                        })}};
+                        })}, timestamp: Date.now()};
                     });
                     return interaction;
                 default:
@@ -70,7 +70,7 @@ export function SVGInput(props: SVGInputProps) {
                     if (edgeExists(interaction.fromId, node.id, input.graph.edges)) {
                         return input;
                     } else {
-                        return {...input, graph: {...input.graph, edges: [...input.graph.edges, { fromId: interaction.fromId, toId: node.id, id: getRandomId() }]}};
+                        return {...input, graph: {...input.graph, edges: [...input.graph.edges, { fromId: interaction.fromId, toId: node.id, id: getRandomId() }]}, timestamp: Date.now()};
                     }
                 });
                 return { type: "idle" };
@@ -94,7 +94,7 @@ export function SVGInput(props: SVGInputProps) {
 
     const handleNodeDoubleClick = (nodeId: string) => {
         props.setInput((input) => {
-            return {...input, graph: {nodes: input.graph.nodes.filter((n) => n.id !== nodeId), edges: input.graph.edges.filter((e) => e.fromId !== nodeId && e.toId !== nodeId) }};
+            return {...input, graph: {nodes: input.graph.nodes.filter((n) => n.id !== nodeId), edges: input.graph.edges.filter((e) => e.fromId !== nodeId && e.toId !== nodeId) }, timestamp: Date.now()};
         })
         setInteraction({ type: "idle" });
     };
@@ -104,7 +104,7 @@ export function SVGInput(props: SVGInputProps) {
         const density = document.getElementById("graphDensity") as HTMLInputElement;
         const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber, 1150, props.height);
         props.setInput((input) => {
-            return {...input, densityFactor: density.valueAsNumber, graph: {nodes: graph.nodes, edges: graph.edges }};
+            return {...input, densityFactor: density.valueAsNumber, graph: {nodes: graph.nodes, edges: graph.edges }, timestamp: Date.now()};
         });
     };
 
@@ -130,7 +130,7 @@ export function SVGInput(props: SVGInputProps) {
             <div style={{display: "flex", flexDirection: "column", gap: 3}}>
                 <button id={"reset"} style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                     props.setInput((input) => {
-                        return {...input, graph: {nodes: [], edges: []}};
+                        return {...input, graph: {nodes: [], edges: []}, timestamp: Date.now()};
                     });
                     setInteraction({ type: "idle" });
                 }}>Reset</button>

@@ -73,6 +73,7 @@ export type AnimationResponse = {
     initialState: Graph,
     intermediateStates: AnimationState[],
     randomSeed: number,
+    timestamp: number,
 };
 
 export type AnimationState = {
@@ -85,6 +86,7 @@ export type AnimationRequest = {
     graph: Graph,
     densityFactor: number,
     randomSeed: number,
+    timestamp: number,
 };
 
 export type ExportImport = {

@@ -1,3 +1,3 @@
 package com.example.demo;
 
-public record AnimationRequest(Graph graph, Long randomSeed) {}
+public record AnimationRequest(Graph graph, Long randomSeed, Long timestamp) {}
