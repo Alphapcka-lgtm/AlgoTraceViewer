@@ -12,7 +12,7 @@ function App() {
 
     const svgHeight = 500;
 
-    const fetchAnimationAndSetMode = (input: AnimationRequest, mode: "Input" | "Output") => {
+    const fetchAnimationAndSetMode = (input: AnimationRequest) => {
         fetch("http://localhost:8080/vertexcover/random", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -21,9 +21,10 @@ function App() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
+                setInputState((prev) => {
+                    return {...prev, randomSeed: output.randomSeed}
+                });
                 setOutputState(output);
-                setInputState({...input, randomSeed: output.randomSeed});
-                setModeState(mode);
             });
     }
 
@@ -34,11 +35,11 @@ function App() {
               <p style={{flex: 3, border: "2px solid black", borderRadius: "30px"}}>{modeState}</p>
               {modeState === "Input" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
                   if(inputState.timestamp > outputState.timestamp) {
-                      fetchAnimationAndSetMode(inputState, "Output");
+                      fetchAnimationAndSetMode(inputState);
                       setCurrentProgressState(0);
-                  } else {
-                      setModeState("Output");
+                      console.log("fetched")
                   }
+                  setModeState("Output");
               }}>Submit</button> : <></>}
           </div>
           {modeState === "Input"
@@ -64,9 +65,8 @@ function App() {
                   const el = document.getElementById("exportImport") as HTMLInputElement;
                   decodeAndDecompress(el.value).then((im) => {
                       const state = JSON.parse(im) as ExportImport;
+                      fetchAnimationAndSetMode(state.input);
                       setCurrentProgressState(state.initialProgress);
-                      setInputState(state.input);
-                      fetchAnimationAndSetMode(state.input, timestamp: Date.now()}, modeState);
                   })
               }}>Import</button>
           </div>

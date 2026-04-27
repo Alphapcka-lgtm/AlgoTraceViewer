@@ -21,7 +21,7 @@ public class RandomVertexCover {
 
         while (!remainingEdges.isEmpty()) {
             Edge chosenEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
-            remainingEdges.remove(chosenEdge);
+            //remainingEdges.remove(chosenEdge);
 
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
