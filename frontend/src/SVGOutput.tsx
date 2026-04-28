@@ -17,29 +17,34 @@ export function SVGOutput(props: SVGOutputProps) {
     gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
-        const timeline = gsap.timeline({ paused: true, onUpdate: () => props.setCurrentProgress(tlRef.current.progress()), onComplete: () => setIsPlaying(false)});
+        tlRef.current = gsap.timeline({
+            paused: true,
+            onUpdate: () => props.setCurrentProgress(tlRef.current.progress()),
+            onComplete: () => setIsPlaying(false)
+        });
 
         props.output.intermediateStates.forEach((intermediateState) => {
             const pickRandomEdge = getRandomId();
             const markIncidentEdges = getRandomId();
             const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 0.1};
             const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 0.1};
-            timeline.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
-            timeline.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
-            timeline.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
+
+            tlRef.current.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
+            tlRef.current.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
+            tlRef.current.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
 
             intermediateState.incidentEdges.forEach((incidentEdge) => {
-                timeline.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
+                tlRef.current.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
             });
-        })
-        tlRef.current = timeline;
+        });
+
         tlRef.current.progress(props.currentProgress);
-    }, [props.output.timestamp]);
+    }, {dependencies: [props.output.timestamp, props.mode], revertOnUpdate: true});
 
     return props.mode === "Input" ? <></> : <>
         <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px"}}>
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
-            <StaticNodes nodes={props.output.initialState.nodes} />
+            <StaticNodes nodes={props.output.initialState.nodes} idPrefix={""}/>
         </svg>
         <div style={{display: "flex", flexDirection: "column", gap: 3}}>
             <div style={{display: "flex", gap: 3}}>

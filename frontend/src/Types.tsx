@@ -53,7 +53,8 @@ export type DynamicNodesProps = {
 };
 
 export type StaticNodesProps = {
-    nodes: Node[]
+    nodes: Node[],
+    idPrefix: string,
 };
 
 export type SVGInputProps = {
