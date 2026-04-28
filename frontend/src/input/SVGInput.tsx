@@ -1,9 +1,12 @@
-import React, {useState, useRef} from "react";
-import {Edges, PreviewEdge} from "./Edges";
-import {DynamicNodes} from "./Nodes";
-import {getRandomGraph, getRandomId} from "./Utils.tsx";
+import type { Interaction, SVGInputProps } from "./Types.tsx";
+import type { Node, Edge } from "../shared/Types.tsx";
 
-import type {SVGInputProps, Interaction, Node, Edge, Graph} from "./Types.tsx";
+import { getNodeById, getRandomId } from "../shared/Utils.tsx";
+import { Edges, PreviewEdge } from "../shared/Edges.tsx";
+import { InputControl } from "./InputControl.tsx";
+import { Nodes } from "../shared/Nodes.tsx";
+import { useState, useRef } from "react";
+
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
@@ -84,40 +87,14 @@ export function SVGInput(props: SVGInputProps) {
         setInteraction({ type: "idle" });
     };
 
-    const setRandomGraph = () => {
-        const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;
-        const density = document.getElementById("graphDensityInputSlider") as HTMLInputElement;
-        const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber, 1150, props.height);
-        props.setInput((input) => {
-            return { ...input, densityFactor: density.valueAsNumber, graph: { nodes: graph.nodes, edges: graph.edges }, timestamp: Date.now() };
-        });
-    };
-
-    const resetInput = () => {
-        props.setInput((input) => {
-            return { ...input, graph: { nodes: [], edges: [] }, timestamp: Date.now() };
-        });
-        setInteraction({ type: "idle" });
-    }
+    const clickEventHandler = { onClick: handleNodeClick, onMouseDown: handleNodeMouseDown, onMouseUp: handleNodeMouseUp, onDoubleClick: handleNodeDoubleClick };
 
     return props.mode === "Output" ? <></> : <>
             <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } onClick={ handleCanvasClick } onMouseMove={ handleMouseMove } >
-                <Edges nodes={ props.input.graph.nodes } edges={ props.input.graph.edges } idPrefix={ "" } />
-                <PreviewEdge interaction={ interaction } nodes={ props.input.graph.nodes } />
-                <DynamicNodes nodes={ props.input.graph.nodes } onClick={ handleNodeClick } onMouseDown={ handleNodeMouseDown } onMouseUp={ handleNodeMouseUp } onDoubleClick={ handleNodeDoubleClick } />
+                <Nodes nodes={ props.input.graph.nodes } { ...clickEventHandler } />
+                { interaction.type === "drawing-edge" ? <PreviewEdge fromNode={ getNodeById(props.input.graph.nodes, interaction.fromId) } to={ interaction.to } /> : <></> }
+                <Edges nodes={ props.input.graph.nodes } edges={ props.input.graph.edges } />
             </svg>
-            <div style={ { display: "flex", flexDirection: "column", gap: 3 } }>
-                <button onClick={ () => resetInput() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Reset</button>
-                <div style={ { display: "flex", gap: 3 } }>
-                    <div style={ { display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center" } } >
-                        <label htmlFor={ "graphSizeInputSlider" }>Number of Nodes: { props.input.graph.nodes.length }</label>
-                        <input id={ "graphSizeInputSlider" } type={ "range" } min={ 0 } max={ 50 } step={ 1 } value={ props.input.graph.nodes.length } onInput={ () => setRandomGraph() } style={ { width: "90%" } } />
-                    </div>
-                    <div style={ { display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center" } } >
-                        <label htmlFor={ "graphDensityInputSlider" } >Density Factor: { props.input.densityFactor.toString().slice(0,4) }</label>
-                        <input id={ "graphDensityInputSlider" } type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.input.densityFactor } onInput={ () => setRandomGraph() } style={ { width: "90%" } } />
-                    </div>
-                </div>
-            </div>
+            <InputControl setInput={ props.setInput } input={ props.input } setInteraction={ setInteraction } height={ props.height } width={ 1100 } />
         </>;
 }

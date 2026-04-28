@@ -1,6 +1,6 @@
-import type {Node, DynamicNodesProps, StaticNodesProps} from "./Types";
+import type { Node, NodesProps } from "./Types.tsx";
 
-export function DynamicNodes(props: DynamicNodesProps) {
+export function Nodes(props: NodesProps) {
     return props.nodes.map((n: Node, i: number) => (
         <g
             id={n.id.toString()}
@@ -24,29 +24,6 @@ export function DynamicNodes(props: DynamicNodesProps) {
         >
             <circle cx={n.x} cy={n.y} r={11} fill="black" />
             <circle cx={n.x} cy={n.y} r={9} fill="white" />
-            <text
-                x={n.x}
-                y={n.y}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="black"
-                fontSize="10"
-                pointerEvents="none"
-            >
-                {i}
-            </text>
-        </g>
-    ));
-}
-
-export function StaticNodes(props: StaticNodesProps) {
-    return props.nodes.map((n: Node, i: number) => (
-        <g
-            id={n.id.toString()}
-            key={n.id}
-        >
-            <circle cx={n.x} cy={n.y} r={11} fill="black"/>
-            <circle cx={n.x} cy={n.y} r={9} fill="white"/>
             <text
                 x={n.x}
                 y={n.y}

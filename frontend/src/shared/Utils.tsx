@@ -1,4 +1,4 @@
-import type {Graph, Node} from "./Types.tsx"
+import type { Node } from "./Types.tsx"
 
 export function getNodeById(nodes: Node[], id: string): Node{
     return nodes.find((n) => n.id === id)!;
@@ -6,26 +6,6 @@ export function getNodeById(nodes: Node[], id: string): Node{
 
 export function getRandomId(): string{
     return "i" + Math.floor(Date.now() * Math.random()).toString()
-}
-
-export function getRandomGraph(n: number, d: number, w: number, h: number) : Graph {
-
-    const graph: Graph = {nodes: [], edges: []};
-
-    for (let i = 0; i < n; i++) {
-        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * w * 0.45);
-        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.45);
-        graph.nodes.push({ x: xCoordinate, y: yCoordinate, id: getRandomId() })
-    }
-
-    for (let i = 0; i < graph.nodes.length; i++) {
-        for (let j = i+1; j < graph.nodes.length; j++) {
-            if(Math.random() < d) {
-                graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId() });
-            }
-        }
-    }
-    return graph;
 }
 
 export async function compressAndEncode(str: string) {

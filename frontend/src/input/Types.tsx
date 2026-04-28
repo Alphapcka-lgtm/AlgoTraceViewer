@@ -1,0 +1,23 @@
+import type { AnimationRequest } from "../shared/Types.tsx";
+import type { Dispatch, SetStateAction } from "react";
+
+export type Interaction =
+    | { type: "idle" }
+    | { type: "dragging"; nodeId: string }
+    | { type: "drawing-edge"; fromId: string; to?: { x: number; y: number }
+};
+
+export type SVGInputProps = {
+    input: AnimationRequest,
+    setInput: Dispatch<SetStateAction<AnimationRequest>>,
+    mode: string,
+    height: number,
+};
+
+export type InputControlProps = {
+    input: AnimationRequest,
+    setInput: Dispatch<SetStateAction<AnimationRequest>>,
+    setInteraction: Dispatch<SetStateAction<Interaction>>,
+    height: number,
+    width: number,
+};
