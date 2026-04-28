@@ -23,7 +23,7 @@ export function SVGOutput(props: SVGOutputProps) {
             onComplete: () => setIsPlaying(false)
         });
 
-        if (props.mode == "Output") {
+        if (props.mode === "Output") {
             props.output.intermediateStates.forEach((intermediateState) => {
                 const pickRandomEdge = getRandomId();
                 const markIncidentEdges = getRandomId();
@@ -42,55 +42,57 @@ export function SVGOutput(props: SVGOutputProps) {
         }
     }, {dependencies: [props.output.timestamp, props.mode], revertOnUpdate: true});
 
+    const jumpToPreviousStep = () => {
+        if (isPlaying){
+            stopAnimation();
+        }
+        tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
+        props.setCurrentProgress(tlRef.current.progress());
+    }
+
+    const stopAnimation = () => {
+        tlRef.current.pause();
+        setIsPlaying(false);
+    }
+
+    const startAnimation = () => {
+        if (props.currentProgress === 1){
+            tlRef.current.play(0);
+        } else {
+            tlRef.current.play();
+        }
+        setIsPlaying(true);
+    }
+
+    const jumpToNextStep = () => {
+        if (isPlaying){
+            stopAnimation();
+        }
+        tlRef.current.seek(tlRef.current.nextLabel());
+        props.setCurrentProgress(tlRef.current.progress());
+    }
+
+    const resetAnimation = () => {
+        if (isPlaying){
+            setIsPlaying(false);
+        }
+        tlRef.current.pause(0);
+        props.setCurrentProgress(0);
+    }
+
     return props.mode === "Input" ? <></> : <>
-        <svg height={props.height} style={{ border: "2px solid black", borderRadius: "30px"}}>
-            <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes} idPrefix={""} />
-            <StaticNodes nodes={props.output.initialState.nodes} idPrefix={""}/>
+        <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } >
+            <Edges edges={ props.output.initialState.edges } nodes={ props.output.initialState.nodes } idPrefix={ "" } />
+            <StaticNodes nodes={ props.output.initialState.nodes } idPrefix={ "" } />
         </svg>
-        <div style={{display: "flex", flexDirection: "column", gap: 3}}>
-            <div style={{display: "flex", gap: 3}}>
-                <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    if(isPlaying){
-                        tlRef.current.pause();
-                        setIsPlaying(false);
-                    }
-                    tlRef.current.seek(tlRef.current.previousLabel(tlRef.current.time() - 0.01 < 0 ? 0.01 : tlRef.current.time() - 0.01));
-                    props.setCurrentProgress(tlRef.current.progress());
-                }}>Previous Step</button>
-                <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    if(isPlaying){
-                        tlRef.current.pause();
-                        setIsPlaying(false);
-                    }else{
-                        if(props.currentProgress == 1){
-                            tlRef.current.play(0);
-                        } else {
-                            tlRef.current.play();
-                        }
-                        setIsPlaying(true);
-                    }
-                }}>{isPlaying ? "Pause" : "Play"}</button>
-                <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    if(isPlaying){
-                        tlRef.current.pause();
-                        setIsPlaying(false);
-                    }
-                    tlRef.current.seek(tlRef.current.nextLabel());
-                    props.setCurrentProgress(tlRef.current.progress());
-                }}>Next Step</button>
+        <div style={ { display: "flex", flexDirection: "column", gap: 3 } } >
+            <div style={ { display: "flex", gap: 3 } } >
+                <button onClick={ () => jumpToPreviousStep() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Previous Step</button>
+                <button onClick={ () => isPlaying ? stopAnimation() : startAnimation() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >{isPlaying ? "Pause" : "Play"}</button>
+                <button onClick={ () => jumpToNextStep() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Next Step</button>
             </div>
-            <div style={{display: "flex", gap: 3}}>
-                <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                    if(isPlaying){
-                        setIsPlaying(false);
-                    }
-                    tlRef.current.pause(0);
-                    props.setCurrentProgress(0);
-                }}>Reset</button>
-            </div>
-            <input id={"progress"} type={"range"} min={0} max={1} step={"any"} value={props.currentProgress} onInput={(e) => {
-                tlRef.current.progress(e.currentTarget.valueAsNumber);
-            }}/>
+            <button onClick={ () => resetAnimation() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Reset</button>
+            <input type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.currentProgress } onInput={ (e) => tlRef.current.progress(e.currentTarget.valueAsNumber) } />
         </div>
     </>;
 }
