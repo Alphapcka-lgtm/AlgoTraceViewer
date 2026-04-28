@@ -23,22 +23,23 @@ export function SVGOutput(props: SVGOutputProps) {
             onComplete: () => setIsPlaying(false)
         });
 
-        props.output.intermediateStates.forEach((intermediateState) => {
-            const pickRandomEdge = getRandomId();
-            const markIncidentEdges = getRandomId();
-            const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 0.1};
-            const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 0.1};
+        if (props.mode == "Output") {
+            props.output.intermediateStates.forEach((intermediateState) => {
+                const pickRandomEdge = getRandomId();
+                const markIncidentEdges = getRandomId();
+                const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 0.1};
+                const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 0.1};
 
-            tlRef.current.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
-            tlRef.current.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
-            tlRef.current.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
+                tlRef.current.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
+                tlRef.current.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
+                tlRef.current.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
 
-            intermediateState.incidentEdges.forEach((incidentEdge) => {
-                tlRef.current.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
+                intermediateState.incidentEdges.forEach((incidentEdge) => {
+                    tlRef.current.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
+                });
             });
-        });
-
-        tlRef.current.progress(props.currentProgress);
+            tlRef.current.progress(props.currentProgress);
+        }
     }, {dependencies: [props.output.timestamp, props.mode], revertOnUpdate: true});
 
     return props.mode === "Input" ? <></> : <>
