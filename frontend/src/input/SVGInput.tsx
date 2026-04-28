@@ -1,11 +1,12 @@
 import type { Interaction, SVGInputProps } from "./Types.tsx";
 import type { Node, Edge } from "../shared/Types.tsx";
 
-import { getNodeById, getRandomId } from "../shared/Utils.tsx";
+import { getRandomId } from "../shared/Utils.tsx";
 import { Edges, PreviewEdge } from "../shared/Edges.tsx";
 import { InputControl } from "./InputControl.tsx";
 import { Nodes } from "../shared/Nodes.tsx";
 import { useState, useRef } from "react";
+import * as React from "react";
 
 
 export function SVGInput(props: SVGInputProps) {
@@ -91,9 +92,9 @@ export function SVGInput(props: SVGInputProps) {
 
     return props.mode === "Output" ? <></> : <>
             <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } onClick={ handleCanvasClick } onMouseMove={ handleMouseMove } >
-                <Nodes nodes={ props.input.graph.nodes } { ...clickEventHandler } />
-                { interaction.type === "drawing-edge" ? <PreviewEdge fromNode={ getNodeById(props.input.graph.nodes, interaction.fromId) } to={ interaction.to } /> : <></> }
+                <PreviewEdge nodes={ props.input.graph.nodes } interaction={ interaction } />
                 <Edges nodes={ props.input.graph.nodes } edges={ props.input.graph.edges } />
+                <Nodes nodes={ props.input.graph.nodes } { ...clickEventHandler } />
             </svg>
             <InputControl setInput={ props.setInput } input={ props.input } setInteraction={ setInteraction } height={ props.height } width={ 1100 } />
         </>;

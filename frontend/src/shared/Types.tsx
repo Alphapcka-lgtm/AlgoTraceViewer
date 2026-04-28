@@ -1,3 +1,5 @@
+import type {Interaction} from "../input/Types.tsx";
+
 export type Node = {
     x: number,
     y: number,
@@ -29,8 +31,8 @@ export type EdgesProps = {
 };
 
 export type PreviewEdgeProps = {
-    fromNode: Node,
-    to?: {x: number; y: number},
+    interaction: Interaction,
+    nodes: Node[],
 };
 
 export type AnimationResponse = {

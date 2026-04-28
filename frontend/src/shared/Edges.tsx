@@ -22,14 +22,18 @@ export function Edges(props: EdgesProps) {
 }
 
 export function PreviewEdge(props: PreviewEdgeProps) {
-    return props.to ? <line
-        key={-1}
-        x1={props.fromNode.x}
-        y1={props.fromNode.y}
-        x2={props.to.x}
-        y2={props.to.y}
-        stroke="black"
-        strokeWidth={1}
-        strokeDasharray="4"
-    /> : <></>;
-}
+    if(props.interaction.type === "drawing-edge" && props.interaction.to) {
+        const node = getNodeById(props.nodes, props.interaction.fromId);
+        return <line
+            key={-1}
+            x1={node.x}
+            y1={node.y}
+            x2={props.interaction.to.x}
+            y2={props.interaction.to.y}
+            stroke="black"
+            strokeWidth={1}
+            strokeDasharray="4"
+        />;
+    }
+
+    }
