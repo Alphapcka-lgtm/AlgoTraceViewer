@@ -24,52 +24,57 @@ function App() {
                 setInputState({...input, randomSeed: output.randomSeed});
                 setOutputState(output);
             });
-    }
+    };
+
+    const submitInput = () => {
+        if(inputState.timestamp > outputState.timestamp) {
+            fetchAnimationAndSetMode(inputState)
+                .then(() => {
+                    setCurrentProgressState(0);
+                    setModeState("Output");
+                });
+        } else {
+            setModeState("Output");
+        }
+    };
+
+    const exportAnimationState = () => {
+        compressAndEncode(JSON.stringify({
+            input: inputState,
+            initialProgress: currentProgressState,
+        }))
+            .then((ex) => {
+                // navigator.clipboard.writeText(ex);
+                const el = document.getElementById("exportImport") as HTMLInputElement;
+                el.value = ex;
+            });
+    };
+
+    const importAnimationState = () => {
+        const el = document.getElementById("exportImport") as HTMLInputElement;
+        decodeAndDecompress(el.value)
+            .then((im) => {
+                const state = JSON.parse(im) as ExportImport;
+                fetchAnimationAndSetMode(state.input)
+                    .then(() => {
+                        setCurrentProgressState(state.initialProgress);
+                    });
+            });
+    };
 
   return (
-      <div style={{display: "flex", flexDirection: "column", gap: 3, padding: 3}}>
-          <div style={{display: "flex", gap: 3}}>
-              {modeState === "Output" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => setModeState("Input")}>Change Input</button> : <></>}
-              <p style={{flex: 3, border: "2px solid black", borderRadius: "30px"}}>{modeState}</p>
-              {modeState === "Input" ? <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                  if(inputState.timestamp > outputState.timestamp) {
-                      fetchAnimationAndSetMode(inputState)
-                          .then(() => {
-                              setCurrentProgressState(0);
-                              setModeState("Output");
-                          });
-                  } else {
-                      setModeState("Output");
-                  }
-              }}>Submit</button> : <></>}
+      <div style={ { display: "flex", flexDirection: "column", gap: 3, padding: 3 } } >
+          <div style={ { display: "flex", gap: 3 } } >
+              { modeState === "Output" ? <button onClick={ () => setModeState("Input") } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Change Input</button> : <></>}
+              <p style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } >{ modeState }</p>
+              { modeState === "Input" ? <button onClick={ () => submitInput() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Submit</button> : <></> }
           </div>
-          <SVGInput height={svgHeight} input={inputState} setInput={setInputState} mode={modeState} />
-          <SVGOutput height={svgHeight} output={outputState} currentProgress={currentProgressState} setCurrentProgress={setCurrentProgressState} mode={modeState} />
-          <div style={{display: "flex", gap: 3}}>
-
-              <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                  compressAndEncode(JSON.stringify({
-                      input: inputState,
-                      initialProgress: currentProgressState,
-                  })).then((ex) => {
-                      navigator.clipboard.writeText(ex);
-                      const el = document.getElementById("exportImport") as HTMLInputElement;
-                      el.value = ex;
-                  });
-              }}>Export</button>
-
-              <input id={"exportImport"} style={{flex: 3, border: "2px solid black", borderRadius: "30px"}}/>
-
-              <button style={{flex: 1, border: "2px solid black", borderRadius: "30px"}} onClick={() => {
-                  const el = document.getElementById("exportImport") as HTMLInputElement;
-                  decodeAndDecompress(el.value).then((im) => {
-                      const state = JSON.parse(im) as ExportImport;
-                      fetchAnimationAndSetMode(state.input)
-                          .then(() => {
-                              setCurrentProgressState(state.initialProgress);
-                      });
-                  });
-              }}>Import</button>
+          <SVGInput height={ svgHeight } input={ inputState } setInput={ setInputState } mode={ modeState } />
+          <SVGOutput height={ svgHeight } output={ outputState } currentProgress={ currentProgressState } setCurrentProgress={ setCurrentProgressState } mode={ modeState } />
+          <div style={ { display: "flex", gap: 3 } } >
+              <button onClick={ () => exportAnimationState() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Export</button>
+              <input id={"exportImport"} style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } />
+              <button onClick={ () => importAnimationState() } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Import</button>
           </div>
       </div>
     )
