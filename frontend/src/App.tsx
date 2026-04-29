@@ -1,9 +1,9 @@
-import { compressAndEncode, decodeAndDecompress } from "./shared/Utils.tsx";
 import { SVGOutput } from "./output/SVGOutput.tsx";
 import { SVGInput } from "./input/SVGInput.tsx";
 import { useState } from "react";
 
-import type { AnimationResponse, ExportImport, AnimationRequest } from "./shared/Types.tsx";
+import type { AnimationResponse, AnimationRequest, ExportImport } from "./shared/Types.tsx";
+import { compressAndEncode, decodeAndDecompress } from "./shared/Utils.tsx";
 
 function App() {
     const [mode, setMode] = useState<"Input" | "Output">("Input");
@@ -13,7 +13,7 @@ function App() {
 
     const svgHeight = 500;
 
-    const fetchAnimationAndSetMode = async (input: AnimationRequest) => {
+    const fetchAnimation = async (input: AnimationRequest) => {
         return fetch("http://localhost:8080/vertexcover/random", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -29,7 +29,7 @@ function App() {
 
     const submitInput = () => {
         if(input.timestamp > output.timestamp) {
-            fetchAnimationAndSetMode(input)
+            fetchAnimation(input)
                 .then(() => {
                     setProgress(0);
                     setMode("Output");
@@ -56,7 +56,7 @@ function App() {
         decodeAndDecompress(el.value)
             .then((im) => {
                 const state = JSON.parse(im) as ExportImport;
-                fetchAnimationAndSetMode(state.input)
+                fetchAnimation(state.input)
                     .then(() => {
                         setProgress(state.initialProgress);
                     });
@@ -73,10 +73,10 @@ function App() {
           <SVGInput setInput={ setInput } input={ input } mode={ mode } height={ svgHeight } />
           <SVGOutput setProgress={ setProgress } progress={ progress } mode={ mode } output={ output } height={ svgHeight } />
           <div style={ { display: "flex", gap: 3 } } >
-              <button onClick={ exportAnimationState } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Export</button>
-              <input id={"exportImport"} style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } />
-              <button onClick={ importAnimationState } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Import</button>
-          </div>
+            <button onClick={ exportAnimationState } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Export</button>
+            <input id={"exportImport"} style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } />
+            <button onClick={ importAnimationState } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Import</button>
+        </div>
       </div>
     )
 }

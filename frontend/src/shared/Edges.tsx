@@ -1,6 +1,7 @@
-import type { Edge, PreviewEdgeProps, EdgesProps } from "./Types.tsx";
+import type { Edge, EdgesProps } from "./Types.tsx";
 
 import { getNodeById } from "./Utils.tsx";
+import type {PreviewEdgeProps} from "../input/Types.tsx";
 
 export function Edges(props: EdgesProps) {
     return props.edges.map((e: Edge) => {

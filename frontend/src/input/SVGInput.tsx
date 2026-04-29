@@ -88,13 +88,13 @@ export function SVGInput(props: SVGInputProps) {
         setInteraction({ type: "idle" });
     };
 
-    const clickEventHandler = { onClick: handleNodeClick, onMouseDown: handleNodeMouseDown, onMouseUp: handleNodeMouseUp, onDoubleClick: handleNodeDoubleClick };
+    const eventHandler = { onClick: handleNodeClick, onMouseDown: handleNodeMouseDown, onMouseUp: handleNodeMouseUp, onDoubleClick: handleNodeDoubleClick };
 
     return props.mode === "Output" ? <></> : <>
             <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } onClick={ handleCanvasClick } onMouseMove={ handleMouseMove } >
                 <PreviewEdge nodes={ props.input.graph.nodes } interaction={ interaction } />
                 <Edges nodes={ props.input.graph.nodes } edges={ props.input.graph.edges } />
-                <Nodes nodes={ props.input.graph.nodes } { ...clickEventHandler } />
+                <Nodes nodes={ props.input.graph.nodes } { ...eventHandler } />
             </svg>
             <InputControl setInput={ props.setInput } input={ props.input } setInteraction={ setInteraction } height={ props.height } width={ 1100 } />
         </>;

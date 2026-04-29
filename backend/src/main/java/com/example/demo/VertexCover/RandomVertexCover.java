@@ -4,8 +4,6 @@ import com.example.demo.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 public class RandomVertexCover {

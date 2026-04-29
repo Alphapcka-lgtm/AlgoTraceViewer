@@ -1,5 +1,3 @@
-import type {Interaction} from "../input/Types.tsx";
-
 export type Node = {
     x: number,
     y: number,
@@ -30,11 +28,6 @@ export type EdgesProps = {
     edges: Edge[],
 };
 
-export type PreviewEdgeProps = {
-    interaction: Interaction,
-    nodes: Node[],
-};
-
 export type AnimationResponse = {
     initialState: Graph,
     intermediateStates: AnimationState[],
@@ -58,4 +51,4 @@ export type AnimationRequest = {
 export type ExportImport = {
     input: AnimationRequest,
     initialProgress: number,
-}
+};
