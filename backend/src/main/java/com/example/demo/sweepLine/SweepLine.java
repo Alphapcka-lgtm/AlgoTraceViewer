@@ -14,28 +14,30 @@ public class SweepLine {
     public AnimationResponse solve(Graph graph) {
         if(graph.nodes().size() < 2){throw new IllegalStateException();}
 
-        List<Node> points = graph.nodes().stream().sorted(Comparator.comparingDouble(Node::x).thenComparingDouble(Node::y)).toList();
+        List<Node> sortedNodes = graph.nodes().stream().sorted(Comparator.comparingDouble(Node::x).thenComparingDouble(Node::y)).toList();
         List<AnimationState> intermediateStates = new ArrayList<>();
         double d = 2000;
 
-        for(int i = 1; i < points.size(); i++){
+        for(int i = 1; i < sortedNodes.size(); i++){
             List<Node> nodesToCompare = new ArrayList<>();
-            Node closestPoint = null;
+            Node closestNode = null;
             int j = i - 1;
-            while(j >= 0 && Math.abs(points.get(i).x() - points.get(j).x()) < d){
-                if(Math.abs(points.get(i).y() - points.get(j).y()) < d) {
-                    nodesToCompare.add(points.get(j));
+            while(j >= 0 && Math.abs(sortedNodes.get(i).x() - sortedNodes.get(j).x()) < d){
+                if(Math.abs(sortedNodes.get(i).y() - sortedNodes.get(j).y()) < d) {
+                    nodesToCompare.add(sortedNodes.get(j));
                 }
                 j--;
             }
 
+            j = 0;
             while(j < nodesToCompare.size()){
-                if(getDistance(nodesToCompare.get(j), points.get(i)) < d){
-                    closestPoint = nodesToCompare.get(j);
-                    d = getDistance(nodesToCompare.get(j), points.get(i));
+                if(getDistance(nodesToCompare.get(j), sortedNodes.get(i)) < d){
+                    closestNode = nodesToCompare.get(j);
+                    d = getDistance(nodesToCompare.get(j), sortedNodes.get(i));
+                    j++;
                 }
             }
-            intermediateStates.add(AnimationState.builder().CurrentPoint(points.get(i)).ClosestPoint(closestPoint).d(d).build());
+            intermediateStates.add(AnimationState.builder().CurrentNode(sortedNodes.get(i)).ClosestNode(closestNode).d(d).build());
         }
 
         return AnimationResponse.builder().initialState(graph).intermediateStates(intermediateStates).timestamp(System.currentTimeMillis()).build();

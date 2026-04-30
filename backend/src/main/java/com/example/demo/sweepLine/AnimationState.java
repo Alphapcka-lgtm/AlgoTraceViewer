@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 @Builder
 public class AnimationState {
-    public final Node CurrentPoint;
+    public final Node CurrentNode;
     public final List<Node> pointsToCompare;
-    public final Node ClosestPoint;
+    public final Node ClosestNode;
     public final Double d;
 }
