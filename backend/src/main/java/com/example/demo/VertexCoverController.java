@@ -1,7 +1,9 @@
 package com.example.demo;
 
-import com.example.demo.VertexCover.OptimalVertexCover;
-import com.example.demo.VertexCover.RandomVertexCover;
+import com.example.demo.vertexCover.AnimationRequest;
+import com.example.demo.vertexCover.AnimationResponse;
+import com.example.demo.vertexCover.OptimalVertexCover;
+import com.example.demo.vertexCover.RandomVertexCover;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
         allowedHeaders = "*",
         methods = {RequestMethod.POST, RequestMethod.OPTIONS}
 )
-public class Controller {
+public class VertexCoverController {
 
     RandomVertexCover randomVertexCover;
     OptimalVertexCover optimalVertexCover;
 
     @Autowired
-    public Controller(RandomVertexCover randomVertexCover,  OptimalVertexCover optimalVertexCover) {
+    public VertexCoverController(RandomVertexCover randomVertexCover, OptimalVertexCover optimalVertexCover) {
         this.randomVertexCover = randomVertexCover;
         this.optimalVertexCover = optimalVertexCover;
     }

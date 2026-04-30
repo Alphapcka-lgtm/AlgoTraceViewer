@@ -1,6 +1,8 @@
-package com.example.demo.VertexCover;
+package com.example.demo.vertexCover;
 
-import com.example.demo.*;
+import com.example.demo.model.Edge;
+import com.example.demo.model.Graph;
+import com.example.demo.model.Node;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

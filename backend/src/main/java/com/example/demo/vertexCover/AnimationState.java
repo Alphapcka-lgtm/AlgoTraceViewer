@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.demo.vertexCover;
 
+import com.example.demo.model.Edge;
+import com.example.demo.model.Node;
 import lombok.Builder;
 import lombok.Data;
 
