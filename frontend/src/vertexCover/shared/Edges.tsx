@@ -8,7 +8,7 @@ export function Edges(props: EdgesProps) {
         const from = getNodeById(props.nodes, e.fromId);
         const to = getNodeById(props.nodes, e.toId);
 
-        const p = "M " + (from.x) + " " + (from.y) + " L " + (to.x) + " " + (to.y);
+        const p = "M " + (1920 * from.x) + " " + (1080 * from.y) + " L " + (1920 * to.x) + " " + (1080 * to.y);
 
         return (
             <path
@@ -16,7 +16,7 @@ export function Edges(props: EdgesProps) {
                 key={e.id}
                 d={p}
                 stroke="black"
-                strokeWidth={2}
+                strokeWidth={3}
             />
         );
     });
@@ -27,10 +27,10 @@ export function PreviewEdge(props: PreviewEdgeProps) {
         const node = getNodeById(props.nodes, props.interaction.fromId);
         return <line
             key={-1}
-            x1={node.x}
-            y1={node.y}
-            x2={props.interaction.to.x}
-            y2={props.interaction.to.y}
+            x1={1920 * node.x}
+            y1={1080 * node.y}
+            x2={1920 * props.interaction.to.x}
+            y2={1080 * props.interaction.to.y}
             stroke="black"
             strokeWidth={1}
             strokeDasharray="4"

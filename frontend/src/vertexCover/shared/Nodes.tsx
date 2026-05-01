@@ -22,15 +22,15 @@ export function Nodes(props: NodesProps) {
                 props.onDoubleClick(n.id);
             }}
         >
-            <circle cx={n.x} cy={n.y} r={11} fill="black" />
-            <circle cx={n.x} cy={n.y} r={9} fill="white" />
+            <circle cx={1920 * n.x} cy={1080 * n.y} r={20} fill="black" />
+            <circle cx={1920 * n.x} cy={1080 * n.y} r={15} fill="white" />
             <text
-                x={n.x}
-                y={n.y}
+                x={1920 * n.x}
+                y={1080 * n.y}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="black"
-                fontSize="10"
+                fontSize="21"
                 pointerEvents="none"
             >
                 {i}

@@ -11,15 +11,12 @@ export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     mode: string,
-    height: number,
 };
 
 export type InputControlProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
-    height: number,
-    width: number,
 };
 
 export type PreviewEdgeProps = {

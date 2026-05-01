@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { AnimationResponse, AnimationRequest, ExportImport } from "./shared/Types.tsx";
 import { compressAndEncode, decodeAndDecompress } from "./shared/Utils.tsx";
 
-function VertexCover() {
+export function SweepLine() {
     const [mode, setMode] = useState<"Input" | "Output">("Input");
     const [input, setInput] = useState<AnimationRequest>({graph: {nodes: [] }, timestamp: 1});
     const [output, setOutput] = useState<AnimationResponse>({initialState: {nodes: []}, intermediateStates: [], timestamp: 0});
@@ -79,5 +79,3 @@ function VertexCover() {
         </div>
     )
 }
-
-export default VertexCover;

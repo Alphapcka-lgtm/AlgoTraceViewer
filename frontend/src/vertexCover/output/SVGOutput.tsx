@@ -47,7 +47,7 @@ export function SVGOutput(props: SVGOutputProps) {
     const clickEventHandler = { onClick: () => {}, onMouseDown: () => {}, onMouseUp: () => {}, onDoubleClick: () => {} };
 
     return props.mode === "Input" ? <></> : <>
-        <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } >
+        <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style={ { flex: 1, width: "100%", border: "2px solid black", borderRadius: "30px" } } >
             <Edges edges={ props.output.initialState.edges } nodes={ props.output.initialState.nodes } />
             <Nodes nodes={ props.output.initialState.nodes } { ...clickEventHandler } />
         </svg>

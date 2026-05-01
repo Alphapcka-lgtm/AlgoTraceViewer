@@ -13,16 +13,17 @@ export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
     const didNodeMove = useRef(false);
 
-    const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
+    const getRelativeCoordinates = (e: React.MouseEvent<SVGElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    };
+        return { x: (e.clientX - rect.left) / (rect.width), y: (e.clientY - rect.top)  / (rect.height) };
+
+    }
 
     const edgeExists = (a: string, b: string, edges: Edge[]) => edges.some((e) => (e.fromId === a && e.toId === b) || (e.fromId === b && e.toId === a));
 
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
         if (interaction.type === "idle") {
-            const { x, y } = getMousePos(e);
+            const { x, y } = getRelativeCoordinates(e);
             props.setInput((prev) => {
                 return { ...prev, graph: { ...prev.graph, nodes: [...prev.graph.nodes, { x, y, id: getRandomId() }] }, timestamp: Date.now() };
             });
@@ -32,7 +33,7 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-        const pos = getMousePos(e);
+        const pos = getRelativeCoordinates(e);
 
         setInteraction((interaction) => {
             if(interaction.type === "drawing-edge"){
@@ -91,11 +92,11 @@ export function SVGInput(props: SVGInputProps) {
     const eventHandler = { onClick: handleNodeClick, onMouseDown: handleNodeMouseDown, onMouseUp: handleNodeMouseUp, onDoubleClick: handleNodeDoubleClick };
 
     return props.mode === "Output" ? <></> : <>
-            <svg height={ props.height } style={ { border: "2px solid black", borderRadius: "30px" } } onClick={ handleCanvasClick } onMouseMove={ handleMouseMove } >
+            <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style={ { flex: 1, width: "100%", border: "2px solid black", borderRadius: "30px" } } onClick={ handleCanvasClick } onMouseMove={ handleMouseMove } width={1} >
                 <PreviewEdge nodes={ props.input.graph.nodes } interaction={ interaction } />
                 <Edges nodes={ props.input.graph.nodes } edges={ props.input.graph.edges } />
                 <Nodes nodes={ props.input.graph.nodes } { ...eventHandler } />
             </svg>
-            <InputControl setInput={ props.setInput } input={ props.input } setInteraction={ setInteraction } height={ props.height } width={ 1100 } />
+            <InputControl setInput={ props.setInput } input={ props.input } setInteraction={ setInteraction } />
         </>;
 }

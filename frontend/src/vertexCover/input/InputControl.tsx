@@ -8,7 +8,7 @@ export function InputControl(props: InputControlProps ) {
     const setRandomGraph = () => {
         const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;
         const density = document.getElementById("graphDensityInputSlider") as HTMLInputElement;
-        const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber, props.width, props.height);
+        const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber);
         props.setInput((input) => {
             return { ...input, densityFactor: density.valueAsNumber, graph: graph, timestamp: Date.now() };
         });
@@ -36,12 +36,12 @@ export function InputControl(props: InputControlProps ) {
     </div>;
 }
 
-function getRandomGraph(n: number, d: number, w: number, h: number) : Graph {
+function getRandomGraph(n: number, d: number) : Graph {
     const graph: Graph = {nodes: [], edges: []};
 
     for (let i = 0; i < n; i++) {
-        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * w * 0.45);
-        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * h * 0.45);
+        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
+        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
         graph.nodes.push({ x: xCoordinate, y: yCoordinate, id: getRandomId() })
     }
 
