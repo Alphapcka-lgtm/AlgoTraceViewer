@@ -37,3 +37,7 @@ export type ExportImport = {
     input: AnimationRequest,
     initialProgress: number,
 };
+
+export type SweepingBoxesProps = {
+    animationSteps: AnimationState[]
+}

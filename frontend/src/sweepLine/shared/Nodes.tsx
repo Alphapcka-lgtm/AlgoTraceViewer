@@ -5,6 +5,9 @@ export function Nodes(props: NodesProps) {
         <g
             id={n.id.toString()}
             key={n.id}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
             onMouseDown={(e) => {
                 e.stopPropagation();
                 props.onMouseDown(n.id);
@@ -18,15 +21,15 @@ export function Nodes(props: NodesProps) {
                 props.onDoubleClick(n.id);
             }}
         >
-            <circle cx={n.x} cy={n.y} r={11} fill="black" />
-            <circle cx={n.x} cy={n.y} r={9} fill="white" />
+            <circle cx={n.x} cy={n.y} r={20} fill="black" />
+            <circle cx={n.x} cy={n.y} r={15} fill="white" />
             <text
                 x={n.x}
                 y={n.y}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="black"
-                fontSize="10"
+                fontSize="21"
                 pointerEvents="none"
             >
                 {i}

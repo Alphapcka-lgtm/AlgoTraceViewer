@@ -7,16 +7,11 @@ import { Nodes } from "../shared/Nodes.tsx";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 
-import MorphSVGPlugin from "gsap/MorphSVGPlugin";
-import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import gsap from "gsap";
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-
-    gsap.registerPlugin(DrawSVGPlugin);
-    gsap.registerPlugin(MorphSVGPlugin);
 
     useGSAP(() => {
         tlRef.current = gsap.timeline({

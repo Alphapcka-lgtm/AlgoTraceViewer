@@ -16,7 +16,7 @@ public class SweepLine {
 
         List<Node> sortedNodes = graph.nodes().stream().sorted(Comparator.comparingDouble(Node::x).thenComparingDouble(Node::y)).toList();
         List<AnimationState> intermediateStates = new ArrayList<>();
-        double d = 2000;
+        double d = 3000;
 
         for(int i = 1; i < sortedNodes.size(); i++){
             List<Node> nodesToCompare = new ArrayList<>();
@@ -34,10 +34,10 @@ public class SweepLine {
                 if(getDistance(nodesToCompare.get(j), sortedNodes.get(i)) < d){
                     closestNode = nodesToCompare.get(j);
                     d = getDistance(nodesToCompare.get(j), sortedNodes.get(i));
-                    j++;
                 }
+                j++;
             }
-            intermediateStates.add(AnimationState.builder().CurrentNode(sortedNodes.get(i)).ClosestNode(closestNode).d(d).build());
+            intermediateStates.add(AnimationState.builder().currentNode(sortedNodes.get(i)).closestNode(closestNode).d(d).build());
         }
 
         return AnimationResponse.builder().initialState(graph).intermediateStates(intermediateStates).timestamp(System.currentTimeMillis()).build();

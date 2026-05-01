@@ -4,7 +4,6 @@ import type { AnimationResponse } from "../shared/Types.tsx";
 export type SVGOutputProps = {
     output: AnimationResponse,
     mode: string,
-    height: number,
     progress: number,
     setProgress:  Dispatch<SetStateAction<number>>,
 };

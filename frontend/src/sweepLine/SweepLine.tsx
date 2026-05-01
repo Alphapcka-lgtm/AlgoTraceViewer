@@ -11,8 +11,6 @@ export function SweepLine() {
     const [output, setOutput] = useState<AnimationResponse>({initialState: {nodes: []}, intermediateStates: [], timestamp: 0});
     const [progress, setProgress] = useState<number>(0);
 
-    const svgHeight = 500;
-
     const fetchAnimation = async (input: AnimationRequest) => {
         return fetch("http://localhost:8080/sweepline", {
             method: "POST",
@@ -69,8 +67,8 @@ export function SweepLine() {
                 <p style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } >{ mode }</p>
                 { mode === "Input" ? <button onClick={ submitInput } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Submit</button> : <></> }
             </div>
-            <SVGInput setInput={ setInput } input={ input } mode={ mode } height={ svgHeight } />
-            <SVGOutput setProgress={ setProgress } progress={ progress } mode={ mode } output={ output } height={ svgHeight } />
+            <SVGInput setInput={ setInput } input={ input } mode={ mode } />
+            <SVGOutput setProgress={ setProgress } progress={ progress } mode={ mode } output={ output } />
             <div style={ { display: "flex", gap: 3 } } >
                 <button onClick={ exportAnimationState } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Export</button>
                 <input id={"exportImport"} style={ { flex: 3, border: "2px solid black", borderRadius: "30px" } } />
