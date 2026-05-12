@@ -9,7 +9,8 @@ export function SweepingBoxes(props: SweepingBoxesProps) {
                     id={ "a" + as.currentNode.id }
                     className={"sweepingBox"}
                     x={as.currentNode.x - props.animationSteps[i-1].d}
-                    y={ -10 } width={ props.animationSteps[i-1].d }
+                    y={ -10 }
+                    width={ props.animationSteps[i-1].d }
                     height={ 1100 }
                     display={"none"}
                     fill="none"
@@ -21,7 +22,8 @@ export function SweepingBoxes(props: SweepingBoxesProps) {
                     id={ "b" + as.currentNode.id }
                     className={"sweepingBox"}
                     x={as.currentNode.x - as.d}
-                    y={ -10 } width={ as.d }
+                    y={ -10 }
+                    width={ as.d }
                     height={ 1100 }
                     display={"none"}
                     fill="none"
@@ -36,7 +38,8 @@ export function SweepingBoxes(props: SweepingBoxesProps) {
                     id={ "a" + as.currentNode.id }
                     className={"sweepingBox"}
                     x={as.currentNode.x - as.d}
-                    y={ -10 } width={ as.d }
+                    y={ -10 }
+                    width={ as.d }
                     height={ 1100 }
                     fill="none"
                     stroke="red"
