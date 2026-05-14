@@ -1,11 +1,14 @@
-import { useState } from "react";
+import {useState} from "react";
 import { SVGInput } from "./SVGInput";
-import { sendInputPointsToBackend } from "./Api";
-import type { Node } from "./Types";
+import useSweepLineSteps from "./Api.tsx";
+import type {Node} from "./Types";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
     const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
+    //const {algoSteps, loading, error, calculateSteps} = useSweepLineSteps();
+    const {calculateSteps} = useSweepLineSteps();
+
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -28,17 +31,16 @@ export default function App() {
         setNodes([]);
     };
 
-    const handleSubmit = async (nodes: Node[]) => {
+    const handleSubmit = async () => {
         console.log("Submitted:", nodes);
         setModeState("output");
 
         try {
-            const result = await sendInputPointsToBackend(nodes);
+            const result = await calculateSteps(nodes);
             console.log(result);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
         }
-
     };
 
     const handleChangeInput = () => {

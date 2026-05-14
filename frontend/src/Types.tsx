@@ -35,3 +35,23 @@ export type SVGInputProps = {
     onSubmit: (nodes: Node[]) => void;
     onChangeInput: () => void;
 };
+
+
+interface Result {
+    p1: Node;
+    p2: Node;
+    distance: number;
+}
+
+export interface AlgorithmStepDTO {
+    stepIndex: number;
+    description: string;
+    currentPoint: Node;
+    sweepLineX: number;
+    delta: number;
+    activePoints: Node[];
+    allPoints: Node[];
+    bestPair: Result | null;
+    candidatePairs: Result[];
+    processedPoints: Node[];
+}
