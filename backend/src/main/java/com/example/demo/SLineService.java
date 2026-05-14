@@ -9,17 +9,9 @@ import java.util.*;
 @Getter
 @Service
 public class SLineService {
-    private final List<AlgorithmStepDTO> steps;
 
-    public SLineService() {
-        this.steps = new ArrayList<>();
-    }
-
-    private void addStep(AlgorithmStepDTO step){
-        steps.add(step);
-    }
-
-    public void nearestPoints(List<Point> points) {
+    public List<AlgorithmStepDTO> nearestPoints(List<Point> points) {
+        List<AlgorithmStepDTO> steps = new ArrayList<>();
 
         if(points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points");
@@ -56,7 +48,7 @@ public class SLineService {
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.id() + ", "
                 + p1.id() + ") = " + String.format("%.2f", delta);
-        addStep(new AlgorithmStepDTO(0, description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
+        steps.add(new AlgorithmStepDTO(0, description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
                 List.of(new Result(p0,p1,delta)), List.of()));
 
         //nach y sotieren
@@ -73,7 +65,7 @@ public class SLineService {
         //ist quasi der linke rand des balkens
         int tail=0;
 
-        // Already fully processed points (for visualization)
+        // Already fully processed points (only for visualization)
         List<Point> processed = new ArrayList<>();
 
         for(int i = 2; i < xSorted.size(); i++) {
@@ -127,7 +119,7 @@ public class SLineService {
                     + "; active points: " + activePoints.size();
             description = newBest ? newBestFoundMsg : noNewBestFoundMsg;
 
-            addStep(new AlgorithmStepDTO(i-1, description, current, current.x(), delta,
+            steps.add(new AlgorithmStepDTO(i-1, description, current, current.x(), delta,
                     new ArrayList<>(activePoints), xSorted, currBestPair, candidatePairs, new ArrayList<>(processed)));
 
         }
@@ -136,9 +128,10 @@ public class SLineService {
                 + " with a distance of " + String.format("%.2f", currBestPair.distance());
         Point mostRightPoint = xSorted.getLast();
 
-        addStep(new AlgorithmStepDTO(steps.size(), description, mostRightPoint, mostRightPoint.x(), delta,
+        steps.add(new AlgorithmStepDTO(steps.size(), description, mostRightPoint, mostRightPoint.x(), delta,
                 new ArrayList<>(activePoints), xSorted, currBestPair, List.of(), new ArrayList<>(processed)));
 
+        return steps;
     }
 
     public static double euclideanDistance(Point p1, Point p2) {

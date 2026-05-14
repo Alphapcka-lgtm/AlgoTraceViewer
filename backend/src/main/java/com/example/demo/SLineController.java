@@ -1,7 +1,9 @@
 package com.example.demo;
 
+import dto.AlgorithmStepDTO;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,14 +17,9 @@ public class SLineController {
         this.sweepLineService = sLineService;
     }
 
-    @PostMapping("/SVGInputPoints")
-    public List<Point> pointsFromSVGInput(@RequestBody List<Point> points) {
-        for(Point point : points) {
-            System.out.println(point);
-        }
-        return points;
+    @PostMapping("/steps")
+    public List<AlgorithmStepDTO> calculateSteps(@RequestBody List<Point> points) {
+        return sweepLineService.nearestPoints(points);
     }
-
-
 
 }
