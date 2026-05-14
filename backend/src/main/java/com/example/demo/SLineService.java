@@ -1,76 +1,144 @@
 package com.example.demo;
 
+import dto.AlgorithmStepDTO;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Getter
 @Service
 public class SLineService {
+    private final List<AlgorithmStepDTO> steps;
 
-    public static Result nearestPoints(List<Point> points_S) {
+    public SLineService() {
+        this.steps = new ArrayList<>();
+    }
 
-        //The x-queue (=points_xQueue) stores the points of the set S (=points_S) ...
-        List<Point> points_xQueue = new ArrayList<>(points_S);
+    private void addStep(AlgorithmStepDTO step){
+        steps.add(step);
+    }
 
-        if(points_xQueue.size() < 2) {
+    public void nearestPoints(List<Point> points) {
+
+        if(points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points");
         }
 
-        // ... ordered by their x-coordinate (aufsteigend)
-        points_xQueue.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
+        // Sort all points by x-coordinate
+        List<Point> xSorted = new ArrayList<>(points);
+        xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
 
-        if(points_xQueue.size() == 2) {
-            double minDistance = euclideanDistance(points_xQueue.get(0), points_xQueue.get(1));
-            return new Result(points_xQueue.get(0), points_xQueue.get(1), minDistance);
+        /*
+        Bad for animation ??
+
+        //If there are only two points, then the solution is trivial -> return immediately
+        if(xSorted.size() == 2) {
+            double minDistance = euclideanDistance(xSorted.get(0), xSorted.get(1));
+            return new Result(xSorted.get(0), xSorted.get(1), minDistance);
         }
 
+        //If two points are identical, then the solution is trivial -> return immediately
         Set<Point> set = new HashSet<>();
-        for (Point p : points_xQueue) {
+        for (Point p : xSorted) {
             if (!set.add(p)) {
                 return new Result(p, p, 0);
             }
         }
+        */
 
-        Point p1 = points_xQueue.get(0);
-        Point p2 = points_xQueue.get(1);
-        double delta = euclideanDistance(p1, p2); //anfangs delta
+        //Calculate the initial delta from the first two points 
+        Point p0 = xSorted.get(0);
+        Point p1 = xSorted.get(1);
+        double delta = euclideanDistance(p0, p1);
+        Result currBestPair = new Result(p0, p1, delta);
 
-        Result result = new Result(p1, p2, delta);
+        //shortcut for the delta control+cmd+space and then search delta
+        String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.id() + ", "
+                + p1.id() + ") = " + String.format("%.2f", delta);
+        addStep(new AlgorithmStepDTO(0, description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
+                List.of(new Result(p0,p1,delta)), List.of()));
 
-        //nach y sotieren und Punkt-duplikate werden nicht eingefüt/ignoriert
+        //nach y sotieren
+        // Punkt-duplikate werden nicht eingefüt/ignoriert
         //set to store the previously processed points
         // whose x-coordinates are less than delta distance from current point
-        // entählt also alle punkte die im delta * 2detal baken sind wenn man einen bestimmen punkt anschaut
-        TreeSet<Point> treeSetActivePoints = new TreeSet<>(Comparator.comparingInt(Point::y)
-                .thenComparingInt(Point::x));
+        // entählt also alle punkte die im delta * 2detal balken sind? wenn man einen bestimmen punkt anschaut
+        TreeSet<Point> activePoints = new TreeSet<>(Comparator.comparingInt(Point::y).thenComparingInt(Point::x));
+        activePoints.add(p0);
+        activePoints.add(p1);
 
-        treeSetActivePoints.add(p1);
-        treeSetActivePoints.add(p2);
-
-        int tail=0; //index auf den linkesten noch gültigen (teil der aktiven Punktemenge; current ist nicht teil) Punkt ... dann muss man nicht immer alles durchsuchen
+        //index auf den linkesten noch gültigen Punkt des aktiv Window (teil der aktiven Punktemenge; current ist nicht teil)
+        //  ... dann muss man nicht immer alles durchsuchen
         //ist quasi der linke rand des balkens
+        int tail=0;
 
-        for(int i = 2; i < points_xQueue.size(); i++) {
-            Point current = points_xQueue.get(i);
-            while (tail< i && current.x() - points_xQueue.get(tail).x() > delta){
-                treeSetActivePoints.remove(points_xQueue.get(tail));
+        // Already fully processed points (for visualization)
+        List<Point> processed = new ArrayList<>();
+
+        for(int i = 2; i < xSorted.size(); i++) {
+            Point current = xSorted.get(i);
+
+            // Removing points outside the delta window, so points to the left of the tail
+            while (tail < i && current.x() - xSorted.get(tail).x() > delta){
+                Point toRemove = xSorted.get(tail);
+                activePoints.remove(toRemove);
+                processed.add(toRemove);
                 tail++;
             }
 
-            //noch nicht ganz optimal weil ich durch ganze tree set gehe. Muss nur den relvanten y-Bereich im treeset anschauen
-            for(Point p : treeSetActivePoints){
+            /*
+            //noch nicht ganz optimal weil ich durch ganze tree set gehe.
+            // Muss nur den relvanten y-Bereich im treeset anschauen
+            for(Point p : activePoints){
                 if(Math.abs(current.y() - p.y()) < delta){
                     double possibleNewDetla = euclideanDistance(current, p);
                     if(possibleNewDetla < delta){
                         delta = possibleNewDetla;
-                        result = new Result(p, current, delta);
+                        currBestPair = new Result(p, current, delta);
                     }
                 }
             }
+            */
 
-            treeSetActivePoints.add(current);
+            // Find pairs of candidates for this step
+            List<Result> candidatePairs = new ArrayList<>();
+            boolean newBest = false;
+
+            for (Point candidate : activePoints) {
+                // Look only at the relevant y range
+                if (Math.abs(current.y() - candidate.y()) < delta) {
+                    double dist = euclideanDistance(current, candidate);
+                    candidatePairs.add(new Result(candidate, current, dist));
+
+                    // new minimum ?
+                    if (dist < delta) {
+                        delta = dist;
+                        currBestPair = new Result(candidate, current, delta);
+                        newBest = true;
+                    }
+                }
+            }
+            activePoints.add(current);
+
+            String newBestFoundMsg = "New minimum found! δ = " + String.format("%.2f", delta)
+                    + " (" + currBestPair.p0().id() + ", " + currBestPair.p1().id() + ")";
+            String noNewBestFoundMsg = "processed points " + current.id() + "; δ = " + String.format("%.2f", delta)
+                    + "; active points: " + activePoints.size();
+            description = newBest ? newBestFoundMsg : noNewBestFoundMsg;
+
+            addStep(new AlgorithmStepDTO(i-1, description, current, current.x(), delta,
+                    new ArrayList<>(activePoints), xSorted, currBestPair, candidatePairs, new ArrayList<>(processed)));
+
         }
-        return result;
+
+        description = "Done! Closest Pair: " + currBestPair.p0().id() + ", " + currBestPair.p1().id()
+                + " with a distance of " + String.format("%.2f", currBestPair.distance());
+        Point mostRightPoint = xSorted.getLast();
+
+        addStep(new AlgorithmStepDTO(steps.size(), description, mostRightPoint, mostRightPoint.x(), delta,
+                new ArrayList<>(activePoints), xSorted, currBestPair, List.of(), new ArrayList<>(processed)));
+
     }
 
     public static double euclideanDistance(Point p1, Point p2) {
@@ -79,17 +147,5 @@ public class SLineService {
         long squared = (x * x) + (y * y);
         return Math.sqrt(squared);
     }
-
-    static void main(){
-        List<Point> points = List.of(
-                new Point(0, 0, "a"),
-                new Point(10, 10, "b"),
-                new Point(1, 1, "c")
-        );
-        Result res = nearestPoints(points);
-        System.out.println(res);
-    }
-
-
 
 }
