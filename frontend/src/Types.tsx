@@ -1,9 +1,18 @@
 import type {Dispatch, RefObject, SetStateAction} from "react";
 
+/*
 export type Node = {
     x: number;
     y: number;
     id: string;
+};
+*/
+
+export type Node = {
+    x: number;
+    y: number;
+    id: string;
+    label: string;
 };
 
 export type Interaction =
@@ -29,7 +38,8 @@ export type SVGInputProps = {
 
     nodes: Node[];
 
-    onAddNode: (node: Node) => void;
+    //onAddNode: (node: Node) => void;
+    onAddNode: (node: Omit<Node, "label">) => void;
     onMoveNode: (id: string, x: number, y: number) => void;
     onDeleteNode: (id: string) => void;
     onReset: () => void;
@@ -74,4 +84,9 @@ export type OutputControlProps = {
     progress: number;
     setProgress: Dispatch<SetStateAction<number>>;
     tlRef: RefObject<gsap.core.Timeline>; //tlRef wird von SVGOutput übergeben
+};
+
+export type XNodeProps = {
+    node: Node;
+    fill: string;
 };

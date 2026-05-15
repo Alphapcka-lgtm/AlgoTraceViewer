@@ -22,14 +22,14 @@ export const btnStyle: React.CSSProperties = {
 26 -> AA
 27 -> AB
 */
-export function getAlphabetLabel(index: number): string {
-    let label = "";
-    let n = index;
-
-    while (n >= 0) {
-        label = String.fromCharCode((n % 26) + 65) + label;
-        n = Math.floor(n / 26) - 1;
+export function getAlphabetLabel(i: number): string {
+    let result:string = "";
+    let current:number = i;
+    while (current >= 0) {
+        const rest = current % 26;
+        const char = String.fromCharCode(65 + rest);
+        result = char + result;
+        current = Math.floor(current / 26) - 1;
     }
-
-    return label;
+    return result;
 }

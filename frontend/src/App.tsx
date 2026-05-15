@@ -4,6 +4,7 @@ import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, Node} from "./Types";
 //import {SVGOutput} from "./SVGOutput";
 import {SVGOutput2} from "./SVGOutput2.tsx";
+import {getAlphabetLabel} from "./Utils.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -14,11 +15,22 @@ export default function App() {
     //const {algoSteps, loading, error, calculateSteps} = useSweepLineSteps();
     const {loading, error, calculateSteps} = useSweepLineSteps();
 
+    const [nextLabelIndex, setNextLabelIndex] = useState(0);
+
     const svgHeight = 500;
     const svgWidth = 1123;
 
+    /*
     const handleAddNode = (node: Node) => {
         setNodes((prev : Node[])=> [...prev, node]);
+    };
+     */
+
+    const handleAddNode = (node: Omit<Node, "label">) => {
+        const label:string = getAlphabetLabel(nextLabelIndex);
+        const newNode: Node = {...node, label};
+        setNodes((prev:Node[]) => [...prev, newNode]);
+        setNextLabelIndex((prev:number) => prev + 1);
     };
 
     const handleMoveNode = (id: string, x: number, y: number) => {
@@ -33,6 +45,8 @@ export default function App() {
 
     const handleReset = () => {
         setNodes([]);
+        setOutputSteps([]);
+        setNextLabelIndex(0);
     };
 
     /*

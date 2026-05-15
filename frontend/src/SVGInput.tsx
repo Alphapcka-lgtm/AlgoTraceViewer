@@ -20,7 +20,9 @@ export function SVGInput(props: SVGInputProps) {
 
         const {x, y} = getMousePos(e);
         //setNodes((prev) => [...prev, {x, y, id: getRandomId()}]);
+
         props.onAddNode({x, y, id: getRandomId()});
+
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {

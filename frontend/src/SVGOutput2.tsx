@@ -3,6 +3,7 @@ import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl} from "./OutputControl";
+import {XNode} from "./Nodes.tsx";
 
 const STEP_DURATION = 0.9; // Dauer eines einzelnen step tweens in sek
 const PADDING = 30;
@@ -137,19 +138,12 @@ export function SVGOutput2(props: SVGOutputProps) {
                     const isCurrent = p.id === activeStep.currentPoint?.id;
                     const isActive = activeStep.activePoints.some((a) => a.id === p.id);
                     const isProcessed = activeStep.processedPoints.some((d) => d.id === p.id);
-                    const isBest = p.id === activeStep.bestPair?.p0.id || p.id === activeStep.bestPair?.p1.id;
+                    const isBest = p.id === activeStep.bestPair?.p0?.id || p.id === activeStep.bestPair?.p1?.id;
 
-                    const fill = isCurrent ? "#ff6b35"
-                        : isBest ? "#ffd700"
-                            : isActive ? "#00e5ff"
-                                : isProcessed ? "#888"
-                                    : "#4a9eff";
-                    const r = isCurrent ? 8 : isBest ? 7 : isActive ? 6 : 5;
+                    const fill = isCurrent ? "#ff6b35" : isBest ? "#ffd700" : isActive ? "#00e5ff" : isProcessed ? "#888" : "#4a9eff";
 
                     return (
-                        <g key={p.id}>
-                            <circle cx={p.x} cy={p.y} r={r} fill={fill}/>
-                        </g>
+                        <XNode node={p} fill={fill}/>
                     );
                 })}
             </svg>
@@ -164,9 +158,8 @@ export function SVGOutput2(props: SVGOutputProps) {
             }}>
                 <div>Step: <strong>{activeStep.stepIndex + "/" + props.steps.length}</strong></div>
                 <div>δ: <strong>{activeStep.delta.toFixed(2)}</strong></div>
-                <div>Current Point: <strong>{activeStep.currentPoint?.id}</strong></div>
-                <div>Best
-                    Pair: <strong>{activeStep.bestPair ? `${activeStep.bestPair.p0.id} ↔ ${activeStep.bestPair.p1.id}` : "—"}</strong>
+                <div>Current Point: <strong>{activeStep.currentPoint?.label}</strong></div>
+                <div>Best Pair: <strong>{activeStep.bestPair ? `${activeStep.bestPair.p0.label} ↔ ${activeStep.bestPair.p1.label}` : "—"}</strong>
                 </div>
                 <div style={{gridColumn: "1 / -1", color: "#555"}}>{activeStep.description}</div>
             </div>
