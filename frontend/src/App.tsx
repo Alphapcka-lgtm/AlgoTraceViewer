@@ -1,5 +1,5 @@
 import {useState} from "react";
-import { SVGInput } from "./SVGInput";
+import {SVGInput} from "./SVGInput";
 import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, Node} from "./Types";
 //import {SVGOutput} from "./SVGOutput";
@@ -28,20 +28,20 @@ export default function App() {
      */
 
     const handleAddNode = (node: Omit<Node, "label">) => {
-        const label:string = getAlphabetLabel(nextLabelIndex);
+        const label: string = getAlphabetLabel(nextLabelIndex);
         const newNode: Node = {...node, label};
-        setNodes((prev:Node[]) => [...prev, newNode]);
-        setNextLabelIndex((prev:number) => prev + 1);
+        setNodes((prev: Node[]) => [...prev, newNode]);
+        setNextLabelIndex((prev: number) => prev + 1);
     };
 
     const handleMoveNode = (id: string, x: number, y: number) => {
-        setNodes((prev : Node[]) =>
-            prev.map((n : Node) => n.id === id ? { ...n, x, y } : n)
+        setNodes((prev: Node[]) =>
+            prev.map((n: Node) => n.id === id ? {...n, x, y} : n)
         );
     };
 
     const handleDeleteNode = (id: string) => {
-        setNodes((prev : Node[]) => prev.filter(n => n.id !== id));
+        setNodes((prev: Node[]) => prev.filter(n => n.id !== id));
     };
 
     const handleReset = () => {

@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
+import {useEffect, useRef, useState} from "react";
+import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type { AlgorithmStepDTO, Node, SVGOutputProps } from "./Types";
-import { OutputControl2 } from "./OutputControl2";
-import { XNode } from "./Nodes.tsx";
-import { btnStyle } from "./Utils.tsx";
+import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
+import {OutputControl2} from "./OutputControl2";
+import {XNode} from "./Nodes.tsx";
+import {btnStyle} from "./Utils.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 30;
@@ -13,7 +13,6 @@ export function SVGOutput3(props: SVGOutputProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const containerRef = useRef<HTMLDivElement>(null);
     const sweepLineRef = useRef<SVGLineElement>(null);
     const sweepRectRef = useRef<SVGRectElement>(null);
 
@@ -29,12 +28,14 @@ export function SVGOutput3(props: SVGOutputProps) {
         const delta = step.delta;
         const cy = step.currentPoint?.y ?? props.height / 2;
 
+        //Wenn man schnell auf Next/Back klickt kann noch eine alte Animation laufen.... die killen
         gsap.killTweensOf([sweepLineRef.current, sweepRectRef.current]);
 
         gsap.to(sweepLineRef.current, {
-            attr: { x1: x, x2: x },
+            attr: {x1: x, x2: x},
             duration: STEP_DURATION,
             ease: "power2.inOut",
+           // overwrite: "auto",
         });
 
         gsap.to(sweepRectRef.current, {
@@ -46,26 +47,37 @@ export function SVGOutput3(props: SVGOutputProps) {
             },
             duration: STEP_DURATION,
             ease: "power2.inOut",
+            //overwrite: "auto"
         });
     }, {
-        scope: containerRef,
         dependencies: [currentStep],
     });
 
+    //"Taktgeber" für Autoplay...
+    //wenn play aktiv ist wartet der Effekt so lange, bis die aktuelle gsapAnimation fertig ist + bisschen länger
+    // und erst dann wird currentStep um 1 erhöt .
     useEffect(() => {
         if (!actuallyPlaying) return;
-        const timeoutId = setTimeout(() => {
+
+        const goToNextStep = () => {
             setCurrentStep((prev) => prev + 1);
-        }, (STEP_DURATION + 0.2) * 1000);
-        return () => clearTimeout(timeoutId);
+        };
+
+        const timeoutDuration:number = (STEP_DURATION + 0.2) * 1000;
+        const timeoutId:number = setTimeout(goToNextStep, timeoutDuration);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+
     }, [actuallyPlaying, currentStep]);
 
     if (props.loading) {
-        return <p style={{ fontFamily: "monospace" }}>Loading...</p>;
+        return <p style={{fontFamily: "monospace"}}>Loading...</p>;
     }
 
     if (props.error) {
-        return <p style={{ fontFamily: "monospace", color: "red" }}>Error: {props.error}</p>;
+        return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     }
 
     if (!step) {
@@ -75,11 +87,11 @@ export function SVGOutput3(props: SVGOutputProps) {
     const firstStep = props.steps[0];
 
     return (
-        <div ref={containerRef} style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: "20px" }}>
+        <div style={{display: "flex", flexDirection: "column", gap: 8, marginTop: "20px"}}>
 
             <button
                 onClick={props.onChangeInput}
-                style={{ ...btnStyle, width: "50%" }}
+                style={{...btnStyle, width: "50%"}}
             >
                 ← Change input
             </button>
@@ -87,7 +99,7 @@ export function SVGOutput3(props: SVGOutputProps) {
             <svg
                 width={props.width}
                 height={props.height}
-                style={{ border: "2px solid black", borderRadius: "30px" }}
+                style={{border: "2px solid black", borderRadius: "30px"}}
                 viewBox={`0 0 ${props.width} ${props.height}`}
             >
                 <rect
@@ -128,7 +140,7 @@ export function SVGOutput3(props: SVGOutputProps) {
                                         : "#4a9eff";
 
                     return (
-                        <XNode key={p.id} node={p} fill={fill} />
+                        <XNode key={p.id} node={p} fill={fill}/>
                     );
                 })}
             </svg>
@@ -142,17 +154,18 @@ export function SVGOutput3(props: SVGOutputProps) {
                     gap: "4px 16px",
                 }}
             >
-                <div> Step: <strong>{currentStep + 1} / {props.steps.length}</strong> </div>
+                <div> Step: <strong>{currentStep + 1} / {props.steps.length}</strong></div>
 
-                <div> δ: <strong>{step.delta.toFixed(2)}</strong> </div>
+                <div> δ: <strong>{step.delta.toFixed(2)}</strong></div>
 
-                <div> Current Point: <strong>{step.currentPoint?.label}</strong> </div>
+                <div> Current Point: <strong>{step.currentPoint?.label}</strong></div>
 
                 <div>
-                    Best Pair:{" "} <strong> {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"} </strong>
+                    Best Pair:{" "}
+                    <strong> {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"} </strong>
                 </div>
 
-                <div style={{ gridColumn: "1 / -1", color: "#555" }}> {step.description} </div>
+                <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
             </div>
 
             <OutputControl2
@@ -163,7 +176,7 @@ export function SVGOutput3(props: SVGOutputProps) {
                 setIsPlaying={setIsPlaying}
             />
 
-            <div style={{ fontFamily: "monospace", fontSize: 13 }}>
+            <div style={{fontFamily: "monospace", fontSize: 13}}>
                 <div>
                     <strong>Active Points:</strong>{" "}
                     {step.activePoints.length === 0 ? "No active points"
@@ -173,8 +186,8 @@ export function SVGOutput3(props: SVGOutputProps) {
                 <div>
                     <strong>Candidates:</strong>{" "}
                     {step.candidatePairs.length === 0 ? "No candidates in this step" : step.candidatePairs
-                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                            .join("; ")
+                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                        .join("; ")
                     }
                 </div>
             </div>
