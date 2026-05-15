@@ -55,40 +55,51 @@ export function SVGOutput2(props: SVGOutputProps) {
             });
 
             // Pro Schritt: Label setzen + Tweens anhängen
-            props.steps.forEach((step: AlgorithmStepDTO, index: number) => {
+            tlRef.current.addLabel("step-0", 0);
+
+            props.steps.slice(1).forEach((step: AlgorithmStepDTO, index: number) => {
+                const realIndex = index + 1;
+
                 const x = step.sweepLineX;
                 const delta = step.delta;
                 const cy = step.currentPoint?.y ?? props.height / 2;
 
-                // Label = "step-{index}" wird von jumpToNextStep/previousStep genutzt
-                tlRef.current.addLabel(`step-${index}`);
-
                 tlRef.current.to(sweepLineRef.current!, {
-                    attr: {x1: x, x2: x},
+                    attr: { x1: x, x2: x },
                     duration: STEP_DURATION,
                     ease: "power2.inOut",
                 });
 
-                // delta-Balken passt Breite (= delta) und Höhe (= 2delta) an
-                // "<" = parallel zur SweepLineAnimation
-                tlRef.current.to(sweepRectRef.current!, {
-                    attr: {
-                        x: x - delta,
-                        y: cy - delta,
-                        width: delta,
-                        height: delta * 2,
+                tlRef.current.to(
+                    sweepRectRef.current!,
+                    {
+                        attr: {
+                            x: x - delta,
+                            y: cy - delta,
+                            width: delta,
+                            height: delta * 2,
+                        },
+                        duration: STEP_DURATION,
+                        ease: "power2.inOut",
                     },
-                    duration: STEP_DURATION,
-                    ease: "power2.inOut",
-                }, "<");
+                    "<"
+                );
+
+                tlRef.current.addLabel(`step-${realIndex}`);
             });
 
-            // Fortschritt aus vorherigem Render wiederherstellen (z.B. nach ReBuild)
-            tlRef.current.progress(progress);
+            // Fortschritt aus vorherigem Render wiederherstellen
+            //tlRef.current.progress(progress);
+            tlRef.current.pause(0);
+            setProgress(0);
+            setActiveStepIndex(0);
+            setIsPlaying(false);
         },
         // revertOnUpdate: true ... GSAP macht alle Änderungen rückgängig bevor neu gebaut wird
         {scope: containerRef, dependencies: [props.steps], revertOnUpdate: true}
     );
+
+
 
     const activeStep: AlgorithmStepDTO | undefined = props.steps[activeStepIndex];
 
@@ -154,7 +165,7 @@ export function SVGOutput2(props: SVGOutputProps) {
                 gridTemplateColumns: "1fr 1fr",
                 gap: "4px 16px"
             }}>
-                <div>Step: <strong>{activeStep.stepIndex + "/" + props.steps.length}</strong></div>
+                <div>Step: <strong>{activeStepIndex + 1} / {props.steps.length}</strong></div>
                 <div>δ: <strong>{activeStep.delta.toFixed(2)}</strong></div>
                 <div>Current Point: <strong>{activeStep.currentPoint?.label}</strong></div>
                 <div>Best
@@ -168,6 +179,9 @@ export function SVGOutput2(props: SVGOutputProps) {
                 setIsPlaying={setIsPlaying}
                 progress={progress}
                 setProgress={setProgress}
+                activeStepIndex={activeStepIndex}
+                setActiveStepIndex={setActiveStepIndex}
+                stepCount={props.steps.length}
                 tlRef={tlRef}
             />
 

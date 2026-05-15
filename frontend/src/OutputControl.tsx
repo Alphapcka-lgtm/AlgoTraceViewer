@@ -10,7 +10,7 @@ export function OutputControl(props: OutputControlProps) {
 
     const startAnimation = () => {
         // Wenn am Ende: von vorne starten
-        if (props.progress === 1) { //oder >= ?
+        if (props.progress >= 1) {
             props.tlRef.current.play(0);
         } else {
             props.tlRef.current.play();
@@ -46,27 +46,36 @@ export function OutputControl(props: OutputControlProps) {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <div style={{ display: "flex", gap: 3 }}>
-                <button onClick={jumpToPreviousStep} style={btnStyle}>← Back</button>
+                <button onClick={jumpToPreviousStep} style={btnStyle} disabled={props.activeStepIndex === 0}>← Back</button>
                 <button
                     onClick={props.isPlaying ? stopAnimation : startAnimation}
                     style={btnStyle}
                 >
                     {props.isPlaying ? "⏸ Pause" : "▶ Play"}
                 </button>
-                <button onClick={jumpToNextStep} style={btnStyle}>Next →</button>
+                <button onClick={jumpToNextStep} style={btnStyle} disabled={props.activeStepIndex >= props.stepCount - 1}>Next →</button>
             </div>
             <button onClick={resetAnimation} style={btnStyle}>⏮ Reset</button>
 
             {/* Scrubber: progress(value) setzt die Timeline-Position direkt */}
             <input
-                type="range" min={0} max={1} step="any" value={props.progress}
+                type="range"
+                min={0}
+                max={1}
+                step="any"
+                value={props.progress}
                 onInput={(e) => {
-                    props.tlRef.current.progress(e.currentTarget.valueAsNumber);
-                    // progress wird über onUpdate in der Timeline aktualisiert,
-                    // aber beim manuellen Scrubben muss man es explizit setzen
-                    props.setProgress(e.currentTarget.valueAsNumber);
+                    const nextProgress = e.currentTarget.valueAsNumber;
+                    props.tlRef.current.pause();
+                    props.tlRef.current.progress(nextProgress);
+                    props.setIsPlaying(false);
+                    props.setProgress(nextProgress);
+                    const nextStepIndex = Math.min(Math.round(nextProgress * (props.stepCount - 1)), props.stepCount - 1);
+                    props.setActiveStepIndex(nextStepIndex);
                 }}
             />
+
+
         </div>
     );
 }

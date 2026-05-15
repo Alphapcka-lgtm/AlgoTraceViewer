@@ -78,13 +78,32 @@ export type SVGOutputProps = {
     onChangeInput: () => void;
 };
 
+
+//for output2....
 export type OutputControlProps = {
     isPlaying: boolean;
     setIsPlaying: Dispatch<SetStateAction<boolean>>;
+
     progress: number;
     setProgress: Dispatch<SetStateAction<number>>;
+
+    activeStepIndex: number;
+    setActiveStepIndex: React.Dispatch<React.SetStateAction<number>>;
+    stepCount: number;
+
     tlRef: RefObject<gsap.core.Timeline>; //tlRef wird von SVGOutput übergeben
 };
+
+
+export type OutputControlProps2 = {
+    currentStep: number;
+    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+    stepCount: number;
+
+    isPlaying: boolean;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 
 export type XNodeProps = {
     node: Node;
