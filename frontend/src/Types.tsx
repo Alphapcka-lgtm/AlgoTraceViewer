@@ -37,9 +37,9 @@ export type SVGInputProps = {
 };
 
 
-interface Result {
+export interface Result {
+    p0: Node;
     p1: Node;
-    p2: Node;
     distance: number;
 }
 
@@ -55,3 +55,29 @@ export interface AlgorithmStepDTO {
     candidatePairs: Result[];
     processedPoints: Node[];
 }
+
+export type SVGOutputProps = {
+    height: number;
+    width: number;
+    steps: AlgorithmStepDTO[];
+    loading: boolean;
+    error: string | null;
+    onChangeInput: () => void;
+};
+
+
+type RectangleData = {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+export type RectangleProps = {
+    rectangle: RectangleData;
+};
+
+export type RectangleListProps = {
+    rectangles: RectangleData[];
+};

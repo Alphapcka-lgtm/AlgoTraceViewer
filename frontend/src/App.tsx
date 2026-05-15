@@ -1,14 +1,17 @@
 import {useState} from "react";
 import { SVGInput } from "./SVGInput";
 import useSweepLineSteps from "./Api.tsx";
-import type {Node} from "./Types";
+import type {AlgorithmStepDTO, Node} from "./Types";
+import {SVGOutput} from "./SVGOutput";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
     const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
-    //const {algoSteps, loading, error, calculateSteps} = useSweepLineSteps();
-    const {calculateSteps} = useSweepLineSteps();
 
+    const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
+
+    //const {algoSteps, loading, error, calculateSteps} = useSweepLineSteps();
+    const {loading, error, calculateSteps} = useSweepLineSteps();
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -31,13 +34,27 @@ export default function App() {
         setNodes([]);
     };
 
-    const handleSubmit = async () => {
-        console.log("Submitted:", nodes);
-        setModeState("output");
-
+    /*
+    const handleSubmit = async (submittedNodes: Node[]) => {
+        //console.log("Submitted:", submittedNodes);
         try {
-            const result = await calculateSteps(nodes);
+            const result = await calculateSteps(submittedNodes);
+            setModeState("output");
             console.log(result);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    */
+
+    const handleSubmit = async (submittedNodes: Node[]) => {
+        try {
+            const result = await calculateSteps(submittedNodes);
+
+            console.log("Algorithm steps:", result);
+
+            setOutputSteps(result);
+            setModeState("output");
         } catch (error) {
             console.error(error);
         }
@@ -47,21 +64,35 @@ export default function App() {
         setModeState("input");
     };
 
+    if (modeState === "input") {
+        return (
+            <SVGInput
+                height={svgHeight}
+                width={svgWidth}
+                mode={modeState}
+                nodes={nodes}
+
+                onAddNode={handleAddNode}
+                onMoveNode={handleMoveNode}
+                onDeleteNode={handleDeleteNode}
+                onReset={handleReset}
+
+                onSubmit={handleSubmit}
+                onChangeInput={handleChangeInput}
+            />
+        );
+    }
+
     return (
-        <SVGInput
+        <SVGOutput
             height={svgHeight}
             width={svgWidth}
-            mode={modeState}
-            nodes={nodes}
-
-            onAddNode={handleAddNode}
-            onMoveNode={handleMoveNode}
-            onDeleteNode={handleDeleteNode}
-            onReset={handleReset}
-
-            onSubmit={handleSubmit}
+            steps={outputSteps}
+            loading={loading}
+            error={error}
             onChangeInput={handleChangeInput}
         />
     );
+
 }
 

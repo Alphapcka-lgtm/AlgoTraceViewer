@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { DynamicNodes, StaticNodes } from "./Nodes";
-import type { SVGInputProps, Interaction, Node } from "./Types";
-import { getRandomId } from "./Utils";
+import React, {useState} from "react";
+import {DynamicNodes} from "./Nodes";
+import type {SVGInputProps, Interaction} from "./Types";
+import {getRandomId} from "./Utils";
 
 export function SVGInput(props: SVGInputProps) {
-    const [nodes, setNodes] = useState<Node[]>([]);
-    const [interaction, setInteraction] = useState<Interaction>({ type: "idle" });
+    const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
 
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -16,41 +15,41 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
-        if (props.mode !== "input") return;
+        //if (props.mode !== "input") return;
         if (interaction.type !== "idle") return;
 
-        const { x, y } = getMousePos(e);
-        setNodes((prev) => [...prev, { x, y, id: getRandomId() }]);
+        const {x, y} = getMousePos(e);
+        //setNodes((prev) => [...prev, {x, y, id: getRandomId()}]);
+        props.onAddNode({x, y, id: getRandomId()});
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-        if (props.mode !== "input") return;
+        //if (props.mode !== "input") return;
         if (interaction.type !== "dragging") return;
 
         const pos = getMousePos(e);
+        props.onMoveNode(interaction.nodeId, pos.x, pos.y);
 
-        setNodes((prev) =>
-            prev.map((n) =>
-                n.id === interaction.nodeId ? { ...n, ...pos } : n
-            )
-        );
+        //setNodes((prev) => prev.map((n) => n.id === interaction.nodeId ? {...n, ...pos} : n));
+
     };
 
     const handleNodeMouseDown = (nodeId: string) => {
-        if (props.mode !== "input") return;
-        setInteraction({ type: "dragging", nodeId });
+        //if (props.mode !== "input") return;
+        setInteraction({type: "dragging", nodeId});
     };
 
     const handleNodeMouseUp = () => {
-        if (props.mode !== "input") return;
-        setInteraction({ type: "idle" });
+        //if (props.mode !== "input") return;
+        setInteraction({type: "idle"});
     };
 
     const handleNodeDoubleClick = (nodeId: string) => {
-        if (props.mode !== "input") return;
+        //if (props.mode !== "input") return;
 
-        setNodes((prev) => prev.filter((n) => n.id !== nodeId));
-        setInteraction({ type: "idle" });
+        //setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+        props.onDeleteNode(nodeId);
+        setInteraction({type: "idle"});
     };
 
     return (
@@ -58,57 +57,41 @@ export function SVGInput(props: SVGInputProps) {
             <svg
                 width={props.width}
                 height={props.height}
-                style={{ border: "1px solid black", borderRadius: "30px" }}
+                style={{border: "1px solid black", borderRadius: "30px"}}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleNodeMouseUp}
             >
-                {props.mode === "input" ? (
-
-                    <DynamicNodes //DynamicNodes, reset-Button, Submit-Button, verändern erlubt
-                        nodes={nodes}
-                        onMouseDown={handleNodeMouseDown}
-                        onMouseUp={handleNodeMouseUp}
-                        onDoubleClick={handleNodeDoubleClick}
-                    />
-                ) : (
-                    <StaticNodes nodes={nodes} /> //static nodes, change input button, man kann nichts mehr bearbeiten
-                )}
+                <DynamicNodes
+                    nodes={props.nodes}
+                    onMouseDown={handleNodeMouseDown}
+                    onMouseUp={handleNodeMouseUp}
+                    onDoubleClick={handleNodeDoubleClick}
+                />
             </svg>
 
-            {props.mode === "input" ? (
-                <>
-                    <div>
-                        <button
-                            style={{ width: "100%" }}
-                            onClick={() => {
-                                setNodes([]);
-                                setInteraction({ type: "idle" });
-                            }}
-                        >
-                            reset
-                        </button>
-                    </div>
+            <div>
+                <button
+                    style={{width: "100%"}}
+                    onClick={() => {
+                        props.onReset();
+                        setInteraction({type: "idle"});
+                    }}
+                >
+                    reset
+                </button>
 
-                    <div>
-                        <button
-                            style={{ width: "100%" }}
-                            onClick={() => props.onSubmit(nodes)}
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </>
-            ) : (
-                <div>
-                    <button
-                        style={{ width: "100%" }}
-                        onClick={props.onChangeInput}
-                    >
-                        Change Input
-                    </button>
-                </div>
-            )}
+            </div>
+
+            <div>
+                <button
+                    style={{width: "100%"}}
+                    onClick={() => props.onSubmit(props.nodes)}
+                    disabled={props.nodes.length < 2}
+                >
+                    Submit
+                </button>
+            </div>
         </>
     );
 }
