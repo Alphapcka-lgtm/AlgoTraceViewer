@@ -2,7 +2,8 @@ import {useState} from "react";
 import { SVGInput } from "./SVGInput";
 import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, Node} from "./Types";
-import {SVGOutput} from "./SVGOutput";
+//import {SVGOutput} from "./SVGOutput";
+import {SVGOutput2} from "./SVGOutput2.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -84,7 +85,7 @@ export default function App() {
     }
 
     return (
-        <SVGOutput
+        <SVGOutput2
             height={svgHeight}
             width={svgWidth}
             steps={outputSteps}

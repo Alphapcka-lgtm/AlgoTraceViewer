@@ -1,3 +1,5 @@
+import type {Dispatch, RefObject, SetStateAction} from "react";
+
 export type Node = {
     x: number;
     y: number;
@@ -56,6 +58,7 @@ export interface AlgorithmStepDTO {
     processedPoints: Node[];
 }
 
+//was SVGOutput von App bekommt
 export type SVGOutputProps = {
     height: number;
     width: number;
@@ -65,19 +68,10 @@ export type SVGOutputProps = {
     onChangeInput: () => void;
 };
 
-
-type RectangleData = {
-    id: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-};
-
-export type RectangleProps = {
-    rectangle: RectangleData;
-};
-
-export type RectangleListProps = {
-    rectangles: RectangleData[];
+export type OutputControlProps = {
+    isPlaying: boolean;
+    setIsPlaying: Dispatch<SetStateAction<boolean>>;
+    progress: number;
+    setProgress: Dispatch<SetStateAction<number>>;
+    tlRef: RefObject<gsap.core.Timeline>; //tlRef wird von SVGOutput übergeben
 };

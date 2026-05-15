@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {DynamicNodes} from "./Nodes";
 import type {SVGInputProps, Interaction} from "./Types";
-import {getRandomId} from "./Utils";
+import {btnStyle, getRandomId} from "./Utils";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -72,7 +72,7 @@ export function SVGInput(props: SVGInputProps) {
 
             <div>
                 <button
-                    style={{width: "100%"}}
+                    style={btnStyle}
                     onClick={() => {
                         props.onReset();
                         setInteraction({type: "idle"});
@@ -81,16 +81,14 @@ export function SVGInput(props: SVGInputProps) {
                     reset
                 </button>
 
-            </div>
-
-            <div>
                 <button
-                    style={{width: "100%"}}
+                    style={btnStyle}
                     onClick={() => props.onSubmit(props.nodes)}
                     disabled={props.nodes.length < 2}
                 >
                     Submit
                 </button>
+
             </div>
         </>
     );
