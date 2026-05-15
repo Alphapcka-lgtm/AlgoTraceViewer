@@ -56,10 +56,20 @@ export function SVGInput(props: SVGInputProps) {
 
     return (
         <>
+            <div style={{ marginTop: "20px", marginBottom:"5px", textAlign: "right" }}>
+                <button
+                    style={{...btnStyle, width: "50%"}}
+                    onClick={() => props.onSubmit(props.nodes)}
+                    disabled={props.nodes.length < 2}
+                >
+                    Submit
+                </button>
+            </div>
+
             <svg
                 width={props.width}
                 height={props.height}
-                style={{border: "1px solid black", borderRadius: "30px"}}
+                style={{border: "2px solid black", borderRadius: "15px"}}
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleNodeMouseUp}
@@ -82,15 +92,6 @@ export function SVGInput(props: SVGInputProps) {
                 >
                     reset
                 </button>
-
-                <button
-                    style={btnStyle}
-                    onClick={() => props.onSubmit(props.nodes)}
-                    disabled={props.nodes.length < 2}
-                >
-                    Submit
-                </button>
-
             </div>
         </>
     );

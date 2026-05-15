@@ -46,14 +46,14 @@ export function OutputControl(props: OutputControlProps) {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <div style={{ display: "flex", gap: 3 }}>
-                <button onClick={jumpToPreviousStep} style={btnStyle}>← Zurück</button>
+                <button onClick={jumpToPreviousStep} style={btnStyle}>← Back</button>
                 <button
                     onClick={props.isPlaying ? stopAnimation : startAnimation}
                     style={btnStyle}
                 >
                     {props.isPlaying ? "⏸ Pause" : "▶ Play"}
                 </button>
-                <button onClick={jumpToNextStep} style={btnStyle}>Weiter →</button>
+                <button onClick={jumpToNextStep} style={btnStyle}>Next →</button>
             </div>
             <button onClick={resetAnimation} style={btnStyle}>⏮ Reset</button>
 

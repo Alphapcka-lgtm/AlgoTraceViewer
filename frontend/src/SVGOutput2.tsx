@@ -4,6 +4,7 @@ import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl} from "./OutputControl";
 import {XNode} from "./Nodes.tsx";
+import {btnStyle} from "./Utils.tsx";
 
 const STEP_DURATION = 0.9; // Dauer eines einzelnen step tweens in sek
 const PADDING = 30;
@@ -19,6 +20,8 @@ export function SVGOutput2(props: SVGOutputProps) {
 
     // Container scope für useGSAP
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
 
     useGSAP(
         () => {
@@ -87,11 +90,6 @@ export function SVGOutput2(props: SVGOutputProps) {
         {scope: containerRef, dependencies: [props.steps], revertOnUpdate: true}
     );
 
-    // welcher Schritt ist aktuell aktiv? (für Punktfärbung)
-    const activeStepIndex = Math.min(
-        Math.floor(progress * props.steps.length),
-        props.steps.length - 1
-    );
     const activeStep: AlgorithmStepDTO | undefined = props.steps[activeStepIndex];
 
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
@@ -99,11 +97,11 @@ export function SVGOutput2(props: SVGOutputProps) {
     if (!activeStep) return <></>;
 
     return (
-        <div ref={containerRef} style={{display: "flex", flexDirection: "column", gap: 8}}>
+        <div ref={containerRef} style={{display: "flex", flexDirection: "column", gap: 8, marginTop: "20px"}}>
 
             <button
                 onClick={props.onChangeInput}
-                style={{alignSelf: "flex-start", borderRadius: "30px", border: "2px solid black", padding: "4px 12px", cursor: "pointer", fontFamily: "monospace"}}
+                style={{...btnStyle, width: "50%"}}
             > ← Change input
             </button>
 
@@ -143,7 +141,7 @@ export function SVGOutput2(props: SVGOutputProps) {
                     const fill = isCurrent ? "#ff6b35" : isBest ? "#ffd700" : isActive ? "#00e5ff" : isProcessed ? "#888" : "#4a9eff";
 
                     return (
-                        <XNode node={p} fill={fill}/>
+                        <XNode key={p.id} node={p} fill={fill}/>
                     );
                 })}
             </svg>
@@ -159,7 +157,8 @@ export function SVGOutput2(props: SVGOutputProps) {
                 <div>Step: <strong>{activeStep.stepIndex + "/" + props.steps.length}</strong></div>
                 <div>δ: <strong>{activeStep.delta.toFixed(2)}</strong></div>
                 <div>Current Point: <strong>{activeStep.currentPoint?.label}</strong></div>
-                <div>Best Pair: <strong>{activeStep.bestPair ? `${activeStep.bestPair.p0.label} ↔ ${activeStep.bestPair.p1.label}` : "—"}</strong>
+                <div>Best
+                    Pair: <strong>{activeStep.bestPair ? `${activeStep.bestPair.p0.label} ↔ ${activeStep.bestPair.p1.label}` : "—"}</strong>
                 </div>
                 <div style={{gridColumn: "1 / -1", color: "#555"}}>{activeStep.description}</div>
             </div>
@@ -171,6 +170,33 @@ export function SVGOutput2(props: SVGOutputProps) {
                 setProgress={setProgress}
                 tlRef={tlRef}
             />
+
+            <div style={{fontFamily: "monospace", fontSize: 13}}>
+                <div>
+                    <strong>Active Points:</strong>{" "}
+                    {activeStep.activePoints.length === 0
+                        ? "No active points"
+                        : activeStep.activePoints
+                            .map((p) => p.label)
+                            .join(", ")
+                    }
+                </div>
+                <div>
+                    <strong>Candidates:</strong>{" "}
+                    {activeStep.candidatePairs.length === 0
+                        ? "No candidates in this step"
+                        : activeStep.candidatePairs
+                            .map(
+                                (res) =>
+                                    `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`
+                            )
+                            .join("; ")
+                    }
+                </div>
+            </div>
+
+
+
         </div>
     );
 }

@@ -7,7 +7,7 @@ export function getRandomId(): string {
 export const btnStyle: React.CSSProperties = {
     flex: 1,
     border: "2px solid black",
-    borderRadius: "30px",
+    borderRadius: "10px",
     fontFamily: "monospace",
     padding: "4px 10px",
     cursor: "pointer",
