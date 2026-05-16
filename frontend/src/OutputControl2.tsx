@@ -7,16 +7,16 @@ export function OutputControl2(props: OutputControlProps2) {
 
     const goBack = () => {
         props.setIsPlaying(false);
-        props.setCurrentStep((prev) => prev - 1);
+        props.setCurrentStep((prev:number) => prev - 1);
     };
 
     const goNext = () => {
         props.setIsPlaying(false);
-        props.setCurrentStep((prev) => prev + 1);
+        props.setCurrentStep((prev:number) => prev + 1);
     };
 
     const togglePlay = () => {
-        props.setIsPlaying((prev) => !prev);
+        props.setIsPlaying((prev:boolean) => !prev);
     };
 
     const reset = () => {
