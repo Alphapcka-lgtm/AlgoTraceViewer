@@ -109,9 +109,11 @@ export type OutputControlProps2 = {
 
 export type OutputControlProps4 = {
     timelineRef: React.RefObject<gsap.core.Timeline>
+    labels: string[];
 
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+    stepCount: number;
 
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;

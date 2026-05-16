@@ -1,17 +1,18 @@
 import type {OutputControlProps4} from "./Types";
 import {btnStyle} from "./Utils.tsx";
+import gsap from "gsap";
 
 export function OutputControl4(props: OutputControlProps4) {
 
     const tl = props.timelineRef.current;
 
     const isAtStart = props.currentStep === 0;
-    const isAtEnd = props.currentStep >= tl.lables.length - 1;
+    const isAtEnd = props.currentStep >= props.labels.length - 1;
 
     const tweenToStep = (targetStep: number) => {
         if(!tl) return;
 
-        const targetLabel = tl.lables[targetStep];
+        const targetLabel = props.labels[targetStep];
         if(!targetLabel) return;
 
         props.setIsPlaying(false);
@@ -33,6 +34,7 @@ export function OutputControl4(props: OutputControlProps4) {
     const goNext = () => {
         if(isAtEnd) return;
         tweenToStep(props.currentStep+1);
+        //tl.tweenTo(tl.nextLabel());
     };
 
     const togglePlay = () => {
@@ -40,36 +42,17 @@ export function OutputControl4(props: OutputControlProps4) {
             tl.pause();
             props.setIsPlaying(false);
             return;
+        } else{
+            tl.play();
+            props.setIsPlaying(true);
+            return;
         }
-
-        props.setIsPlaying(true);
-
-        const playNext = (step:number) => {
-            const nextStep = step+1;
-            const nextLabel = tl.lables[nextStep];
-            if(!nextLabel){
-                props.setIsPlaying(false);
-                return;
-            }
-
-            tl.tweenTo(nextLabel, {
-                onComplete: () => {
-                    props.setCurrentStep(nextStep);
-                    if(nextStep >= tl.lables.length - 1) {
-                        props.setIsPlaying(false);
-                    } else {
-                        playNext(nextStep);
-                    }
-                }
-            });
-        };
-
-        playNext(props.currentStep);
     };
 
     const reset = () => {
+        tl.pause(0);
         props.setIsPlaying(false);
-        props.setCurrentStep(0);
+        //props.setCurrentStep(0);
     };
 
     return (

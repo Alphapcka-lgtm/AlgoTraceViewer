@@ -30,12 +30,26 @@ export function SVGOutput4(props: SVGOutputProps) {
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
+        const labels = props.steps.map((_, i) => String(i));
 
         const tl = gsap.timeline({
             paused: true,
             defaults: {
                 duration: STEP_DURATION,
                 ease: "power2.inOut",
+            },
+            onUpdate: () => {
+                const currentLabel = timelineRef.current.previousLabel();
+                if(currentLabel){
+                    const currentLabelIndex = parseInt(currentLabel);
+                    setCurrentStep(currentLabelIndex);
+                } else {
+                    setCurrentStep(props.steps.length-1);
+                }
+                //props.setProgress(timelineRef.current.progress());
+            },
+            onComplete: () => {
+                setIsPlaying(false);
             }
         });
 
@@ -63,11 +77,10 @@ export function SVGOutput4(props: SVGOutputProps) {
             }
         });
 
-        tl.addLabel(currentStep.toString());
+        tl.addLabel(labels[0]);
 
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex:number = index + 1;
-            const label:string = stepIndex.toString();
 
             tl.to(activeRect, {
                 attr: {
@@ -76,7 +89,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                     width: step.delta,
                     height: props.height - 2 * PADDING,
                 }
-            }, label);
+            });
 
             tl.to(candidateRect, {
                 attr: {
@@ -85,10 +98,10 @@ export function SVGOutput4(props: SVGOutputProps) {
                     width: step.delta,
                     height: step.delta * 2,
                 }
-            }, label);
+            }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein ....
-            //tl.addLabel(label);
+            tl.addLabel(labels[stepIndex]);
         });
 
         timelineRef.current = tl;
@@ -188,8 +201,10 @@ export function SVGOutput4(props: SVGOutputProps) {
 
             <OutputControl4
                 timelineRef={timelineRef}
+                labels={props.steps.map((_, i) => String(i))}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
+                stepCount={props.steps.length}
                 isPlaying={actuallyPlaying}
                 setIsPlaying={setIsPlaying}
             />
