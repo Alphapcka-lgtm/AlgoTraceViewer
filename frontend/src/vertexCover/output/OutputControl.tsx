@@ -6,7 +6,8 @@ export function OutputControl(props: OutputControlProps){
         if (props.isPlaying){
             stopAnimation();
         }
-        props.tlRef.current.seek(props.tlRef.current.previousLabel(props.tlRef.current.time() - 0.01 < 0 ? 0.01 : props.tlRef.current.time() - 0.01));
+        const previousLabel = props.tlRef.current.previousLabel(props.tlRef.current.time() - 0.01 < 0 ? 0.01 : props.tlRef.current.time() - 0.01);
+        props.tlRef.current.play().tweenTo(previousLabel);
         props.setProgress(props.tlRef.current.progress());
     }
 
@@ -28,8 +29,7 @@ export function OutputControl(props: OutputControlProps){
         if (props.isPlaying){
             stopAnimation();
         }
-        props.tlRef.current.seek(props.tlRef.current.nextLabel());
-        props.setProgress(props.tlRef.current.progress());
+        props.tlRef.current.play().tweenTo(props.tlRef.current.nextLabel());
     }
 
     const resetAnimation = () => {

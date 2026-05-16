@@ -16,16 +16,21 @@ export function SVGOutput(props: SVGOutputProps) {
     useGSAP(() => {
         tlRef.current = gsap.timeline({
             paused: true,
-            onUpdate: () => props.setProgress(tlRef.current.progress()),
-            onComplete: () => setIsPlaying(false)
+            onUpdate: () => {
+                props.setProgress(tlRef.current.progress());
+            },
+            onComplete: () => {
+                setIsPlaying(false);
+                tlRef.current.pause();
+            }
         });
 
         if (props.mode === "Output") {
             props.output.intermediateStates.forEach((intermediateState) => {
                 const pickRandomEdge = getRandomId();
                 const markIncidentEdges = getRandomId();
-                const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 0.1};
-                const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 0.1};
+                const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 1.0};
+                const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 1.0};
 
                 tlRef.current.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
                 tlRef.current.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
