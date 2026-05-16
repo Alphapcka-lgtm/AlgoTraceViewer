@@ -46,8 +46,8 @@ public class SLineService {
         Result currBestPair = new Result(p0, p1, delta);
 
         //shortcut for the delta control+cmd+space and then search delta
-        String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.id() + ", "
-                + p1.id() + ") = " + String.format("%.2f", delta);
+        String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.label() + ", "
+                + p1.label() + ") = " + String.format("%.2f", delta);
         steps.add(new AlgorithmStepDTO(0, description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
                 List.of(new Result(p0,p1,delta)), List.of()));
 
@@ -93,7 +93,7 @@ public class SLineService {
             }
             */
 
-            // Find pairs of candidates for this step
+            // check candidates for this step
             List<Result> candidatePairs = new ArrayList<>();
             boolean newBest = false;
 
@@ -111,20 +111,20 @@ public class SLineService {
                     }
                 }
             }
-            activePoints.add(current);
 
             String newBestFoundMsg = "New minimum found! δ = " + String.format("%.2f", delta)
-                    + " (" + currBestPair.p0().id() + ", " + currBestPair.p1().id() + ")";
-            String noNewBestFoundMsg = "processed points " + current.id() + "; δ = " + String.format("%.2f", delta)
+                    + " (" + currBestPair.p0().label() + ", " + currBestPair.p1().label() + ")";
+            String noNewBestFoundMsg = "processed points " + current.label() + "; δ = " + String.format("%.2f", delta)
                     + "; active points: " + activePoints.size();
             description = newBest ? newBestFoundMsg : noNewBestFoundMsg;
 
             steps.add(new AlgorithmStepDTO(i-1, description, current, current.x(), delta,
                     new ArrayList<>(activePoints), xSorted, currBestPair, candidatePairs, new ArrayList<>(processed)));
 
+            activePoints.add(current); //muss nach dem steps.add damit current Point nicht in active Menge
         }
 
-        description = "Done! Closest Pair: " + currBestPair.p0().id() + ", " + currBestPair.p1().id()
+        description = "Done! Closest Pair: " + currBestPair.p0().label() + ", " + currBestPair.p1().label()
                 + " with a distance of " + String.format("%.2f", currBestPair.distance());
         Point mostRightPoint = xSorted.getLast();
 
