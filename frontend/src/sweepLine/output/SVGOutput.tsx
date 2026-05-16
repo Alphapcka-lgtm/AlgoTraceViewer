@@ -26,7 +26,6 @@ export function SVGOutput(props: SVGOutputProps) {
             onComplete: () => setIsPlaying(false)
         });
 
-
         if (props.mode === "Output") {
 
             props.output.intermediateStates.forEach((intermediateState, index) => {

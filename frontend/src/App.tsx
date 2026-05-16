@@ -1,9 +1,9 @@
 
 import './App.css'
-import {SweepLine} from "./sweepLine/SweepLine.tsx";
+import {VertexCover} from "./vertexCover/VertexCover.tsx";
 
 export function App(){
     return <>
-        <SweepLine/>
+        <VertexCover/>
     </>
 }
