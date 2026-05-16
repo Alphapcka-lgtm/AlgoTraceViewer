@@ -20,9 +20,6 @@ export function SVGOutput4(props: SVGOutputProps) {
 
     const step: AlgorithmStepDTO | undefined = props.steps[currentStep];
 
-    const isAtEnd = currentStep >= props.steps.length - 1;
-    const actuallyPlaying = isPlaying && !isAtEnd;
-
     useGSAP(() => {
         if (!step || !activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
 
@@ -32,25 +29,40 @@ export function SVGOutput4(props: SVGOutputProps) {
         timelineRef.current?.kill();
         const labels = props.steps.map((_, i) => String(i));
 
-        const tl = gsap.timeline({
+        let lastLabel:string | null = null;
+
+        const timeline = gsap.timeline({
             paused: true,
             defaults: {
                 duration: STEP_DURATION,
                 ease: "power2.inOut",
             },
             onUpdate: () => {
-                const currentLabel = timelineRef.current.previousLabel();
-                if(currentLabel){
-                    const currentLabelIndex = parseInt(currentLabel);
-                    setCurrentStep(currentLabelIndex);
-                } else {
-                    setCurrentStep(props.steps.length-1);
-                }
+                const tl = timelineRef.current;
+
+                //const playing:boolean = !tl.paused();
+                //setIsPlaying(playing);
+
+                const currentLabel: string = tl.previousLabel();
+                //dadurch wird current step bei label 0 richtig gesetzt
+                //const resolvedLabel: string = currentLabel !== null ? currentLabel : "0";
+                const resolvedLabel = currentLabel ?? "0";
+                if (resolvedLabel === lastLabel) return; // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
+
+                const stepIndex:number = parseInt(currentLabel, 10);
+                if(!Number.isNaN(stepIndex)) return;
+
+                lastLabel = resolvedLabel;
+                setCurrentStep(stepIndex);
                 //props.setProgress(timelineRef.current.progress());
+
+
+
             },
             onComplete: () => {
                 setIsPlaying(false);
             }
+
         });
 
         const firstStep: AlgorithmStepDTO = props.steps[0];
@@ -77,12 +89,12 @@ export function SVGOutput4(props: SVGOutputProps) {
             }
         });
 
-        tl.addLabel(labels[0]);
+        timeline.addLabel(labels[0]);
 
         props.steps.slice(1).forEach((step, index) => {
-            const stepIndex:number = index + 1;
+            const stepIndex: number = index + 1;
 
-            tl.to(activeRect, {
+            timeline.to(activeRect, {
                 attr: {
                     x: step.sweepLineX - step.delta,
                     y: PADDING,
@@ -91,7 +103,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 }
             });
 
-            tl.to(candidateRect, {
+            timeline.to(candidateRect, {
                 attr: {
                     x: step.sweepLineX - step.delta,
                     y: getCy(step),
@@ -101,15 +113,15 @@ export function SVGOutput4(props: SVGOutputProps) {
             }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein ....
-            tl.addLabel(labels[stepIndex]);
+            timeline.addLabel(labels[stepIndex]);
         });
 
-        timelineRef.current = tl;
+        timelineRef.current = timeline;
 
         setCurrentStep(0);
         setIsPlaying(false);
         return () => {
-            tl.kill();
+            timeline.kill();
             timelineRef.current = gsap.timeline();
         };
     }, {
@@ -205,7 +217,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
                 stepCount={props.steps.length}
-                isPlaying={actuallyPlaying}
+                isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
             />
 
