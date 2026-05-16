@@ -1,17 +1,19 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
-import {OutputControl2} from "./OutputControl2";
+import {OutputControl4} from "./OutputControl4";
 import {XNode} from "./Nodes.tsx";
 import {btnStyle} from "./Utils.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
-export function SVGOutput3(props: SVGOutputProps) {
+export function SVGOutput4(props: SVGOutputProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
+
+    const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
 
     const activeSweepWindowRef = useRef<SVGRectElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
@@ -22,59 +24,85 @@ export function SVGOutput3(props: SVGOutputProps) {
     const actuallyPlaying = isPlaying && !isAtEnd;
 
     useGSAP(() => {
-        if (!step || !activeSweepWindowRef.current || !candidateSweepWindowRef.current) return;
+        if (!step || !activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
 
-        const x = step.sweepLineX;
-        const delta = step.delta;
-        const cy = step.currentPoint?.y ?? props.height / 2;
+        const activeRect = activeSweepWindowRef.current;
+        const candidateRect = candidateSweepWindowRef.current;
 
-        //Wenn man schnell auf Next/Back klickt kann noch eine alte Animation laufen.... die killen
-        gsap.killTweensOf([activeSweepWindowRef.current, candidateSweepWindowRef.current]);
+        timelineRef.current?.kill();
 
-        gsap.to(activeSweepWindowRef.current, {
+        const tl = gsap.timeline({
+            paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut",
+            }
+        });
+
+        const firstStep: AlgorithmStepDTO = props.steps[0];
+
+        const getCy = (step: AlgorithmStepDTO) =>
+            (step.currentPoint?.y ?? props.height / 2) - step.delta;
+
+        //init state setzen
+        gsap.set(activeRect, {
             attr: {
-                x: x - delta,
+                x: firstStep.sweepLineX - firstStep.delta,
                 y: PADDING,
-                width: delta,
-                height: props.height - 2 * PADDING, //2 * PADDING damit nach oben und nach unten padding ist...
-            },
-            duration: STEP_DURATION,
-            ease: "power2.inOut",
-            //overwrite: "auto"
+                width: firstStep.delta,
+                height: props.height - 2 * PADDING,
+            }
         });
 
-        gsap.to(candidateSweepWindowRef.current, {
+        gsap.set(candidateRect, {
             attr: {
-                x: x - delta,
-                y: cy - delta,
-                width: delta,
-                height: delta * 2,
-            },
-            duration: STEP_DURATION,
-            ease: "power2.inOut",
-            //overwrite: "auto"
+                x: firstStep.sweepLineX - firstStep.delta,
+                y: getCy(firstStep),
+                width: firstStep.delta,
+                height: firstStep.delta * 2,
+            }
         });
-    }, {dependencies: [currentStep]});
 
-    //"Taktgeber" für Autoplay...
-    //wenn play aktiv ist wartet der Effekt so lange, bis die aktuelle gsapAnimation fertig ist + bisschen länger
-    // und erst dann wird currentStep um 1 erhöt .
-    useEffect(() => {
-        if (!actuallyPlaying) return;
+        tl.addLabel(currentStep.toString());
 
-        const goToNextStep = () => {
-            setCurrentStep((prev) => prev + 1);
-        };
+        props.steps.slice(1).forEach((step, index) => {
+            const stepIndex:number = index + 1;
+            const label:string = stepIndex.toString();
 
-        const timeoutDuration: number = (STEP_DURATION + 0.2) * 1000;
-        //const timeoutId:number = setTimeout(goToNextStep, timeoutDuration);
-        const timeoutId: ReturnType<typeof setTimeout> = setTimeout(goToNextStep, timeoutDuration);
+            tl.to(activeRect, {
+                attr: {
+                    x: step.sweepLineX - step.delta,
+                    y: PADDING,
+                    width: step.delta,
+                    height: props.height - 2 * PADDING,
+                }
+            }, label);
 
+            tl.to(candidateRect, {
+                attr: {
+                    x: step.sweepLineX - step.delta,
+                    y: getCy(step),
+                    width: step.delta,
+                    height: step.delta * 2,
+                }
+            }, label);
+
+            // hier sollte der zustand vom einem step erreicht sein ....
+            //tl.addLabel(label);
+        });
+
+        timelineRef.current = tl;
+
+        setCurrentStep(0);
+        setIsPlaying(false);
         return () => {
-            clearTimeout(timeoutId);
+            tl.kill();
+            timelineRef.current = gsap.timeline();
         };
+    }, {
+        dependencies: [props.steps],
+    });
 
-    }, [actuallyPlaying, currentStep]);
 
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
@@ -158,10 +186,10 @@ export function SVGOutput3(props: SVGOutputProps) {
                 <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
             </div>
 
-            <OutputControl2
+            <OutputControl4
+                timelineRef={timelineRef}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
-                stepCount={props.steps.length}
                 isPlaying={actuallyPlaying}
                 setIsPlaying={setIsPlaying}
             />

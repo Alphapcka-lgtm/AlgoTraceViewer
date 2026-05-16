@@ -26,9 +26,11 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
+/*
 export type StaticNodesProps = {
     nodes: Node[];
 };
+*/
 
 //was SVGInput alles von App bekommt
 export type SVGInputProps = {
@@ -99,6 +101,17 @@ export type OutputControlProps2 = {
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
     stepCount: number;
+
+    isPlaying: boolean;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+
+export type OutputControlProps4 = {
+    timelineRef: React.RefObject<gsap.core.Timeline>
+
+    currentStep: number;
+    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
