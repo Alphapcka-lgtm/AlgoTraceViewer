@@ -49,8 +49,8 @@ export function SVGOutput4(props: SVGOutputProps) {
                 const resolvedLabel = currentLabel ?? "0";
                 if (resolvedLabel === lastLabel) return; // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
 
-                const stepIndex:number = parseInt(currentLabel, 10);
-                if(!Number.isNaN(stepIndex)) return;
+                const stepIndex:number = parseInt(resolvedLabel, 10);
+                if(Number.isNaN(stepIndex)) return;
 
                 lastLabel = resolvedLabel;
                 setCurrentStep(stepIndex);

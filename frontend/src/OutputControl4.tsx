@@ -37,17 +37,23 @@ export function OutputControl4(props: OutputControlProps4) {
 
     const togglePlay = () => {
         const tl = props.timelineRef.current;
+        if(!tl) return;
+
+        gsap.killTweensOf(tl);
+
+        if (tl.progress() >= 0.9999) {
+            tl.restart();
+            props.setIsPlaying(true);
+            return;
+        }
+
         if(!tl.paused()){
             tl.pause();
             props.setIsPlaying(false);
             return;
         }
 
-        if (tl.progress() >= 0.9999) {
-            tl.restart();
-        } else {
-            tl.play();
-        }
+        tl.play();
         props.setIsPlaying(true);
     };
 
@@ -55,7 +61,7 @@ export function OutputControl4(props: OutputControlProps4) {
         const tl = props.timelineRef.current;
         if(!tl) return;
         gsap.killTweensOf(tl);
-        tl.pause(0);
+        tl.restart(); //tl.pause(0);
         props.setCurrentStep(0);
         props.setIsPlaying(false);
     };
