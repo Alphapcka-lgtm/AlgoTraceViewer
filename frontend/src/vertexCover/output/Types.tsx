@@ -6,6 +6,8 @@ export type SVGOutputProps = {
     mode: string,
     progress: number,
     setProgress:  Dispatch<SetStateAction<number>>,
+    stepIndex: number,
+    setStepIndex:  Dispatch<SetStateAction<number>>,
 };
 
 export type OutputControlProps = {

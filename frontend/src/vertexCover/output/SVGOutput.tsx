@@ -17,6 +17,13 @@ export function SVGOutput(props: SVGOutputProps) {
         tlRef.current = gsap.timeline({
             paused: true,
             onUpdate: () => {
+                const currentStep = tlRef.current.nextLabel();
+                if(currentStep){
+                    const currentStepIndex = parseInt(currentStep.split("-")[0]);
+                    props.setStepIndex(currentStepIndex);
+                } else {
+                    props.setStepIndex(props.output.intermediateStates.length);
+                }
                 props.setProgress(tlRef.current.progress());
             },
             onComplete: () => {
@@ -26,9 +33,9 @@ export function SVGOutput(props: SVGOutputProps) {
         });
 
         if (props.mode === "Output") {
-            props.output.intermediateStates.forEach((intermediateState) => {
-                const pickRandomEdge = getRandomId();
-                const markIncidentEdges = getRandomId();
+            props.output.intermediateStates.forEach((intermediateState, index) => {
+                const pickRandomEdge =  index + "-" + getRandomId();
+                const markIncidentEdges = index + "-" + getRandomId();
                 const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 1.0};
                 const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 1.0};
 
@@ -51,6 +58,7 @@ export function SVGOutput(props: SVGOutputProps) {
             <Edges edges={ props.output.initialState.edges } nodes={ props.output.initialState.nodes } />
             <Nodes nodes={ props.output.initialState.nodes } { ...clickEventHandler } />
         </svg>
+        <div><strong>Step:</strong> {props.stepIndex} / {props.output.intermediateStates.length}</div>
         <OutputControl isPlaying={ isPlaying } setIsPlaying={ setIsPlaying } progress={ props.progress } setProgress={ props.setProgress } tlRef={ tlRef } />
     </>;
 }
