@@ -204,7 +204,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             <div
                 style={{
                     fontFamily: "monospace",
-                    fontSize: 13,
+                    fontSize: 15,
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: "4px 16px",
@@ -230,7 +230,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 setIsPlaying={setIsPlaying}
             />
 
-            <div style={{fontFamily: "monospace", fontSize: 13}}>
+            <div style={{fontFamily: "monospace", fontSize: 15}}>
                 <div>
                     <strong>Active Points:</strong>{" "}
                     {step.activePoints.length === 0 ? "No active points"
