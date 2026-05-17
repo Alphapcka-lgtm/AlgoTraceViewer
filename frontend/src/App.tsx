@@ -4,7 +4,7 @@ import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, Node} from "./Types";
 //import {SVGOutput} from "./SVGOutput";
 //import {SVGOutput2} from "./SVGOutput2.tsx";
-import {SVGOutput3} from "./SVGOutput3.tsx";
+import {SVGOutput4} from "./SVGOutput4.tsx";
 import {getAlphabetLabel} from "./Utils.tsx";
 
 export default function App() {
@@ -100,7 +100,7 @@ export default function App() {
     }
 
     return (
-        <SVGOutput3
+        <SVGOutput4
             height={svgHeight}
             width={svgWidth}
             steps={outputSteps}

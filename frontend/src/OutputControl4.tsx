@@ -61,7 +61,8 @@ export function OutputControl4(props: OutputControlProps4) {
         const tl = props.timelineRef.current;
         if(!tl) return;
         gsap.killTweensOf(tl);
-        tl.restart(); //tl.pause(0);
+        //tl.restart();
+        tl.pause(0);
         props.setCurrentStep(0);
         props.setIsPlaying(false);
     };

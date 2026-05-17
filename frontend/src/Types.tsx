@@ -124,3 +124,11 @@ export type XNodeProps = {
     node: Node;
     fill: string;
 };
+
+
+export type ModeTabsProps = {
+    mode: "input" | "output";
+    onChangeInput: () => void;
+    onSubmit: () => void;
+    canSubmit: boolean;
+};

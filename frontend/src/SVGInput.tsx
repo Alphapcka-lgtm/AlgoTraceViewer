@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {DynamicNodes} from "./Nodes";
 import type {SVGInputProps, Interaction} from "./Types";
 import {btnStyle, getRandomId} from "./Utils";
+import {IOModeTabs} from "./IOModeTabs";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -56,15 +57,12 @@ export function SVGInput(props: SVGInputProps) {
 
     return (
         <>
-            <div style={{ marginTop: "20px", marginBottom:"5px", textAlign: "right" }}>
-                <button
-                    style={{...btnStyle, width: "50%"}}
-                    onClick={() => props.onSubmit(props.nodes)}
-                    disabled={props.nodes.length < 2}
-                >
-                    Submit
-                </button>
-            </div>
+            <IOModeTabs
+                mode="input"
+                onChangeInput={props.onChangeInput}
+                onSubmit={() => props.onSubmit(props.nodes)}
+                canSubmit={props.nodes.length >= 2}
+            />
 
             <svg
                 width={props.width}

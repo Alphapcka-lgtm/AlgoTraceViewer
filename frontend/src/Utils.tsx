@@ -11,7 +11,18 @@ export const btnStyle: React.CSSProperties = {
     fontFamily: "monospace",
     padding: "4px 10px",
     cursor: "pointer",
+    backgroundColor:"rgba(240, 240, 240, 0.8)"
 };
+
+export const tabStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
+    ...btnStyle,
+    width: "50%",
+    opacity: disabled ? 0.45 : 1,
+    border: "2px solid black",
+    //borderBottom: active ? "3px solid black" : "1px solid #aaa",
+    fontWeight: active ? "bold" : "normal",
+    cursor: disabled ? "default" : "pointer",
+});
 
 
 /*

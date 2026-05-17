@@ -4,8 +4,7 @@ import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl4} from "./OutputControl4";
 import {XNode} from "./Nodes.tsx";
-import {btnStyle} from "./Utils.tsx";
-
+import {IOModeTabs} from "./IOModeTabs";
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
@@ -27,7 +26,7 @@ export function SVGOutput4(props: SVGOutputProps) {
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
-        const labels = props.steps.map((_, i) => String(i));
+        const myLabels = props.steps.map((_, i) => String(i));
 
         let lastLabel:string | null = null;
 
@@ -43,20 +42,30 @@ export function SVGOutput4(props: SVGOutputProps) {
                 //const playing:boolean = !tl.paused();
                 //setIsPlaying(playing);
 
-                const currentLabel: string = tl.previousLabel();
-                //dadurch wird current step bei label 0 richtig gesetzt
-                //const resolvedLabel: string = currentLabel !== null ? currentLabel : "0";
-                const resolvedLabel = currentLabel ?? "0";
-                if (resolvedLabel === lastLabel) return; // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
+                const currTime = tl.time();
 
-                const stepIndex:number = parseInt(resolvedLabel, 10);
-                if(Number.isNaN(stepIndex)) return;
+                let stepIndex = 0;
+                for(let i=0; i<myLabels.length; i++) {
 
-                lastLabel = resolvedLabel;
+                    const labelTime = tl.labels[myLabels[i]];
+                    console.log(labelTime);
+                    if(labelTime<=currTime+0.0001){
+                        stepIndex = i;
+                    }else{
+                        break;
+                    }
+                }
+
+                const currentLabel: string = stepIndex.toString();
+                if(currentLabel === lastLabel){ // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
+                    return;
+                }
+
+                lastLabel = currentLabel;
                 setCurrentStep(stepIndex);
+
+
                 //props.setProgress(timelineRef.current.progress());
-
-
 
             },
             onComplete: () => {
@@ -89,7 +98,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             }
         });
 
-        timeline.addLabel(labels[0]);
+        timeline.addLabel(myLabels[0]);
 
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
@@ -113,7 +122,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein ....
-            timeline.addLabel(labels[stepIndex]);
+            timeline.addLabel(myLabels[stepIndex]);
         });
 
         timelineRef.current = timeline;
@@ -138,14 +147,14 @@ export function SVGOutput4(props: SVGOutputProps) {
     const firstStep: AlgorithmStepDTO = props.steps[0];
 
     return (
-        <div style={{display: "flex", flexDirection: "column", gap: 8, marginTop: "20px"}}>
+        <div>
 
-            <button
-                onClick={props.onChangeInput}
-                style={{...btnStyle, width: "50%"}}
-            >
-                ← Change input
-            </button>
+            <IOModeTabs
+                mode="output"
+                onChangeInput={props.onChangeInput}
+                onSubmit={() => {}}
+                canSubmit={false}
+            />
 
             <svg
                 width={props.width}
