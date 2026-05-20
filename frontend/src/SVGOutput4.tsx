@@ -12,6 +12,8 @@ export function SVGOutput4(props: SVGOutputProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
+    const [progress, setProgress] = useState(0);    //für scrubber
+
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
 
     const activeSweepWindowRef = useRef<SVGRectElement>(null);
@@ -39,8 +41,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             onUpdate: () => {
                 const tl = timelineRef.current;
 
-                //const playing:boolean = !tl.paused();
-                //setIsPlaying(playing);
+                setProgress(tl.progress()); //für scrubber
 
                 const currTime = tl.time();
 
@@ -69,6 +70,7 @@ export function SVGOutput4(props: SVGOutputProps) {
 
             },
             onComplete: () => {
+                setProgress(1); //für scrubber ... und auch nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
                 setIsPlaying(false);
             }
 
@@ -228,6 +230,8 @@ export function SVGOutput4(props: SVGOutputProps) {
                 stepCount={props.steps.length}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
+                progress={progress}
+                setProgress={setProgress}
             />
 
             <div style={{fontFamily: "monospace", fontSize: 15}}>

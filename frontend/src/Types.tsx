@@ -117,6 +117,10 @@ export type OutputControlProps4 = {
 
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+
+    //Für scrubber
+    progress: number;
+    setProgress: React.Dispatch<React.SetStateAction<number>>;
 };
 
 

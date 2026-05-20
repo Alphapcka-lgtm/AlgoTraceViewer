@@ -67,23 +67,42 @@ export function OutputControl4(props: OutputControlProps4) {
         props.setIsPlaying(false);
     };
 
+    const scrub = (value: number) => {
+        const tl = props.timelineRef.current;
+        if (!tl) return;
+        gsap.killTweensOf(tl);
+        tl.pause();
+        tl.progress(value);
+        props.setProgress(value);
+        props.setIsPlaying(false);
+    };
+
     return (
-        <div style={{display: "flex", gap: 3}}>
-            <button onClick={goBack} disabled={isAtStart} style={btnStyle}>
-                ← Back
-            </button>
+        <div>
+            <div style={{display: "flex", gap: 3}}>
+                <button onClick={goBack} disabled={isAtStart} style={btnStyle}>
+                    ← Back
+                </button>
 
-            <button onClick={togglePlay} style={btnStyle}>
-                {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
-            </button>
+                <button onClick={togglePlay} style={btnStyle}>
+                    {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
+                </button>
 
-            <button onClick={goNext} disabled={isAtEnd} style={btnStyle}>
-                Next →
-            </button>
+                <button onClick={goNext} disabled={isAtEnd} style={btnStyle}>
+                    Next →
+                </button>
 
-            <button onClick={reset} disabled={isAtStart} style={btnStyle}>
-                ⏮ Reset
-            </button>
+                <button onClick={reset} disabled={isAtStart} style={btnStyle}>
+                    ⏮ Reset
+                </button>
+            </div>
+
+            <input
+                type="range" min={0} max={1} step="any" value={props.progress}
+                onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
+                style={{width: "98%", marginTop:"8px", accentColor: "red", height: "40px", cursor: "pointer"}}
+            />
         </div>
+
     );
 }
