@@ -74,7 +74,7 @@ export default function App() {
     };
 
     const createExportString = () => {
-        return encodeExportState({nodes, progress, stepIndex: currentStep});
+        return encodeExportState({nodes, progress});
     };
 
     const handleImport = async (encoded: string) => {

@@ -109,5 +109,4 @@ export type ModeTabsProps = {
 export type ExportState = {
     nodes: Node[];
     progress: number;
-    stepIndex: number;
 };

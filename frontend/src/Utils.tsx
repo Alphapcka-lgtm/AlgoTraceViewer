@@ -12,7 +12,8 @@ export const btnStyle: React.CSSProperties = {
     fontFamily: "monospace",
     padding: "4px 10px",
     cursor: "pointer",
-    backgroundColor:"rgba(240, 240, 240, 0.8)"
+    backgroundColor:"rgba(240, 240, 240, 0.8)",
+    fontSize:18
 };
 
 export const tabStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
