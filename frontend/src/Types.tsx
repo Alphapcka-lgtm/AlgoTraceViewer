@@ -70,6 +70,18 @@ export type SVGOutputProps = {
     loading: boolean;
     error: string | null;
     onChangeInput: () => void;
+
+    currentStep: number;
+    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+
+    //für scrubber:
+    progress: number;
+    setProgress: React.Dispatch<React.SetStateAction<number>>;
+
+    //pendingImportProgress: number | null;
+    //onImportProgressApplied: () => void;
+
+    onExport: () => void;
 };
 
 export type OutputControlProps4 = {
@@ -101,3 +113,40 @@ export type ModeTabsProps = {
     onSubmit: () => void;
     canSubmit: boolean;
 };
+
+export type ExportState = {
+    nodes: Node[];
+    progress: number;
+    stepIndex: number;
+};
+
+//Überlegung für später
+//Step + lokaler Step Fortschritt
+//also stepIndex = aktueller Abschnitt / aktueller Step
+// stepProgress = Fortschritt zwischen diesem Step und dem nächsten Step
+
+
+/*
+User klickt Export
+→ App nimmt nodes + progress + currentStep
+→ JSON.stringify
+→ Base64URL
+→ clipboard.writeText(...)
+
+User fügt String ein
+→ decode
+→ nodes setzen
+→ Backend mit nodes aufrufen
+→ steps setzen
+→ Output anzeigen
+→ Timeline bauen
+→ progress setzen
+→ pause
+
+
+if (typeof imported.progress === "number") {
+    tl.progress(imported.progress).pause();
+} else {
+    tl.seek(imported.stepIndex.toString()).pause();
+}
+* */

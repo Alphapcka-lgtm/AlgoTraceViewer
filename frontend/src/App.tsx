@@ -5,7 +5,7 @@ import type {AlgorithmStepDTO, Node} from "./Types";
 //import {SVGOutput} from "./SVGOutput";
 //import {SVGOutput2} from "./SVGOutput2.tsx";
 import {SVGOutput4} from "./SVGOutput4.tsx";
-import {getAlphabetLabel} from "./Utils.tsx";
+import {encodeExportState, getAlphabetLabel} from "./Utils.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -17,6 +17,11 @@ export default function App() {
     const {loading, error, calculateSteps} = useSweepLineSteps();
 
     const [nextLabelIndex, setNextLabelIndex] = useState(0);
+
+    const [currentStep, setCurrentStep] = useState(0);
+    const [progress, setProgress] = useState(0);    //für scrubber
+
+    //const [pendingImportProgress, setPendingImportProgress] = useState<number | null>(null);
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -80,6 +85,11 @@ export default function App() {
         setModeState("input");
     };
 
+    const handleExport = async () => {
+        const encoded = encodeExportState({nodes, progress, stepIndex: currentStep});
+        await navigator.clipboard.writeText(encoded);
+    };
+
     if (modeState === "input") {
         return (
             <SVGInput
@@ -107,6 +117,11 @@ export default function App() {
             loading={loading}
             error={error}
             onChangeInput={handleChangeInput}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+            progress={progress}
+            setProgress={setProgress}
+            onExport={handleExport}
         />
     );
 

@@ -9,17 +9,14 @@ const STEP_DURATION = 0.9;
 const PADDING = 1;
 
 export function SVGOutput4(props: SVGOutputProps) {
-    const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-
-    const [progress, setProgress] = useState(0);    //für scrubber
 
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
 
     const activeSweepWindowRef = useRef<SVGRectElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
 
-    const step: AlgorithmStepDTO | undefined = props.steps[currentStep];
+    const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
 
     useGSAP(() => {
         if (!step || !activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -41,7 +38,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             onUpdate: () => {
                 const tl = timelineRef.current;
 
-                setProgress(tl.progress()); //für scrubber
+                props.setProgress(tl.progress()); //für scrubber
 
                 const currTime = tl.time();
 
@@ -63,14 +60,14 @@ export function SVGOutput4(props: SVGOutputProps) {
                 }
 
                 lastLabel = currentLabel;
-                setCurrentStep(stepIndex);
+                props.setCurrentStep(stepIndex);
 
 
                 //props.setProgress(timelineRef.current.progress());
 
             },
             onComplete: () => {
-                setProgress(1); //für scrubber ... und auch nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
+                props.setProgress(1); //für scrubber ... und auch nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
                 setIsPlaying(false);
             }
 
@@ -129,7 +126,7 @@ export function SVGOutput4(props: SVGOutputProps) {
 
         timelineRef.current = timeline;
 
-        setCurrentStep(0);
+        props.setCurrentStep(0);
         setIsPlaying(false);
         return () => {
             timeline.kill();
@@ -212,7 +209,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                     gap: "4px 16px",
                 }}
             >
-                <div><strong>Step:</strong> {currentStep + 1} / {props.steps.length}</div>
+                <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
                 <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
                 <div><strong>Current Point:</strong> {step.currentPoint?.label}</div>
                 <div>
@@ -225,13 +222,13 @@ export function SVGOutput4(props: SVGOutputProps) {
             <OutputControl4
                 timelineRef={timelineRef}
                 labels={props.steps.map((_, i) => String(i))}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
+                currentStep={props.currentStep}
+                setCurrentStep={props.setCurrentStep}
                 stepCount={props.steps.length}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={progress}
-                setProgress={setProgress}
+                progress={props.progress}
+                setProgress={props.setProgress}
             />
 
             <div style={{fontFamily: "monospace", fontSize: 15}}>

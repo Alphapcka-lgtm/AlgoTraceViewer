@@ -1,4 +1,5 @@
 import React from "react";
+import type {ExportState} from "./Types.tsx";
 
 export function getRandomId(): string {
     return "i" + Math.floor(Date.now() * Math.random()).toString();
@@ -43,4 +44,15 @@ export function getAlphabetLabel(i: number): string {
         current = Math.floor(current / 26) - 1;
     }
     return result;
+}
+
+
+export function encodeExportState(state: ExportState): string {
+    const json = JSON.stringify(state);
+    return btoa(encodeURIComponent(json));
+}
+
+export function decodeExportState(encoded: string): ExportState {
+    const json = decodeURIComponent(atob(encoded));
+    return JSON.parse(json) as ExportState;
 }
