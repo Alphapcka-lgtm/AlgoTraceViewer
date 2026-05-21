@@ -6,6 +6,8 @@ import {OutputControl4} from "./OutputControl4";
 import {XNode} from "./Nodes.tsx";
 import {IOModeTabs} from "./IOModeTabs";
 import {getStepIndexFromTimeline, createStepLabels} from "./Utils.tsx";
+import {ImportExportDialog} from "./ImportExportDialog.tsx";
+
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
@@ -240,6 +242,11 @@ export function SVGOutput4(props: SVGOutputProps) {
                     }
                 </div>
             </div>
+
+            <ImportExportDialog
+                mode="output"
+                createExportString={props.createExportString}
+            />
         </div>
     );
 }

@@ -3,6 +3,7 @@ import {DynamicNodes} from "./Nodes";
 import type {SVGInputProps, Interaction} from "./Types";
 import {btnStyle, getRandomId} from "./Utils";
 import {IOModeTabs} from "./IOModeTabs";
+import {ImportExportDialog} from "./ImportExportDialog";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -91,6 +92,11 @@ export function SVGInput(props: SVGInputProps) {
                     reset
                 </button>
             </div>
+
+            <ImportExportDialog
+                mode={"input"}
+                onImport={props.onImport}
+            />
         </>
     );
 }
