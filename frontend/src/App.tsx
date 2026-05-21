@@ -1,11 +1,11 @@
 import {useState} from "react";
 import {SVGInput} from "./SVGInput";
 import useSweepLineSteps from "./Api.tsx";
-import type {AlgorithmStepDTO, Node} from "./Types";
+import type {AlgorithmStepDTO, ExportState, Node} from "./Types";
 //import {SVGOutput} from "./SVGOutput";
 //import {SVGOutput2} from "./SVGOutput2.tsx";
 import {SVGOutput4} from "./SVGOutput4.tsx";
-import {encodeExportState, getAlphabetLabel} from "./Utils.tsx";
+import {decodeExportState, encodeExportState, getAlphabetLabel} from "./Utils.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -20,8 +20,6 @@ export default function App() {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);    //für scrubber
-
-    //const [pendingImportProgress, setPendingImportProgress] = useState<number | null>(null);
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -53,27 +51,16 @@ export default function App() {
         setNodes([]);
         setOutputSteps([]);
         setNextLabelIndex(0);
+
+        setCurrentStep(0);
+        setProgress(0);
     };
 
-    /*
-    const handleSubmit = async (submittedNodes: Node[]) => {
-        //console.log("Submitted:", submittedNodes);
-        try {
-            const result = await calculateSteps(submittedNodes);
-            setModeState("output");
-            console.log(result);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    */
-
+    //quasi die grundfunktion für handleNormalSubmit und handleImport
     const handleSubmit = async (submittedNodes: Node[]) => {
         try {
             const result = await calculateSteps(submittedNodes);
-
-            console.log("Algorithm steps:", result);
-
+            //console.log("Algorithm steps:", result);
             setOutputSteps(result);
             setModeState("output");
         } catch (error) {
@@ -81,13 +68,36 @@ export default function App() {
         }
     };
 
+    //bei normalen will man ganz normal am anfang starten...
+    const handleNormalSubmit = async (submittedNodes: Node[]) => {
+        setProgress(0);
+        setCurrentStep(0);
+
+        await handleSubmit(submittedNodes);
+    };
+
     const handleChangeInput = () => {
         setModeState("input");
     };
 
-    const handleExport = async () => {
-        const encoded = encodeExportState({nodes, progress, stepIndex: currentStep});
-        await navigator.clipboard.writeText(encoded);
+    const createExportString = () => {
+        return encodeExportState({nodes, progress, stepIndex: currentStep});
+    };
+
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported:ExportState = decodeExportState(encoded);
+
+            setNodes(imported.nodes);
+            // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
+            setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
+            setProgress(imported.progress);
+            setCurrentStep(imported.stepIndex);
+
+            await handleSubmit(imported.nodes);
+        } catch (error) {
+            console.error("Invalid import string", error);
+        }
     };
 
     if (modeState === "input") {
@@ -103,8 +113,10 @@ export default function App() {
                 onDeleteNode={handleDeleteNode}
                 onReset={handleReset}
 
-                onSubmit={handleSubmit}
+                onSubmit={handleNormalSubmit}
                 onChangeInput={handleChangeInput}
+
+                onImport={handleImport}
             />
         );
     }
@@ -121,7 +133,7 @@ export default function App() {
             setCurrentStep={setCurrentStep}
             progress={progress}
             setProgress={setProgress}
-            onExport={handleExport}
+            createExportString={createExportString}
         />
     );
 

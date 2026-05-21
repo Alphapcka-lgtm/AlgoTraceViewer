@@ -40,6 +40,8 @@ export type SVGInputProps = {
 
     onSubmit: (nodes: Node[]) => void;
     onChangeInput: () => void;
+
+    onImport: (encoded: string) => void;
 };
 
 
@@ -78,10 +80,7 @@ export type SVGOutputProps = {
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
 
-    //pendingImportProgress: number | null;
-    //onImportProgressApplied: () => void;
-
-    onExport: () => void;
+    createExportString: () => string;
 };
 
 export type OutputControlProps4 = {
@@ -127,26 +126,30 @@ export type ExportState = {
 
 
 /*
+
+Input:
+    Import möglich
+    Export nicht nötig
+
+Output:
+    Export möglich
+    Import nicht nötig
+
+
 User klickt Export
-→ App nimmt nodes + progress + currentStep
-→ JSON.stringify
-→ Base64URL
-→ clipboard.writeText(...)
+1. App nimmt nodes + progress + currentStep
+2 JSON.stringify
+3 Base64URL
+4. clipboard.writeText(...)
 
-User fügt String ein
-→ decode
-→ nodes setzen
-→ Backend mit nodes aufrufen
-→ steps setzen
-→ Output anzeigen
-→ Timeline bauen
-→ progress setzen
-→ pause
+Import:
+1. String decodieren
+2 nodes setzen
+3. progress setzen
+4. currentStep explizit setzen
+5 Backend mit nodes aufrufen
+6. Output rendern
+7. Timeline bauen
+8. Timeline explizit auf progress setzen
 
-
-if (typeof imported.progress === "number") {
-    tl.progress(imported.progress).pause();
-} else {
-    tl.seek(imported.stepIndex.toString()).pause();
-}
 * */

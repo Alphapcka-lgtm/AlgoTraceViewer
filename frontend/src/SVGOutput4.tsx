@@ -5,6 +5,7 @@ import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl4} from "./OutputControl4";
 import {XNode} from "./Nodes.tsx";
 import {IOModeTabs} from "./IOModeTabs";
+import {getStepIndexFromTimeline, createStepLabels} from "./Utils.tsx";
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
@@ -19,16 +20,24 @@ export function SVGOutput4(props: SVGOutputProps) {
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
 
     useGSAP(() => {
-        if (!step || !activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
+        if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
 
         const activeRect = activeSweepWindowRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
-        const myLabels = props.steps.map((_, i) => String(i));
+        const myLabels = createStepLabels(props.steps.length);
 
-        let lastLabel:string | null = null;
+        //es wird jetzt der zustand von app gesetzt...
+        // Beim normalen Submit (nichts importered) ist props.progress = 0 und props.currentStep = 0
+        // und wenn imported wurde, sind das halt die importierten Werte...
+        const initialProgress:number = props.progress;
+        const initialStep:number = props.currentStep;
 
+        //let lastLabel:string | null = null;
+        let lastLabel: string | null = initialStep.toString();
+
+        // timeline erstellen:
         const timeline = gsap.timeline({
             paused: true,
             defaults: {
@@ -37,22 +46,9 @@ export function SVGOutput4(props: SVGOutputProps) {
             },
             onUpdate: () => {
                 const tl = timelineRef.current;
-
                 props.setProgress(tl.progress()); //für scrubber
 
-                const currTime = tl.time();
-
-                let stepIndex = 0;
-                for(let i=0; i<myLabels.length; i++) {
-
-                    const labelTime = tl.labels[myLabels[i]];
-                    console.log(labelTime);
-                    if(labelTime<=currTime+0.0001){
-                        stepIndex = i;
-                    }else{
-                        break;
-                    }
-                }
+                const stepIndex:number = getStepIndexFromTimeline(tl, myLabels);
 
                 const currentLabel: string = stepIndex.toString();
                 if(currentLabel === lastLabel){ // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
@@ -61,9 +57,6 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                 lastLabel = currentLabel;
                 props.setCurrentStep(stepIndex);
-
-
-                //props.setProgress(timelineRef.current.progress());
 
             },
             onComplete: () => {
@@ -81,56 +74,57 @@ export function SVGOutput4(props: SVGOutputProps) {
         //init state setzen
         gsap.set(activeRect, {
             attr: {
-                x: firstStep.sweepLineX - firstStep.delta,
-                y: PADDING,
-                width: firstStep.delta,
-                height: props.height - 2 * PADDING,
+                x: firstStep.sweepLineX - firstStep.delta, y: PADDING,
+                width: firstStep.delta, height: props.height - 2 * PADDING,
             }
         });
 
         gsap.set(candidateRect, {
             attr: {
-                x: firstStep.sweepLineX - firstStep.delta,
-                y: getCy(firstStep),
-                width: firstStep.delta,
-                height: firstStep.delta * 2,
+                x: firstStep.sweepLineX - firstStep.delta, y: getCy(firstStep),
+                width: firstStep.delta, height: firstStep.delta * 2,
             }
         });
-
+        //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
+        //adding tweens:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
 
             timeline.to(activeRect, {
                 attr: {
-                    x: step.sweepLineX - step.delta,
-                    y: PADDING,
-                    width: step.delta,
-                    height: props.height - 2 * PADDING,
+                    x: step.sweepLineX - step.delta, y: PADDING,
+                    width: step.delta, height: props.height - 2 * PADDING,
                 }
             });
 
             timeline.to(candidateRect, {
                 attr: {
-                    x: step.sweepLineX - step.delta,
-                    y: getCy(step),
-                    width: step.delta,
-                    height: step.delta * 2,
+                    x: step.sweepLineX - step.delta, y: getCy(step),
+                    width: step.delta, height: step.delta * 2,
                 }
             }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein ....
+            //alle anderen labels setzen
             timeline.addLabel(myLabels[stepIndex]);
         });
 
-        timelineRef.current = timeline;
+        timelineRef.current = timeline; //store timeline in ref
 
-        props.setCurrentStep(0);
+        //timeline.progress(value, suppressEvents);
+        // true verindert während dieses einen progress(...)Aufrufs das timeline callbacks ausgeführt werden (onUpdate...)
+        // das ist wichtig beim diesem Initialisieren, weil progress und currentStep schon aus App kommen und onUpdate somit nichts (stepindex) überschreibt
+        timeline.progress(initialProgress, true).pause();
         setIsPlaying(false);
+
+        props.setProgress(initialProgress);//eigentlich redundant, weil App diese Werte ja schon gesetzt hat, aber finde es so klarer
+        props.setCurrentStep(initialStep);// "
+
         return () => {
             timeline.kill();
-            timelineRef.current = gsap.timeline();
+            timelineRef.current = gsap.timeline({paused: true}); //damit eine pausierte leere timeline erzeugt wird... aber eigentlich egal finde es nur schöner so
         };
     }, {
         dependencies: [props.steps],
@@ -221,7 +215,7 @@ export function SVGOutput4(props: SVGOutputProps) {
 
             <OutputControl4
                 timelineRef={timelineRef}
-                labels={props.steps.map((_, i) => String(i))}
+                labels={createStepLabels(props.steps.length)}
                 currentStep={props.currentStep}
                 setCurrentStep={props.setCurrentStep}
                 stepCount={props.steps.length}
