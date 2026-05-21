@@ -17,41 +17,27 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
-        //if (props.mode !== "input") return;
         if (interaction.type !== "idle") return;
-
         const {x, y} = getMousePos(e);
-        //setNodes((prev) => [...prev, {x, y, id: getRandomId()}]);
-
         props.onAddNode({x, y, id: getRandomId()});
 
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-        //if (props.mode !== "input") return;
         if (interaction.type !== "dragging") return;
-
         const pos = getMousePos(e);
         props.onMoveNode(interaction.nodeId, pos.x, pos.y);
-
-        //setNodes((prev) => prev.map((n) => n.id === interaction.nodeId ? {...n, ...pos} : n));
-
     };
 
     const handleNodeMouseDown = (nodeId: string) => {
-        //if (props.mode !== "input") return;
         setInteraction({type: "dragging", nodeId});
     };
 
     const handleNodeMouseUp = () => {
-        //if (props.mode !== "input") return;
         setInteraction({type: "idle"});
     };
 
     const handleNodeDoubleClick = (nodeId: string) => {
-        //if (props.mode !== "input") return;
-
-        //setNodes((prev) => prev.filter((n) => n.id !== nodeId));
         props.onDeleteNode(nodeId);
         setInteraction({type: "idle"});
     };

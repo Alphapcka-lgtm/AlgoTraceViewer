@@ -13,7 +13,6 @@ export default function App() {
 
     const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
 
-    //const {algoSteps, loading, error, calculateSteps} = useSweepLineSteps();
     const {loading, error, calculateSteps} = useSweepLineSteps();
 
     const [nextLabelIndex, setNextLabelIndex] = useState(0);
@@ -23,12 +22,6 @@ export default function App() {
 
     const svgHeight = 500;
     const svgWidth = 1123;
-
-    /*
-    const handleAddNode = (node: Node) => {
-        setNodes((prev : Node[])=> [...prev, node]);
-    };
-     */
 
     const handleAddNode = (node: Omit<Node, "label">) => {
         const label: string = getAlphabetLabel(nextLabelIndex);
@@ -92,7 +85,6 @@ export default function App() {
             // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
             setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
             setProgress(imported.progress);
-            //setCurrentStep(imported.stepIndex);
 
             await handleSubmit(imported.nodes);
         } catch (error) {

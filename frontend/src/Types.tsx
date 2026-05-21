@@ -18,12 +18,6 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
-/*
-export type StaticNodesProps = {
-    nodes: Node[];
-};
-*/
-
 //was SVGInput alles von App bekommt
 export type SVGInputProps = {
     height: number;
@@ -105,7 +99,6 @@ export type XNodeProps = {
     fill: string;
 };
 
-
 export type ModeTabsProps = {
     mode: "input" | "output";
     onChangeInput: () => void;
@@ -118,38 +111,3 @@ export type ExportState = {
     progress: number;
     stepIndex: number;
 };
-
-//Überlegung für später
-//Step + lokaler Step Fortschritt
-//also stepIndex = aktueller Abschnitt / aktueller Step
-// stepProgress = Fortschritt zwischen diesem Step und dem nächsten Step
-
-
-/*
-
-Input:
-    Import möglich
-    Export nicht nötig
-
-Output:
-    Export möglich
-    Import nicht nötig
-
-
-User klickt Export
-1. App nimmt nodes + progress + currentStep
-2 JSON.stringify
-3 Base64URL
-4. clipboard.writeText(...)
-
-Import:
-1. String decodieren
-2 nodes setzen
-3. progress setzen
-4. currentStep explizit setzen
-5 Backend mit nodes aufrufen
-6. Output rendern
-7. Timeline bauen
-8. Timeline explizit auf progress setzen
-
-* */

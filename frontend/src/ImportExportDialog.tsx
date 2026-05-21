@@ -7,6 +7,9 @@ type ImportExportDialogProps = {
     createExportString?: () => string;
 };
 
+//Input: Import möglich, Export nicht möglich
+//Output: Export möglich, Import nicht möglich
+
 export function ImportExportDialog(props: ImportExportDialogProps) {
     const [open, setOpen] = useState(false);
     const [importValue, setImportValue] = useState("");

@@ -30,14 +30,12 @@ export function SVGOutput4(props: SVGOutputProps) {
         timelineRef.current?.kill();
         const myLabels = createStepLabels(props.steps.length);
 
-        //es wird jetzt der zustand von app gesetzt...
-        // Beim normalen Submit (nichts importered) ist props.progress = 0 und props.currentStep = 0
-        // und wenn imported wurde, sind das halt die importierten Werte...
+        // Startzustand der Timeline aus app.
+        // Beim normalen Submit (nichts importered) ist props.progress = 0
+        // und wenn imported wurde, sind das halt die importierten Fortschritt...
         const initialProgress:number = props.progress;
-        //const initialStep:number = props.currentStep;
 
         let lastLabel:string | null = null;
-        //let lastLabel: string | null = initialStep.toString();
 
         // timeline erstellen:
         const timeline = gsap.timeline({
@@ -115,15 +113,10 @@ export function SVGOutput4(props: SVGOutputProps) {
 
         timelineRef.current = timeline; //store timeline in ref
 
-        //timeline.progress(value, suppressEvents);
-        // true verindert während dieses einen progress(...)Aufrufs das timeline callbacks ausgeführt werden (onUpdate...)
-        // das ist wichtig beim diesem Initialisieren, weil progress und currentStep schon aus App kommen und onUpdate somit nichts (stepindex) überschreibt
-       // timeline.progress(initialProgress, true).pause();
+        // Setzt die gerade gebaute Timeline auf den richtigen (0 oder den vom import) progress.
+        //in onUpdate wird dann aus progress der richitge currentStep berechnet
         timeline.progress(initialProgress).pause();
         setIsPlaying(false);
-
-        //props.setProgress(initialProgress);//eigentlich redundant, weil App diese Werte ja schon gesetzt hat, aber finde es so klarer
-        //props.setCurrentStep(initialStep);// "
 
         return () => {
             timeline.kill();

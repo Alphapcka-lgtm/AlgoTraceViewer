@@ -66,26 +66,3 @@ export function XNode({ node, fill }: XNodeProps){
         </g>
     );
 }
-/*
-//für den output modus
-export function StaticNodes(props: StaticNodesProps) {
-    return props.nodes.map((n: Node, i: number) => (
-        <g key={n.id}>
-            <circle cx={n.x} cy={n.y} r={11} fill="black" />
-            <circle cx={n.x} cy={n.y} r={10} fill="white" />
-            <text
-                x={n.x}
-                y={n.y}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="black"
-                fontSize="10"
-                pointerEvents="none"
-            >
-                {n.label}
-            </text>
-        </g>
-    ));
-}
-
- */

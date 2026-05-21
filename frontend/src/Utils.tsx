@@ -64,7 +64,6 @@ export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[
     return stepIndex;
 }
 
-
 export function encodeExportState(state: ExportState): string {
     const json = JSON.stringify(state);
     return btoa(encodeURIComponent(json));
@@ -80,16 +79,10 @@ export function createStepLabels(stepCount: number): string[] {
 }
 
 /*
-Vllt baue ich das später noch bei initialProgress und initialStep in svgOutput ein ...
+Vllt baue ich das später noch bei initialProgress in svgOutput ein ...
 export function checkProgress(progress: number): number {
     if (progress < 0) return 0;
     if (progress > 1) return 1;
     return progress;
-}
-
-export function checkStepIndex(stepIndex: number, stepCount: number): number {
-    if (stepIndex < 0) return 0;
-    if (stepIndex >= stepCount) return stepCount - 1;
-    return stepIndex;
 }
  */
