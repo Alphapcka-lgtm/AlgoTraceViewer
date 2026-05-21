@@ -1,6 +1,19 @@
-import type {OutputControlProps} from "./Types";
-import {btnStyle} from "./Utils.tsx";
+import {btnStyle} from "../Utils.tsx";
+import React, {type Dispatch, type RefObject, type SetStateAction} from "react";
 
+export type OutputControlProps = {
+    isPlaying: boolean;
+    setIsPlaying: Dispatch<SetStateAction<boolean>>;
+
+    progress: number;
+    setProgress: Dispatch<SetStateAction<number>>;
+
+    activeStepIndex: number;
+    setActiveStepIndex: React.Dispatch<React.SetStateAction<number>>;
+    stepCount: number;
+
+    tlRef: RefObject<gsap.core.Timeline>; //tlRef wird von SVGOutput übergeben
+};
 export function OutputControl(props: OutputControlProps) {
 
     const stopAnimation = () => {

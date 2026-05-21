@@ -1,10 +1,10 @@
 import {useEffect, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
-import {OutputControl2} from "./OutputControl2";
-import {XNode} from "./Nodes.tsx";
-import {btnStyle} from "./Utils.tsx";
+import type {AlgorithmStepDTO, Node, SVGOutputProps} from "../Types.tsx";
+import {OutputControl2} from "./OutputControl2.tsx";
+import {XNode} from "../Nodes.tsx";
+import {btnStyle} from "../Utils.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;

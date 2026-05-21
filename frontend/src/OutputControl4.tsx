@@ -65,6 +65,7 @@ export function OutputControl4(props: OutputControlProps4) {
         tl.pause(0);
         props.setCurrentStep(0);
         props.setIsPlaying(false);
+        props.setProgress(0); //für scrubber
     };
 
     const scrub = (value: number) => {

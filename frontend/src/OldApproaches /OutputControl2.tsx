@@ -1,6 +1,15 @@
-import type {OutputControlProps2} from "./Types";
-import {btnStyle} from "./Utils.tsx";
+import {btnStyle} from "../Utils.tsx";
+import React from "react";
 
+
+export type OutputControlProps2 = {
+    currentStep: number;
+    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+    stepCount: number;
+
+    isPlaying: boolean;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+};
 export function OutputControl2(props: OutputControlProps2) {
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.stepCount - 1;
