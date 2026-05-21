@@ -92,7 +92,7 @@ export default function App() {
             // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
             setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
             setProgress(imported.progress);
-            setCurrentStep(imported.stepIndex);
+            //setCurrentStep(imported.stepIndex);
 
             await handleSubmit(imported.nodes);
         } catch (error) {
