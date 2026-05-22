@@ -14,7 +14,7 @@ const STEP_DURATION = 1.0;
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const labels = createStepLabels(props.output.intermediateStates.length + 1);
+    const labels = createStepLabels(2 * props.output.intermediateStates.length + 1);
 
     useGSAP(() => {
 
@@ -48,17 +48,29 @@ export function SVGOutput(props: SVGOutputProps) {
                 timeline.to("#" + intermediateState.chosenEdge.fromId, markRandomEdge, "<");
                 timeline.to("#" + intermediateState.chosenEdge.toId, markRandomEdge, "<");
 
+                timeline.addLabel(labels[2 * index + 1]);
+
                 const markIncidentEdges = {filter: "drop-shadow(0px 0px 3px blue)"};
 
-                intermediateState.incidentEdges.forEach((incidentEdge) => {
-                    timeline.to("#" + incidentEdge.id, markIncidentEdges, "<");
+                intermediateState.incidentEdges.forEach((incidentEdge, index) => {
+                    if(index == 0){
+                        timeline.to("#" + incidentEdge.id, markIncidentEdges);
+                    } else {
+                        timeline.to("#" + incidentEdge.id, markIncidentEdges, "<");
+                    }
                 });
 
-                timeline.addLabel(labels[index+1]);
+                timeline.addLabel(labels[2 * index + 2]);
             });
 
-            timeline.progress(props.progress);
+            timeline.progress(props.progress).pause();
+            setIsPlaying(false);
             tlRef.current = timeline;
+
+            return () => {
+                timeline.kill();
+                tlRef.current = gsap.timeline({paused: true});
+            };
         }
     }, {dependencies: [props.output.timestamp, props.mode], revertOnUpdate: true});
 
@@ -69,7 +81,7 @@ export function SVGOutput(props: SVGOutputProps) {
             <Edges edges={ props.output.initialState.edges } nodes={ props.output.initialState.nodes } />
             <Nodes nodes={ props.output.initialState.nodes } { ...clickEventHandler } />
         </svg>
-        <div><strong>Step:</strong> {props.stepIndex} / {labels.length}</div>
+        <div><strong>Step:</strong> {props.stepIndex} / {labels.length-1}</div>
         <OutputControl isPlaying={ isPlaying } setIsPlaying={ setIsPlaying } progress={ props.progress } setProgress={ props.setProgress } tlRef={ tlRef } setStepIndex={ props.setStepIndex } stepIndex={ props.stepIndex } labels={ labels } />
     </>;
 }
