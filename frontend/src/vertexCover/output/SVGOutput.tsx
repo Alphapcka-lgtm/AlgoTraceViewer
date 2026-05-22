@@ -1,7 +1,7 @@
 import type { SVGOutputProps } from "./Types.tsx";
 
 import { OutputControl } from "./OutputControl.tsx";
-import { getRandomId } from "../shared/Utils.tsx";
+import { createStepLabels, getStepIndexFromTimeline } from "../shared/Utils.tsx";
 import { Edges } from "../shared/Edges.tsx";
 import { Nodes } from "../shared/Nodes.tsx";
 import { useRef, useState } from "react";
@@ -9,43 +9,55 @@ import { useGSAP } from "@gsap/react";
 
 import gsap from "gsap";
 
+const STEP_DURATION = 1.0;
+
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const labels = [...props.output.intermediateStates.flatMap(() => [getRandomId(), getRandomId()]), getRandomId()];
+    const labels = createStepLabels(props.output.intermediateStates.length);
 
     useGSAP(() => {
+        let lastLabel: string | null = null;
+
         tlRef.current = gsap.timeline({
             paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut",
+            },
             onUpdate: () => {
-                const currentStep = tlRef.current.nextLabel();
-                if(currentStep){
-                    const currentStepIndex = parseInt(currentStep.split("-")[0]);
-                    props.setStepIndex(currentStepIndex);
-                } else {
-                    props.setStepIndex(props.output.intermediateStates.length);
+                const tl = tlRef.current;
+                props.setProgress(tl.progress()); //für scrubber
+
+                const stepIndex:number = getStepIndexFromTimeline(tl, labels);
+
+                const currentLabel: string = stepIndex.toString();
+                if(currentLabel === lastLabel){ // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
+                    return;
                 }
-                props.setProgress(tlRef.current.progress());
+
+                lastLabel = currentLabel;
+
+                props.setStepIndex(stepIndex);
             },
             onComplete: () => {
                 setIsPlaying(false);
                 tlRef.current.pause();
-            }
+            },
         });
 
         if (props.mode === "Output") {
             props.output.intermediateStates.forEach((intermediateState, index) => {
-                const pickRandomEdge =  (2*index) + "-" + getRandomId();
-                const markIncidentEdges = (2*index+1) + "-" + getRandomId();
-                const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 1.0};
-                const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 1.0};
+                const markRandomEdge = {filter: "drop-shadow(0px 0px 5px red)"};
 
-                tlRef.current.to("#" + intermediateState.chosenEdge.id, tweenVars1, pickRandomEdge);
-                tlRef.current.to("#" + intermediateState.chosenEdge.fromId, tweenVars1, pickRandomEdge);
-                tlRef.current.to("#" + intermediateState.chosenEdge.toId, tweenVars1, pickRandomEdge);
+                tlRef.current.to("#" + intermediateState.chosenEdge.id, markRandomEdge, labels[index]);
+                tlRef.current.to("#" + intermediateState.chosenEdge.fromId, markRandomEdge, labels[index]);
+                tlRef.current.to("#" + intermediateState.chosenEdge.toId, markRandomEdge, labels[index]);
+
+                const markIncidentEdges = {filter: "drop-shadow(0px 0px 3px blue)"};
 
                 intermediateState.incidentEdges.forEach((incidentEdge) => {
-                    tlRef.current.to("#" + incidentEdge.id, tweenVars2, markIncidentEdges);
+                    tlRef.current.to("#" + incidentEdge.id, markIncidentEdges, labels[index]);
                 });
             });
             tlRef.current.progress(props.progress);

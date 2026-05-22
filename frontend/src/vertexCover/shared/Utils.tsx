@@ -49,3 +49,26 @@ function base64ToByteArray(str: string){
 
     return bytes;
 }
+
+export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[]): number {
+    const currTime = tl.time();
+
+    let stepIndex = 0;
+
+    for (let i = 0; i < labels.length; i++) {
+        const labelTime = tl.labels[labels[i]];
+        // console.log(labelTime);
+        if (labelTime <= currTime + 0.0001) {
+            stepIndex = i;
+        } else {
+            break;
+        }
+    }
+
+    return stepIndex;
+}
+
+
+export function createStepLabels(stepCount: number): string[] {
+    return Array.from({ length: stepCount }, (_, i) => String(i));
+}

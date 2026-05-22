@@ -1,13 +1,29 @@
 import type { OutputControlProps } from "./Types.tsx";
+import gsap from "gsap";
 
 export function OutputControl(props: OutputControlProps){
 
+    const tweenToStep = (targetStep: number) => {
+        const tl = props.tlRef.current;
+        if(!tl) return;
+
+        const targetLabel = props.labels[targetStep];
+        if(!targetLabel) return;
+
+        props.setIsPlaying(false); //wenn im autoplay auf next/back geklickt wird autoplay bendet
+
+        gsap.killTweensOf(tl);
+
+        tl.tweenTo(targetLabel, {
+            onComplete: () => {
+                props.setStepIndex(targetStep);
+            }
+        });
+    };
+
     const jumpToPreviousStep = () => {
-        if (props.isPlaying){
-            stopAnimation();
-        }
-        const previousLabel = props.tlRef.current.previousLabel(props.tlRef.current.time() - 0.01 < 0 ? 0.01 : props.tlRef.current.time() - 0.01);
-        props.tlRef.current.tweenTo(previousLabel);
+        if(props.tlRef.current.progress() <= 0) return;
+        tweenToStep(props.stepIndex-1);
     }
 
     const stopAnimation = () => {
@@ -25,10 +41,8 @@ export function OutputControl(props: OutputControlProps){
     }
 
     const jumpToNextStep = () => {
-        if (props.isPlaying){
-            stopAnimation();
-        }
-        props.tlRef.current.tweenTo(props.tlRef.current.nextLabel());
+        if(props.tlRef.current.progress() >= 1) return;
+        tweenToStep(props.stepIndex+1);
     }
 
     const resetAnimation = () => {
