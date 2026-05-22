@@ -14,12 +14,11 @@ const STEP_DURATION = 1.0;
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const labels = createStepLabels(props.output.intermediateStates.length);
+    const labels = createStepLabels(props.output.intermediateStates.length + 1);
 
     useGSAP(() => {
-        let lastLabel: string | null = null;
 
-        tlRef.current = gsap.timeline({
+        const timeline = gsap.timeline({
             paused: true,
             defaults: {
                 duration: STEP_DURATION,
@@ -31,13 +30,6 @@ export function SVGOutput(props: SVGOutputProps) {
 
                 const stepIndex:number = getStepIndexFromTimeline(tl, labels);
 
-                const currentLabel: string = stepIndex.toString();
-                if(currentLabel === lastLabel){ // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
-                    return;
-                }
-
-                lastLabel = currentLabel;
-
                 props.setStepIndex(stepIndex);
             },
             onComplete: () => {
@@ -46,21 +38,27 @@ export function SVGOutput(props: SVGOutputProps) {
             },
         });
 
+        timeline.addLabel(labels[0]);
+
         if (props.mode === "Output") {
             props.output.intermediateStates.forEach((intermediateState, index) => {
                 const markRandomEdge = {filter: "drop-shadow(0px 0px 5px red)"};
 
-                tlRef.current.to("#" + intermediateState.chosenEdge.id, markRandomEdge, labels[index]);
-                tlRef.current.to("#" + intermediateState.chosenEdge.fromId, markRandomEdge, labels[index]);
-                tlRef.current.to("#" + intermediateState.chosenEdge.toId, markRandomEdge, labels[index]);
+                timeline.to("#" + intermediateState.chosenEdge.id, markRandomEdge);
+                timeline.to("#" + intermediateState.chosenEdge.fromId, markRandomEdge, "<");
+                timeline.to("#" + intermediateState.chosenEdge.toId, markRandomEdge, "<");
 
                 const markIncidentEdges = {filter: "drop-shadow(0px 0px 3px blue)"};
 
                 intermediateState.incidentEdges.forEach((incidentEdge) => {
-                    tlRef.current.to("#" + incidentEdge.id, markIncidentEdges, labels[index]);
+                    timeline.to("#" + incidentEdge.id, markIncidentEdges, "<");
                 });
+
+                timeline.addLabel(labels[index+1]);
             });
-            tlRef.current.progress(props.progress);
+
+            timeline.progress(props.progress);
+            tlRef.current = timeline;
         }
     }, {dependencies: [props.output.timestamp, props.mode], revertOnUpdate: true});
 
