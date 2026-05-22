@@ -198,25 +198,6 @@ export function SVGOutput4(props: SVGOutputProps) {
                 })}
             </svg>
 
-            <div
-                style={{
-                    fontFamily: "monospace",
-                    fontSize: 15,
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "4px 16px",
-                }}
-            >
-                <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
-                <div><strong>Current Point:</strong> {step.currentPoint?.label}</div>
-                <div>
-                    <strong> Best Pair:{" "}</strong>
-                    {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                </div>
-                <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
-            </div>
-
             <OutputControl4
                 timelineRef={timelineRef}
                 labels={createStepLabels(props.steps.length)}
@@ -231,21 +212,32 @@ export function SVGOutput4(props: SVGOutputProps) {
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
+            <div style={{fontFamily: "monospace", fontSize: 15,}}>
+                <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
 
-            <div style={{fontFamily: "monospace", fontSize: 15}}>
-                <div>
-                    <strong>Active Points:</strong>{" "}
-                    {step.activePoints.length === 0 ? "No active points"
-                        : step.activePoints.map((p) => p.label).join(", ")}
+                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 16px"}}>
+                    <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
+                    <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
+                    <div><strong>Current Point:</strong> {step.currentPoint?.label}</div>
+                    <div>
+                        <strong> Best Pair:{" "}</strong>
+                        {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                    </div>
+                    <div>
+                        <strong>Active Points:</strong>{" "}
+                        {step.activePoints.length === 0 ? "No active points"
+                            : step.activePoints.map((p) => p.label).join(", ")}
+                    </div>
+
+                    <div>
+                        <strong>Candidates:</strong>{" "}
+                        {step.candidatePairs.length === 0 ? "No candidates in this step" : step.candidatePairs
+                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                            .join("; ")
+                        }
+                    </div>
                 </div>
 
-                <div>
-                    <strong>Candidates:</strong>{" "}
-                    {step.candidatePairs.length === 0 ? "No candidates in this step" : step.candidatePairs
-                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                        .join("; ")
-                    }
-                </div>
             </div>
 
             <ImportExportDialog
