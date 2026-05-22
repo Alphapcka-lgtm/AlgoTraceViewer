@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
@@ -20,6 +20,8 @@ export function SVGOutput4(props: SVGOutputProps) {
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
 
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
+    //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
+    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
 
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
@@ -35,13 +37,11 @@ export function SVGOutput4(props: SVGOutputProps) {
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
-        const myLabels = createStepLabels(props.steps.length);
 
         // Startzustand der Timeline aus app.
         // Beim normalen Submit (nichts importered) ist props.progress = 0
         // und wenn imported wurde, sind das halt die importierten Fortschritt...
         const initialProgress:number = props.progress;
-
 
         // timeline erstellen:
         const timeline = gsap.timeline({
@@ -53,9 +53,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             onUpdate: () => {
                 const tl = timelineRef.current;
                 props.setProgress(tl.progress()); //für scrubber
-
                 const stepIndex:number = getStepIndexFromTimeline(tl, myLabels);
-
                 props.setCurrentStep(stepIndex);
 
             },
@@ -218,7 +216,7 @@ export function SVGOutput4(props: SVGOutputProps) {
 
             <OutputControl4
                 timelineRef={timelineRef}
-                labels={createStepLabels(props.steps.length)}
+                labels={myLabels}
                 currentStep={props.currentStep}
                 setCurrentStep={props.setCurrentStep}
                 stepCount={props.steps.length}
@@ -255,7 +253,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                         }
                     </div>
                     {/*
-                    <div>
+                        <div>
                         <strong>Future Points:</strong>{" "}
                         {step.futurePoints.length === 0 ? "—"
                             : step.futurePoints.map((p) => p.label).join(", ")}
