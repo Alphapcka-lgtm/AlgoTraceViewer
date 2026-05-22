@@ -197,6 +197,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                     const isBest = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
                     const isFuture = step.futurePoints.some((f) => f.id === p.id);
 
+                    //TODO: Nochmal nachdenken ob diese darstellung wirklich gut ist!
                     let fill = "black";
 
                     if (isCurrent) {

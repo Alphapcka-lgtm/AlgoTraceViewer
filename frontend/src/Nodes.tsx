@@ -27,11 +27,19 @@ export function DynamicNodes(props: DynamicNodesProps) {
     ));
 }
 
+export function XNode({ node, fill }: XNodeProps) {
+    const NODE_SIZE = 4;
+    const HITBOX_RADIUS = 8;
 
-export function XNode({ node, fill }: XNodeProps){
-    const NODE_SIZE:number = 4;
     return (
-        <g key={node.id}>
+        <g>
+            <circle
+                cx={node.x}
+                cy={node.y}
+                r={HITBOX_RADIUS}
+                fill="transparent"
+                pointerEvents="all"
+            />
 
             <line
                 x1={node.x - NODE_SIZE}
@@ -41,6 +49,7 @@ export function XNode({ node, fill }: XNodeProps){
                 stroke={fill}
                 strokeWidth={3}
                 strokeLinecap="round"
+                pointerEvents="none"
             />
 
             <line
@@ -51,6 +60,7 @@ export function XNode({ node, fill }: XNodeProps){
                 stroke={fill}
                 strokeWidth={3}
                 strokeLinecap="round"
+                pointerEvents="none"
             />
 
             <text
@@ -59,10 +69,10 @@ export function XNode({ node, fill }: XNodeProps){
                 fontSize="13"
                 fontFamily="monospace"
                 fill={fill}
+                pointerEvents="none"
             >
                 {node.label}
             </text>
-
         </g>
     );
 }
