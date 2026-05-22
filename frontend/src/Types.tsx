@@ -91,6 +91,10 @@ export type OutputControlProps4 = {
     //Für scrubber
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
+
+
+    playbackSpeed: number;
+    onPlaybackSpeedChange: (speed: number) => void;
 };
 
 
@@ -110,3 +114,4 @@ export type ExportState = {
     nodes: Node[];
     progress: number;
 };
+

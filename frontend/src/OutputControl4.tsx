@@ -103,6 +103,17 @@ export function OutputControl4(props: OutputControlProps4) {
                 onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
                 style={{width: "98%", marginTop:"8px", accentColor: "red", height: "40px", cursor: "pointer"}}
             />
+
+            <div style={{display: "flex", gap: 3, width: "25%"}}>
+                {[0.5, 1, 2].map((speed) => (
+                    <button key={speed} onClick={() => props.onPlaybackSpeedChange(speed)}
+                        style={{...btnStyle, opacity: props.playbackSpeed === speed ? 1 : 0.55,
+                            fontWeight: props.playbackSpeed === speed ? "bold" : "normal"}}
+                    >
+                        {speed}x
+                    </button>
+                ))}
+            </div>
         </div>
 
     );

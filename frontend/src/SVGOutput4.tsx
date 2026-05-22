@@ -21,6 +21,13 @@ export function SVGOutput4(props: SVGOutputProps) {
 
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
 
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        timelineRef.current.timeScale(speed);
+    };
+
     useGSAP(() => {
         if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
 
@@ -116,6 +123,7 @@ export function SVGOutput4(props: SVGOutputProps) {
         // Setzt die gerade gebaute Timeline auf den richtigen (0 oder den vom import) progress.
         //in onUpdate wird dann aus progress der richitge currentStep berechnet
         timeline.progress(initialProgress).pause();
+        timeline.timeScale(playbackSpeed); //hat keine auswirkung auf progress ... timeScale verändert nur wie schnell Timeline abgespielt wird
         setIsPlaying(false);
 
         return () => {
@@ -219,6 +227,9 @@ export function SVGOutput4(props: SVGOutputProps) {
                 setIsPlaying={setIsPlaying}
                 progress={props.progress}
                 setProgress={props.setProgress}
+
+                playbackSpeed={playbackSpeed}
+                onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
             <div style={{fontFamily: "monospace", fontSize: 15}}>
