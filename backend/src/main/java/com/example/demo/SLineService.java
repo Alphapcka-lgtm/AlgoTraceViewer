@@ -13,16 +13,16 @@ public class SLineService {
     public List<AlgorithmStepDTO> nearestPoints(List<Point> points) {
         List<AlgorithmStepDTO> steps = new ArrayList<>();
 
-        if(points == null || points.size() < 2) {
+        if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points");
         }
 
-        // Sort all points by x-coordinate
+        //x-Queue aufbauen ... Sort all points by x coordinate
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
 
         /*
-        Bad for animation ??
+        Bad for animation ...
 
         //If there are only two points, then the solution is trivial -> return immediately
         if(xSorted.size() == 2) {
@@ -39,40 +39,56 @@ public class SLineService {
         }
         */
 
-        //Calculate the initial delta from the first two points 
+        //Init mit p0 und p1
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
-        double delta = euclideanDistance(p0, p1);
+        double delta = euclideanDistance(p0, p1); //Calculate the initial delta from the first two points
         Result currBestPair = new Result(p0, p1, delta);
 
-        //shortcut for the delta control+cmd+space and then search delta
-        String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.label() + ", "
-                + p1.label() + ") = " + String.format("%.2f", delta);
-        steps.add(new AlgorithmStepDTO(description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
-                List.of(new Result(p0,p1,delta)), List.of()));
+        // y-Table: enthält nur active points (zwischen tail inkl. und current exkl.)
+        // Sortiert nach y, bei gleichem y nach x
+        //Punkte mit gleicher Position werden nicht verdrängt
+        TreeSet<Point> activePoints = new TreeSet<>(
+                Comparator.comparingInt(Point::y)
+                        .thenComparingInt(Point::x)
+                        .thenComparing(Point::id)
+        );
 
-        //nach y sotieren
-        // Punkt-duplikate werden nicht eingefüt/ignoriert
-        //set to store the previously processed points
-        // whose x-coordinates are less than delta distance from current point
-        // entählt also alle punkte die im delta * 2detal balken sind? wenn man einen bestimmen punkt anschaut
-        TreeSet<Point> activePoints = new TreeSet<>(Comparator.comparingInt(Point::y).thenComparingInt(Point::x));
+        //processed/discarded points ... leer am Anfang
+        List<Point> processed = new ArrayList<>();
+        // active points:  nur p0. currentPoint (p1) ist noch NICHT drin
         activePoints.add(p0);
+        // current: p1
+        // future: alle "nach" p1
+        List<Point> future0 = xSorted.subList(2, xSorted.size());
+
+        //shortcut for the delta control+cmd+space and then search delta
+        String description = "Initialization: Points sorted by x-coordinate. "
+                + "δ = dist(" + p0.label() + ", " + p1.label() + ") = "
+                + String.format("%.2f", delta);
+
+        steps.add(new AlgorithmStepDTO(
+                description, p1, p1.x(), delta,
+                new ArrayList<>(activePoints),   //p1 noch nicht drin
+                xSorted, currBestPair,
+                List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0)
+        ));
+
+        // jetzt p1 zur active menge hinzufügen
         activePoints.add(p1);
 
-        //index auf den linkesten noch gültigen Punkt des aktiv Window (teil der aktiven Punktemenge; current ist nicht teil)
-        //  ... dann muss man nicht immer alles durchsuchen
+        // tail zeigt auf den linkesten noch "gültigen" Punkt der active Menge
+        //  ... dadurch muss man nicht weniger punkte "durchsuchen"
         //ist quasi der linke rand des balkens
-        int tail=0;
+        int tail = 0;
 
-        // Already fully processed points (only for visualization)
-        List<Point> processed = new ArrayList<>();
-
-        for(int i = 2; i < xSorted.size(); i++) {
+        // mainschleife ... startet bei index 2
+        for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
 
-            // Removing points outside the delta window, so points to the left of the tail
-            while (tail < i && current.x() - xSorted.get(tail).x() > delta){
+            // Punkte aus der active Menge entfernen, die außerhalb des [x-delta, x) Streifens liegen
+            // -> werden der processed Menge hinzugefügt
+            while (tail < i && current.x() - xSorted.get(tail).x() > delta) {
                 Point toRemove = xSorted.get(tail);
                 activePoints.remove(toRemove);
                 processed.add(toRemove);
@@ -93,17 +109,15 @@ public class SLineService {
             }
             */
 
-            // check candidates for this step
+            // Kandidaten bestimmen ... active points im "kleinen/kleineren" [y-delta, y+delta] Fenster
             List<Result> candidatePairs = new ArrayList<>();
             boolean newBest = false;
 
             for (Point candidate : activePoints) {
-                // Look only at the relevant y range
                 if (Math.abs(current.y() - candidate.y()) < delta) {
                     double dist = euclideanDistance(current, candidate);
                     candidatePairs.add(new Result(candidate, current, dist));
 
-                    // new minimum ?
                     if (dist < delta) {
                         delta = dist;
                         currBestPair = new Result(candidate, current, delta);
@@ -112,33 +126,47 @@ public class SLineService {
                 }
             }
 
-            String newBestFoundMsg = "New minimum found! δ = " + String.format("%.2f", delta)
+            // future = alle Punkte "rechts" von current (Index i+1 bis Ende)
+            List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
+
+            String newBestMsg = "New minimum found! δ = " + String.format("%.2f", delta)
                     + " (" + currBestPair.p0().label() + ", " + currBestPair.p1().label() + ")";
-            String noNewBestFoundMsg = "processed points " + current.label() + "; δ = " + String.format("%.2f", delta)
+            String noNewBestMsg = "Processed point " + current.label() + "; δ = " + String.format("%.2f", delta)
                     + "; active points: " + activePoints.size();
-            description = newBest ? newBestFoundMsg : noNewBestFoundMsg;
 
-            steps.add(new AlgorithmStepDTO(description, current, current.x(), delta,
-                    new ArrayList<>(activePoints), xSorted, currBestPair, candidatePairs, new ArrayList<>(processed)));
+            // Step BEVOR current in active Menge kommt ...currentPoint ist ja nicht teil von activePoints
+            steps.add(new AlgorithmStepDTO(
+                    newBest ? newBestMsg : noNewBestMsg, current, current.x(), delta,
+                    new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
+                    xSorted, currBestPair, candidatePairs, new ArrayList<>(processed), futurePoints
+            ));
 
-            activePoints.add(current); //muss nach dem steps.add damit current Point nicht in active Menge
+            // current NACH dem Step in die active menge aufnehmen
+            activePoints.add(current);
         }
 
-        description = "Done! Closest Pair: " + currBestPair.p0().label() + ", " + currBestPair.p1().label()
-                + " with a distance of " + String.format("%.2f", currBestPair.distance());
-        Point mostRightPoint = xSorted.getLast();
+        // final Step .... alle verbleibenden activePoints noch zeigen
+        // currentPoint = null weil der alg fertig ist
+        Point lastPoint = xSorted.getLast();
 
-        steps.add(new AlgorithmStepDTO(description, mostRightPoint, mostRightPoint.x(), delta,
-                new ArrayList<>(activePoints), xSorted, currBestPair, List.of(), new ArrayList<>(processed)));
+        String doneMsg = "Done! Closest pair: "
+                + currBestPair.p0().label() + " ↔ " + currBestPair.p1().label()
+                + ", distance = " + String.format("%.2f", currBestPair.distance());
+
+        steps.add(new AlgorithmStepDTO(
+                doneMsg,
+                null, // kein currentPoint mehr
+                lastPoint.x(), delta,
+                new ArrayList<>(activePoints),  // aktive Menge noch zeigen
+                xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of()
+        ));
 
         return steps;
     }
 
     public static double euclideanDistance(Point p1, Point p2) {
-        long x = (long) p2.x() - p1.x();
-        long y = (long) p2.y() - p1.y();
-        long squared = (x * x) + (y * y);
-        return Math.sqrt(squared);
+        long dx = (long) p2.x() - p1.x();
+        long dy = (long) p2.y() - p1.y();
+        return Math.sqrt(dx * dx + dy * dy);
     }
-
 }

@@ -6,7 +6,6 @@ import com.example.demo.Result;
 import java.util.List;
 
 /**
- * @param stepIndex          Index dieses Schritts
  * @param description        Beschreibung was in diesem Schritt passiert
  * @param currentPoint       Der Punkt, bei dem die SweepLine gerade hält
  * @param sweepLineX         Die aktuelle x Position der SweepLine (= currentPoint.x)
@@ -26,5 +25,6 @@ public record AlgorithmStepDTO(
         List<Point> allPoints,
         Result bestPair,
         List<Result> candidatePairs,
-        List<Point> processedPoints
+        List<Point> processedPoints,
+        List<Point> futurePoints
 ) {}

@@ -47,7 +47,7 @@ export interface Result {
 
 export interface AlgorithmStepDTO {
     description: string;
-    currentPoint: Node;
+    currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
     sweepLineX: number;
     delta: number;
     activePoints: Node[];
@@ -55,6 +55,7 @@ export interface AlgorithmStepDTO {
     bestPair: Result | null;
     candidatePairs: Result[];
     processedPoints: Node[];
+    futurePoints: Node[];
 }
 
 //was SVGOutput von App bekommt

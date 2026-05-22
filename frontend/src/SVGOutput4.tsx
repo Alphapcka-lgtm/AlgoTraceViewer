@@ -134,6 +134,8 @@ export function SVGOutput4(props: SVGOutputProps) {
         dependencies: [props.steps],
     });
 
+    //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
+    //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
 
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
@@ -186,16 +188,39 @@ export function SVGOutput4(props: SVGOutputProps) {
 
 
                 {step.allPoints.map((p: Node) => {
-                    const isCurrent: boolean = p.id === step.currentPoint?.id;
-                    const isActive: boolean = step.activePoints.some((a) => a.id === p.id);
-                    const isProcessed: boolean = step.processedPoints.some((d) => d.id === p.id);
-                    const isBest: boolean = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
+                    const isCurrent   = step.currentPoint !== null && p.id === step.currentPoint.id;
+                    //const isCandidate = candidatePointIds.has(p.id);
+                    //const isActive    = step.activePoints.some((a) => a.id === p.id);
+                    const isProcessed = step.processedPoints.some((d) => d.id === p.id);
+                    const isBest      = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
+                    const isFuture    = step.futurePoints.some((f) => f.id === p.id);
 
-                    const fill =
-                        isCurrent ? "#ff6b35" : isBest ? "#ffd700" : isActive ? "pink" : isProcessed ? "brown" : "#4a9eff";
+                    let fill = "#4a9eff";
 
-                    return (<XNode key={p.id} node={p} fill={fill}/>);
+                    if (isCurrent) {
+                        fill = "#BE3D2A";
+                    } else if (isBest) {
+                        fill = "#ffd700";
+                    }
+                    /*
+                    else if(isCandidate){
+                        fill = "#a855f7";  // im kleinen fenster
+                    }  else if (isActive){
+                        fill = "#4a9eff";  //im großen Fenster
+                    }
+                     */
+                    else if (isProcessed) {
+
+                        fill = "#aaaaaa"; // abgearbeitet
+                    } else if (isFuture) {
+                        fill = "#cccccc";//noch nicht betrachtet
+                    }
+
+                    return <XNode key={p.id} node={p} fill={fill} />;
                 })}
+
+
+
             </svg>
 
             <OutputControl4
@@ -236,6 +261,15 @@ export function SVGOutput4(props: SVGOutputProps) {
                             .join("; ")
                         }
                     </div>
+                    {/*
+                    <div>
+                        <strong>Future Points:</strong>{" "}
+                        {step.futurePoints.length === 0 ? "—"
+                            : step.futurePoints.map((p) => p.label).join(", ")}
+                    </div>
+
+                    */}
+
                 </div>
 
             </div>
