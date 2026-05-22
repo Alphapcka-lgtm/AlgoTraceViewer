@@ -42,7 +42,6 @@ export function SVGOutput4(props: SVGOutputProps) {
         // und wenn imported wurde, sind das halt die importierten Fortschritt...
         const initialProgress:number = props.progress;
 
-        let lastLabel:string | null = null;
 
         // timeline erstellen:
         const timeline = gsap.timeline({
@@ -57,12 +56,6 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                 const stepIndex:number = getStepIndexFromTimeline(tl, myLabels);
 
-                const currentLabel: string = stepIndex.toString();
-                if(currentLabel === lastLabel){ // nur wenn sich label ändert currentStep updaten und somit auch nur dann rerendern
-                    return;
-                }
-
-                lastLabel = currentLabel;
                 props.setCurrentStep(stepIndex);
 
             },
