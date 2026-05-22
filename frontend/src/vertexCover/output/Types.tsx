@@ -15,5 +15,8 @@ export type OutputControlProps = {
     setIsPlaying: Dispatch<SetStateAction<boolean>>,
     progress: number,
     setProgress: Dispatch<SetStateAction<number>>,
-    tlRef: RefObject<gsap.core.Timeline>
+    stepIndex: number,
+    setStepIndex:  Dispatch<SetStateAction<number>>,
+    labels: string[],
+    tlRef: RefObject<gsap.core.Timeline>,
 }

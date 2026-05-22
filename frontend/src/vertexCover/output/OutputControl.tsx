@@ -16,7 +16,7 @@ export function OutputControl(props: OutputControlProps){
     }
 
     const startAnimation = () => {
-        if (props.progress === 1){
+        if (props.progress >= 1){
             props.tlRef.current.play(0);
         } else {
             props.tlRef.current.play();
@@ -37,6 +37,7 @@ export function OutputControl(props: OutputControlProps){
         }
         props.tlRef.current.pause(0);
         props.setProgress(0);
+        props.setStepIndex(0);
     }
 
     return <div style={ { display: "flex", flexDirection: "column", gap: 3 } } >

@@ -12,6 +12,7 @@ import gsap from "gsap";
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const labels = [...props.output.intermediateStates.flatMap(() => [getRandomId(), getRandomId()]), getRandomId()];
 
     useGSAP(() => {
         tlRef.current = gsap.timeline({
@@ -34,8 +35,8 @@ export function SVGOutput(props: SVGOutputProps) {
 
         if (props.mode === "Output") {
             props.output.intermediateStates.forEach((intermediateState, index) => {
-                const pickRandomEdge =  index + "-" + getRandomId();
-                const markIncidentEdges = index + "-" + getRandomId();
+                const pickRandomEdge =  (2*index) + "-" + getRandomId();
+                const markIncidentEdges = (2*index+1) + "-" + getRandomId();
                 const tweenVars1 = {filter: "drop-shadow(0px 0px 5px red)", ease: "power4",  duration: 1.0};
                 const tweenVars2 = {filter: "drop-shadow(0px 0px 3px blue)", ease: "power4", duration: 1.0};
 
@@ -58,7 +59,7 @@ export function SVGOutput(props: SVGOutputProps) {
             <Edges edges={ props.output.initialState.edges } nodes={ props.output.initialState.nodes } />
             <Nodes nodes={ props.output.initialState.nodes } { ...clickEventHandler } />
         </svg>
-        <div><strong>Step:</strong> {props.stepIndex} / {props.output.intermediateStates.length}</div>
-        <OutputControl isPlaying={ isPlaying } setIsPlaying={ setIsPlaying } progress={ props.progress } setProgress={ props.setProgress } tlRef={ tlRef } />
+        <div><strong>Step:</strong> {props.stepIndex} / {labels.length}</div>
+        <OutputControl isPlaying={ isPlaying } setIsPlaying={ setIsPlaying } progress={ props.progress } setProgress={ props.setProgress } tlRef={ tlRef } setStepIndex={ props.setStepIndex } stepIndex={ props.stepIndex } labels={ labels } />
     </>;
 }
