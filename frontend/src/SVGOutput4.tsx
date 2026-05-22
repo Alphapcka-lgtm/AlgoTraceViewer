@@ -25,6 +25,8 @@ export function SVGOutput4(props: SVGOutputProps) {
 
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
+    const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
+
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
         timelineRef.current.timeScale(speed);
@@ -74,7 +76,12 @@ export function SVGOutput4(props: SVGOutputProps) {
             },
             onUpdate: () => {
                 const tl = timelineRef.current;
-                props.setProgress(tl.progress()); //für scrubber
+
+                const now = performance.now();
+                if (now - lastProgressUpdateRef.current > 100) { // setProgress throttlen, sonst kann man playback speed nicht mehr während auotplay ändern
+                    props.setProgress(tl.progress()); //für scrubber
+                    lastProgressUpdateRef.current = now;
+                }
                 const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
                 props.setCurrentStep(stepIndex);
 
@@ -135,12 +142,12 @@ export function SVGOutput4(props: SVGOutputProps) {
         dependencies: [props.steps],
     });
 
-    //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
-    //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
-
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
+
+    //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
+    //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
 
     //für rect und line nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
@@ -265,7 +272,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                     </div>
                     {/*
                         <div>
-                        <strong>Future Points:</strong>{" "}
+                        <strong>Future Points:</strong>
                         {step.futurePoints.length === 0 ? "—"
                             : step.futurePoints.map((p) => p.label).join(", ")}
                     </div>
