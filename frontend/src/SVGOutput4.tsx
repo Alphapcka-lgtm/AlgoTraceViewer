@@ -30,6 +30,28 @@ export function SVGOutput4(props: SVGOutputProps) {
         timelineRef.current.timeScale(speed);
     };
 
+    const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
+        return {
+            x: step.sweepLineX - step.delta,
+            y: PADDING,
+            width: step.delta,
+            height: props.height - 2 * PADDING
+        };
+    };
+
+    const getCy = (step: AlgorithmStepDTO) =>
+        (step.currentPoint?.y ?? props.height / 2) - step.delta;
+
+    const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
+        return {
+            x: step.sweepLineX - step.delta,
+            y: getCy(step),
+            width: step.delta,
+            height: step.delta * 2
+        };
+    };
+
+
     useGSAP(() => {
         if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
 
@@ -41,7 +63,7 @@ export function SVGOutput4(props: SVGOutputProps) {
         // Startzustand der Timeline aus app.
         // Beim normalen Submit (nichts importered) ist props.progress = 0
         // und wenn imported wurde, sind das halt die importierten Fortschritt...
-        const initialProgress:number = props.progress;
+        const initialProgress: number = props.progress;
 
         // timeline erstellen:
         const timeline = gsap.timeline({
@@ -53,7 +75,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             onUpdate: () => {
                 const tl = timelineRef.current;
                 props.setProgress(tl.progress()); //für scrubber
-                const stepIndex:number = getStepIndexFromTimeline(tl, myLabels);
+                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
                 props.setCurrentStep(stepIndex);
 
             },
@@ -66,46 +88,34 @@ export function SVGOutput4(props: SVGOutputProps) {
 
         const firstStep: AlgorithmStepDTO = props.steps[0];
 
-        const getCy = (step: AlgorithmStepDTO) =>
-            (step.currentPoint?.y ?? props.height / 2) - step.delta;
-
         //init state setzen
         gsap.set(activeRect, {
-            attr: {
-                x: firstStep.sweepLineX - firstStep.delta, y: PADDING,
-                width: firstStep.delta, height: props.height - 2 * PADDING,
-            }
+            attr: getActiveRectAttrs(firstStep)
         });
 
         gsap.set(candidateRect, {
-            attr: {
-                x: firstStep.sweepLineX - firstStep.delta, y: getCy(firstStep),
-                width: firstStep.delta, height: firstStep.delta * 2,
-            }
+            attr: getCandidateRectAttrs(firstStep)
         });
+
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
         //adding tweens:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
+            const rectOpacity: number = step.currentPoint !== null ? 1 : 0; //beim final step die zwei rects ausblenden
 
             timeline.to(activeRect, {
-                attr: {
-                    x: step.sweepLineX - step.delta, y: PADDING,
-                    width: step.delta, height: props.height - 2 * PADDING,
-                }
+                attr: getActiveRectAttrs(step),
+                opacity: rectOpacity,
             });
 
             timeline.to(candidateRect, {
-                attr: {
-                    x: step.sweepLineX - step.delta, y: getCy(step),
-                    width: step.delta, height: step.delta * 2,
-                }
+                attr: getCandidateRectAttrs(step),
+                opacity: rectOpacity,
             }, "<");
 
-            // hier sollte der zustand vom einem step erreicht sein ....
-            //alle anderen labels setzen
+            // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
             timeline.addLabel(myLabels[stepIndex]);
         });
 
@@ -142,7 +152,8 @@ export function SVGOutput4(props: SVGOutputProps) {
             <IOModeTabs
                 mode="output"
                 onChangeInput={props.onChangeInput}
-                onSubmit={() => {}}
+                onSubmit={() => {
+                }}
                 canSubmit={false}
             />
 
@@ -179,14 +190,14 @@ export function SVGOutput4(props: SVGOutputProps) {
 
 
                 {step.allPoints.map((p: Node) => {
-                    const isCurrent   = step.currentPoint !== null && p.id === step.currentPoint.id;
+                    const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
                     //const isCandidate = candidatePointIds.has(p.id);
                     //const isActive    = step.activePoints.some((a) => a.id === p.id);
                     const isProcessed = step.processedPoints.some((d) => d.id === p.id);
-                    const isBest      = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
-                    const isFuture    = step.futurePoints.some((f) => f.id === p.id);
+                    const isBest = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
+                    const isFuture = step.futurePoints.some((f) => f.id === p.id);
 
-                    let fill = "#4a9eff";
+                    let fill = "black";
 
                     if (isCurrent) {
                         fill = "#BE3D2A";
@@ -207,9 +218,8 @@ export function SVGOutput4(props: SVGOutputProps) {
                         fill = "#cccccc";//noch nicht betrachtet
                     }
 
-                    return <XNode key={p.id} node={p} fill={fill} />;
+                    return <XNode key={p.id} node={p} fill={fill}/>;
                 })}
-
 
 
             </svg>
@@ -234,20 +244,20 @@ export function SVGOutput4(props: SVGOutputProps) {
                 <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 16px"}}>
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
                     <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
-                    <div><strong>Current Point:</strong> {step.currentPoint?.label}</div>
+                    <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
                     <div>
                         <strong> Best Pair:{" "}</strong>
                         {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
                     </div>
                     <div>
                         <strong>Active Points:</strong>{" "}
-                        {step.activePoints.length === 0 ? "No active points"
+                        {step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
                             : step.activePoints.map((p) => p.label).join(", ")}
                     </div>
 
                     <div>
                         <strong>Candidates:</strong>{" "}
-                        {step.candidatePairs.length === 0 ? "No candidates in this step" : step.candidatePairs
+                        {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
                             .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
                             .join("; ")
                         }
