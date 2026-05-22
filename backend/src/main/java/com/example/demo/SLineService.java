@@ -48,7 +48,7 @@ public class SLineService {
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: The points were sorted by their x-coordinates. δ = dist(" + p0.label() + ", "
                 + p1.label() + ") = " + String.format("%.2f", delta);
-        steps.add(new AlgorithmStepDTO(0, description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
+        steps.add(new AlgorithmStepDTO(description, p1, p1.x(), delta, List.of(p0, p1), xSorted, currBestPair,
                 List.of(new Result(p0,p1,delta)), List.of()));
 
         //nach y sotieren
@@ -118,7 +118,7 @@ public class SLineService {
                     + "; active points: " + activePoints.size();
             description = newBest ? newBestFoundMsg : noNewBestFoundMsg;
 
-            steps.add(new AlgorithmStepDTO(i-1, description, current, current.x(), delta,
+            steps.add(new AlgorithmStepDTO(description, current, current.x(), delta,
                     new ArrayList<>(activePoints), xSorted, currBestPair, candidatePairs, new ArrayList<>(processed)));
 
             activePoints.add(current); //muss nach dem steps.add damit current Point nicht in active Menge
@@ -128,7 +128,7 @@ public class SLineService {
                 + " with a distance of " + String.format("%.2f", currBestPair.distance());
         Point mostRightPoint = xSorted.getLast();
 
-        steps.add(new AlgorithmStepDTO(steps.size(), description, mostRightPoint, mostRightPoint.x(), delta,
+        steps.add(new AlgorithmStepDTO(description, mostRightPoint, mostRightPoint.x(), delta,
                 new ArrayList<>(activePoints), xSorted, currBestPair, List.of(), new ArrayList<>(processed)));
 
         return steps;

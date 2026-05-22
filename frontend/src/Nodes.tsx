@@ -29,7 +29,7 @@ export function DynamicNodes(props: DynamicNodesProps) {
 
 
 export function XNode({ node, fill }: XNodeProps){
-    const NODE_SIZE:number = 6;
+    const NODE_SIZE:number = 4;
     return (
         <g key={node.id}>
 

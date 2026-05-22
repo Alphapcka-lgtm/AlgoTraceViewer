@@ -192,7 +192,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                     const isBest: boolean = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
 
                     const fill =
-                        isCurrent ? "#ff6b35" : isBest ? "#ffd700" : isActive ? "#00e5ff" : isProcessed ? "#888" : "#4a9eff";
+                        isCurrent ? "#ff6b35" : isBest ? "#ffd700" : isActive ? "pink" : isProcessed ? "brown" : "#4a9eff";
 
                     return (<XNode key={p.id} node={p} fill={fill}/>);
                 })}

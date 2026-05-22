@@ -18,7 +18,6 @@ import java.util.List;
  * @param processedPoints    Punkte, die bereits abgearbeitet wurden (links von SweepLine)
  */
 public record AlgorithmStepDTO(
-        int stepIndex,
         String description,
         Point currentPoint,
         int sweepLineX,

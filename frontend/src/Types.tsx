@@ -46,7 +46,6 @@ export interface Result {
 }
 
 export interface AlgorithmStepDTO {
-    stepIndex: number;
     description: string;
     currentPoint: Node;
     sweepLineX: number;
