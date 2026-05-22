@@ -80,39 +80,38 @@ export function OutputControl4(props: OutputControlProps4) {
 
     return (
         <div>
-            <div style={{display: "flex", gap: 3}}>
-                <button onClick={goBack} disabled={isAtStart} style={btnStyle}>
-                    ← Back
+            <div style={{display: "flex", gap: 3, alignItems: "center"}}>
+                <select
+                    value={props.playbackSpeed}
+                    onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
+                    style={btnStyle}
+                >
+                    <option value={0.5}>0.5x</option>
+                    <option value={1}>1x</option>
+                    <option value={2}>2x</option>
+                </select>
+
+                <button title="Back" onClick={goBack} disabled={isAtStart} style={btnStyle}>
+                    ←
                 </button>
 
                 <button onClick={togglePlay} style={btnStyle}>
                     {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
                 </button>
 
-                <button onClick={goNext} disabled={isAtEnd} style={btnStyle}>
-                    Next →
+                <button title="Next" onClick={goNext} disabled={isAtEnd} style={btnStyle}>
+                    →
                 </button>
 
-                <button onClick={reset} disabled={isAtStart} style={btnStyle}>
-                    ⏮ Reset
+                <button title="Reset" onClick={reset} disabled={isAtStart} style={btnStyle}>
+                    ⏮
                 </button>
-            </div>
 
-            <input
-                type="range" min={0} max={1} step="any" value={props.progress}
-                onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
-                style={{width: "98%", marginTop:"8px", accentColor: "red", height: "40px", cursor: "pointer"}}
-            />
-
-            <div style={{display: "flex", gap: 3, width: "25%"}}>
-                {[0.5, 1, 2].map((speed) => (
-                    <button key={speed} onClick={() => props.onPlaybackSpeedChange(speed)}
-                        style={{...btnStyle, opacity: props.playbackSpeed === speed ? 1 : 0.55,
-                            fontWeight: props.playbackSpeed === speed ? "bold" : "normal"}}
-                    >
-                        {speed}x
-                    </button>
-                ))}
+                <input
+                    type="range" min={0} max={1} step="any" value={props.progress}
+                    onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
+                    style={{width: "20%", marginTop:"8px", accentColor: "red", height: "40px", cursor: "pointer"}}
+                />
             </div>
         </div>
 
