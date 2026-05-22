@@ -157,7 +157,7 @@ public class SLineService {
                 doneMsg,
                 null, // kein currentPoint mehr
                 lastPoint.x(), delta,
-                new ArrayList<>(activePoints),  // aktive Menge noch zeigen
+                List.of(), //aktive menge nicht mehr zeigen
                 xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of()
         ));
 
