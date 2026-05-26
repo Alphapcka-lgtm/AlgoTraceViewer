@@ -56,6 +56,7 @@ export interface AlgorithmStepDTO {
     candidatePairs: Result[];
     processedPoints: Node[];
     futurePoints: Node[];
+    pseudoCodeLineIds: string[];
 }
 
 //was SVGOutput von App bekommt
@@ -115,3 +116,8 @@ export type ExportState = {
     progress: number;
 };
 
+export type PseudoCodeLine = {
+    id: string;
+    text: string;
+    indent?: number;
+};

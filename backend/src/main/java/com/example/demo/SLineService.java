@@ -71,7 +71,8 @@ public class SLineService {
                 description, p1, p1.x(), delta,
                 new ArrayList<>(activePoints),   //p1 noch nicht drin
                 xSorted, currBestPair,
-                List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0)
+                List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0),
+                List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
         // jetzt p1 zur active menge hinzufügen
@@ -86,13 +87,16 @@ public class SLineService {
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
 
+            boolean removedOldPoints = false; //für pseudo code highlighting
+
             // Punkte aus der active Menge entfernen, die außerhalb des [x-delta, x) Streifens liegen
             // -> werden der processed Menge hinzugefügt
-            while (tail < i && current.x() - xSorted.get(tail).x() > delta) {
+            while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
                 Point toRemove = xSorted.get(tail);
                 activePoints.remove(toRemove);
                 processed.add(toRemove);
                 tail++;
+                removedOldPoints = true;
             }
 
             /*
@@ -134,11 +138,34 @@ public class SLineService {
             String noNewBestMsg = "Processed point " + current.label() + "; δ = " + String.format("%.2f", delta)
                     + "; active points: " + activePoints.size();
 
+
+
+            List<String> pseudoCodeLineIds = new ArrayList<>();
+            pseudoCodeLineIds.add("for-loop");
+            pseudoCodeLineIds.add("set-current");
+            pseudoCodeLineIds.add("while-loop");
+            if (removedOldPoints) {
+                pseudoCodeLineIds.add("remove-point");
+                pseudoCodeLineIds.add("increment-pointer");
+            }
+            pseudoCodeLineIds.add("candidate-range");
+            if (!candidatePairs.isEmpty()) {
+                pseudoCodeLineIds.add("check-distance");
+            }
+            if (newBest) {
+                pseudoCodeLineIds.add("update-delta");
+                pseudoCodeLineIds.add("update-bestPair");
+            }
+            pseudoCodeLineIds.add("insert-current");
+
+
+
             // Step BEVOR current in active Menge kommt ...currentPoint ist ja nicht teil von activePoints
             steps.add(new AlgorithmStepDTO(
                     newBest ? newBestMsg : noNewBestMsg, current, current.x(), delta,
                     new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
-                    xSorted, currBestPair, candidatePairs, new ArrayList<>(processed), futurePoints
+                    xSorted, currBestPair, candidatePairs, new ArrayList<>(processed), futurePoints,
+                    pseudoCodeLineIds
             ));
 
             // current NACH dem Step in die active menge aufnehmen
@@ -158,7 +185,8 @@ public class SLineService {
                 null, // kein currentPoint mehr
                 lastPoint.x(), delta,
                 List.of(), //aktive menge nicht mehr zeigen
-                xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of()
+                xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of(),
+                List.of("return")
         ));
 
         return steps;

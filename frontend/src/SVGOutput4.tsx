@@ -5,8 +5,9 @@ import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl4} from "./OutputControl4";
 import {XNode} from "./Nodes.tsx";
 import {IOModeTabs} from "./IOModeTabs";
-import {getStepIndexFromTimeline, createStepLabels} from "./Utils.tsx";
+import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "./Utils.tsx";
 import {ImportExportDialog} from "./ImportExportDialog.tsx";
+import {PseudoCodePanel} from "./PseudoCodePanel";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;
@@ -286,6 +287,11 @@ export function SVGOutput4(props: SVGOutputProps) {
             <ImportExportDialog
                 mode="output"
                 createExportString={props.createExportString}
+            />
+
+            <PseudoCodePanel
+                lines={SWEEP_LINE_PSEUDOCODE}
+                activeLineIds={step.pseudoCodeLineIds}
             />
         </div>
     );

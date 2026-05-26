@@ -26,5 +26,6 @@ public record AlgorithmStepDTO(
         Result bestPair,
         List<Result> candidatePairs,
         List<Point> processedPoints,
-        List<Point> futurePoints
+        List<Point> futurePoints,
+        List<String> pseudoCodeLineIds
 ) {}

@@ -1,5 +1,6 @@
 import React from "react";
-import type {ExportState} from "./Types.tsx";
+import type {ExportState, PseudoCodeLine} from "./Types.tsx";
+
 
 export function getRandomId(): string {
     return "i" + Math.floor(Date.now() * Math.random()).toString();
@@ -12,8 +13,8 @@ export const btnStyle: React.CSSProperties = {
     fontFamily: "monospace",
     padding: "4px 10px",
     cursor: "pointer",
-    backgroundColor:"rgba(240, 240, 240, 0.8)",
-    fontSize:18
+    backgroundColor: "rgba(240, 240, 240, 0.8)",
+    fontSize: 18
 };
 
 export const tabStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
@@ -36,8 +37,8 @@ export const tabStyle = (active: boolean, disabled: boolean): React.CSSPropertie
 27 -> AB
 */
 export function getAlphabetLabel(i: number): string {
-    let result:string = "";
-    let current:number = i;
+    let result: string = "";
+    let current: number = i;
     while (current >= 0) {
         const rest = current % 26;
         const char = String.fromCharCode(65 + rest);
@@ -76,7 +77,7 @@ export function decodeExportState(encoded: string): ExportState {
 }
 
 export function createStepLabels(stepCount: number): string[] {
-    return Array.from({ length: stepCount }, (_, i) => String(i));
+    return Array.from({length: stepCount}, (_, i) => String(i));
 }
 
 /*
@@ -87,3 +88,23 @@ export function checkProgress(progress: number): number {
     return progress;
 }
  */
+
+export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
+    {id: "sort", text: "xQueue = sortx(P)"},
+    {id: "init-ytable", text: "yTable = [ ]"},
+    {id: "init-bestpair", text: "bestPair = (p0, p1)"},
+    {id: "init-delta", text: "δ = dist(p0, p1)"},
+    {id: "insert-initial", text: "yTable.insert(p0), yTable.insert(p1)"},
+    {id: "init-tail", text: "tail = 0"},
+    {id: "for-loop", text: "for i = 2 to xQueue.size - 1:"},
+    {id: "set-current", text: "current = xQueue.get(i)", indent: 1},
+    {id: "while-loop", text: "while xQueue.get(tail).x ≤ current.x - δ:", indent: 1},
+    {id: "remove-point", text: "yTable.delete(xQueue.get(tail))", indent: 2},
+    {id: "increment-tail", text: "tail += 1", indent: 2},
+    {id: "candidate-range", text: "for all points p in yTable where |p.y - current.y| < δ:", indent: 1},
+    {id: "check-distance", text: "if p != current && dist(current, p) < δ:", indent: 2},
+    {id: "update-delta", text: "δ = dist(current, p)", indent: 3},
+    {id: "update-bestpair", text: "bestPair = (current, p)", indent: 3},
+    {id: "insert-current", text: "yTable.insert(current)", indent: 1},
+    {id: "return", text: "return (bestPair, δ)"}
+];
