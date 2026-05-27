@@ -2,12 +2,14 @@ export type Node = {
     x: number,
     y: number,
     id: string,
+    label?: string,
 };
 
 export type Edge = {
     fromId: string,
     toId: string,
     id: string,
+    label?: string,
 };
 
 export type Graph = {

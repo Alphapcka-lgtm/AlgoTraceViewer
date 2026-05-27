@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 
 import gsap from "gsap";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 
 const STEP_DURATION = 1.0;
 
@@ -17,6 +18,8 @@ export function SVGOutput(props: SVGOutputProps) {
     const labels = createStepLabels(2 * props.output.intermediateStates.length + 1);
 
     useGSAP(() => {
+
+        gsap.registerPlugin(DrawSVGPlugin);
 
         const timeline = gsap.timeline({
             paused: true,
@@ -38,25 +41,52 @@ export function SVGOutput(props: SVGOutputProps) {
             },
         });
 
-        timeline.addLabel(labels[0]);
 
         if (props.mode === "Output") {
-            props.output.intermediateStates.forEach((intermediateState, index) => {
-                const markRandomEdge = {filter: "drop-shadow(0px 0px 5px red)"};
 
-                timeline.to("#" + intermediateState.chosenEdge.id, markRandomEdge);
-                timeline.to("#" + intermediateState.chosenEdge.fromId, markRandomEdge, "<");
-                timeline.to("#" + intermediateState.chosenEdge.toId, markRandomEdge, "<");
+            timeline.addLabel(labels[0]);
+
+
+            props.output.intermediateStates.forEach((intermediateState, index) => {
+
+                timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
+                timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
+                timeline.to("#u1" + intermediateState.chosenEdge.fromId, {r: 29}, "<");
+                timeline.to("#u1" + intermediateState.chosenEdge.toId, {r: 29}, "<");
+                timeline.to("#u2" + intermediateState.chosenEdge.fromId, {r: 26}, "<");
+                timeline.to("#u2" + intermediateState.chosenEdge.toId, {r: 26}, "<");
+                timeline.to("#u3" + intermediateState.chosenEdge.fromId, {r: 20}, "<");
+                timeline.to("#u3" + intermediateState.chosenEdge.toId, {r: 20}, "<");
 
                 timeline.addLabel(labels[2 * index + 1]);
 
-                const markIncidentEdges = {filter: "drop-shadow(0px 0px 3px blue)"};
-
                 intermediateState.incidentEdges.forEach((incidentEdge, index) => {
                     if(index == 0){
-                        timeline.to("#" + incidentEdge.id, markIncidentEdges);
+                        if (incidentEdge.id === intermediateState.chosenEdge.id) {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                            timeline.set("#u3" + incidentEdge.id, {opacity: 100}, "<");
+                            timeline.from("#u3" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                        } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                        } else {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                        }
                     } else {
-                        timeline.to("#" + incidentEdge.id, markIncidentEdges, "<");
+                        if (incidentEdge.id === intermediateState.chosenEdge.id) {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                            timeline.set("#u3" + incidentEdge.id, {opacity: 100}, "<");
+                            timeline.from("#u3" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                        } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                        } else {
+                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
+                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                        }
                     }
                 });
 

@@ -69,3 +69,11 @@ export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[
 export function createStepLabels(stepCount: number): string[] {
     return Array.from({ length: stepCount }, (_, i) => String(i));
 }
+
+export function getNodeLabel(i: number): string {
+    if(i < 26){
+        return String.fromCharCode(65 + i);
+    } else {
+        return getNodeLabel((i / 26) - 1) + String.fromCharCode(65 + (i % 26) );
+    }
+}
