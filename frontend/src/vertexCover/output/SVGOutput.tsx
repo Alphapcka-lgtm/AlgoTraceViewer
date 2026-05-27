@@ -15,7 +15,7 @@ const STEP_DURATION = 1.0;
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const labels = createStepLabels(2 * props.output.intermediateStates.length + 1);
+    const labels = createStepLabels(3 * props.output.intermediateStates.length + 1);
 
     useGSAP(() => {
 
@@ -51,14 +51,17 @@ export function SVGOutput(props: SVGOutputProps) {
 
                 timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
                 timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
-                timeline.to("#u1" + intermediateState.chosenEdge.fromId, {r: 29}, "<");
+
+                timeline.addLabel(labels[3 * index + 1]);
+
+                timeline.to("#u1" + intermediateState.chosenEdge.fromId, {r: 29});
                 timeline.to("#u1" + intermediateState.chosenEdge.toId, {r: 29}, "<");
                 timeline.to("#u2" + intermediateState.chosenEdge.fromId, {r: 26}, "<");
                 timeline.to("#u2" + intermediateState.chosenEdge.toId, {r: 26}, "<");
                 timeline.to("#u3" + intermediateState.chosenEdge.fromId, {r: 20}, "<");
                 timeline.to("#u3" + intermediateState.chosenEdge.toId, {r: 20}, "<");
 
-                timeline.addLabel(labels[2 * index + 1]);
+                timeline.addLabel(labels[3 * index + 2]);
 
                 intermediateState.incidentEdges.forEach((incidentEdge, index) => {
                     if(index == 0){
@@ -90,7 +93,7 @@ export function SVGOutput(props: SVGOutputProps) {
                     }
                 });
 
-                timeline.addLabel(labels[2 * index + 2]);
+                timeline.addLabel(labels[3 * index + 3]);
             });
 
             timeline.progress(props.progress).pause();
