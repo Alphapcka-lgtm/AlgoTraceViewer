@@ -40,8 +40,7 @@ public class SLineService {
         List<Point> processed = new ArrayList<>();
         // active points:  nur p0. currentPoint (p1) ist noch NICHT drin
         activePoints.add(p0);
-        // current: p1
-        // future: alle "nach" p1
+        // current: p1, future: alle "nach" p1
         List<Point> future0 = xSorted.subList(2, xSorted.size());
 
         //shortcut for the delta control+cmd+space and then search delta
@@ -50,7 +49,7 @@ public class SLineService {
                 + String.format("%.2f", delta);
 
         steps.add(new AlgorithmStepDTO(
-                description, p1, p1.x(), delta,
+                description, p1, p1.x(), delta, delta,
                 new ArrayList<>(activePoints),   //p1 noch nicht drin
                 xSorted, currBestPair,
                 List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0),
@@ -69,11 +68,13 @@ public class SLineService {
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
 
+            double deltaBeforeStep = delta;
             boolean removedOldPoints = false; //für pseudo code highlighting
 
             // Punkte aus der active Menge entfernen, die außerhalb des [x-delta, x) Streifens liegen
             // -> werden der processed Menge hinzugefügt
-            while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
+            //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
+            while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
                 Point toRemove = xSorted.get(tail);
                 activePoints.remove(toRemove);
                 processed.add(toRemove);
@@ -86,7 +87,8 @@ public class SLineService {
             boolean newBest = false;
 
             for (Point candidate : activePoints) {
-                if (Math.abs(current.y() - candidate.y()) < delta) {
+                //if (Math.abs(current.y() - candidate.y()) < delta) {
+                if (Math.abs(current.y() - candidate.y()) < deltaBeforeStep) {
                     double dist = euclideanDistance(current, candidate);
                     candidatePairs.add(new Result(candidate, current, dist));
 
@@ -114,7 +116,7 @@ public class SLineService {
             pseudoCodeLineIds.add("while-loop");
             if (removedOldPoints) {
                 pseudoCodeLineIds.add("remove-point");
-                pseudoCodeLineIds.add("increment-pointer");
+                pseudoCodeLineIds.add("increment-tail");
             }
             pseudoCodeLineIds.add("candidate-range");
             if (!candidatePairs.isEmpty()) {
@@ -122,7 +124,7 @@ public class SLineService {
             }
             if (newBest) {
                 pseudoCodeLineIds.add("update-delta");
-                pseudoCodeLineIds.add("update-bestPair");
+                pseudoCodeLineIds.add("update-bestpair");
             }
             pseudoCodeLineIds.add("insert-current");
 
@@ -130,7 +132,7 @@ public class SLineService {
 
             // Step BEVOR current in active Menge kommt ...currentPoint ist ja nicht teil von activePoints
             steps.add(new AlgorithmStepDTO(
-                    newBest ? newBestMsg : noNewBestMsg, current, current.x(), delta,
+                    newBest ? newBestMsg : noNewBestMsg, current, current.x(), delta, deltaBeforeStep,
                     new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
                     xSorted, currBestPair, candidatePairs, new ArrayList<>(processed), futurePoints,
                     pseudoCodeLineIds
@@ -151,7 +153,7 @@ public class SLineService {
         steps.add(new AlgorithmStepDTO(
                 doneMsg,
                 null, // kein currentPoint mehr
-                lastPoint.x(), delta,
+                lastPoint.x(), delta, delta,
                 List.of(), //aktive menge nicht mehr zeigen
                 xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of(),
                 List.of("return")

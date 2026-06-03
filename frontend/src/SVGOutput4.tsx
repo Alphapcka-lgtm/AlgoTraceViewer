@@ -34,23 +34,26 @@ export function SVGOutput4(props: SVGOutputProps) {
     };
 
     const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
+        const searchDelta = step.searchDelta;
+
         return {
-            x: step.sweepLineX - step.delta,
+            x: step.sweepLineX - searchDelta,
             y: PADDING,
-            width: step.delta,
+            width: searchDelta,
             height: props.height - 2 * PADDING
         };
     };
 
     const getCy = (step: AlgorithmStepDTO) =>
-        (step.currentPoint?.y ?? props.height / 2) - step.delta;
+        (step.currentPoint?.y ?? props.height / 2) - step.searchDelta;
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
+        const searchDelta = step.searchDelta;
         return {
-            x: step.sweepLineX - step.delta,
+            x: step.sweepLineX - searchDelta,
             y: getCy(step),
-            width: step.delta,
-            height: step.delta * 2
+            width: searchDelta,
+            height: searchDelta * 2
         };
     };
 
@@ -173,9 +176,9 @@ export function SVGOutput4(props: SVGOutputProps) {
             >
                 <rect
                     ref={activeSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.delta}
+                    x={firstStep.sweepLineX - firstStep.searchDelta}
                     y={PADDING}
-                    width={firstStep.delta}
+                    width={firstStep.searchDelta}
                     height={props.height - 2 * PADDING}
                     fill="rgba(0, 0, 0, 0.02)"
                     stroke="rgba(0, 0, 0, 0.75)"
@@ -185,10 +188,10 @@ export function SVGOutput4(props: SVGOutputProps) {
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.delta}
-                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.delta}
-                    width={firstStep.delta}
-                    height={firstStep.delta * 2}
+                    x={firstStep.sweepLineX - firstStep.searchDelta}
+                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.searchDelta}
+                    width={firstStep.searchDelta}
+                    height={firstStep.searchDelta * 2}
                     fill="rgba(255, 241, 255, 0.75)"
                     stroke="rgba(204, 14, 119, 0.75)"
                     strokeWidth="2"

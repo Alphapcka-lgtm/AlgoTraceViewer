@@ -21,6 +21,7 @@ public record AlgorithmStepDTO(
         Point currentPoint,
         int sweepLineX,
         double delta,
+        double searchDelta,
         List<Point> activePoints,
         List<Point> allPoints,
         Result bestPair,
