@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {DynamicNodes} from "../shared/Nodes.tsx";
 import type {SVGInputProps, Interaction} from "../shared/Types.tsx";
-import {btnStyle, getRandomId} from "../shared/Utils.tsx";
+import {getRandomId} from "../shared/Utils.tsx";
 import {IOModeTabs} from "../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
 
@@ -9,10 +9,17 @@ export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
 
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
+        const svg = e.currentTarget;
+        const rect = svg.getBoundingClientRect();
+
+        /*
+         * The SVG is responsive: its visual size can differ from the internal viewBox size.
+         * Mouse coordinates are measured in screen pixels, so they are
+         * convert them back into the SVG coordinate system used by the nodes.
+         */
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
+            x: ((e.clientX - rect.left) / rect.width) * props.width,
+            y: ((e.clientY - rect.top) / rect.height) * props.height,
         };
     };
 
@@ -43,7 +50,7 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     return (
-        <>
+        <div className="algorithm-panel">
             <IOModeTabs
                 mode="input"
                 onChangeInput={props.onChangeInput}
@@ -52,12 +59,12 @@ export function SVGInput(props: SVGInputProps) {
             />
 
             <svg
-                width={props.width}
-                height={props.height}
-                style={{border: "2px solid black", borderRadius: "15px"}}
+                className="algorithm-canvas"
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleNodeMouseUp}
+                viewBox={`0 0 ${props.width} ${props.height}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 <DynamicNodes
                     nodes={props.nodes}
@@ -67,22 +74,22 @@ export function SVGInput(props: SVGInputProps) {
                 />
             </svg>
 
-            <div>
+            <div className="control-row">
                 <button
-                    style={btnStyle}
+                    className="control-button"
                     onClick={() => {
                         props.onReset();
                         setInteraction({type: "idle"});
                     }}
                 >
-                    reset
+                    Reset
                 </button>
             </div>
 
             <ImportExportDialog
-                mode={"input"}
+                mode="input"
                 onImport={props.onImport}
             />
-        </>
+        </div>
     );
 }

@@ -17,31 +17,30 @@ public class SLineService {
             throw new IllegalArgumentException("There must be at least two points");
         }
 
-        //x-Queue aufbauen ... Sort all points by x coordinate
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
 
-        //Init mit p0 und p1
+        // Setting initial best pair the initial delta from the first two points before the sweep starts.
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
-        double delta = euclideanDistance(p0, p1); //Calculate the initial delta from the first two points
+        double delta = euclideanDistance(p0, p1);
         Result currBestPair = new Result(p0, p1, delta);
 
-        // y-Table: enthält nur active points (zwischen tail inkl. und current exkl.)
-        // Sortiert nach y, bei gleichem y nach x
-        //Punkte mit gleicher Position werden nicht verdrängt
+        /*
+        yTable contains the points currently inside the active sweep window:
+        from xSorted[tail] inclusive up to the current point exclusive.
+        It is ordered by y-coordinate; Point::id keeps duplicate coordinates distinct.
+         */
         TreeSet<Point> activePoints = new TreeSet<>(
-                Comparator.comparingInt(Point::y)
-                        .thenComparingInt(Point::x)
-                        .thenComparing(Point::id)
-        );
+                Comparator.comparingInt(Point::y).thenComparingInt(Point::x).thenComparing(Point::id));
 
-        //processed/discarded points ... leer am Anfang
-        List<Point> processed = new ArrayList<>();
+        // Points that are to the left of the tail so that have already left the active sweep window
+        List<Point> processed = new ArrayList<>(); //discarded points
         // active points:  nur p0. currentPoint (p1) ist noch NICHT drin
+
+        // During initialization, p1 is the current point. Therefore, only p0 is part of activePoints at this moment.
         activePoints.add(p0);
-        // current: p1, future: alle "nach" p1
-        List<Point> future0 = xSorted.subList(2, xSorted.size());
+        List<Point> future0 = xSorted.subList(2, xSorted.size()); // points to the right of the current point.
 
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: Points sorted by x-coordinate. "
@@ -56,51 +55,28 @@ public class SLineService {
                 List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
-        // jetzt p1 zur active menge hinzufügen
         activePoints.add(p1);
 
-        // tail zeigt auf den linkesten noch "gültigen" Punkt der active Menge
-        //  ... dadurch muss man nicht weniger punkte "durchsuchen"
-        //ist quasi der linke rand des balkens
+        // Index of the leftmost point that is still part of the active sweep window.
+        // Points before tail have already been removed from activePoints.
         int tail = 0;
 
-        // mainschleife ... startet bei index 2
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
-
             double deltaBeforeStep = delta;
-            boolean removedOldPoints = false; //für pseudo code highlighting
 
-            // Punkte aus der active Menge entfernen, die außerhalb des [x-delta, x) Streifens liegen
-            // -> werden der processed Menge hinzugefügt
-            //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
-            while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
-                Point toRemove = xSorted.get(tail);
-                activePoints.remove(toRemove);
-                processed.add(toRemove);
-                tail++;
-                removedOldPoints = true;
-            }
+            RemovalResult rm = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaBeforeStep);
+            tail = rm.newTail();
+            boolean removedPoints = rm.removedAny();//für pseudo code highlighting
 
-            // Kandidaten bestimmen ... active points im "kleinen/kleineren" [y-delta, y+delta] Fenster
-            List<Result> candidatePairs = new ArrayList<>();
-            boolean newBest = false;
+            // Determine Candidates: checking only active points whose y-distance is smaller than delta .
+            //so activepoints in the [y-delta, y+delta]-window (candidaten window)
+            CandidateResult candidates = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeStep, delta, currBestPair);
+            delta = candidates.delta();
+            currBestPair = candidates.bestPair();
+            boolean foundNewBest = candidates.foundNewBest();
 
-            for (Point candidate : activePoints) {
-                //if (Math.abs(current.y() - candidate.y()) < delta) {
-                if (Math.abs(current.y() - candidate.y()) < deltaBeforeStep) {
-                    double dist = euclideanDistance(current, candidate);
-                    candidatePairs.add(new Result(candidate, current, dist));
-
-                    if (dist < delta) {
-                        delta = dist;
-                        currBestPair = new Result(candidate, current, delta);
-                        newBest = true;
-                    }
-                }
-            }
-
-            // future = alle Punkte "rechts" von current (Index i+1 bis Ende)
+            //// only for Visualization: points not processed yet, so all points right from current (i+1 ...)
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
             String newBestMsg = "New minimum found! δ = " + String.format("%.2f", delta)
@@ -108,42 +84,23 @@ public class SLineService {
             String noNewBestMsg = "Processed point " + current.label() + "; δ = " + String.format("%.2f", delta)
                     + "; active points: " + activePoints.size();
 
+            boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
+            List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(removedPoints, hasCandidatePairs, foundNewBest);
 
-
-            List<String> pseudoCodeLineIds = new ArrayList<>();
-            pseudoCodeLineIds.add("for-loop");
-            pseudoCodeLineIds.add("set-current");
-            pseudoCodeLineIds.add("while-loop");
-            if (removedOldPoints) {
-                pseudoCodeLineIds.add("remove-point");
-                pseudoCodeLineIds.add("increment-tail");
-            }
-            pseudoCodeLineIds.add("candidate-range");
-            if (!candidatePairs.isEmpty()) {
-                pseudoCodeLineIds.add("check-distance");
-            }
-            if (newBest) {
-                pseudoCodeLineIds.add("update-delta");
-                pseudoCodeLineIds.add("update-bestpair");
-            }
-            pseudoCodeLineIds.add("insert-current");
-
-
-
-            // Step BEVOR current in active Menge kommt ...currentPoint ist ja nicht teil von activePoints
+            // step is taken before inserting the current point beause currentPoint ist not part of activePoints
             steps.add(new AlgorithmStepDTO(
-                    newBest ? newBestMsg : noNewBestMsg, current, current.x(), delta, deltaBeforeStep,
+                    foundNewBest ? newBestMsg : noNewBestMsg, current, current.x(), delta, deltaBeforeStep,
                     new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
-                    xSorted, currBestPair, candidatePairs, new ArrayList<>(processed), futurePoints,
+                    xSorted, currBestPair, candidates.candidatePairs(), new ArrayList<>(processed), futurePoints,
                     pseudoCodeLineIds
             ));
 
-            // current NACH dem Step in die active menge aufnehmen
+            // Current point becomes part of the activePoinsts/sweep window after the step
             activePoints.add(current);
         }
 
-        // final Step .... alle verbleibenden activePoints noch zeigen
-        // currentPoint = null weil der alg fertig ist
+        // Final visualization state after the sweep has finished.
+        // currentPoint = null because the alg has finished
         Point lastPoint = xSorted.getLast();
 
         String doneMsg = "Done! Closest pair: "
@@ -162,9 +119,95 @@ public class SLineService {
         return steps;
     }
 
+    /**
+     * Removes points that are more than delta to the left of the current point.
+     * These points are left of the active sweep window, so they cannot form
+     * a closer pair with the current point or any later point.
+     * Removed points are moved from activePoints to processed, and tail is
+     * advanced to the new left border of the active sweep window.
+     */
+    private RemovalResult removePointsOutsideActiveSweepWindow(Point current, List<Point> xSorted, TreeSet<Point> activePoints,
+            List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
+
+        boolean removedPoints = false; ////für pseudo code highlighting ...
+
+        //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
+        //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
+        while (tail < currIndex && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) {
+            Point oldPoint = xSorted.get(tail);
+            activePoints.remove(oldPoint);
+            processed.add(oldPoint);
+            tail++;
+            removedPoints = true;
+        }
+
+        return new RemovalResult(tail, removedPoints);
+    }
+
+
+    /**
+     * Checks only active points that are at most delta above or below the current point, so that lie inside the candidate sweep window.
+     * activePoints already contains only points inside the active sweep window (so no points farther left than
+     * delta). Therefore, this method only needs to filter by y-distance: at most delta above or below the current point.
+     */
+    private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
+            Point current, TreeSet<Point> activePoints, double deltaBeforeStep, double currDelta, Result currentBestPair
+    ) {
+        List<Result> candidatePairs = new ArrayList<>();
+        boolean foundNewBest = false;
+
+        for (Point activePoint : activePoints) {
+            //if (Math.abs(current.y() - candidate.y()) < delta) {
+            if (Math.abs(current.y() - activePoint.y()) < deltaBeforeStep) {
+                Point candidate = activePoint;
+                double distance = euclideanDistance(current, candidate);
+                candidatePairs.add(new Result(candidate, current, distance));
+
+                if (distance < currDelta) {
+                    currDelta = distance;
+                    currentBestPair = new Result(candidate, current, distance);
+                    foundNewBest = true;
+                }
+            }
+        }
+
+        return new CandidateResult(currDelta, currentBestPair, candidatePairs, foundNewBest);
+    }
+
+    private List<String> buildPseudoCodeLineIds(boolean removedPoints, boolean hasCandidatePairs, boolean foundNewBest) {
+        List<String> ids = new ArrayList<>();
+        ids.add("for-loop");
+        ids.add("set-current");
+
+        ids.add("while-loop");
+        if (removedPoints) {
+            ids.add("remove-point");
+            ids.add("increment-tail");
+        }
+        ids.add("candidate-range");
+        if (hasCandidatePairs) {
+            ids.add("check-distance");
+        }
+        if (foundNewBest) {
+            ids.add("update-delta");
+            ids.add("update-bestpair");
+        }
+        ids.add("insert-current");
+        return ids;
+    }
+
     public static double euclideanDistance(Point p1, Point p2) {
         long dx = (long) p2.x() - p1.x();
         long dy = (long) p2.y() - p1.y();
         return Math.sqrt(dx * dx + dy * dy);
     }
+
+    private record RemovalResult(int newTail, boolean removedAny) {}
+
+    private record CandidateResult(
+            double delta,
+            Result bestPair,
+            List<Result> candidatePairs,
+            boolean foundNewBest
+    ) {}
 }

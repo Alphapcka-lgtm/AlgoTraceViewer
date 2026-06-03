@@ -1,5 +1,4 @@
 import type {OutputControlProps4} from "../shared/Types.tsx";
-import {btnStyle} from "../shared/Utils.tsx";
 import gsap from "gsap";
 
 export function OutputControl4(props: OutputControlProps4) {
@@ -79,41 +78,42 @@ export function OutputControl4(props: OutputControlProps4) {
     };
 
     return (
-        <div>
-            <div style={{display: "flex", gap: 3, alignItems: "center"}}>
-                <select
-                    value={props.playbackSpeed}
-                    onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
-                    style={btnStyle}
-                >
-                    <option value={0.5}>0.5x</option>
-                    <option value={1}>1x</option>
-                    <option value={2}>2x</option>
-                </select>
+        <div className="control-row">
+            <select
+                value={props.playbackSpeed}
+                onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
+                className="control-select"
+            >
+                <option value={0.5}>0.5x</option>
+                <option value={1}>1x</option>
+                <option value={2}>2x</option>
+            </select>
 
-                <button title="Back" onClick={goBack} disabled={isAtStart} style={btnStyle}>
-                    ←
-                </button>
+            <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
+                ←
+            </button>
 
-                <button onClick={togglePlay} style={btnStyle}>
-                    {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
-                </button>
+            <button onClick={togglePlay} className="control-button">
+                {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
+            </button>
 
-                <button title="Next" onClick={goNext} disabled={isAtEnd} style={btnStyle}>
-                    →
-                </button>
+            <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
+                →
+            </button>
 
-                <button title="Reset" onClick={reset} disabled={isAtStart} style={btnStyle}>
-                    ⏮
-                </button>
+            <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">
+                ⏮
+            </button>
 
-                <input
-                    type="range" min={0} max={1} step="any" value={props.progress}
-                    onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
-                    style={{width: "20%", marginTop:"8px", accentColor: "red", height: "40px", cursor: "pointer"}}
-                />
-            </div>
+            <input
+                className="timeline-slider"
+                type="range"
+                min={0}
+                max={1}
+                step="any"
+                value={props.progress}
+                onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
+            />
         </div>
-
     );
 }
