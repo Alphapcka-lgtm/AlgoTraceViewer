@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {btnStyle} from "./Utils";
+import {btnStyle} from "./Utils.tsx";
 
 type ImportExportDialogProps = {
     mode: "input" | "output";

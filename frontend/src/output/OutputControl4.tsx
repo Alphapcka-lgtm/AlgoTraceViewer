@@ -1,5 +1,5 @@
-import type {OutputControlProps4} from "./Types";
-import {btnStyle} from "./Utils.tsx";
+import type {OutputControlProps4} from "../shared/Types.tsx";
+import {btnStyle} from "../shared/Utils.tsx";
 import gsap from "gsap";
 
 export function OutputControl4(props: OutputControlProps4) {

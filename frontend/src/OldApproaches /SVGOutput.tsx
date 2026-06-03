@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
-import type {AlgorithmStepDTO, SVGOutputProps} from "../Types.tsx";
+import type {AlgorithmStepDTO, SVGOutputProps} from "../shared/Types.tsx";
 
 const PADDING = 30;
 const ANIM_DURATION = 0.9;

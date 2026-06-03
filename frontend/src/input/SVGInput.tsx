@@ -1,9 +1,9 @@
 import React, {useState} from "react";
-import {DynamicNodes} from "./Nodes";
-import type {SVGInputProps, Interaction} from "./Types";
-import {btnStyle, getRandomId} from "./Utils";
-import {IOModeTabs} from "./IOModeTabs";
-import {ImportExportDialog} from "./ImportExportDialog";
+import {DynamicNodes} from "../shared/Nodes.tsx";
+import type {SVGInputProps, Interaction} from "../shared/Types.tsx";
+import {btnStyle, getRandomId} from "../shared/Utils.tsx";
+import {IOModeTabs} from "../shared/IOModeTabs.tsx";
+import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});

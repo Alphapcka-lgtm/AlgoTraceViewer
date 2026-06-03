@@ -1,4 +1,4 @@
-import type { Node, DynamicNodesProps, XNodeProps } from "./Types";
+import type { Node, DynamicNodesProps, XNodeProps } from "./Types.tsx";
 import {useState} from "react";
 //die Punkte zeichnen....
 

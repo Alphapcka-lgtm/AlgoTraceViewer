@@ -1,4 +1,4 @@
-import type {AlgorithmStepDTO, Node} from "./Types";
+import type {AlgorithmStepDTO, Node} from "./shared/Types.tsx";
 import {useState} from "react";
 
 export default function useSweepLineSteps() {

@@ -1,13 +1,13 @@
 import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
-import {OutputControl4} from "./OutputControl4";
-import {XNodeWithCords} from "./Nodes.tsx";
-import {IOModeTabs} from "./IOModeTabs";
-import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "./Utils.tsx";
-import {ImportExportDialog} from "./ImportExportDialog.tsx";
-import {PseudoCodePanel} from "./PseudoCodePanel";
+import type {AlgorithmStepDTO, Node, SVGOutputProps} from "../shared/Types.tsx";
+import {OutputControl4} from "./OutputControl4.tsx";
+import {XNodeWithCords} from "../shared/Nodes.tsx";
+import {IOModeTabs} from "../shared/IOModeTabs.tsx";
+import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../shared/Utils.tsx";
+import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "./PseudoCodePanel.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;

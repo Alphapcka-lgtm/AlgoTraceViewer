@@ -1,11 +1,11 @@
 import {useState} from "react";
-import {SVGInput} from "./SVGInput";
+import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
-import type {AlgorithmStepDTO, ExportState, Node} from "./Types";
+import type {AlgorithmStepDTO, ExportState, Node} from "./shared/Types.tsx";
 //import {SVGOutput} from "./SVGOutput";
 //import {SVGOutput2} from "./SVGOutput2.tsx";
-import {SVGOutput4} from "./SVGOutput4.tsx";
-import {decodeExportState, encodeExportState, getAlphabetLabel} from "./Utils.tsx";
+import {SVGOutput4} from "./output/SVGOutput4.tsx";
+import {decodeExportState, encodeExportState, getAlphabetLabel} from "./shared/Utils.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)

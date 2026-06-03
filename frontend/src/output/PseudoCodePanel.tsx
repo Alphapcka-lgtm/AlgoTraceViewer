@@ -1,4 +1,4 @@
-import type {PseudoCodeLine} from "./Types";
+import type {PseudoCodeLine} from "../shared/Types.tsx";
 
 type PseudoCodePanelProps = {
     lines: PseudoCodeLine[];

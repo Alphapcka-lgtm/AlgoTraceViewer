@@ -1,4 +1,4 @@
-import {btnStyle} from "../Utils.tsx";
+import {btnStyle} from "../shared/Utils.tsx";
 import React from "react";
 
 
