@@ -23,7 +23,7 @@ export function DynamicNodes(props: DynamicNodesProps) {
                 props.onDoubleClick(n.id);
             }}
         >
-            <XNodeWithCords node={n} fill={"black"}/>
+            <XNode node={n} fill={"black"}/>
         </g>
     ));
 }
