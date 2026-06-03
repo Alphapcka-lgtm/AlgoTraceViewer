@@ -96,6 +96,9 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "init-delta", text: "δ = dist(p0, p1)"},
     {id: "insert-initial", text: "yTable.insert(p0), yTable.insert(p1)"},
     {id: "init-tail", text: "tail = 0"},
+
+
+
     {id: "for-loop", text: "for i = 2 to xQueue.size - 1:"},
     {id: "set-current", text: "current = xQueue.get(i)", indent: 1},
     {id: "while-loop", text: "while xQueue.get(tail).x ≤ current.x - δ:", indent: 1},
@@ -106,5 +109,6 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "update-delta", text: "δ = dist(current, p)", indent: 3},
     {id: "update-bestpair", text: "bestPair = (current, p)", indent: 3},
     {id: "insert-current", text: "yTable.insert(current)", indent: 1},
+
     {id: "return", text: "return (bestPair, δ)"}
 ];

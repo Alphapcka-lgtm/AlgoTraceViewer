@@ -21,24 +21,6 @@ public class SLineService {
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
 
-        /*
-        Bad for animation ...
-
-        //If there are only two points, then the solution is trivial -> return immediately
-        if(xSorted.size() == 2) {
-            double minDistance = euclideanDistance(xSorted.get(0), xSorted.get(1));
-            return new Result(xSorted.get(0), xSorted.get(1), minDistance);
-        }
-
-        //If two points are identical, then the solution is trivial -> return immediately
-        Set<Point> set = new HashSet<>();
-        for (Point p : xSorted) {
-            if (!set.add(p)) {
-                return new Result(p, p, 0);
-            }
-        }
-        */
-
         //Init mit p0 und p1
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
@@ -98,20 +80,6 @@ public class SLineService {
                 tail++;
                 removedOldPoints = true;
             }
-
-            /*
-            //noch nicht ganz optimal weil ich durch ganze tree set gehe.
-            // Muss nur den relvanten y-Bereich im treeset anschauen
-            for(Point p : activePoints){
-                if(Math.abs(current.y() - p.y()) < delta){
-                    double possibleNewDetla = euclideanDistance(current, p);
-                    if(possibleNewDetla < delta){
-                        delta = possibleNewDetla;
-                        currBestPair = new Result(p, current, delta);
-                    }
-                }
-            }
-            */
 
             // Kandidaten bestimmen ... active points im "kleinen/kleineren" [y-delta, y+delta] Fenster
             List<Result> candidatePairs = new ArrayList<>();
