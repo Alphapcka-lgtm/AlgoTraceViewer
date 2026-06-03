@@ -94,39 +94,42 @@ export default function App() {
 
     if (modeState === "input") {
         return (
-            <SVGInput
-                height={svgHeight}
-                width={svgWidth}
-                mode={modeState}
-                nodes={nodes}
+            <div style={{display: "flex", flexDirection:"column"}}>
+                <SVGInput
+                    height={svgHeight}
+                    width={svgWidth}
+                    mode={modeState}
+                    nodes={nodes}
 
-                onAddNode={handleAddNode}
-                onMoveNode={handleMoveNode}
-                onDeleteNode={handleDeleteNode}
-                onReset={handleReset}
+                    onAddNode={handleAddNode}
+                    onMoveNode={handleMoveNode}
+                    onDeleteNode={handleDeleteNode}
+                    onReset={handleReset}
 
-                onSubmit={handleNormalSubmit}
-                onChangeInput={handleChangeInput}
+                    onSubmit={handleNormalSubmit}
+                    onChangeInput={handleChangeInput}
 
-                onImport={handleImport}
-            />
+                    onImport={handleImport}
+                />
+            </div>
         );
     }
 
     return (
-        <SVGOutput4
-            height={svgHeight}
-            width={svgWidth}
-            steps={outputSteps}
-            loading={loading}
-            error={error}
-            onChangeInput={handleChangeInput}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-            progress={progress}
-            setProgress={setProgress}
-            createExportString={createExportString}
-        />
+        <div style={{display: "flex", flexDirection:"column"}}>
+            <SVGOutput4
+                height={svgHeight}
+                width={svgWidth}
+                steps={outputSteps}
+                loading={loading}
+                error={error}
+                onChangeInput={handleChangeInput}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+                progress={progress}
+                setProgress={setProgress}
+                createExportString={createExportString}
+            />
+        </div>
     );
-
 }

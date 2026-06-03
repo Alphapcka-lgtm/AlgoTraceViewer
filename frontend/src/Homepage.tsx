@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-import App from "./App";
+import App from "./sweepLine/App.tsx";
+import {VertexCover} from "./vertexCover/VertexCover.tsx";
 
 type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover";
 
@@ -63,13 +64,6 @@ function NavButton(props: NavButtonProps) {
         >
             {props.label}
         </button>
-    );
-}
-
-
-function VertexCover() {
-    return (
-        <h1>VertexCover</h1>
     );
 }
 

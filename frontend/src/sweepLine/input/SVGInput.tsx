@@ -43,7 +43,7 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     return (
-        <>
+        <div style={{flex: 1, width: "100%"}} >
             <IOModeTabs
                 mode="input"
                 onChangeInput={props.onChangeInput}
@@ -58,6 +58,8 @@ export function SVGInput(props: SVGInputProps) {
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleNodeMouseUp}
+                viewBox={`0 0 ${props.width} ${props.height}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 <DynamicNodes
                     nodes={props.nodes}
@@ -83,6 +85,6 @@ export function SVGInput(props: SVGInputProps) {
                 mode={"input"}
                 onImport={props.onImport}
             />
-        </>
+        </div>
     );
 }

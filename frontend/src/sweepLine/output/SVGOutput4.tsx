@@ -158,7 +158,7 @@ export function SVGOutput4(props: SVGOutputProps) {
     const firstStep: AlgorithmStepDTO = props.steps[0];
 
     return (
-        <div>
+        <div style={{flex: 1, width: "100%"}} >
 
             <IOModeTabs
                 mode="output"
@@ -173,6 +173,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 height={props.height}
                 style={{border: "2px solid black", borderRadius: "15px"}}
                 viewBox={`0 0 ${props.width} ${props.height}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 <rect
                     ref={activeSweepWindowRef}
