@@ -1,4 +1,5 @@
 import type { Node, DynamicNodesProps, XNodeProps } from "./Types";
+import {useState} from "react";
 //die Punkte zeichnen....
 
 //für den input modus
@@ -22,9 +23,26 @@ export function DynamicNodes(props: DynamicNodesProps) {
                 props.onDoubleClick(n.id);
             }}
         >
-            <XNode node={n} fill={"black"}/>
+            <XNodeWithCords node={n} fill={"black"}/>
         </g>
     ));
+}
+
+
+export function XNodeWithCords({ node, fill }: XNodeProps) {
+
+    const [isHovering, setIsHovering] = useState(false);
+
+    return (
+        <g onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <XNode node={node} fill={fill} />
+            {isHovering && (
+                <text x={node.x + 10} y={node.y + 20} fill="black" fontSize="12" fontFamily="monospace">
+                    ({node.x}, {node.y})
+                </text>
+            )}
+        </g>
+    );
 }
 
 export function XNode({ node, fill }: XNodeProps) {

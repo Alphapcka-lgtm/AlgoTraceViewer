@@ -3,7 +3,7 @@ import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {AlgorithmStepDTO, Node, SVGOutputProps} from "./Types";
 import {OutputControl4} from "./OutputControl4";
-import {XNode} from "./Nodes.tsx";
+import {XNodeWithCords} from "./Nodes.tsx";
 import {IOModeTabs} from "./IOModeTabs";
 import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "./Utils.tsx";
 import {ImportExportDialog} from "./ImportExportDialog.tsx";
@@ -230,7 +230,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                         fill = "#cccccc";//noch nicht betrachtet
                     }
 
-                    return <XNode key={p.id} node={p} fill={fill}/>;
+                    return <XNodeWithCords key={p.id} node={p} fill={fill}/>;
                 })}
 
 
