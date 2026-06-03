@@ -30,22 +30,6 @@ export function Edges(props: EdgesProps) {
                     strokeWidth={9}
                 />
                 <path
-                    id={ "u2" + e.id.toString() }
-                    key={ "u2" + e.id }
-                    d={p}
-                    style={{opacity: 0}}
-                    stroke={colors.orange}
-                    strokeWidth={9}
-                />
-                <path
-                    id={ "u3" + e.id.toString() }
-                    key={ "u3" + e.id }
-                    d={p}
-                    style={{opacity: 0}}
-                    stroke={colors.orange}
-                    strokeWidth={9}
-                />
-                <path
                     id={ e.id.toString() }
                     key={e.id}
                     d={p}

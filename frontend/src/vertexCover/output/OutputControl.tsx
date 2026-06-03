@@ -10,13 +10,14 @@ export function OutputControl(props: OutputControlProps){
         const targetLabel = props.labels[targetStep];
         if(!targetLabel) return;
 
-        props.setIsPlaying(false); //wenn im autoplay auf next/back geklickt wird autoplay bendet
+        props.setIsPlaying(true);
 
         gsap.killTweensOf(tl);
 
         tl.tweenTo(targetLabel, {
             onComplete: () => {
                 props.setStepIndex(targetStep);
+                props.setIsPlaying(false)
             }
         });
     };
@@ -61,6 +62,12 @@ export function OutputControl(props: OutputControlProps){
             <button onClick={ jumpToNextStep } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Next Step</button>
         </div>
         <button onClick={ resetAnimation } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Reset</button>
-        <input type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.progress } onInput={ (e) => props.tlRef.current.progress(e.currentTarget.valueAsNumber) } />
+        <input type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.progress } onInput={ (e) => {
+            if(props.isPlaying){
+                props.setIsPlaying(false);
+                props.tlRef.current.pause();
+            }
+            props.tlRef.current.progress(e.currentTarget.valueAsNumber);
+        } } />
     </div>
 }

@@ -10,12 +10,12 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 
-const STEP_DURATION = 1.0;
+const STEP_DURATION = 0.5;
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const labels = createStepLabels(3 * props.output.intermediateStates.length + 1);
+    const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
 
     useGSAP(() => {
 
@@ -41,18 +41,27 @@ export function SVGOutput(props: SVGOutputProps) {
             },
         });
 
-
         if (props.mode === "Output") {
 
             timeline.addLabel(labels[0]);
 
+            props.output.initialState.edges.forEach((edge, index) => {
+                if (index == 0) {
+                    timeline.set("#u0" + edge.id, {opacity: 100});
+                } else {
+                    timeline.set("#u0" + edge.id, {opacity: 100}, "<");
+                }
+                timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
+            })
+
+            timeline.addLabel(labels[1]);
 
             props.output.intermediateStates.forEach((intermediateState, index) => {
 
                 timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
                 timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
 
-                timeline.addLabel(labels[3 * index + 1]);
+                timeline.addLabel(labels[3 * index + 2]);
 
                 timeline.to("#u1" + intermediateState.chosenEdge.fromId, {r: 29});
                 timeline.to("#u1" + intermediateState.chosenEdge.toId, {r: 29}, "<");
@@ -61,39 +70,31 @@ export function SVGOutput(props: SVGOutputProps) {
                 timeline.to("#u3" + intermediateState.chosenEdge.fromId, {r: 20}, "<");
                 timeline.to("#u3" + intermediateState.chosenEdge.toId, {r: 20}, "<");
 
-                timeline.addLabel(labels[3 * index + 2]);
+                timeline.addLabel(labels[3 * index + 3]);
 
                 intermediateState.incidentEdges.forEach((incidentEdge, index) => {
                     if(index == 0){
                         if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
-                            timeline.set("#u3" + incidentEdge.id, {opacity: 100}, "<");
-                            timeline.from("#u3" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"});
+                            timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
                         } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"});
                         } else {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100});
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"});
                         }
                     } else {
                         if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
-                            timeline.set("#u3" + incidentEdge.id, {opacity: 100}, "<");
-                            timeline.from("#u3" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
+                            timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
                         } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
                         } else {
-                            timeline.set("#u2" + incidentEdge.id, {opacity: 100}, "<");
-                            timeline.from("#u2" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
                         }
                     }
                 });
 
-                timeline.addLabel(labels[3 * index + 3]);
+                timeline.addLabel(labels[3 * index + 4]);
             });
 
             timeline.progress(props.progress).pause();
