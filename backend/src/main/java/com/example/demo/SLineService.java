@@ -17,28 +17,30 @@ public class SLineService {
             throw new IllegalArgumentException("There must be at least two points");
         }
 
-        //x-Queue aufbauen ... Sort all points by x coordinate
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
 
-        //Init mit p0 und p1
+        // Setting initial best pair the initial delta from the first two points before the sweep starts.
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
-        double delta = euclideanDistance(p0, p1); //Calculate the initial delta from the first two points
+        double delta = euclideanDistance(p0, p1);
         Result currBestPair = new Result(p0, p1, delta);
 
-        // y-Table: enthält nur active points (zwischen tail inkl. und current exkl.)
-        // Sortiert nach y, bei gleichem y nach x
-        //Punkte mit gleicher Position werden nicht verdrängt
+        /*
+        yTable contains the points currently inside the active sweep window:
+        from xSorted[tail] inclusive up to the current point exclusive.
+        It is ordered by y-coordinate; Point::id keeps duplicate coordinates distinct.
+         */
         TreeSet<Point> activePoints = new TreeSet<>(
                 Comparator.comparingInt(Point::y).thenComparingInt(Point::x).thenComparing(Point::id));
 
-        //processed/discarded points ... leer am Anfang
-        List<Point> processed = new ArrayList<>();
+        // Points that are to the left of the tail so that have already left the active sweep window
+        List<Point> processed = new ArrayList<>(); //discarded points
         // active points:  nur p0. currentPoint (p1) ist noch NICHT drin
+
+        // During initialization, p1 is the current point. Therefore, only p0 is part of activePoints at this moment.
         activePoints.add(p0);
-        // current: p1, future: alle "nach" p1
-        List<Point> future0 = xSorted.subList(2, xSorted.size());
+        List<Point> future0 = xSorted.subList(2, xSorted.size()); // points to the right of the current point.
 
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: Points sorted by x-coordinate. "
@@ -53,15 +55,12 @@ public class SLineService {
                 List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
-        // jetzt p1 zur active menge hinzufügen
         activePoints.add(p1);
 
-        // tail zeigt auf den linkesten noch "gültigen" Punkt der active Menge
-        //  ... dadurch muss man nicht weniger punkte "durchsuchen"
-        //ist quasi der linke rand des balkens
+        // Index of the leftmost point that is still part of the active sweep window.
+        // Points before tail have already been removed from activePoints.
         int tail = 0;
 
-        // mainschleife ... startet bei index 2
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
             double deltaBeforeStep = delta;
@@ -70,13 +69,14 @@ public class SLineService {
             tail = rm.newTail();
             boolean removedPoints = rm.removedAny();//für pseudo code highlighting
 
-            // Kandidaten bestimmen ... active points im "kleinen/kleineren" [y-delta, y+delta] Fenster
+            // Determine Candidates: checking only active points whose y-distance is smaller than delta .
+            //so activepoints in the [y-delta, y+delta]-window (candidaten window)
             CandidateResult candidates = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeStep, delta, currBestPair);
             delta = candidates.delta();
             currBestPair = candidates.bestPair();
             boolean foundNewBest = candidates.foundNewBest();
 
-            // future = alle Punkte "rechts" von current (Index i+1 bis Ende)
+            //// only for Visualization: points not processed yet, so all points right from current (i+1 ...)
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
             String newBestMsg = "New minimum found! δ = " + String.format("%.2f", delta)
@@ -87,8 +87,7 @@ public class SLineService {
             boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
             List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(removedPoints, hasCandidatePairs, foundNewBest);
 
-
-            // Step BEVOR current in active Menge kommt ...currentPoint ist ja nicht teil von activePoints
+            // step is taken before inserting the current point beause currentPoint ist not part of activePoints
             steps.add(new AlgorithmStepDTO(
                     foundNewBest ? newBestMsg : noNewBestMsg, current, current.x(), delta, deltaBeforeStep,
                     new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
@@ -96,12 +95,12 @@ public class SLineService {
                     pseudoCodeLineIds
             ));
 
-            // current NACH dem Step in die active menge aufnehmen
+            // Current point becomes part of the activePoinsts/sweep window after the step
             activePoints.add(current);
         }
 
-        // final Step .... alle verbleibenden activePoints noch zeigen
-        // currentPoint = null weil der alg fertig ist
+        // Final visualization state after the sweep has finished.
+        // currentPoint = null because the alg has finished
         Point lastPoint = xSorted.getLast();
 
         String doneMsg = "Done! Closest pair: "
@@ -121,11 +120,11 @@ public class SLineService {
     }
 
     /**
-     * Removes all points from the active sweep window that are too far left of the current point.
-     * The active sweep window is the vertical strip [current.x - deltaBeforeStep, current.x).
-     * Points outside this strip cannot improve the current best distance anymore,
-     * because their x-distance to the current point is already at least delta.
-     * Removed points are moved from activePoints to processed.
+     * Removes points that are more than delta to the left of the current point.
+     * These points are left of the active sweep window, so they cannot form
+     * a closer pair with the current point or any later point.
+     * Removed points are moved from activePoints to processed, and tail is
+     * advanced to the new left border of the active sweep window.
      */
     private RemovalResult removePointsOutsideActiveSweepWindow(Point current, List<Point> xSorted, TreeSet<Point> activePoints,
             List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
@@ -147,9 +146,9 @@ public class SLineService {
 
 
     /**
-     * Checks all active points that lie inside the candidate sweep window
-     * [current.x - deltaBeforeStep, current.x) × [current.y - deltaBeforeStep, current.y + deltaBeforeStep].
-     * Since activePoints already only contains points from the active sweep window, this method only has to filter by y-distance.
+     * Checks only active points that are at most delta above or below the current point, so that lie inside the candidate sweep window.
+     * activePoints already contains only points inside the active sweep window (so no points farther left than
+     * delta). Therefore, this method only needs to filter by y-distance: at most delta above or below the current point.
      */
     private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
             Point current, TreeSet<Point> activePoints, double deltaBeforeStep, double currDelta, Result currentBestPair
