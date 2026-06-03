@@ -2,10 +2,9 @@ import {useState} from "react";
 import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, ExportState, Node} from "./shared/Types.tsx";
-//import {SVGOutput} from "./SVGOutput";
-//import {SVGOutput2} from "./SVGOutput2.tsx";
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
 import {decodeExportState, encodeExportState, getAlphabetLabel} from "./shared/Utils.tsx";
+import "./App.css";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -94,21 +93,18 @@ export default function App() {
 
     if (modeState === "input") {
         return (
-            <div style={{display: "flex", flexDirection:"column"}}>
+            <div className="algorithm-shell">
                 <SVGInput
                     height={svgHeight}
                     width={svgWidth}
                     mode={modeState}
                     nodes={nodes}
-
                     onAddNode={handleAddNode}
                     onMoveNode={handleMoveNode}
                     onDeleteNode={handleDeleteNode}
                     onReset={handleReset}
-
                     onSubmit={handleNormalSubmit}
                     onChangeInput={handleChangeInput}
-
                     onImport={handleImport}
                 />
             </div>
@@ -116,7 +112,7 @@ export default function App() {
     }
 
     return (
-        <div style={{display: "flex", flexDirection:"column"}}>
+        <div className="algorithm-shell">
             <SVGOutput4
                 height={svgHeight}
                 width={svgWidth}

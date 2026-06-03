@@ -1,17 +1,16 @@
 import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
-
 type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover";
 
 export function Homepage() {
     const [activeTab, setActiveTab] = useState<Tab>("homepage");
 
     return (
-        <div style={pageStyle}>
+        <div className="app-page">
             <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
 
-            <main style={mainStyle}>
+            <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
                 {activeTab === "sweepline" && <App/>}
                 {activeTab === "vertexcover" && <VertexCover/>}
@@ -22,12 +21,15 @@ export function Homepage() {
 }
 
 type HeaderProps = { activeTab: Tab; setActiveTab: React.Dispatch<React.SetStateAction<Tab>>; };
-function Header(props:HeaderProps) {
+function Header(props: HeaderProps) {
     return (
-        <header style={headerStyle}>
+        <header className="home-header">
             <AlgoTraceLogo/>
 
-            <NavigationBar activeTab={props.activeTab} onTabChange={props.setActiveTab}/>
+            <NavigationBar
+                activeTab={props.activeTab}
+                onTabChange={props.setActiveTab}
+            />
         </header>
     );
 }
@@ -36,13 +38,11 @@ type NavigationBarProps = { activeTab: Tab; onTabChange: (tab: Tab) => void; };
 
 function NavigationBar(props: NavigationBarProps) {
     return (
-        <nav style={navStyle}>
+        <nav className="home-nav">
             <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
             <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab}
-                       onTabChange={props.onTabChange}/>
-            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab}
-                       onTabChange={props.onTabChange}/>
+            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
         </nav>
     );
 }
@@ -56,11 +56,7 @@ function NavButton(props: NavButtonProps) {
         <button
             type="button"
             onClick={() => props.onTabChange(props.tab)}
-            style={{
-                ...navButtonStyle,
-                background: isActive ? "#102E50" : "white",
-                color: isActive ? "white" : "#102E50",
-            }}
+            className={`home-nav-button ${isActive ? "is-active" : ""}`}
         >
             {props.label}
         </button>
@@ -79,13 +75,13 @@ type HomeContentProps = {
 function HomeContent(props: HomeContentProps) {
     return (
         <section>
-            <h1 style={headlineStyle}>Willkommen im Algo Trace Viewer</h1>
+            <h1 className="home-headline">Willkommen im Algo Trace Viewer</h1>
 
-            <p style={textStyle}>
+            <p className="home-text">
                 Wähle einen Algorithmus aus, um seine Schritte visuell nachzuvollziehen.
             </p>
 
-            <div style={cardGridStyle}>
+            <div className="algorithm-card-grid">
                 <AlgorithmCard
                     title="Sweepline"
                     description="bli bla blup"
@@ -114,9 +110,13 @@ type AlgorithmCardProps = {
 
 function AlgorithmCard(props: AlgorithmCardProps) {
     return (
-        <button type="button" onClick={props.onClick} style={cardStyle}>
-            <h2 style={cardTitleStyle}>{props.title}</h2>
-            <p style={cardTextStyle}>{props.description}</p>
+        <button
+            type="button"
+            onClick={props.onClick}
+            className="algorithm-card"
+        >
+            <h2 className="algorithm-card-title">{props.title}</h2>
+            <p className="algorithm-card-text">{props.description}</p>
         </button>
     );
 }
@@ -125,9 +125,8 @@ function AlgorithmCard(props: AlgorithmCardProps) {
 function AlgoTraceLogo() {
     return (
         <svg
+            className="home-logo"
             xmlns="http://www.w3.org/2000/svg"
-            width="340"
-            height="100"
             viewBox="0 0 370 110"
             role="img"
             aria-labelledby="title desc"
@@ -171,7 +170,7 @@ function AlgoTraceLogo() {
         </svg>
     );
 }
-
+/*
 const pageStyle: React.CSSProperties = {
     padding: 24,
     //fontFamily: "Inter, Segoe UI, Arial, sans-serif",
@@ -253,3 +252,5 @@ const cardTextStyle: React.CSSProperties = {
     fontSize: 15,
     lineHeight: 1.5,
 };
+
+ */

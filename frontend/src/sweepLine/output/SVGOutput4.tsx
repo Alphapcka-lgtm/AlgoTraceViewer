@@ -158,8 +158,7 @@ export function SVGOutput4(props: SVGOutputProps) {
     const firstStep: AlgorithmStepDTO = props.steps[0];
 
     return (
-        <div style={{flex: 1, width: "100%"}} >
-
+        <div className="algorithm-panel">
             <IOModeTabs
                 mode="output"
                 onChangeInput={props.onChangeInput}
@@ -169,9 +168,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             />
 
             <svg
-                width={props.width}
-                height={props.height}
-                style={{border: "2px solid black", borderRadius: "15px"}}
+                className="algorithm-canvas"
                 viewBox={`0 0 ${props.width} ${props.height}`}
                 preserveAspectRatio="xMidYMid meet"
             >
@@ -234,7 +231,6 @@ export function SVGOutput4(props: SVGOutputProps) {
                     return <XNodeWithCords key={p.id} node={p} fill={fill}/>;
                 })}
 
-
             </svg>
 
             <OutputControl4
@@ -251,10 +247,12 @@ export function SVGOutput4(props: SVGOutputProps) {
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
-            <div style={{fontFamily: "monospace", fontSize: 15,}}>
-                <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
 
-                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 16px"}}>
+
+            <div className="step-info">
+                <div className="step-description"> {step.description} </div>
+
+                <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
                     <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
                     <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
