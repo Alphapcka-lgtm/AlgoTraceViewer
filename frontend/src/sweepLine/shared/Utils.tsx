@@ -100,6 +100,47 @@ export function checkProgress(progress: number): number {
 }
  */
 
+
+export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
+    { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
+
+    { id: "for-loop", text: "for each point current from left to right:" },
+
+    {
+        id: "update-active-window",
+        text: "remove points outside the active sweep window",
+        indent: 1
+    },
+
+    {
+        id: "check-candidate-window",
+        text: "compare current with points inside the candidate sweep window",
+        indent: 1
+    },
+
+    {
+        id: "update-bestpair",
+        text: "if a closer pair was found: update bestPair and δ",
+        indent: 1
+    },
+
+    {
+        id: "shrink-windows",
+        text: "shrink sweep windows to the new δ",
+        indent: 1
+    },
+
+    {
+        id: "insert-current",
+        text: "insert current into yTable",
+        indent: 1
+    },
+
+    { id: "return", text: "return bestPair and δ" }
+];
+
+
+/*
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "sort", text: "xQueue = sortx(P)"},
     {id: "init-ytable", text: "yTable = [ ]"},
@@ -123,3 +164,5 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
 
     {id: "return", text: "return (bestPair, δ)"}
 ];
+
+ */
