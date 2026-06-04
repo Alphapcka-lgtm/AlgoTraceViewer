@@ -54,7 +54,7 @@ export function SVGInput(props: SVGInputProps) {
             <IOModeTabs
                 mode="input"
                 onChangeInput={props.onChangeInput}
-                onSubmit={() => props.onSubmit(props.nodes)}
+                onSubmit={props.onSubmit}
                 canSubmit={props.nodes.length >= 2}
             />
 

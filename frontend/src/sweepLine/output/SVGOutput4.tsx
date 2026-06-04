@@ -44,16 +44,14 @@ export function SVGOutput4(props: SVGOutputProps) {
         };
     };
 
-    const getCy = (step: AlgorithmStepDTO) =>
-        (step.currentPoint?.y ?? props.height / 2) - step.searchDelta;
-
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
         const searchDelta = step.searchDelta;
+        const currentY = step.currentPoint?.y ?? props.height / 2;
         return {
             x: step.sweepLineX - searchDelta,
-            y: getCy(step),
+            y: currentY - searchDelta,
             width: searchDelta,
-            height: searchDelta * 2
+            height: searchDelta * 2,
         };
     };
 
