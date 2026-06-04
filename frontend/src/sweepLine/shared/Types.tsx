@@ -1,4 +1,5 @@
 import React from "react";
+import type {AnimationRequest} from "../../vertexCover/shared/Types.tsx";
 
 export type Node = {
     x: number;
@@ -32,7 +33,7 @@ export type SVGInputProps = {
     onDeleteNode: (id: string) => void;
     onReset: () => void;
 
-    onSubmit: (nodes: Node[]) => void;
+    onSubmit: () => void;
     onChangeInput: () => void;
 
     onImport: (encoded: string) => void;
@@ -112,10 +113,9 @@ export type ModeTabsProps = {
     canSubmit: boolean;
 };
 
-export type ExportState = {
-    nodes: Node[];
-    progress: number;
-};
+export type ExportState =
+    | { algorithm: "sweepLine", progress: number, input: Node[] }
+    | { algorithm: "vertexCover", progress: number, input: AnimationRequest };
 
 export type PseudoCodeLine = {
     id: string;

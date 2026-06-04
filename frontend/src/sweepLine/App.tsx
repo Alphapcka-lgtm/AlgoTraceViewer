@@ -61,11 +61,11 @@ export default function App() {
     };
 
     //bei normalen will man ganz normal am anfang starten...
-    const handleNormalSubmit = async (submittedNodes: Node[]) => {
+    const handleNormalSubmit = async () => {
         setProgress(0);
         setCurrentStep(0);
 
-        await handleSubmit(submittedNodes);
+        await handleSubmit(nodes);
     };
 
     const handleChangeInput = () => {
@@ -73,19 +73,21 @@ export default function App() {
     };
 
     const createExportString = () => {
-        return encodeExportState({nodes, progress});
+        return encodeExportState({algorithm: "sweepLine", input: nodes, progress});
     };
 
     const handleImport = async (encoded: string) => {
         try {
             const imported:ExportState = decodeExportState(encoded);
 
-            setNodes(imported.nodes);
-            // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
-            setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
-            setProgress(imported.progress);
+            if(imported.algorithm === "sweepLine"){
+                setNodes(imported.input);
+                // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
+                setNextLabelIndex(imported.input.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
+                setProgress(imported.progress);
 
-            await handleSubmit(imported.nodes);
+                await handleSubmit(imported.input);
+            }
         } catch (error) {
             console.error("Invalid import string", error);
         }

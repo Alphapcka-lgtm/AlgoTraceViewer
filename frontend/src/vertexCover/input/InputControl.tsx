@@ -21,7 +21,7 @@ export function InputControl(props: InputControlProps ) {
         props.setInteraction({ type: "idle" });
     };
 
-    return <div style={ { display: "flex", flexDirection: "column", gap: 3 } } >
+    return <div className="control-row" >
         <button onClick={ resetInput } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Reset</button>
         <div style={ { display: "flex", gap: 3 } }>
             <div style={ { display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center" } } >

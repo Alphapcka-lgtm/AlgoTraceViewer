@@ -10,7 +10,7 @@ export type Interaction =
 export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
-    mode: string,
+    onSubmit: () => void;
 };
 
 export type InputControlProps = {

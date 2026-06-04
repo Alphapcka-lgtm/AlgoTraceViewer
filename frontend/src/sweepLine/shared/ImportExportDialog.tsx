@@ -3,8 +3,8 @@ import {btnStyle} from "./Utils.tsx";
 
 type ImportExportDialogProps = {
     mode: "input" | "output";
-    onImport?: (encoded: string) => void;
-    createExportString?: () => string;
+    onImport: (encoded: string) => void;
+    createExportString: () => string;
 };
 
 //Input: Import möglich, Export nicht möglich
@@ -20,7 +20,7 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
         setCopied(false);
 
         if (props.mode === "output") {
-            const value = props.createExportString?.() ?? "";
+            const value = props.createExportString();
             setExportValue(value);
         }
         setOpen(true);
