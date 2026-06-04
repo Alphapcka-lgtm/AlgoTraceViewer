@@ -31,7 +31,7 @@ export type SVGInputProps = {
     onDeleteNode: (id: string) => void;
     onReset: () => void;
 
-    onSubmit: (nodes: Node[]) => void;
+    onSubmit: () => void;
     onChangeInput: () => void;
 
     onImport: (encoded: string) => void;

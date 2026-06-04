@@ -51,7 +51,7 @@ public class SLineService {
                 new ArrayList<>(activePoints),   //p1 noch nicht drin
                 xSorted, currBestPair,
                 List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0),
-                List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
+                List.of("init") //List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
         activePoints.add(p1);
@@ -62,37 +62,97 @@ public class SLineService {
 
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
+
+            //Delta at beginning of this iteration. size of the search windows to find candidate pairs for the current point.
             double deltaBeforeStep = delta;
 
             RemovalResult rm = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaBeforeStep);
             tail = rm.newTail();
             boolean removedPoints = rm.removedAny();//für pseudo code highlighting
 
+            /*
+             * Candidate checking may find a smaller delta.
+             * Step i: "New minimum found!" The windows still show the old search delta, because that was the
+                        window in which the candidates were checked.
+             * Step i+1: "delta shrinks..." The windows shrink at the same current point to the new delta.
+             * Step i+2: The next point is processed and the smaller windows move on.
+             */
             // Determine Candidates: checking only active points whose y-distance is smaller than delta .
             //so activepoints in the [y-delta, y+delta]-window (candidaten window)
             CandidateResult candidates = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeStep, delta, currBestPair);
-            delta = candidates.delta();
-            currBestPair = candidates.bestPair();
+
+            double deltaAfterCandidateCheck = candidates.delta();
+            Result bestPairAfterCandidateCheck = candidates.bestPair();
             boolean foundNewBest = candidates.foundNewBest();
 
-            // only for Visualization: points not processed yet, so all points right from current (i+1 ...)
+            // Only for visualization: points not processed yet, so all points right of current.
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
-            String newBestMsg = "New minimum found! δ = " + String.format("%.2f", delta)
-                    + " (" + currBestPair.p0().label() + ", " + currBestPair.p1().label() + ")";
-            String noNewBestMsg = "Processed point " + current.label() + "; δ = " + String.format("%.2f", delta)
+            String newBestMsg = "New minimum found! δ = " + String.format("%.2f", deltaAfterCandidateCheck)
+                    + " (" + bestPairAfterCandidateCheck.p0().label()
+                    + ", " + bestPairAfterCandidateCheck.p1().label() + ")";
+
+            String noNewBestMsg = "Processed point " + current.label()
+                    + "; δ = " + String.format("%.2f", deltaAfterCandidateCheck)
                     + "; active points: " + activePoints.size();
 
             boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
-            List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(removedPoints, hasCandidatePairs, foundNewBest);
 
+            List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(
+                    removedPoints,
+                    hasCandidatePairs,
+                    foundNewBest);
+
+            /*
+             * Step i: If a new minimum was found, the step message already shows the new delta.
+             * However, searchDelta stays deltaBeforeStep so the windows still show the
+             * old search window in which the candidates were actually checked.
+             */
             // step is taken before inserting the current point beause currentPoint ist not part of activePoints
             steps.add(new AlgorithmStepDTO(
-                    foundNewBest ? newBestMsg : noNewBestMsg, current, current.x(), delta, deltaBeforeStep,
-                    new ArrayList<>(activePoints),  // active = {tail .. i-1} ... current noch nicht drin
-                    xSorted, currBestPair, candidates.candidatePairs(), new ArrayList<>(processed), futurePoints,
+                    foundNewBest ? newBestMsg : noNewBestMsg,
+                    current,
+                    current.x(),
+                    deltaAfterCandidateCheck,
+                    deltaBeforeStep,                        // window size used during this candidate search check
+                    new ArrayList<>(activePoints),
+                    xSorted,
+                    bestPairAfterCandidateCheck,
+                    candidates.candidatePairs(),
+                    new ArrayList<>(processed),
+                    futurePoints,
                     pseudoCodeLineIds
             ));
+
+            /*
+             * Step i+1: This step only exists when delta became smaller.
+             * makes effect of the new delta visible: both sweep windows shrink at the same current point.
+             * Here delta and searchDelta are both the new smaller value.
+             */
+            if (foundNewBest) {
+                steps.add(new AlgorithmStepDTO(
+                        "δ shrinks from " + String.format("%.2f", deltaBeforeStep)
+                                + " to " + String.format("%.2f", deltaAfterCandidateCheck)
+                                + ". The sweep windows become smaller.",
+                        current,
+                        current.x(),
+                        deltaAfterCandidateCheck,          // new best distance
+                        deltaAfterCandidateCheck,          // new window size for the shrink step
+                        new ArrayList<>(activePoints),     // current is still not active yet
+                        xSorted,
+                        bestPairAfterCandidateCheck,
+                        candidates.candidatePairs(),
+                        new ArrayList<>(processed),
+                        futurePoints,
+                        List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
+                ));
+            }
+
+
+             //From here on, the algorithm state is updated for the next iteration.
+             //The smaller delta is now the "official search radius" for later points
+            delta = deltaAfterCandidateCheck;
+            currBestPair = bestPairAfterCandidateCheck;
 
             // Current point becomes part of the activePoinsts/sweep window after the step
             activePoints.add(current);
@@ -132,7 +192,7 @@ public class SLineService {
 
         //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
         //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
-        System.out.println(current.x() +" - "+xSorted.get(tail).x() + " deltaBeforeStep " + deltaBeforeStep + " tail " + tail);
+        //System.out.println(current.x() +" - "+xSorted.get(tail).x() + " deltaBeforeStep " + deltaBeforeStep + " tail " + tail);
         while (tail < currIndex && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) {
             Point oldPoint = xSorted.get(tail);
             activePoints.remove(oldPoint);
@@ -174,6 +234,7 @@ public class SLineService {
         return new CandidateResult(currDelta, currentBestPair, candidatePairs, foundNewBest);
     }
 
+    /*
     private List<String> buildPseudoCodeLineIds(boolean removedPoints, boolean hasCandidatePairs, boolean foundNewBest) {
         List<String> ids = new ArrayList<>();
         ids.add("for-loop");
@@ -196,6 +257,33 @@ public class SLineService {
         return ids;
     }
 
+
+     */
+
+    private List<String> buildPseudoCodeLineIds(
+            boolean removedPoints,
+            boolean hasCandidatePairs,
+            boolean foundNewBest
+    ) {
+        List<String> ids = new ArrayList<>();
+
+        ids.add("for-loop");
+        ids.add("set-current");
+
+        if (removedPoints) {
+            ids.add("update-active-window");
+        }
+
+        if (hasCandidatePairs) {
+            ids.add("check-candidate-window");
+        }
+
+        if (foundNewBest) {
+            ids.add("update-bestpair");
+        }
+
+        return ids;
+    }
     public static double euclideanDistance(Point p1, Point p2) {
         long dx = (long) p2.x() - p1.x();
         long dy = (long) p2.y() - p1.y();

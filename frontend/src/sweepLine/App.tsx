@@ -68,11 +68,11 @@ export default function App() {
     };
 
     //bei normalen will man ganz normal am anfang starten...
-    const handleNormalSubmit = async (submittedNodes: Node[]) => {
+    const handleNormalSubmit = async () => {
         setProgress(0);
         setCurrentStep(0);
 
-        await handleSubmit(submittedNodes);
+        await handleSubmit(nodes);
     };
 
     const handleChangeInput = () => {
