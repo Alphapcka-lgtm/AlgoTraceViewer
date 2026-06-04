@@ -11,6 +11,7 @@ export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     onSubmit: () => void;
+    onImport: (encoded: string) => void;
 };
 
 export type InputControlProps = {

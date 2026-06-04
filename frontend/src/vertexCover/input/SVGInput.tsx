@@ -144,7 +144,7 @@ export function SVGInput(props: SVGInputProps) {
         <ImportExportDialog
             mode="input"
             createExportString={() => ""}
-            onImport={() => {}}
+            onImport={props.onImport}
         />
     </div>;
 }

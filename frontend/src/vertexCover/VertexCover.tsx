@@ -3,7 +3,8 @@ import {SVGInput} from "./input/SVGInput.tsx";
 import {useState} from "react";
 
 import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
-import {encodeExportState} from "../sweepLine/shared/Utils.tsx";
+import {decodeExportState, encodeExportState} from "../sweepLine/shared/Utils.tsx";
+import type {ExportState} from "../sweepLine/shared/Types.tsx";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -50,6 +51,19 @@ export function VertexCover() {
             });
     };
 
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported:ExportState = decodeExportState(encoded);
+            if (imported.algorithm === "vertexCover") {
+                setInput(imported.input);
+                setProgress(imported.progress);
+                submitInput();
+            }
+        } catch (error) {
+            console.error("Invalid import string", error);
+        }
+    };
+
     return (
         <div className="algorithm-shell">
             {mode == "input" ?
@@ -57,6 +71,7 @@ export function VertexCover() {
                     setInput={setInput}
                     input={input}
                     onSubmit={submitInput}
+                    onImport={handleImport}
                 /> :
                 <SVGOutput
                     setProgress={setProgress}

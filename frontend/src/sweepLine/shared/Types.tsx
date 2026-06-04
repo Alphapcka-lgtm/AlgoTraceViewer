@@ -27,8 +27,7 @@ export type SVGInputProps = {
 
     nodes: Node[];
 
-    //onAddNode: (node: Node) => void;
-    onAddNode: (node: Omit<Node, "label">) => void;
+    onAddNode: (node: Node) => void;
     onMoveNode: (id: string, x: number, y: number) => void;
     onDeleteNode: (id: string) => void;
     onReset: () => void;

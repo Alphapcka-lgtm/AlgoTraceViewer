@@ -26,7 +26,7 @@ export function SVGInput(props: SVGInputProps) {
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
         if (interaction.type !== "idle") return;
         const {x, y} = getMousePos(e);
-        props.onAddNode({x, y, id: getRandomId()});
+        props.onAddNode({x, y, id: getRandomId(), label: ""});
 
     };
 
