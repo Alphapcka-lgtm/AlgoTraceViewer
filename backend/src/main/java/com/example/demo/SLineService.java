@@ -36,7 +36,6 @@ public class SLineService {
 
         // Points that are to the left of the tail so that have already left the active sweep window
         List<Point> processed = new ArrayList<>(); //discarded points
-        // active points:  nur p0. currentPoint (p1) ist noch NICHT drin
 
         // During initialization, p1 is the current point. Therefore, only p0 is part of activePoints at this moment.
         activePoints.add(p0);
@@ -76,7 +75,7 @@ public class SLineService {
             currBestPair = candidates.bestPair();
             boolean foundNewBest = candidates.foundNewBest();
 
-            //// only for Visualization: points not processed yet, so all points right from current (i+1 ...)
+            // only for Visualization: points not processed yet, so all points right from current (i+1 ...)
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
             String newBestMsg = "New minimum found! δ = " + String.format("%.2f", delta)
@@ -129,10 +128,11 @@ public class SLineService {
     private RemovalResult removePointsOutsideActiveSweepWindow(Point current, List<Point> xSorted, TreeSet<Point> activePoints,
             List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
 
-        boolean removedPoints = false; ////für pseudo code highlighting ...
+        boolean removedPoints = false; //für pseudo code highlighting ...
 
         //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
         //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
+        System.out.println(current.x() +" - "+xSorted.get(tail).x() + " deltaBeforeStep " + deltaBeforeStep + " tail " + tail);
         while (tail < currIndex && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) {
             Point oldPoint = xSorted.get(tail);
             activePoints.remove(oldPoint);

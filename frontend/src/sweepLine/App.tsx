@@ -3,7 +3,7 @@ import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
 import type {AlgorithmStepDTO, ExportState, Node} from "./shared/Types.tsx";
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
-import {decodeExportState, encodeExportState, getAlphabetLabel} from "./shared/Utils.tsx";
+import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel} from "./shared/Utils.tsx";
 import "./App.css";
 
 export default function App() {
@@ -14,19 +14,22 @@ export default function App() {
 
     const {loading, error, calculateSteps} = useSweepLineSteps();
 
-    const [nextLabelIndex, setNextLabelIndex] = useState(0);
-
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);    //für scrubber
 
     const svgHeight = 500;
     const svgWidth = 1123;
 
-    const handleAddNode = (node: Omit<Node, "label">) => {
-        const label: string = getAlphabetLabel(nextLabelIndex);
-        const newNode: Node = {...node, label};
-        setNodes((prev: Node[]) => [...prev, newNode]);
-        setNextLabelIndex((prev: number) => prev + 1);
+    /*
+    Fügt dem input state eine neue node hinzu.
+    Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
+    Aber Lables werden vor submit "normalisiert" mit assignLabels()...
+    */
+    const handleAddNode = (node: Node) => {
+        setNodes((prev) => {
+            const labeledNode: Node = {...node, label: getAlphabetLabel(prev.length)};
+            return [...prev, labeledNode];
+        });
     };
 
     const handleMoveNode = (id: string, x: number, y: number) => {
@@ -42,16 +45,20 @@ export default function App() {
     const handleReset = () => {
         setNodes([]);
         setOutputSteps([]);
-        setNextLabelIndex(0);
 
         setCurrentStep(0);
         setProgress(0);
     };
 
     //quasi die grundfunktion für handleNormalSubmit und handleImport
+    //bevor die nodes ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
+    // die durch löschen von nodes entsehen können.
     const handleSubmit = async (submittedNodes: Node[]) => {
         try {
-            const result = await calculateSteps(submittedNodes);
+            const labeledNodes:Node[] = assignLabels(submittedNodes);
+            setNodes(labeledNodes);
+
+            const result = await calculateSteps(labeledNodes);
             //console.log("Algorithm steps:", result);
             setOutputSteps(result);
             setModeState("output");
@@ -79,12 +86,8 @@ export default function App() {
     const handleImport = async (encoded: string) => {
         try {
             const imported:ExportState = decodeExportState(encoded);
-
             setNodes(imported.nodes);
-            // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
-            setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
             setProgress(imported.progress);
-
             await handleSubmit(imported.nodes);
         } catch (error) {
             console.error("Invalid import string", error);

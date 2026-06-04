@@ -1,5 +1,5 @@
 import React from "react";
-import type {ExportState, PseudoCodeLine} from "./Types.tsx";
+import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
 
 
 export function getRandomId(): string {
@@ -47,6 +47,17 @@ export function getAlphabetLabel(i: number): string {
     }
     return result;
 }
+
+/*
+alle vorhandenen lables werden überschrieben, sodass wenn nodes gelöscht wurden keine "beschriftungslücken"
+gibt. Das wird gemacht before die nodes ans backend geschicket werden...
+label werden nur für anzeige und explanations benuzt... deshalb gibt es noch node id
+ */
+export function assignLabels(nodes: Node[]): Node[] {
+    return nodes.map((node, index) => ({...node, label: getAlphabetLabel(index)}));
+}
+
+
 
 export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[]): number {
     const currTime = tl.time();
