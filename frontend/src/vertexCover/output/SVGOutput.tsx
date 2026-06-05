@@ -99,7 +99,7 @@ export function SVGOutput(props: SVGOutputProps) {
             timeline.addLabel(labels[3 * index + 4]);
         });
 
-        timeline.progress(props.progress).pause();
+        timeline.progress(props.progress);
         setIsPlaying(false);
 
         return () => {
