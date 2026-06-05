@@ -77,7 +77,7 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
 
     return (
         <>
-            <button type="button" onClick={openDialog} style={{...btnStyle, marginTop: "6px"}}>
+            <button type="button" onClick={openDialog} className="control-button" style={{marginTop: "6px"}}>
                 {props.mode === "input" ? "Import" : "Export"}
             </button>
 
@@ -106,11 +106,11 @@ function ImportDialog(props: ImportDialogProps) {
             />
 
             <div style={buttonRowStyle}>
-                <button type="button" onClick={props.importState} disabled={!props.canImport} style={btnStyle}>
+                <button type="button" onClick={props.importState} disabled={!props.canImport} className="control-button">
                     Import
                 </button>
 
-                <button type="button" onClick={props.closeDialog} style={btnStyle}>
+                <button type="button" onClick={props.closeDialog} className="control-button">
                     Cancel
                 </button>
             </div>
