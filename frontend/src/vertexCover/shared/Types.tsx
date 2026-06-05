@@ -19,10 +19,10 @@ export type Graph = {
 
 export type NodesProps = {
     nodes: Node[],
-    onMouseDown: (i: string) => void,
-    onMouseUp: () => void,
-    onClick: (node: Node) => void,
-    onDoubleClick: (i: string) => void,
+    onMouseDown?: (i: string) => void,
+    onMouseUp?: () => void,
+    onClick?: (node: Node) => void,
+    onDoubleClick?: (i: string) => void,
 };
 
 export type EdgesProps = {
@@ -48,9 +48,4 @@ export type AnimationRequest = {
     densityFactor: number,
     randomSeed: number,
     timestamp: number,
-};
-
-export type ExportImport = {
-    input: AnimationRequest,
-    initialProgress: number,
 };

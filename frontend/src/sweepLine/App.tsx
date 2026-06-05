@@ -80,15 +80,17 @@ export default function App() {
     };
 
     const createExportString = () => {
-        return encodeExportState({nodes, progress});
+        return encodeExportState({algorithm: "sweepLine", input: nodes, progress});
     };
 
     const handleImport = async (encoded: string) => {
         try {
             const imported:ExportState = decodeExportState(encoded);
-            setNodes(imported.nodes);
-            setProgress(imported.progress);
-            await handleSubmit(imported.nodes);
+            if (imported.algorithm === "sweepLine") {
+                setNodes(imported.input);
+                setProgress(imported.progress);
+                await handleSubmit(imported.input);
+            }
         } catch (error) {
             console.error("Invalid import string", error);
         }
