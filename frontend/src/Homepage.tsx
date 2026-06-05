@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
-import {SwapInput} from "./ehrlichSwaps/input.tsx";
+import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
 
 export function Homepage() {
@@ -15,7 +15,7 @@ export function Homepage() {
                 {activeTab === "sweepline" && <App/>}
                 {activeTab === "vertexcover" && <VertexCover/>}
                 {activeTab === "suffixarray" && <SuffixArray/>}
-                {activeTab === "ehrlichswaps" && <SwapInput />}
+                {activeTab === "ehrlichswaps" && <EhrlichSwaps />}
             </main>
         </div>
     );
