@@ -8,5 +8,4 @@ export type SVGOutputProps = {
     stepIndex: number,
     setStepIndex:  Dispatch<SetStateAction<number>>,
     onChangeInput: () => void;
-    createExportString: () => string;
 };
