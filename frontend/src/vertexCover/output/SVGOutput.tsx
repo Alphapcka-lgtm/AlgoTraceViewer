@@ -43,6 +43,7 @@ export function SVGOutput(props: SVGOutputProps) {
             },
         });
 
+        tlRef.current = timeline;
 
         timeline.addLabel(labels[0]);
 
@@ -100,13 +101,12 @@ export function SVGOutput(props: SVGOutputProps) {
 
         timeline.progress(props.progress).pause();
         setIsPlaying(false);
-        tlRef.current = timeline;
 
         return () => {
             timeline.kill();
             tlRef.current = gsap.timeline({paused: true});
         };
-    }, {dependencies: [props.output.timestamp], revertOnUpdate: true});
+    }, {dependencies: [props.output.timestamp]});
 
     return <div className="algorithm-panel">
         <IOModeTabs
@@ -120,10 +120,16 @@ export function SVGOutput(props: SVGOutputProps) {
             <Nodes nodes={props.output.initialState.nodes} />
         </svg>
         <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-        <OutputControl isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={props.progress}
-                       setProgress={props.setProgress} tlRef={tlRef} setStepIndex={props.setStepIndex}
-                       stepIndex={props.stepIndex} labels={labels}/>
-
+        <OutputControl
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+            progress={props.progress}
+            setProgress={props.setProgress}
+            tlRef={tlRef}
+            setStepIndex={props.setStepIndex}
+            stepIndex={props.stepIndex}
+            labels={labels}
+        />
         <ImportExportDialog
             mode="output"
             createExportString={props.createExportString}
