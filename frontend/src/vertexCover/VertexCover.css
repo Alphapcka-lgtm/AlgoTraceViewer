@@ -170,7 +170,7 @@
     background: white;
     box-shadow: var(--shadow);
 }
-
+/*
 .mode-tabs {
     display: flex;
     gap: 6px;
@@ -193,10 +193,37 @@
 
     font-weight: 700;
 }
+*/
 
+.mode-tabs {
+    display: flex;
+    gap: 7px;
+    padding: 7px;
+    border: 2px solid var(--primary);
+    border-radius: 25px;
+    background: var(--card-background);
+    box-shadow: var(--shadow);
+    margin-bottom: 15px;
+}
+
+.mode-tab {
+    flex: 1;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    background: white;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
+}
 .mode-tab.is-active {
     background: var(--primary);
     color: white;
+}
+
+.mode-tab.is-active:disabled {
+    opacity: 1;
+    cursor: default;
 }
 
 .control-row {
@@ -210,8 +237,7 @@
 }
 
 .control-button,
-.control-select,
-.control-range{
+.control-select {
     min-height: 40px;
 
     border: 2px solid var(--primary);
