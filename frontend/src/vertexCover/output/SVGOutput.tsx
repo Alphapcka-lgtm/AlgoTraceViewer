@@ -1,6 +1,5 @@
 import type {SVGOutputProps} from "./Types.tsx";
 
-import {OutputControl} from "./OutputControl.tsx";
 import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
@@ -11,13 +10,20 @@ import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
 
 const STEP_DURATION = 0.5;
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
+
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        tlRef.current.timeScale(speed);
+    };
 
     useGSAP(() => {
 
@@ -119,17 +125,24 @@ export function SVGOutput(props: SVGOutputProps) {
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes} />
         </svg>
-        <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-        <OutputControl
+        <OutputControl4
+            timelineRef={tlRef}
+            labels={labels}
+            currentStep={props.stepIndex}
+            setCurrentStep={props.setStepIndex}
+            stepCount={props.output.intermediateStates.length + 2}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             progress={props.progress}
             setProgress={props.setProgress}
-            tlRef={tlRef}
-            setStepIndex={props.setStepIndex}
-            stepIndex={props.stepIndex}
-            labels={labels}
+            playbackSpeed={playbackSpeed}
+            onPlaybackSpeedChange={changePlaybackSpeed}
         />
+        <div className="step-info">
+            <div className="step-info-grid">
+                <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+            </div>
+        </div>
         <ImportExportDialog
             mode="output"
             createExportString={props.createExportString}
