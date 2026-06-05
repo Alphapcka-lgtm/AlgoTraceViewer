@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
-type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover";
+import {SwapInput} from "./ehrlichSwaps/input.tsx";
+type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
 
 export function Homepage() {
     const [activeTab, setActiveTab] = useState<Tab>("homepage");
-
     return (
         <div className="app-page">
             <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
@@ -15,6 +15,7 @@ export function Homepage() {
                 {activeTab === "sweepline" && <App/>}
                 {activeTab === "vertexcover" && <VertexCover/>}
                 {activeTab === "suffixarray" && <SuffixArray/>}
+                {activeTab === "ehrlichswaps" && <SwapInput />}
             </main>
         </div>
     );
@@ -43,6 +44,7 @@ function NavigationBar(props: NavigationBarProps) {
             <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
             <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
             <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="ehrlichswaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
         </nav>
     );
 }

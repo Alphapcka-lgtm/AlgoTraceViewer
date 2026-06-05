@@ -298,4 +298,5 @@ public class SLineService {
             List<Result> candidatePairs,
             boolean foundNewBest
     ) {}
+
 }
