@@ -43,6 +43,7 @@ export function SVGOutput(props: SVGOutputProps) {
             },
         });
 
+        tlRef.current = timeline;
 
         timeline.addLabel(labels[0]);
 
@@ -98,15 +99,14 @@ export function SVGOutput(props: SVGOutputProps) {
             timeline.addLabel(labels[3 * index + 4]);
         });
 
-        timeline.progress(props.progress).pause();
+        timeline.progress(props.progress);
         setIsPlaying(false);
-        tlRef.current = timeline;
 
         return () => {
             timeline.kill();
             tlRef.current = gsap.timeline({paused: true});
         };
-    }, {dependencies: [props.output.timestamp], revertOnUpdate: true});
+    }, {dependencies: [props.output.timestamp]});
 
     return <div className="algorithm-panel">
         <IOModeTabs

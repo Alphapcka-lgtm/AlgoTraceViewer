@@ -25,9 +25,11 @@ export function VertexCover() {
         timestamp: 0
     });
 
-    const submitInput = () => {
-        if (input.timestamp > output.timestamp) {
-            fetchAnimation(input)
+    const submitInput = (inp: AnimationRequest) => {
+        console.log(inp.timestamp);
+        console.log(output.timestamp);
+        if (inp.timestamp > output.timestamp) {
+            fetchAnimation(inp)
                 .then(() => {
                     setProgress(0);
                     setMode("output");
@@ -46,7 +48,7 @@ export function VertexCover() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInput({...input, randomSeed: output.randomSeed});
+                setInput({...input, randomSeed: output.randomSeed, timestamp: output.timestamp});
                 setOutput(output);
             });
     };
@@ -55,9 +57,11 @@ export function VertexCover() {
         try {
             const imported:ExportState = decodeExportState(encoded);
             if (imported.algorithm === "vertexCover") {
-                setInput(imported.input);
-                setProgress(imported.progress);
-                submitInput();
+                fetchAnimation(imported.input)
+                    .then(() => {
+                        setProgress(imported.progress);
+                        setMode("output");
+                    });
             }
         } catch (error) {
             console.error("Invalid import string", error);
@@ -70,7 +74,7 @@ export function VertexCover() {
                 <SVGInput
                     setInput={setInput}
                     input={input}
-                    onSubmit={submitInput}
+                    onSubmit={() => submitInput(input)}
                     onImport={handleImport}
                 /> :
                 <SVGOutput
