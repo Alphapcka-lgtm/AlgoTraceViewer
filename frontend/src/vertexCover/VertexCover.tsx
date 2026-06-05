@@ -30,6 +30,7 @@ export function VertexCover() {
             fetchAnimation(inp)
                 .then(() => {
                     setProgress(0);
+                    setStepIndex(0);
                     setMode("output");
                 });
         } else {

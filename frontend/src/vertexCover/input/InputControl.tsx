@@ -21,19 +21,21 @@ export function InputControl(props: InputControlProps ) {
         props.setInteraction({ type: "idle" });
     };
 
-    return <div className="control-row" >
-        <button onClick={ resetInput } style={ { flex: 1, border: "2px solid black", borderRadius: "30px" } } >Reset</button>
-        <div style={ { display: "flex", gap: 3 } }>
-            <div style={ { display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center" } } >
-                <label htmlFor={ "graphSizeInputSlider" }>Number of Nodes: { props.input.graph.nodes.length }</label>
-                <input id={ "graphSizeInputSlider" } type={ "range" } min={ 0 } max={ 50 } step={ 1 } value={ props.input.graph.nodes.length } onInput={ setRandomGraph } style={ { width: "90%" } } />
-            </div>
-            <div style={ { display: "flex", flexDirection: "column", flex: 1, border: "2px solid black", borderRadius: "30px", alignItems: "center" } } >
-                <label htmlFor={ "graphDensityInputSlider" } >Density Factor: { props.input.densityFactor.toString().slice(0,4) }</label>
-                <input id={ "graphDensityInputSlider" } type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.input.densityFactor } onInput={ setRandomGraph } style={ { width: "90%" } } />
-            </div>
+    return <>
+        <div className="control-row" >
+            <button onClick={ resetInput } className="control-button" >Reset</button>
         </div>
-    </div>;
+        <div className="control-row">
+                <div className="control-button" >
+                    <label htmlFor={ "graphSizeInputSlider" }>Number of Nodes: { props.input.graph.nodes.length }</label>
+                    <input id={ "graphSizeInputSlider" } type={ "range" } min={ 0 } max={ 50 } step={ 1 } value={ props.input.graph.nodes.length } onInput={ setRandomGraph } style={ { width: "100%" } } />
+                </div>
+                <div className="control-button" >
+                    <label htmlFor={ "graphDensityInputSlider" } >Density Factor: { props.input.densityFactor.toString().slice(0,4) }</label>
+                    <input id={ "graphDensityInputSlider" } type={ "range" } min={ 0 } max={ 1 } step={ "any" } value={ props.input.densityFactor } onInput={ setRandomGraph } style={ { width: "100%" } } />
+                </div>
+        </div>
+    </>;
 }
 
 function getRandomGraph(n: number, d: number) : Graph {

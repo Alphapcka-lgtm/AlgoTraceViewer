@@ -1,6 +1,11 @@
 import type {SVGOutputProps} from "./Types.tsx";
 
-import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
+import {
+    createStepLabels,
+    getActiveLineIds,
+    getStepIndexFromTimeline,
+    RANDOM_VERTEX_COVER_PSEUDOCODE
+} from "../shared/Utils.tsx";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
@@ -11,6 +16,7 @@ import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
 
 const STEP_DURATION = 0.5;
 
@@ -147,6 +153,10 @@ export function SVGOutput(props: SVGOutputProps) {
             mode="output"
             createExportString={props.createExportString}
             onImport={() => {}}
+        />
+        <PseudoCodePanel
+            lines={RANDOM_VERTEX_COVER_PSEUDOCODE}
+            activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
         />
     </div>;
 }
