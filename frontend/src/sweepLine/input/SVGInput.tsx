@@ -89,6 +89,7 @@ export function SVGInput(props: SVGInputProps) {
             <ImportExportDialog
                 mode="input"
                 onImport={props.onImport}
+                createExportString={() => ""}
             />
         </div>
     );

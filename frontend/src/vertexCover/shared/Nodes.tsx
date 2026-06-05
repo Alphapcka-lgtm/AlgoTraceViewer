@@ -9,26 +9,34 @@ export function Nodes(props: NodesProps) {
             key={n.id}
             onMouseDown={(e) => {
                 e.stopPropagation();
-                props.onMouseDown(n.id);
+                if(props.onMouseDown){
+                    props.onMouseDown(n.id);
+                }
             }}
             onMouseUp={(e) => {
                 e.stopPropagation();
-                props.onMouseUp();
+                if(props.onMouseUp){
+                    props.onMouseUp();
+                }
             }}
             onClick={(e) => {
                 e.stopPropagation();
-                props.onClick(n);
+                if(props.onClick){
+                    props.onClick(n);
+                }
             }}
             onDoubleClick={(e) => {
                 e.stopPropagation();
-                props.onDoubleClick(n.id);
+                if(props.onDoubleClick){
+                    props.onDoubleClick(n.id);
+                }
             }}
         >
-            <circle id={ "u1" + n.id.toString()} key={ "u1" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill="black" />
-            <circle id={ "u2" + n.id.toString()} key={ "u2" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
-            <circle cx={1920 * n.x} cy={1080 * n.y} r={23} fill="black" />
-            <circle cx={1920 * n.x} cy={1080 * n.y} r={20} fill="white" />
-            <circle id={ "u3" + n.id.toString()} key={ "u3" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
+            <circle id={ "u1" + n.id } key={ "u1" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill="black" />
+            <circle id={ "u2" + n.id } key={ "u2" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
+            <circle id={ "u4" + n.id } key={ "u4" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={23} fill="black" />
+            <circle id={ "u5" + n.id } key={ "u5" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={20} fill="white" />
+            <circle id={ "u3" + n.id } key={ "u3" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
             <text
                 x={1920 * n.x}
                 y={1080 * n.y}
