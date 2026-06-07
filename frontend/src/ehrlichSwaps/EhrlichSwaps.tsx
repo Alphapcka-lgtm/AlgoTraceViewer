@@ -3,6 +3,7 @@ import {SVGInput} from "./input/SVGInput.tsx";
 import {useState} from "react";
 
 import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
+import {getRandomId} from "./shared/Utils.tsx";
 
 export function EhrlichSwaps() {
     const [mode, setMode] = useState<"input" | "output">("output");
@@ -17,9 +18,7 @@ export function EhrlichSwaps() {
     });
 
     const [output, setOutput] = useState<AnimationResponse>({
-        initialState: {nodes: [], edges: []},
-        intermediateStates: [],
-        randomSeed: 0,
+        ids: [getRandomId(), getRandomId(), getRandomId(), getRandomId(), getRandomId()],
         timestamp: 0
     });
 
@@ -32,7 +31,7 @@ export function EhrlichSwaps() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInput({...input, randomSeed: output.randomSeed, timestamp: output.timestamp});
+                setInput({...input, timestamp: output.timestamp});
                 setOutput(output);
             });
     };

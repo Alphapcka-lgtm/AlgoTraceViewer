@@ -17,30 +17,9 @@ export type Graph = {
     edges: Edge[],
 };
 
-export type NodesProps = {
-    nodes: Node[],
-    onMouseDown?: (i: string) => void,
-    onMouseUp?: () => void,
-    onClick?: (node: Node) => void,
-    onDoubleClick?: (i: string) => void,
-};
-
-export type EdgesProps = {
-    nodes: Node[],
-    edges: Edge[],
-};
-
 export type AnimationResponse = {
-    initialState: Graph,
-    intermediateStates: AnimationState[],
-    randomSeed: number,
+    ids: string[],
     timestamp: number,
-};
-
-export type AnimationState = {
-    chosenEdge: Edge,
-    chosenNodes: Node[],
-    incidentEdges: Edge[],
 };
 
 export type AnimationRequest = {

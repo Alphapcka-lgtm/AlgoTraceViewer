@@ -3,12 +3,13 @@ import type {PseudoCodeLine} from "../shared/Types.tsx";
 type PseudoCodePanelProps = {
     lines: PseudoCodeLine[];
     activeLineIds: string[];
+    title: string;
 };
 
 export function PseudoCodePanel(props: PseudoCodePanelProps) {
     return (
         <div className="pseudocode-panel">
-            <div className="pseudocode-title">Sweep Line Pseudocode</div>
+            <div className="pseudocode-title">{props.title}</div>
 
             {props.lines.map((line) => {
                 const active = props.activeLineIds.includes(line.id);

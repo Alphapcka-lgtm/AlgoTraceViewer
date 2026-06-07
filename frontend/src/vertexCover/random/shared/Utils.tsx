@@ -1,5 +1,5 @@
 import type { Node } from "./Types.tsx"
-import type {PseudoCodeLine} from "../../sweepLine/shared/Types.tsx";
+import type {PseudoCodeLine} from "../../../sweepLine/shared/Types.tsx";
 
 export function getNodeById(nodes: Node[], id: string): Node{
     return nodes.find((n) => n.id === id)!;

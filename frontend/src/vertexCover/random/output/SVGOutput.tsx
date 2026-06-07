@@ -13,10 +13,10 @@ import {useGSAP} from "@gsap/react";
 
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
-import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
+import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
+import {OutputControl4} from "../../../sweepLine/output/OutputControl4.tsx";
+import {PseudoCodePanel} from "../../../sweepLine/output/PseudoCodePanel.tsx";
 
 const STEP_DURATION = 0.5;
 
@@ -162,6 +162,7 @@ export function SVGOutput(props: SVGOutputProps) {
         <PseudoCodePanel
             lines={RANDOM_VERTEX_COVER_PSEUDOCODE}
             activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
+            title={"Vertex Cover PseudoCode"}
         />
     </div>;
 }

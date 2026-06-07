@@ -7,8 +7,8 @@ import {InputControl} from "./InputControl.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useState, useRef} from "react";
 import * as React from "react";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
+import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
 
 
 export function SVGInput(props: SVGInputProps) {
