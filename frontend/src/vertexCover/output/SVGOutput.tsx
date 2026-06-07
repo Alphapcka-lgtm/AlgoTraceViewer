@@ -77,12 +77,17 @@ export function SVGOutput(props: SVGOutputProps) {
 
             timeline.addLabel(labels[3 * index + 2]);
 
-            timeline.to("#u1" + intermediateState.chosenEdge.fromId, {r: 29});
-            timeline.to("#u1" + intermediateState.chosenEdge.toId, {r: 29}, "<");
-            timeline.to("#u2" + intermediateState.chosenEdge.fromId, {r: 26}, "<");
-            timeline.to("#u2" + intermediateState.chosenEdge.toId, {r: 26}, "<");
-            timeline.to("#u3" + intermediateState.chosenEdge.fromId, {r: 20}, "<");
-            timeline.to("#u3" + intermediateState.chosenEdge.toId, {r: 20}, "<");
+            intermediateState.chosenNodes.forEach((node, index) => {
+                if(index === 0){
+                    timeline.to("#u1" + node.id, {r: 29});
+                    timeline.to("#u2" + node.id, {r: 26}, "<");
+                    timeline.to("#u3" + node.id, {r: 20}, "<");
+                } else {
+                    timeline.to("#u1" + node.id, {r: 29}, "<");
+                    timeline.to("#u2" + node.id, {r: 26}, "<");
+                    timeline.to("#u3" + node.id, {r: 20}, "<");
+                }
+            })
 
             timeline.addLabel(labels[3 * index + 3]);
 
