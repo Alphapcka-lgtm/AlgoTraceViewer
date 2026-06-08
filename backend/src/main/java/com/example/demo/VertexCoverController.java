@@ -36,6 +36,6 @@ public class VertexCoverController {
 
     @PostMapping("/vertexcover/heuristic")
     public ResponseEntity<AnimationResponse> heuristicVertexCover(@RequestBody AnimationRequest request) {
-        return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph()));
+        return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.randomSeed()));
     }
 }

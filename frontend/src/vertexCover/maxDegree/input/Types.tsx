@@ -18,6 +18,8 @@ export type InputControlProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
+    selected: string,
+    setSelected: Dispatch<SetStateAction<string>>,
 };
 
 export type PreviewEdgeProps = {

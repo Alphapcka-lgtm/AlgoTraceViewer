@@ -1,18 +1,19 @@
 import type {Interaction, SVGInputProps} from "./Types.tsx";
-import type {Node, Edge} from "../shared/Types.tsx";
+import type {Edge, Node} from "../shared/Types.tsx";
 
 import {getRandomId} from "../shared/Utils.tsx";
 import {Edges, PreviewEdge} from "../shared/Edges.tsx";
 import {InputControl} from "./InputControl.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
-import {useState, useRef} from "react";
 import * as React from "react";
+import {useRef, useState} from "react";
 import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
 
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
+    const [selected, setSelected] = useState("custom");
     const didNodeMove = useRef(false);
 
     const getRelativeCoordinates = (e: React.MouseEvent<SVGElement>) => {
@@ -23,6 +24,7 @@ export function SVGInput(props: SVGInputProps) {
     const edgeExists = (a: string, b: string, edges: Edge[]) => edges.some((e) => (e.fromId === a && e.toId === b) || (e.fromId === b && e.toId === a));
 
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
+        setSelected("custom");
         if (interaction.type === "idle") {
             const {x, y} = getRelativeCoordinates(e);
             props.setInput((prev) => {
@@ -92,6 +94,7 @@ export function SVGInput(props: SVGInputProps) {
     };
 
     const handleNodeMouseDown = (nodeId: string) => {
+        setSelected("custom");
         if (interaction.type === "idle") {
             didNodeMove.current = false;
             setInteraction({type: "dragging", nodeId});
@@ -139,7 +142,7 @@ export function SVGInput(props: SVGInputProps) {
             <Edges nodes={props.input.graph.nodes} edges={props.input.graph.edges}/>
             <Nodes nodes={props.input.graph.nodes} {...eventHandler} />
         </svg>
-        <InputControl setInput={props.setInput} input={props.input} setInteraction={setInteraction}/>
+        <InputControl setInput={props.setInput} input={props.input} setInteraction={setInteraction} setSelected={setSelected} selected={selected}/>
 
         <ImportExportDialog
             mode="input"

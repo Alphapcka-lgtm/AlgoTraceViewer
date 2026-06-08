@@ -11,7 +11,10 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
-    public AnimationResponse solve(Graph graph) {
+    public AnimationResponse solve(Graph graph, Long seed) {
+        seed = seed == 0 ? System.nanoTime() : seed;
+
+        Random randomGenerator = new Random(seed);
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
