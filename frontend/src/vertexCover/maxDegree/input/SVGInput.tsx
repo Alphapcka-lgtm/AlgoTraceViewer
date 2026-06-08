@@ -137,7 +137,7 @@ export function SVGInput(props: SVGInputProps) {
             canSubmit={props.input.graph.edges.length > 0}
         />
         <svg className="algorithm-canvas" onClick={handleCanvasClick} onMouseMove={handleMouseMove}
-             viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet">
+             viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
             <PreviewEdge nodes={props.input.graph.nodes} interaction={interaction}/>
             <Edges nodes={props.input.graph.nodes} edges={props.input.graph.edges}/>
             <Nodes nodes={props.input.graph.nodes} {...eventHandler} />

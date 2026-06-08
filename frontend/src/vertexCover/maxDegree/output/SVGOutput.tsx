@@ -97,9 +97,9 @@ export function SVGOutput(props: SVGOutputProps) {
 
                 timeline.addLabel(labels[3 * index + 3]);
 
-                timeline.to("#u1" + node.id, {r: 29});
-                timeline.to("#u2" + node.id, {r: 26}, "<");
-                timeline.to("#u3" + node.id, {r: 20}, "<");
+                timeline.to("#u1" + node.id, {r: 20});
+                timeline.to("#u2" + node.id, {r: 18}, "<");
+                timeline.to("#u3" + node.id, {r: 15}, "<");
 
                 timeline.addLabel(labels[3 * index + 4]);
 
@@ -156,7 +156,7 @@ export function SVGOutput(props: SVGOutputProps) {
             }}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet">
+        <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>

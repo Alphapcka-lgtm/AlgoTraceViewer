@@ -2,7 +2,7 @@ import type {InputControlProps} from "./Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 
 import {getRandomId} from "../shared/Utils.tsx";
-import {test_graph} from "./Presets.tsx";
+import {preset} from "./Presets.tsx";
 
 export function InputControl(props: InputControlProps) {
 
@@ -39,9 +39,7 @@ export function InputControl(props: InputControlProps) {
                         if(selected === "random") {
                             setRandomGraph();
                         } else if (selected === "preset") {
-                            props.setInput(prev => {
-                                return {...prev, graph: test_graph};
-                            })
+                            props.setInput(preset)
                         }
                     }}
                 >

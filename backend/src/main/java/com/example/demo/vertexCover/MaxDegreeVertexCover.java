@@ -11,10 +11,18 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
-    public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == 0 ? System.nanoTime() : seed;
+    private static Map<String, int[]> presets = Map.of("preset", new int[]{0, 2, 2, 3, 5, 4, 2, 2, 0, 2, 2, 0, 1, 6, 2, 2, 2, 7, 6, 4, 6, 5, 8, 0, 0, 2, 0});
 
-        Random randomGenerator = new Random(seed);
+    public AnimationResponse solve(Graph graph, Long seed) {
+
+        Random randomGenerator;
+
+        if(presets.containsKey("preset")){
+            randomGenerator = new PresetRandom(presets.get("preset"));
+        } else {
+            seed = seed == 0 ? System.nanoTime() : seed;
+            randomGenerator = new Random(seed);
+        }
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
@@ -31,8 +39,13 @@ public class MaxDegreeVertexCover {
 
         while (!remainingEdges.isEmpty()) {
 
+            int maxDegree = neighbourCount.values().stream().max(Integer::compareTo).orElse(0);
 
-            Node maxDegreeNode = neighbourCount.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+            List<Node> maxDegreeNodes = neighbourCount.entrySet().stream().filter(e -> e.getValue() == maxDegree).map(Map.Entry::getKey).toList();
+
+            int randomIndex = randomGenerator.nextInt(maxDegreeNodes.size());
+
+            Node maxDegreeNode = maxDegreeNodes.get(randomIndex);
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> {
                 if (edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())) {
@@ -47,7 +60,7 @@ public class MaxDegreeVertexCover {
 
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
                     .sorted(Comparator.comparing(e -> e.getKey().label()))
-                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
+                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue())).sorted(Comparator.comparing(ndp -> ndp.node().label()))
                     .toList();
 
             intermediateStates.add(AnimationState.builder()
@@ -67,5 +80,20 @@ public class MaxDegreeVertexCover {
 
     private static Node getNodeById(List<Node> nodes, String id) {
         return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
+    }
+
+    private static class PresetRandom extends Random {
+
+        private final int[] preset;
+        private int index = 0;
+
+        public PresetRandom(int[] preset) {
+            this.preset = preset;
+        }
+
+        @Override
+        public int nextInt(int bound) {
+            return preset[index++];
+        }
     }
 }
