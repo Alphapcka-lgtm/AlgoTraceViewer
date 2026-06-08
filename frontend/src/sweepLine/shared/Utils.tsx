@@ -77,8 +77,37 @@ export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[
     return stepIndex;
 }
 
+
+function roundNumber(num:number, decimals:number):number {
+    const factor:number = 10 ** decimals;
+    return Math.round((num+Number.EPSILON) * factor) / factor;
+}
+
+function roundNodeCoordinates(nodes: Node[], decimals: number): Node[] {
+    return nodes.map((node) => ({...node, x: roundNumber(node.x, decimals), y: roundNumber(node.y, decimals)}));
+}
+
 export function encodeExportState(state: ExportState): string {
-    const json = JSON.stringify(state);
+    let exportState = state;
+
+    if (state.algorithm === "sweepLine") {
+        exportState = {...state,
+            input: roundNodeCoordinates(state.input, 4)};
+    }
+    /*
+    else if (state.algorithm === "vertexCover") {
+        exportState = {...state,
+            input: {...state.input,
+                graph: {
+                    ...state.input.graph,
+                    nodes: roundNodeCoordinates(state.input.graph.nodes, 4),
+                },
+            },
+        };
+    }
+    */
+
+    const json = JSON.stringify(exportState);
     return btoa(encodeURIComponent(json));
 }
 
