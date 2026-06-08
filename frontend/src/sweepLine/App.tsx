@@ -103,9 +103,9 @@ export default function App() {
                 return;
             }
             const importTimestamp = Date.now();
-            const labeledNodes = assignLabels(imported.input);
+            const importedNodes = imported.input; //assign label wird dann in calculateOutput geamacht ...
             setProgress(imported.progress);
-            await calculateOutput(labeledNodes, importTimestamp);
+            await calculateOutput(importedNodes, importTimestamp);
         } catch (error) {
             console.error("Invalid import string", error);
         }
