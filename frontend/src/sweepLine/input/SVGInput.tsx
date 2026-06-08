@@ -84,13 +84,13 @@ export function SVGInput(props: SVGInputProps) {
                 >
                     Reset
                 </button>
-            </div>
 
-            <ImportExportDialog
-                mode="input"
-                onImport={props.onImport}
-                createExportString={() => ""}
-            />
+                <ImportExportDialog
+                    mode="input"
+                    onImport={props.onImport}
+                    createExportString={() => ""}
+                />
+            </div>
         </div>
     );
 }
