@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
-import {EhrlichSwaps} from "./ehrlichSwaps/EhrlichSwaps.tsx";
-import {MaxDegreeVertexCover} from "./vertexCover/maxDegree/MaxDegreeVertexCover.tsx";
+import {VertexCover} from "./vertexCover/VertexCover.tsx";
+import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
 
 export function Homepage() {
@@ -13,7 +13,7 @@ export function Homepage() {
             <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
                 {activeTab === "sweepline" && <App/>}
-                {activeTab === "vertexcover" && <MaxDegreeVertexCover/>}
+                {activeTab === "vertexcover" && <VertexCover/>}
                 {activeTab === "suffixarray" && <SuffixArray/>}
                 {activeTab === "ehrlichswaps" && <EhrlichSwaps />}
             </main>

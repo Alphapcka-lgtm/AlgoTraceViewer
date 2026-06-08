@@ -1,6 +1,6 @@
 import React from "react";
 import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
-
+import LZString from "lz-string";
 
 export function getRandomId(): string {
     return "i" + Math.floor(Date.now() * Math.random()).toString();
@@ -77,13 +77,50 @@ export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[
     return stepIndex;
 }
 
+
+function roundNumber(num:number, decimals:number):number {
+    const factor:number = 10 ** decimals;
+    return Math.round((num+Number.EPSILON) * factor) / factor;
+}
+
+function roundNodeCoordinates(nodes: Node[], decimals: number): Node[] {
+    return nodes.map((node) => ({...node, x: roundNumber(node.x, decimals), y: roundNumber(node.y, decimals)}));
+}
+
 export function encodeExportState(state: ExportState): string {
-    const json = JSON.stringify(state);
-    return btoa(encodeURIComponent(json));
+    let exportState = state;
+
+    if (state.algorithm === "sweepLine") {
+        exportState = {...state,
+            input: roundNodeCoordinates(state.input, 4),
+            progress: roundNumber(state.progress, 4),
+
+        };
+    }
+    /*
+    else if (state.algorithm === "vertexCover") {
+        exportState = {...state,
+            input: {...state.input,
+                graph: {
+                    ...state.input.graph,
+                    nodes: roundNodeCoordinates(state.input.graph.nodes, 4),
+                },
+            },
+        };
+    }
+    */
+
+    const json = JSON.stringify(exportState);
+    //return btoa(encodeURIComponent(json));
+    return LZString.compressToEncodedURIComponent(json);
 }
 
 export function decodeExportState(encoded: string): ExportState {
-    const json = decodeURIComponent(atob(encoded));
+    //const json = decodeURIComponent(atob(encoded));
+    const json = LZString.decompressFromEncodedURIComponent(encoded);
+    if (json === null) {
+        throw new Error("Invalid export string");
+    }
     return JSON.parse(json) as ExportState;
 }
 

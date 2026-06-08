@@ -1,58 +1,86 @@
-import {SVGOutput} from "./output/SVGOutput.tsx";
-import {SVGInput} from "./input/SVGInput.tsx";
-import {useState} from "react";
+import { useState } from "react";
+import {SwapInput} from "./input/input.tsx";
+import {SwapOutput} from "./output/output.tsx";
+import {type EhrlichSwapStepDTO, sendSwapInput} from "./Api.ts";
 
-import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
-import {getRandomId} from "./shared/Utils.tsx";
 
-export function EhrlichSwaps() {
-    const [mode, setMode] = useState<"input" | "output">("output");
-    const [progress, setProgress] = useState<number>(0);
-    const [stepIndex, setStepIndex] = useState(0);
+export default function EhrlichSwaps() {
+    const [modeState, setModeState] = useState("input");
+    const [values, setValues] = useState<string[]>([""]);
+    const [ehrlichSwapsSteps, setEhrlichSwapsSteps] = useState<EhrlichSwapStepDTO[]>([]);
 
-    const [input, setInput] = useState<AnimationRequest>({
-        graph: {nodes: [], edges: []},
-        densityFactor: 0.2,
-        randomSeed: 0,
-        timestamp: 1
-    });
+    const [currentStep, setCurrentStep] = useState(0);
+    const [progress, setProgress] = useState(0);    //für scrubber
 
-    const [output, setOutput] = useState<AnimationResponse>({
-        ids: [getRandomId(), getRandomId(), getRandomId(), getRandomId(), getRandomId()],
-        timestamp: 0
-    });
-
-    const fetchAnimation = async (input: AnimationRequest) => {
-        return fetch("http://localhost:8080/ehrlichswaps/", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(input),
-        })
-            .then((response) => response.json())
-            .then((json) => {
-                const output = json as AnimationResponse;
-                setInput({...input, timestamp: output.timestamp});
-                setOutput(output);
-            });
+    const addField = () => {
+        setValues((previousValues) => [...previousValues, ""]);
     };
+
+    const removeLastField = () => {
+        setValues((previousValues) => {
+            if (previousValues.length <= 1) return previousValues;
+            return previousValues.slice(0, previousValues.length - 1);
+        });
+    };
+
+    const updateValue = (index: number, newValue: string) => {
+        setValues((previousValues) =>
+            previousValues.map((oldValue, currentIndex) =>
+                currentIndex === index ? newValue : oldValue
+            )
+        );
+    };
+
+    const handleSubmit  = async () => {
+        setEhrlichSwapsSteps([]);
+
+        try {
+            const response = await sendSwapInput(values);
+
+            console.log("swap result:", response);
+            console.log("is array:", Array.isArray(response));
+
+            setEhrlichSwapsSteps(response);
+            setModeState("output");
+            setProgress(0);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleChangeInput = () => {
+        setModeState("input");
+    };
+
+
+    if (modeState === "input") {
+        return (
+            <div className="algorithm-shell">
+                <SwapInput
+                    values={values}
+                    onAddField={addField}
+                    onRemoveLastField={removeLastField}
+                    onUpdateValue={updateValue}
+                    onSubmit={handleSubmit}
+                    onChangeInput={handleChangeInput}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="algorithm-shell">
-            {mode == "input" ?
-                <SVGInput
-                    setInput={setInput}
-                    input={input}
-                    onSubmit={() => setMode("output")}
-                /> :
-                <SVGOutput
-                    setProgress={setProgress}
-                    progress={progress}
-                    setStepIndex={setStepIndex}
-                    stepIndex={stepIndex}
-                    output={output}
-                    onChangeInput={() => setMode("input")}
-                />
-            }
+            <SwapOutput
+                values={values}
+                steps={ehrlichSwapsSteps}
+                onChangeInput={handleChangeInput}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+                progress={progress}
+                setProgress={setProgress}
+            />
         </div>
-    )
+    );
+
+
 }

@@ -99,6 +99,16 @@ export type OutputControlProps4 = {
     onPlaybackSpeedChange: (speed: number) => void;
 };
 
+export type SweepLineInputState = {
+    nodes: Node[];
+    timestamp: number;
+};
+
+export type SweepLineOutputState = {
+    steps: AlgorithmStepDTO[];
+    timestamp: number;
+};
+
 
 export type XNodeProps = {
     node: Node;
