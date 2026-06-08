@@ -42,10 +42,14 @@ export default function App() {
     };
 
     const handleDeleteNode = (id: string) => {
-        setInputState(prev => ({
-            nodes: prev.nodes.filter(n => n.id !== id),
-            timestamp: Date.now()
-        }));
+        setInputState(prev => {
+            const remainingNodes = prev.nodes.filter(n => n.id !== id);
+            return {
+                ...prev,
+                nodes: assignLabels(remainingNodes),
+                timestamp: Date.now()
+            };
+        });
     };
 
     const handleReset = () => {
