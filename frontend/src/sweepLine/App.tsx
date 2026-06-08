@@ -1,16 +1,18 @@
 import {useState} from "react";
 import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
-import type {AlgorithmStepDTO, ExportState, Node} from "./shared/Types.tsx";
+import type {ExportState, Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel} from "./shared/Utils.tsx";
 import "./App.css";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
-    const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
 
-    const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
+    //const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
+    //const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
+    const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});
+    const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
 
     const {loading, error, calculateSteps} = useSweepLineSteps();
 
@@ -26,25 +28,29 @@ export default function App() {
     Aber Lables werden vor submit "normalisiert" mit assignLabels()...
     */
     const handleAddNode = (node: Node) => {
-        setNodes((prev) => {
-            const labeledNode: Node = {...node, label: getAlphabetLabel(prev.length)};
-            return [...prev, labeledNode];
+        setInputState(prev => {
+            const labeledNode: Node = {...node, label: getAlphabetLabel(prev.nodes.length)};
+            return {nodes: [...prev.nodes, labeledNode], timestamp: Date.now()};
         });
     };
 
     const handleMoveNode = (id: string, x: number, y: number) => {
-        setNodes((prev: Node[]) =>
-            prev.map((n: Node) => n.id === id ? {...n, x, y} : n)
-        );
+        setInputState(prev => ({
+            nodes:  prev.nodes.map((n: Node) => n.id === id ? {...n, x, y} : n),
+            timestamp: Date.now()
+        }));
     };
 
     const handleDeleteNode = (id: string) => {
-        setNodes((prev: Node[]) => prev.filter(n => n.id !== id));
+        setInputState(prev => ({
+            nodes: prev.nodes.filter(n => n.id !== id),
+            timestamp: Date.now()
+        }));
     };
 
     const handleReset = () => {
-        setNodes([]);
-        setOutputSteps([]);
+        setInputState({nodes: [], timestamp: Date.now()});
+        setOutputState({steps: [], timestamp: -1});
 
         setCurrentStep(0);
         setProgress(0);
@@ -53,14 +59,15 @@ export default function App() {
     //quasi die grundfunktion für handleNormalSubmit und handleImport
     //bevor die nodes ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
     // die durch löschen von nodes entsehen können.
-    const handleSubmit = async (submittedNodes: Node[]) => {
+    //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
+    const calculateOutput = async (submittedNodes: Node[], inputTimestamp: number) => {
         try {
-            const labeledNodes:Node[] = assignLabels(submittedNodes);
-            setNodes(labeledNodes);
+            const labeledNodes: Node[] = assignLabels(submittedNodes);
+            setInputState({nodes: labeledNodes, timestamp: inputTimestamp});
 
             const result = await calculateSteps(labeledNodes);
             //console.log("Algorithm steps:", result);
-            setOutputSteps(result);
+            setOutputState({steps: result, timestamp: inputTimestamp});
             setModeState("output");
         } catch (error) {
             console.error(error);
@@ -69,10 +76,16 @@ export default function App() {
 
     //bei normalen will man ganz normal am anfang starten...
     const handleNormalSubmit = async () => {
+        const outputIsStillValid = outputState.steps.length > 0 && inputState.timestamp <= outputState.timestamp;
+        if (outputIsStillValid) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
+            setModeState("output");
+            return;
+        }
+        //wenn input neu/verändert bei 0 starten
         setProgress(0);
         setCurrentStep(0);
 
-        await handleSubmit(nodes);
+        await calculateOutput(inputState.nodes, inputState.timestamp);
     };
 
     const handleChangeInput = () => {
@@ -80,17 +93,19 @@ export default function App() {
     };
 
     const createExportString = () => {
-        return encodeExportState({algorithm: "sweepLine", input: nodes, progress});
+        return encodeExportState({algorithm: "sweepLine", input: inputState.nodes, progress});
     };
 
     const handleImport = async (encoded: string) => {
         try {
-            const imported:ExportState = decodeExportState(encoded);
-            if (imported.algorithm === "sweepLine") {
-                setNodes(imported.input);
-                setProgress(imported.progress);
-                await handleSubmit(imported.input);
+            const imported: ExportState = decodeExportState(encoded);
+            if (imported.algorithm !== "sweepLine") {
+                return;
             }
+            const importTimestamp = Date.now();
+            const labeledNodes = assignLabels(imported.input);
+            setProgress(imported.progress);
+            await calculateOutput(labeledNodes, importTimestamp);
         } catch (error) {
             console.error("Invalid import string", error);
         }
@@ -103,7 +118,7 @@ export default function App() {
                     height={svgHeight}
                     width={svgWidth}
                     mode={modeState}
-                    nodes={nodes}
+                    nodes={inputState.nodes}
                     onAddNode={handleAddNode}
                     onMoveNode={handleMoveNode}
                     onDeleteNode={handleDeleteNode}
@@ -121,7 +136,7 @@ export default function App() {
             <SVGOutput4
                 height={svgHeight}
                 width={svgWidth}
-                steps={outputSteps}
+                steps={outputState.steps}
                 loading={loading}
                 error={error}
                 onChangeInput={handleChangeInput}
