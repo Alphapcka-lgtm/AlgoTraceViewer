@@ -92,7 +92,10 @@ export function encodeExportState(state: ExportState): string {
 
     if (state.algorithm === "sweepLine") {
         exportState = {...state,
-            input: roundNodeCoordinates(state.input, 4)};
+            input: roundNodeCoordinates(state.input, 4),
+           // progress: roundNumber(state.progress, 5),
+
+        };
     }
     /*
     else if (state.algorithm === "vertexCover") {
