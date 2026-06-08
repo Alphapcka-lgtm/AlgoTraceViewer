@@ -103,7 +103,7 @@ export default function App() {
                 return;
             }
             const importTimestamp = Date.now();
-            const importedNodes = imported.input; //assign label wird dann in calculateOutput geamacht ...
+            const importedNodes = imported.input; //assign labels wird dann in calculateOutput geamacht ...
             setProgress(imported.progress);
             await calculateOutput(importedNodes, importTimestamp);
         } catch (error) {
