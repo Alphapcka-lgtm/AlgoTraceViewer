@@ -1,6 +1,6 @@
 import React from "react";
 import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
-
+import LZString from "lz-string";
 
 export function getRandomId(): string {
     return "i" + Math.floor(Date.now() * Math.random()).toString();
@@ -111,11 +111,16 @@ export function encodeExportState(state: ExportState): string {
     */
 
     const json = JSON.stringify(exportState);
-    return btoa(encodeURIComponent(json));
+    //return btoa(encodeURIComponent(json));
+    return LZString.compressToEncodedURIComponent(json);
 }
 
 export function decodeExportState(encoded: string): ExportState {
-    const json = decodeURIComponent(atob(encoded));
+    //const json = decodeURIComponent(atob(encoded));
+    const json = LZString.decompressFromEncodedURIComponent(encoded);
+    if (json === null) {
+        throw new Error("Invalid export string");
+    }
     return JSON.parse(json) as ExportState;
 }
 
