@@ -156,9 +156,8 @@ export function SVGOutput(props: SVGOutputProps) {
             title={"Vertex Cover PseudoCode"}
         />
         <ImportExportDialog
-            mode="output"
+            onImport={props.onImport}
             createExportString={props.createExportString}
-            onImport={() => {}}
         />
     </div>;
 }

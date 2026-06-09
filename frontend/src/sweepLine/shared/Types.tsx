@@ -115,9 +115,13 @@ export type SweepLineOutputState = {
 };
 
 
+export type RingStyle = "none" | "active" | "candidate";
+
 export type XNodeProps = {
     node: Node;
     fill: string;
+    scale?: number;
+    ringStyle?: RingStyle;
 };
 
 export type ModeTabsProps = {

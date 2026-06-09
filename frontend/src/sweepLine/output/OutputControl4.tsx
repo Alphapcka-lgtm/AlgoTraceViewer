@@ -90,7 +90,7 @@ export function OutputControl4(props: OutputControlProps4) {
             </select>
 
             <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
-                ←
+                <strong>←</strong>
             </button>
 
             <button onClick={togglePlay} className="control-button">
@@ -98,7 +98,7 @@ export function OutputControl4(props: OutputControlProps4) {
             </button>
 
             <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
-                →
+                <strong>→</strong>
             </button>
 
             <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">

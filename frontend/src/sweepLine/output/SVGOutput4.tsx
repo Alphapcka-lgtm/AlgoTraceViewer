@@ -1,7 +1,7 @@
 import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, SVGOutputProps} from "../shared/Types.tsx";
+import type {AlgorithmStepDTO, Node, RingStyle, SVGOutputProps} from "../shared/Types.tsx";
 import {OutputControl4} from "./OutputControl4.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
 import {IOModeTabs} from "../shared/IOModeTabs.tsx";
@@ -150,6 +150,9 @@ export function SVGOutput4(props: SVGOutputProps) {
 
     //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
     //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
+    const candidatePointIds = new Set(
+        step.candidatePairs.map((pair) => pair.p0.id)
+    );
 
     //für rect und line nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
@@ -198,35 +201,34 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                 {step.allPoints.map((p: Node) => {
                     const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
-                    //const isCandidate = candidatePointIds.has(p.id);
-                    //const isActive    = step.activePoints.some((a) => a.id === p.id);
+                    const isCandidate = candidatePointIds.has(p.id);
+                    const isActive    = step.activePoints.some((a) => a.id === p.id);
                     const isProcessed = step.processedPoints.some((d) => d.id === p.id);
                     const isBest = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
                     const isFuture = step.futurePoints.some((f) => f.id === p.id);
 
                     //TODO: Nochmal nachdenken ob diese darstellung wirklich gut ist!
-                    let fill = "black";
+                    let fill = "#555";
 
+                    if (isFuture) {
+                        fill = "#cccccc";
+                    }
+                    if (isProcessed) {
+                        fill = "#aaaaaa";
+                    }
                     if (isCurrent) {
-                        fill = "#BE3D2A";
-                    } else if (isBest) {
+                        fill = "black";
+                    }
+                    if (isBest) {
                         fill = "#ffd700";
                     }
-                    /*
-                    else if(isCandidate){
-                        fill = "#a855f7";  // im kleinen fenster
-                    }  else if (isActive){
-                        fill = "#4a9eff";  //im großen Fenster
-                    }
-                     */
-                    else if (isProcessed) {
+                    const scale = isCurrent ? 1.2 : 1;
 
-                        fill = "#aaaaaa"; // abgearbeitet
-                    } else if (isFuture) {
-                        fill = "#cccccc";//noch nicht betrachtet
-                    }
+                    let ringStyle: RingStyle = "none";
+                    if (isActive) ringStyle = "active";
+                    if (isCandidate) ringStyle = "candidate";
 
-                    return <XNodeWithCords key={p.id} node={p} fill={fill}/>;
+                    return <XNodeWithCords key={p.id} node={p} fill={fill} scale={scale} ringStyle={ringStyle} />;
                 })}
             </svg>
 
@@ -270,15 +272,6 @@ export function SVGOutput4(props: SVGOutputProps) {
                             .join("; ")
                         }
                     </div>
-                    {/*
-                        <div>
-                        <strong>Future Points:</strong>
-                        {step.futurePoints.length === 0 ? "—"
-                            : step.futurePoints.map((p) => p.label).join(", ")}
-                    </div>
-
-                    */}
-
                 </div>
             </div>
 

@@ -1,18 +1,14 @@
 import type { Node, DynamicNodesProps, XNodeProps } from "./Types.tsx";
-import {useState} from "react";
-//die Punkte zeichnen....
+import { useState } from "react";
 
-//für den input modus
 export function DynamicNodes(props: DynamicNodesProps) {
-    return props.nodes.map((n: Node) => (
+    return props.nodes.map((node: Node) => (
         <g
-            key={n.id}
-            onClick={(e) => {
-                e.stopPropagation();
-            }}
+            key={node.id}
+            onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => {
                 e.stopPropagation();
-                props.onMouseDown(n.id);
+                props.onMouseDown(node.id);
             }}
             onMouseUp={(e) => {
                 e.stopPropagation();
@@ -20,50 +16,72 @@ export function DynamicNodes(props: DynamicNodesProps) {
             }}
             onDoubleClick={(e) => {
                 e.stopPropagation();
-                props.onDoubleClick(n.id);
+                props.onDoubleClick(node.id);
             }}
         >
-            <XNode node={n} fill={"black"}/>
+            <XNodeWithCords node={node} fill="black" />
         </g>
     ));
 }
 
-
-export function XNodeWithCords({ node, fill }: XNodeProps) {
-
+export function XNodeWithCords({ node, fill, scale = 1, ringStyle = "none"}: XNodeProps) {
     const [isHovering, setIsHovering] = useState(false);
 
     return (
-        <g onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <XNode node={node} fill={fill} />
+        <g
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+        >
+            <XNode node={node} fill={fill} scale={scale} ringStyle={ringStyle} />
+
             {isHovering && (
-                <text x={node.x + 10} y={node.y + 20} fill="black" fontSize="12" fontFamily="monospace">
-                    ({node.x}, {node.y})
+                <text
+                    x={node.x + 12}
+                    y={node.y + 22}
+                    fill="black"
+                    fontSize="12"
+                    fontFamily="monospace"
+                >
+                    ({Math.round(node.x)}, {Math.round(node.y)})
                 </text>
             )}
         </g>
     );
 }
 
-export function XNode({ node, fill }: XNodeProps) {
+export function XNode({node, fill, scale = 1, ringStyle = "none"}: XNodeProps) {
     const NODE_SIZE = 4;
-    const HITBOX_RADIUS = 8;
+    const HITBOX_RADIUS = 5;
+    const RING_RADIUS = 9;
 
     return (
-        <g>
+        <g transform={`translate(${node.x}, ${node.y}) scale(${scale})`} style={{transition: "transform 0.2s ease"}}>
+            {ringStyle !== "none" && (
+                <circle
+                    cx={0}
+                    cy={0}
+                    r={RING_RADIUS}
+                    fill="none"
+                    stroke={fill}
+                    strokeWidth={1.5}
+                    strokeDasharray={ringStyle === "candidate" ? "3 2" : undefined}
+                    pointerEvents="none"
+                />
+            )}
+
             <circle
-                cx={node.x}
-                cy={node.y}
+                cx={0}
+                cy={0}
                 r={HITBOX_RADIUS}
                 fill="transparent"
                 pointerEvents="all"
             />
 
             <line
-                x1={node.x - NODE_SIZE}
-                y1={node.y - NODE_SIZE}
-                x2={node.x + NODE_SIZE}
-                y2={node.y + NODE_SIZE}
+                x1={-NODE_SIZE}
+                y1={-NODE_SIZE}
+                x2={NODE_SIZE}
+                y2={NODE_SIZE}
                 stroke={fill}
                 strokeWidth={3}
                 strokeLinecap="round"
@@ -71,10 +89,10 @@ export function XNode({ node, fill }: XNodeProps) {
             />
 
             <line
-                x1={node.x + NODE_SIZE}
-                y1={node.y - NODE_SIZE}
-                x2={node.x - NODE_SIZE}
-                y2={node.y + NODE_SIZE}
+                x1={NODE_SIZE}
+                y1={-NODE_SIZE}
+                x2={-NODE_SIZE}
+                y2={NODE_SIZE}
                 stroke={fill}
                 strokeWidth={3}
                 strokeLinecap="round"
@@ -82,8 +100,8 @@ export function XNode({ node, fill }: XNodeProps) {
             />
 
             <text
-                x={node.x + 10}
-                y={node.y - 10}
+                x={10}
+                y={-10}
                 fontSize="13"
                 fontFamily="monospace"
                 fill={fill}
