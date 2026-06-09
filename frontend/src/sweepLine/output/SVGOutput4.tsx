@@ -228,7 +228,6 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                     return <XNodeWithCords key={p.id} node={p} fill={fill}/>;
                 })}
-
             </svg>
 
             <OutputControl4
@@ -281,13 +280,11 @@ export function SVGOutput4(props: SVGOutputProps) {
                     */}
 
                 </div>
-
             </div>
 
             <ImportExportDialog
-                mode="output"
+                onImport={props.onImport}
                 createExportString={props.createExportString}
-                onImport={() => {}}
             />
 
             <PseudoCodePanel
@@ -295,6 +292,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 activeLineIds={step.pseudoCodeLineIds}
                 title={"Sweep Line PseudoCode"}
             />
+
         </div>
     );
 }
