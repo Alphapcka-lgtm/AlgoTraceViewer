@@ -55,6 +55,11 @@ export function SVGOutput4(props: SVGOutputProps) {
         };
     };
 
+    const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
+        step.pseudoCodeLineIds.includes("shrink-windows"); //dann das candidate window nicht zeigen
+
+    const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
+        step.currentPoint !== null && !isShrinkStep(step);
 
     useGSAP(() => {
         if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -99,11 +104,13 @@ export function SVGOutput4(props: SVGOutputProps) {
 
         //init state setzen
         gsap.set(activeRect, {
-            attr: getActiveRectAttrs(firstStep)
+            attr: getActiveRectAttrs(firstStep),
+            opacity: firstStep.currentPoint !== null ? 1 : 0,
         });
 
         gsap.set(candidateRect, {
-            attr: getCandidateRectAttrs(firstStep)
+            attr: getCandidateRectAttrs(firstStep),
+            opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0,
         });
 
         //startzustand label setzen
@@ -112,16 +119,17 @@ export function SVGOutput4(props: SVGOutputProps) {
         //adding tweens:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
-            const rectOpacity: number = step.currentPoint !== null ? 1 : 0; //beim final step die zwei rects ausblenden
+            const activeRectOpacity: number = step.currentPoint !== null ? 1 : 0;//beim final step die zwei rects ausblenden
+            const candidateRectOpacity: number = shouldShowCandidateWindow(step) ? 1 : 0;
 
             timeline.to(activeRect, {
                 attr: getActiveRectAttrs(step),
-                opacity: rectOpacity,
+                opacity: activeRectOpacity,
             });
 
             timeline.to(candidateRect, {
                 attr: getCandidateRectAttrs(step),
-                opacity: rectOpacity,
+                opacity: candidateRectOpacity,
             }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
@@ -267,9 +275,15 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                     <div>
                         <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
-                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                            .join("; ")
+                        {step.currentPoint === null
+                            ? "—"
+                            : shouldShowCandidateWindow(step)
+                                ? "—"
+                                : step.candidatePairs.length === 0
+                                    ? "No candidates"
+                                    : step.candidatePairs
+                                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                                        .join("; ")
                         }
                     </div>
                 </div>
