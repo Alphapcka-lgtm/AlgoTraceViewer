@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import type {AnimationResponse, AnimationRequest, VertexCoverProps} from "./shared/Types.tsx";
+import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "./../sweepLine/shared/Utils.tsx";
 import type {ExportState} from "./../sweepLine/shared/Types.tsx";
 import {getNodeLabel} from "./shared/Utils.tsx";
@@ -8,10 +8,11 @@ import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
 import {SVGInput} from "./input/SVGInput.tsx";
 import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
 
-export function VertexCover(props: VertexCoverProps) {
+export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState(0);
+    const [variant, setVariant] = useState<VertexCoverVariant>("random");
 
     const [input, setInput] = useState<AnimationRequest>({
         graph: {nodes: [], edges: []},
@@ -31,9 +32,13 @@ export function VertexCover(props: VertexCoverProps) {
     const submitInput = (inp: AnimationRequest) => {
         console.log(inp);
         if (inp.timestamp > output.timestamp) {
-            const labeledInp = {...inp, graph: {nodes: inp.graph.nodes.map((node, index) => {
+            const labeledInp = {
+                ...inp, graph: {
+                    nodes: inp.graph.nodes.map((node, index) => {
                         return {...node, label: getNodeLabel(index)};
-                    }), edges: inp.graph.edges}};
+                    }), edges: inp.graph.edges
+                }
+            };
             fetchAnimation(labeledInp)
                 .then(() => {
                     setProgress(0);
@@ -46,7 +51,7 @@ export function VertexCover(props: VertexCoverProps) {
     };
 
     const fetchAnimation = async (input: AnimationRequest) => {
-        return fetch("http://localhost:8080/" + props.algorithm, {
+        return fetch("http://localhost:8080/vertexCover/" + variant, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(input),
@@ -63,8 +68,8 @@ export function VertexCover(props: VertexCoverProps) {
 
     const handleImport = async (encoded: string) => {
         try {
-            const imported:ExportState = decodeExportState(encoded);
-            if (imported.algorithm === "randomvertexcover" || imported.algorithm === "maxdegreevertexcover") {
+            const imported: ExportState = decodeExportState(encoded);
+            if (imported.algorithm === "vertexCover") {
 
                 fetchAnimation(imported.input)
                     .then(() => {
@@ -76,10 +81,54 @@ export function VertexCover(props: VertexCoverProps) {
         }
     };
 
-    const createExportString = () => encodeExportState({algorithm: props.algorithm, progress, input});
+    const createExportString = () => encodeExportState({algorithm: "vertexCover", progress, input});
 
-    if(props.algorithm === "randomvertexcover"){
-        return (
+    const onTabChange = (v: VertexCoverVariant) => {
+        if (mode === "input") {
+            setInput(prev => {
+                return {...prev, timestamp: Date.now()};
+            })
+            setVariant(v);
+        }
+    }
+
+    const svgOutput = variant === "random" ? (
+        <RandomSVGOutput
+            setProgress={setProgress}
+            progress={progress}
+            setStepIndex={setStepIndex}
+            stepIndex={stepIndex}
+            output={output}
+            onChangeInput={() => setMode("input")}
+            createExportString={createExportString}
+            onImport={handleImport}
+        />
+    ) : variant === "maxDegree" ? (
+        <MaxDegreeSVGOutput
+            setProgress={setProgress}
+            progress={progress}
+            setStepIndex={setStepIndex}
+            stepIndex={stepIndex}
+            output={output}
+            onChangeInput={() => setMode("input")}
+            createExportString={createExportString}
+            onImport={handleImport}
+        />
+    ) : <></>;
+
+    return (
+        <>
+            <nav className="home-nav" style={{
+                padding: "0.25rem",
+                width: "fit-content",
+                marginLeft: "auto",
+                marginRight: "3rem",
+                marginBottom: "1rem"
+            }}>
+                <NavButton variant="random" label="Random" activeVariant={variant} onTabChange={onTabChange}/>
+                <NavButton variant="maxDegree" label="Max Degree" activeVariant={variant} onTabChange={onTabChange}/>
+                <NavButton variant="staticList" label="Static List" activeVariant={variant} onTabChange={onTabChange}/>
+            </nav>
             <div className="algorithm-shell">
                 {mode == "input" ?
                     <SVGInput
@@ -88,45 +137,24 @@ export function VertexCover(props: VertexCoverProps) {
                         onSubmit={submitCurrentInput}
                         createExportString={createExportString}
                         onImport={handleImport}
-                    /> :
-                    <RandomSVGOutput
-                        setProgress={setProgress}
-                        progress={progress}
-                        setStepIndex={setStepIndex}
-                        stepIndex={stepIndex}
-                        output={output}
-                        onChangeInput={() => setMode("input")}
-                        createExportString={createExportString}
-                        onImport={handleImport}
-                    />
+                    /> : svgOutput
                 }
             </div>
-        )
-    }
+        </>
+    )
+}
 
-    if (props.algorithm === "maxdegreevertexcover"){
-        return (
-            <div className="algorithm-shell">
-                {mode == "input" ?
-                    <SVGInput
-                        setInput={setInput}
-                        input={input}
-                        onSubmit={submitCurrentInput}
-                        createExportString={createExportString}
-                        onImport={handleImport}
-                    /> :
-                    <MaxDegreeSVGOutput
-                        setProgress={setProgress}
-                        progress={progress}
-                        setStepIndex={setStepIndex}
-                        stepIndex={stepIndex}
-                        output={output}
-                        onChangeInput={() => setMode("input")}
-                        createExportString={createExportString}
-                        onImport={handleImport}
-                    />
-                }
-            </div>
-        )
-    }
+function NavButton(props: NavButtonProps) {
+    const isActive = props.activeVariant === props.variant;
+
+    return (
+        <button
+            style={{padding: "0.5rem 1.5rem", fontSize: "1rem"}}
+            type="button"
+            onClick={() => props.onTabChange(props.variant)}
+            className={`home-nav-button ${isActive ? "is-active" : ""}`}
+        >
+            {props.label}
+        </button>
+    );
 }
