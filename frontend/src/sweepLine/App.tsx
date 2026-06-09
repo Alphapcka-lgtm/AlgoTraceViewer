@@ -3,7 +3,7 @@ import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
 import type {ExportState, Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
-import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel} from "./shared/Utils.tsx";
+import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "./shared/Utils.tsx";
 import "./App.css";
 
 export default function App() {
@@ -115,6 +115,27 @@ export default function App() {
         }
     };
 
+    //Wert von Slider soll aktuelle Anzahl Nodes zeigen
+    // Slider nach rechts -> zufällige Nodes hinzufügen
+    // Slider nach links -> Nodes am Ende entfernen
+    // Manuelles Hinzufügen oder Löschen -> Slider passt sich automatisch an
+    const handleSetNodeCount = (targetCount: number) => {
+        const PADDING = 80; // das nodes nichts zu sehr an rand sind
+        setInputState((prev) => {
+            //anzahl ist schon richitg ...
+            if (targetCount === prev.nodes.length) return prev;
+            //slider wurde nach links bewegt
+            //wenn z.b vorher: 10 Nodes und jetzt Slider: 6 dann nur ersten 6 nodes (prev.nodes.slice(0, 6))
+            if (targetCount < prev.nodes.length) {
+                return {...prev, nodes: assignLabels(prev.nodes.slice(0, targetCount)), timestamp: Date.now()};
+            }
+            //slider nach rechts
+            const missingCount:number = targetCount - prev.nodes.length;
+            const newNodes = createRandomNodes(missingCount, PADDING, svgWidth, svgHeight);
+            return {...prev, nodes: assignLabels([...prev.nodes, ...newNodes]), timestamp: Date.now()};
+        });
+    };
+
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
@@ -130,6 +151,8 @@ export default function App() {
                     onSubmit={handleNormalSubmit}
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
+
+                    onSetNodeCount={handleSetNodeCount}
                 />
             </div>
         );

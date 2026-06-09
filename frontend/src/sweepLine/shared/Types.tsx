@@ -24,18 +24,16 @@ export type SVGInputProps = {
     height: number;
     width: number;
     mode: string;
-
     nodes: Node[];
-
     onAddNode: (node: Node) => void;
     onMoveNode: (id: string, x: number, y: number) => void;
     onDeleteNode: (id: string) => void;
     onReset: () => void;
-
     onSubmit: () => void;
     onChangeInput: () => void;
-
     onImport: (encoded: string) => void;
+
+    onSetNodeCount: (count: number) => void;
 };
 
 

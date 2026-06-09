@@ -90,6 +90,17 @@ export function SVGInput(props: SVGInputProps) {
                     onImport={props.onImport}
                     createExportString={() => ""}
                 />
+
+                <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>
+                <span style={{ width: 70 }}>Nodes: {props.nodes.length}</span>
+                    <input
+                        className="timeline-slider"
+                        type="range" min={0} max={50} value={props.nodes.length}
+                        onChange={(event) =>
+                            props.onSetNodeCount(Number(event.currentTarget.value))
+                        }
+                    />
+                </label>
             </div>
         </div>
     );
