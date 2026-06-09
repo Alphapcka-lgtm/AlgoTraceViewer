@@ -1,23 +1,22 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
-
-import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
-import {OutputControl4} from "../../../sweepLine/output/OutputControl4.tsx";
-import {PseudoCodePanel} from "../../../sweepLine/output/PseudoCodePanel.tsx";
-import type {SVGOutputProps} from "../../shared/Types.tsx";
-import {Edges} from "../../shared/Edges.tsx";
-import {Nodes} from "../../shared/Nodes.tsx";
-import {getActiveLineIds, PSEUDOCODE} from "./PseudoCode.tsx";
 
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
+import type {SVGOutputProps} from "../shared/Types.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
+import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {Edges} from "../shared/Edges.tsx";
+import {Nodes} from "../shared/Nodes.tsx";
+import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.tsx";
+import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 
 const STEP_DURATION = 1.0;
 
-export function SVGOutput(props: SVGOutputProps) {
+export function MaxDegreeSVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -197,15 +196,13 @@ export function SVGOutput(props: SVGOutputProps) {
             </div>
         </div>
         <PseudoCodePanel
-            lines={PSEUDOCODE}
-            activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
+            lines={PSEUDOCODE_MAX_DEGREE}
+            activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
             title={"Vertex Cover PseudoCode"}
         />
         <ImportExportDialog
-            mode="output"
             createExportString={props.createExportString}
-            onImport={() => {
-            }}
+            onImport={props.onImport}
         />
     </div>;
 }

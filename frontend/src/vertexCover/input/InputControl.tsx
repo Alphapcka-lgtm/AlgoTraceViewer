@@ -28,16 +28,10 @@ export function InputControl(props: InputControlProps) {
     return <>
         <div className="control-row">
             <ImportExportDialog
-                mode="input"
-                createExportString={() => ""}
+                createExportString={props.createExportString}
                 onImport={props.onImport}
             />
-            <ImportExportDialog
-                mode="output"
-                createExportString={props.createExportString}
-                onImport={() => {}}
-            />
-            <button onClick={resetInput} className="control-button" style={{flex: 9}} >Reset</button>
+            <button onClick={resetInput} className="control-button" style={{flex: 13}} >Reset</button>
         </div>
         <div className="control-row">
             <select
@@ -54,8 +48,8 @@ export function InputControl(props: InputControlProps) {
                     }
                 }}
             >
-                {presets.map(preset => {
-                    return <option value={preset.name} >{preset.name}</option>;
+                {presets.map((preset, index) => {
+                    return <option key={index} value={preset.name} >{preset.name}</option>;
                 })}
                 <option value="random" >random</option>
                 <option value="custom" >custom</option>
@@ -81,7 +75,7 @@ function getRandomGraph(n: number, d: number): Graph {
     for (let i = 0; i < n; i++) {
         const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
         const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
-        graph.nodes.push({x: xCoordinate, y: yCoordinate, id: getRandomId()})
+        graph.nodes.push({x: Math.floor(xCoordinate * 1123), y: Math.floor(yCoordinate * 500), id: getRandomId()})
     }
 
     for (let i = 0; i < graph.nodes.length; i++) {

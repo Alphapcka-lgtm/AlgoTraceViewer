@@ -11,20 +11,10 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
-    private static final Map<String, int[]> presets = Map.of("preset", new int[]{0, 2, 2, 3, 5, 4, 2, 2, 0, 2, 2, 0, 1, 6, 2, 2, 2, 7, 6, 4, 6, 5, 8, 0, 0, 2, 0});
-
-    private static final Comparator<NodeDegreePair> comp = (ndp1, ndp2) -> ndp1.node().label().length() == ndp2.node().label().length() ? ndp1.node().label().compareTo(ndp2.node().label()) : ndp1.node().label().length() -  ndp2.node().label().length();
-
     public AnimationResponse solve(Graph graph, Long seed) {
+        seed = seed == 0 ? System.nanoTime() : seed;
 
-        Random randomGenerator;
-
-        if(presets.containsKey("presets")){
-            randomGenerator = new PresetRandom(presets.get("preset"));
-        } else {
-            seed = seed == 0 ? System.nanoTime() : seed;
-            randomGenerator = new Random(seed);
-        }
+        Random randomGenerator = new Random(seed);
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
@@ -63,7 +53,7 @@ public class MaxDegreeVertexCover {
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
                     .sorted(Comparator.comparing(e -> e.getKey().label()))
                     .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
-                    .sorted(comp).toList();
+                    .toList();
 
             intermediateStates.add(AnimationState.builder()
                     .incidentEdges(incidentEdges)
@@ -77,25 +67,11 @@ public class MaxDegreeVertexCover {
                 .initialDegreeMap(initialDegreePairs)
                 .intermediateStates(intermediateStates)
                 .timestamp(System.currentTimeMillis())
+                .randomSeed(seed)
                 .build();
     }
 
     private static Node getNodeById(List<Node> nodes, String id) {
         return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
-    }
-
-    private static class PresetRandom extends Random {
-
-        private final int[] preset;
-        private int index = 0;
-
-        public PresetRandom(int[] preset) {
-            this.preset = preset;
-        }
-
-        @Override
-        public int nextInt(int bound) {
-            return preset[index++];
-        }
     }
 }
