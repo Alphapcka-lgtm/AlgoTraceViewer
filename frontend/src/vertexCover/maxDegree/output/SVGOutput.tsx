@@ -37,7 +37,7 @@ export function SVGOutput(props: SVGOutputProps) {
     useGSAP(() => {
 
         gsap.registerPlugin(DrawSVGPlugin);
-        gsap.registerPlugin(ScrambleTextPlugin)
+        gsap.registerPlugin(ScrambleTextPlugin);
 
         const timeline = gsap.timeline({
             paused: true,

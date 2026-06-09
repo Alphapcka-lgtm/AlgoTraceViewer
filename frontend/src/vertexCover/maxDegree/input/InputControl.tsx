@@ -2,7 +2,8 @@ import type {InputControlProps} from "./Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 
 import {getRandomId} from "../shared/Utils.tsx";
-import {preset} from "./Presets.tsx";
+import {presets} from "./Presets.tsx";
+import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
 
 export function InputControl(props: InputControlProps) {
 
@@ -26,7 +27,17 @@ export function InputControl(props: InputControlProps) {
 
     return <>
         <div className="control-row">
-            <button onClick={resetInput} className="control-button">Reset</button>
+            <button onClick={resetInput} className="control-button" style={{flex: 4}} >Reset</button>
+            <ImportExportDialog
+                mode="input"
+                createExportString={() => ""}
+                onImport={props.onImport}
+            />
+            <ImportExportDialog
+                mode="output"
+                createExportString={props.createExportString}
+                onImport={() => {}}
+            />
         </div>
         <div className="control-row">
             <div className="control-button">
@@ -38,12 +49,14 @@ export function InputControl(props: InputControlProps) {
                         props.setSelected(selected);
                         if(selected === "random") {
                             setRandomGraph();
-                        } else if (selected === "preset") {
-                            props.setInput(preset)
+                        } else if (selected !== "custom") {
+                            props.onImport(presets.filter(preset => preset.name === selected)[0].importString);
                         }
                     }}
                 >
-                    <option value="preset" >preset</option>
+                    {presets.map(preset => {
+                        return <option value={preset.name} >{preset.name}</option>;
+                    })}
                     <option value="random" >random</option>
                     <option value="custom" >custom</option>
                 </select>

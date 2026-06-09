@@ -8,8 +8,6 @@ import {Nodes} from "../shared/Nodes.tsx";
 import * as React from "react";
 import {useRef, useState} from "react";
 import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
-
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -142,11 +140,13 @@ export function SVGInput(props: SVGInputProps) {
             <Edges nodes={props.input.graph.nodes} edges={props.input.graph.edges}/>
             <Nodes nodes={props.input.graph.nodes} {...eventHandler} />
         </svg>
-        <InputControl setInput={props.setInput} input={props.input} setInteraction={setInteraction} setSelected={setSelected} selected={selected}/>
-
-        <ImportExportDialog
-            mode="input"
-            createExportString={() => ""}
+        <InputControl
+            setInput={props.setInput}
+            input={props.input}
+            setInteraction={setInteraction}
+            setSelected={setSelected}
+            selected={selected}
+            createExportString={props.createExportString}
             onImport={props.onImport}
         />
     </div>;

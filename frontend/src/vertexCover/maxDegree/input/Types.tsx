@@ -11,6 +11,7 @@ export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     onSubmit: () => void;
+    createExportString: () => string;
     onImport: (encoded: string) => void;
 };
 
@@ -20,6 +21,8 @@ export type InputControlProps = {
     setInteraction: Dispatch<SetStateAction<Interaction>>,
     selected: string,
     setSelected: Dispatch<SetStateAction<string>>,
+    createExportString: () => string;
+    onImport: (encoded: string) => void;
 };
 
 export type PreviewEdgeProps = {

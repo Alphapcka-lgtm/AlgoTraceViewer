@@ -77,7 +77,7 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
 
     return (
         <>
-            <button type="button" onClick={openDialog} className="control-button" style={{marginTop: "6px"}}>
+            <button type="button" onClick={openDialog} className="control-button">
                 {props.mode === "input" ? "Import" : "Export"}
             </button>
 

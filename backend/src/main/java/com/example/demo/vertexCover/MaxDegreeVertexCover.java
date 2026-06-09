@@ -11,13 +11,15 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
-    private static Map<String, int[]> presets = Map.of("preset", new int[]{0, 2, 2, 3, 5, 4, 2, 2, 0, 2, 2, 0, 1, 6, 2, 2, 2, 7, 6, 4, 6, 5, 8, 0, 0, 2, 0});
+    private static final Map<String, int[]> presets = Map.of("preset", new int[]{0, 2, 2, 3, 5, 4, 2, 2, 0, 2, 2, 0, 1, 6, 2, 2, 2, 7, 6, 4, 6, 5, 8, 0, 0, 2, 0});
+
+    private static final Comparator<NodeDegreePair> comp = (ndp1, ndp2) -> ndp1.node().label().length() == ndp2.node().label().length() ? ndp1.node().label().compareTo(ndp2.node().label()) : ndp1.node().label().length() -  ndp2.node().label().length();
 
     public AnimationResponse solve(Graph graph, Long seed) {
 
         Random randomGenerator;
 
-        if(presets.containsKey("preset")){
+        if(presets.containsKey("presets")){
             randomGenerator = new PresetRandom(presets.get("preset"));
         } else {
             seed = seed == 0 ? System.nanoTime() : seed;
@@ -60,8 +62,8 @@ public class MaxDegreeVertexCover {
 
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
                     .sorted(Comparator.comparing(e -> e.getKey().label()))
-                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue())).sorted(Comparator.comparing(ndp -> ndp.node().label()))
-                    .toList();
+                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
+                    .sorted(comp).toList();
 
             intermediateStates.add(AnimationState.builder()
                     .incidentEdges(incidentEdges)

@@ -28,6 +28,7 @@ export function MaxDegreeVertexCover() {
     });
 
     const submitInput = (inp: AnimationRequest) => {
+        console.log(inp);
         if (inp.timestamp > output.timestamp) {
             const labeledInp = {...inp, graph: {nodes: inp.graph.nodes.map((node, index) => {
                         return {...node, label: getNodeLabel(index)};
@@ -68,13 +69,14 @@ export function MaxDegreeVertexCover() {
                 fetchAnimation(imported.input)
                     .then(() => {
                         setProgress(imported.progress);
-                        setMode("output");
                     });
             }
         } catch (error) {
             console.error("Invalid import string", error);
         }
     };
+
+    const createExportString = () => encodeExportState({algorithm: "heuristicVertexCover", progress, input});
 
     return (
         <div className="algorithm-shell">
@@ -83,6 +85,7 @@ export function MaxDegreeVertexCover() {
                     setInput={setInput}
                     input={input}
                     onSubmit={submitCurrentInput}
+                    createExportString={createExportString}
                     onImport={handleImport}
                 /> :
                 <SVGOutput
@@ -92,7 +95,7 @@ export function MaxDegreeVertexCover() {
                     stepIndex={stepIndex}
                     output={output}
                     onChangeInput={() => setMode("input")}
-                    createExportString={() => encodeExportState({algorithm: "heuristicVertexCover", progress, input})}
+                    createExportString={createExportString}
                 />
             }
         </div>
