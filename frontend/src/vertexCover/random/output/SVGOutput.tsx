@@ -150,15 +150,15 @@ export function SVGOutput(props: SVGOutputProps) {
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
             </div>
         </div>
-        <ImportExportDialog
-            mode="output"
-            createExportString={props.createExportString}
-            onImport={() => {}}
-        />
         <PseudoCodePanel
             lines={PSEUDOCODE}
             activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
             title={"Vertex Cover PseudoCode"}
+        />
+        <ImportExportDialog
+            mode="output"
+            createExportString={props.createExportString}
+            onImport={() => {}}
         />
     </div>;
 }
