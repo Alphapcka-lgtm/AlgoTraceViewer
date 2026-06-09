@@ -124,6 +124,17 @@ public class SLineService {
                     pseudoCodeLineIds
             ));
 
+            List<Point> activePointsAfterShrink = activePoints.stream()
+                    .filter(p -> current.x() - p.x() < deltaAfterCandidateCheck)
+                    .toList();
+
+            List<Point> processedAfterShrink = new ArrayList<>(processed);
+
+            for (Point p : activePoints) {
+                if (current.x() - p.x() >= deltaAfterCandidateCheck) {
+                    processedAfterShrink.add(p);
+                }
+            }
             /*
              * Step i+1: This step only exists when delta became smaller.
              * makes effect of the new delta visible: both sweep windows shrink at the same current point.
@@ -138,11 +149,11 @@ public class SLineService {
                         current.x(),
                         deltaAfterCandidateCheck,          // new best distance
                         deltaAfterCandidateCheck,          // new window size for the shrink step
-                        new ArrayList<>(activePoints),     // current is still not active yet
+                        new ArrayList<>(activePointsAfterShrink),     // current is still not active yet
                         xSorted,
                         bestPairAfterCandidateCheck,
                         candidates.candidatePairs(),
-                        new ArrayList<>(processed),
+                        processedAfterShrink,
                         futurePoints,
                         List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
                 ));
