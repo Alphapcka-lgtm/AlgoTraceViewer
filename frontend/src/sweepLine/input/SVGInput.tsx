@@ -98,9 +98,8 @@ export function SVGInput(props: SVGInputProps) {
                 </button>
 
                 <ImportExportDialog
-                    mode="input"
                     onImport={props.onImport}
-                    createExportString={() => ""}
+                    createExportString={props.createExportString}
                 />
 
                 <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>

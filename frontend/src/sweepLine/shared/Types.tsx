@@ -1,5 +1,5 @@
 import React from "react";
-import type {AnimationRequest} from "../../vertexCover/random/shared/Types.tsx";
+import type {AnimationRequest} from "../../vertexCover/shared/Types.tsx";
 
 export type Node = {
     x: number;
@@ -37,6 +37,8 @@ export type SVGInputProps = {
 
     selectedPreset: string;
     onPresetChange: (selected: string) => void;
+
+    createExportString: () => string;
 };
 
 
@@ -78,6 +80,8 @@ export type SVGOutputProps = {
     setProgress: React.Dispatch<React.SetStateAction<number>>;
 
     createExportString: () => string;
+
+    onImport: (encoded: string) => void;
 };
 
 export type OutputControlProps4 = {

@@ -76,7 +76,8 @@ export default function App() {
             const result = await calculateSteps(labeledNodes);
             //console.log("Algorithm steps:", result);
             setOutputState({steps: result, timestamp: inputTimestamp});
-            setModeState("output");
+
+            //setModeState("output");
         } catch (error) {
             console.error(error);
         }
@@ -171,6 +172,7 @@ export default function App() {
 
                     selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
+                    createExportString={createExportString}
                 />
             </div>
         );
@@ -190,6 +192,7 @@ export default function App() {
                 progress={progress}
                 setProgress={setProgress}
                 createExportString={createExportString}
+                onImport={handleImport}
             />
         </div>
     );

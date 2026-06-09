@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {btnStyle} from "./Utils.tsx";
 
 type ImportExportDialogProps = {
-    mode: "input" | "output";
     onImport: (encoded: string) => void;
     createExportString: () => string;
 };
@@ -11,24 +10,24 @@ type ImportExportDialogProps = {
 //Output: Export möglich, Import nicht möglich
 
 export function ImportExportDialog(props: ImportExportDialogProps) {
-    const [open, setOpen] = useState(false);
+    const [dialogMode, setDialogMode] = useState<"import" | "export" | null>(null);
     const [importValue, setImportValue] = useState("");
     const [exportValue, setExportValue] = useState("");
     const [copied, setCopied] = useState(false);
 
-    const openDialog = () => {
+    const openImportDialog = () => {
         setCopied(false);
-
-        if (props.mode === "output") {
-            const value = props.createExportString();
-            setExportValue(value);
-        }
-        setOpen(true);
+        setImportValue("");
+        setDialogMode("import");
     };
 
-    const closeDialog = () => {
-        setOpen(false);
+    const openExportDialog = () => {
+        setCopied(false);
+        setExportValue(props.createExportString());
+        setDialogMode("export");
     };
+
+    const closeDialog = () => {setDialogMode(null);};
 
     const copyExport = async () => {
         if (!exportValue) return;
@@ -38,50 +37,51 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
 
     const importState = () => {
         const trimmed = importValue.trim();
-        if (!trimmed || !props.onImport) return;
+        if (!trimmed) return;
         props.onImport(trimmed);
         setImportValue("");
-        setOpen(false);
+        closeDialog();
     };
 
-    let dialog = null;
+    const canImport = importValue.trim().length > 0;
+    const dialogTitle = dialogMode === "import" ? "Import" : dialogMode === "export" ? "Export" : "";
 
-    if (open) {
-        dialog = (
-            <div style={overlayStyle} onClick={closeDialog}>
-                <div style={dialogStyle} onClick={(event) => event.stopPropagation()}>
-                    <h3 style={{marginTop: 0}}>
-                        {props.mode === "input" ? "Import" : "Export"}
-                    </h3>
-
-                    {props.mode === "input" ? (
-                        <ImportDialog
-                            importValue={importValue}
-                            setImportValue={setImportValue}
-                            importState={importState}
-                            closeDialog={closeDialog}
-                            canImport={!!importValue.trim() && !!props.onImport}
-                        />
-                    ) : (
-                        <ExportDialog
-                            exportValue={exportValue}
-                            copyExport={copyExport}
-                            closeDialog={closeDialog}
-                            copied={copied}
-                        />
-                    )}
-                </div>
-            </div>
+    let dialogContent = null;
+    if (dialogMode === "import") {
+        dialogContent = (
+            <ImportDialog
+                importValue={importValue}
+                setImportValue={setImportValue}
+                importState={importState}
+                closeDialog={closeDialog}
+                canImport={canImport}
+            />
+        );
+    } else if (dialogMode === "export") {
+        dialogContent = (
+            <ExportDialog
+                exportValue={exportValue}
+                copyExport={copyExport}
+                closeDialog={closeDialog}
+                copied={copied}
+            />
         );
     }
 
     return (
         <>
-            <button type="button" onClick={openDialog} className="control-button">
-                {props.mode === "input" ? "Import" : "Export"}
-            </button>
-
-            {dialog}
+            <button type="button" onClick={openImportDialog} className="control-button">Import</button>
+            <button type="button" onClick={openExportDialog} className="control-button">Export</button>
+            {dialogMode && (
+                <div style={overlayStyle} onClick={closeDialog}>
+                    <div style={dialogStyle}
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <h3 style={{ marginTop: 0 }}>{dialogTitle}</h3>
+                        {dialogContent}
+                    </div>
+                </div>
+            )}
         </>
     );
 }

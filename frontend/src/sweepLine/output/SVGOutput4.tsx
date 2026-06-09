@@ -283,9 +283,8 @@ export function SVGOutput4(props: SVGOutputProps) {
             </div>
 
             <ImportExportDialog
-                mode="output"
+                onImport={props.onImport}
                 createExportString={props.createExportString}
-                onImport={() => {}}
             />
 
             <PseudoCodePanel
