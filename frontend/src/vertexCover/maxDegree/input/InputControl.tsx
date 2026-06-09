@@ -27,7 +27,6 @@ export function InputControl(props: InputControlProps) {
 
     return <>
         <div className="control-row">
-            <button onClick={resetInput} className="control-button" style={{flex: 4}} >Reset</button>
             <ImportExportDialog
                 mode="input"
                 createExportString={() => ""}
@@ -38,6 +37,7 @@ export function InputControl(props: InputControlProps) {
                 createExportString={props.createExportString}
                 onImport={() => {}}
             />
+            <button onClick={resetInput} className="control-button" style={{flex: 9}} >Reset</button>
         </div>
         <div className="control-row">
             <div className="control-button">
