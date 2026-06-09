@@ -1,163 +1,77 @@
-private final static int EXTENDED_ASCII_SIZE = 256;
+import com.example.demo.experiments.data.TypeMap;
 
-private final static char S_TYPE = 'S';
-private final static char L_TYPE = 'L';
+//boolean test = true;
 
-boolean test = true;
+static String source;
 
 void main() {
-//    int[] arr = new int[]{2, -1, 4};
-//    showSuffixArray(arr);
-//    showSuffixArray(arr, 2);
-//    IO.println(String.format("'a'=%d", (int) 'a'));
-//    IO.println(String.format("'%c'=%d", (char) ((short) 0), (int) ((char) 0)));
+    source = "immissiissippi";
+    source = "banana";
 
-    String source = "cabbage";
-    int[] cabbageBuckets = findBucketSizes(source);
-    char[] cabbageTypes = buildTypeMap(source);
-    int[] cabbageGuess = guessLmsSort(source, cabbageBuckets, cabbageTypes);
-
-//    IO.println(Arrays.toString(cabbageBuckets));
-//    IO.println(Arrays.toString(cabbageTypes));
-//    IO.println(Arrays.toString(cabbageGuess));
-
-    IO.println("induce sort l");
-    induceSortL(source, cabbageGuess, cabbageBuckets, cabbageTypes);
-    IO.println("induce sort s");
-    induceSortS(source, cabbageGuess, cabbageBuckets, cabbageTypes);
-
-    IO.println("summary");
-    SuffixArraySummary summary = summariseSuffixArray(source, cabbageGuess, cabbageTypes);
-    IO.println(summary.summaryString);
-    IO.println(summary.summaryAlphabetSize);
-    IO.println(summary.summarySuffixOffsets);
-
-    IO.println("make summary suffix array");
-    int[] summarySuffixArray = makeSummarySuffixArray(summary.summaryString, summary.summaryAlphabetSize);
-    showSuffixArray(summarySuffixArray);
-
-    IO.println("accurate lms sort");
-    int[] cabbageReal = accurateLMSSort(source, cabbageBuckets, cabbageTypes, summarySuffixArray, summary.summarySuffixOffsets);
-    showSuffixArray(cabbageReal);
-
-    IO.println(Arrays.toString(makeSuffixArrayByInducedSorting(source, 256)));
+    IO.println(Arrays.toString(suffixArray(source)));
+//    for (char i = 'a'; i < 'a' + 26; i++) {
+//        IO.println(i);
+//    }
 }
 
 /**
  * Make a suffix array with LMS-substrings approximately right.
  */
-int[] guessLmsSort(final String source, final int[] bucketSizes, final char[] typeMap) {
+int[] guessLmsSort(final int[] text, final int[] bucketSizes, final TypeMap typeMap, int alphabetSize, final boolean trackSteps) {
     // Create a suffix array with room for a pointer to every suffix of
     // the string, including the empty suffix at the end.
-    final int[] guessedSuffixArray = new int[source.length() + 1];
+    final int[] guessedSuffixArray = new int[text.length];
     Arrays.fill(guessedSuffixArray, -1);
 
-    final List<Integer> bucketTails = findBucketTails(bucketSizes);
+    final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
     // Bucket-sort all the LMS suffixes into their appropriate bucket.
-    for (int i = 0; i < source.length(); i++) {
-        if (!isLmsChar(i, typeMap)) {
+    IO.println("Sort all lms suffixes into appropriate bucket");
+    for (int i = 0; i < text.length; i++) {
+        if (!typeMap.isLmsChar(i)) {
             // Not the start of an LMS suffix
             continue;
         }
 
         // Which bucket does this suffix go into?
-        char bucketIndex;
-        if (test) {
-            bucketIndex = (char) (source.charAt(i) - 'a');
-        } else {
-            bucketIndex = source.charAt(i);
-        }
+        int bucketIndex;
+        bucketIndex = text[i];
         // Add the start position at the tail of the bucket...
-        guessedSuffixArray[bucketTails.get(bucketIndex)] = i;
+        guessedSuffixArray[bucketTails[bucketIndex]] = i;
+        if (trackSteps) {
+            char c = (i < source.length()) ? source.charAt(i) : '$';
+            IO.println(c + "(" + i + ")" + " -> " + bucketTails[bucketIndex]);
+            showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+        }
         // ... and move the tail pointer down.
-        bucketTails.set(bucketIndex, bucketTails.get(bucketIndex) - 1);
+        bucketTails[bucketIndex]--;
 
         // Show the current state of the array
-        showSuffixArray(guessedSuffixArray);
+//        showSuffixArray(guessedSuffixArray);
     }
 
-    // The empty suffix is defined to be an LMS-substring, and we know
-    // it goes at the front.
-    guessedSuffixArray[0] = source.length();
-
-    showSuffixArray(guessedSuffixArray);
     return guessedSuffixArray;
 }
 
-/**
- *
- * @param offset  the offset
- * @param typeMap the typemap
- * @return <code>true</code> if the character at offset is a left-most S-type.
- */
-boolean isLmsChar(final int offset, final char[] typeMap) {
-    if (offset <= 0 || offset >= typeMap.length) {
-        return false;
-    }
+int[] findBucketSizes(final int[] text, final int alphabetSize) {
+    final int[] res = new int[alphabetSize + 1];
 
-    if (typeMap[offset] == S_TYPE && typeMap[offset - 1] == L_TYPE) {
-        return true;
-    }
-
-    return false;
-}
-
-char[] buildTypeMap(final String data) {
-    final char[] res = new char[data.length() + 1];
-    res[data.length()] = S_TYPE;
-
-    if (data.isEmpty()) {
-        return res;
-    }
-
-    res[data.length() - 1] = L_TYPE;
-
-    for (int i = data.length() - 2; i > -1; i--) {
-        if (data.charAt(i) > data.charAt(i + 1)) {
-            res[i] = L_TYPE;
-        } else if (data.charAt(i) == data.charAt(i + 1) && res[i + 1] == L_TYPE) {
-            res[i] = L_TYPE;
-        } else {
-            res[i] = S_TYPE;
-        }
+    for (int c : text) {
+        res[c]++;
     }
 
     return res;
 }
 
-int[] findBucketSizes(final String source) {
-    return findBucketSizes(source, EXTENDED_ASCII_SIZE);
-}
-
-int[] findBucketSizes(final String source, final int alphabetSize) {
-    final int[] res = new int[alphabetSize];
-
-    for (char c : source.toCharArray()) {
-        /*
-         * TODO: good idea to later make it more easily viewable for visualization
-         *  but it currently results in wrong guesses
-         */
-        // use this so that 'a' is at the first place of the array
-        if (test) {
-            res[c - 'a']++;
-        } else {
-            res[c]++;
-        }
+int[] findBucketTails(final int[] bucketSizes, int alphabetSize) {
+    int[] end = new int[alphabetSize + 1];
+    int sum = 0;
+    for (int i = 0; i <= alphabetSize; i++) {
+        sum += bucketSizes[i];
+        end[i] = sum - 1;
     }
 
-    return res;
-}
-
-List<Integer> findBucketTails(final int[] bucketSizes) {
-    int offset = 1;
-    final List<Integer> res = new ArrayList<>();
-    for (int bucketSize : bucketSizes) {
-        offset += bucketSize;
-        res.add(offset - 1);
-    }
-
-    return res;
+    return end;
 }
 
 
@@ -184,14 +98,15 @@ void showSuffixArray(final int[] arr) {
 /**
  * Slot L-Type suffixes into place
  *
- * @param source
+ * @param text
  * @param guessedSuffixArray
  * @param bucketSizes
  * @param typeMap
  */
-void induceSortL(final String source, final int[] guessedSuffixArray, final int[] bucketSizes, final char[] typeMap) {
-    final List<Integer> bucketHeads = findBucketHeads(bucketSizes);
+void induceSortL(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps) {
+    final int[] bucketHeads = findBucketHeads(bucketSizes, alphabetSize);
 
+    IO.println("Inducing L-suffixes");
     for (int i = 0; i < guessedSuffixArray.length; i++) {
         if (guessedSuffixArray[i] == -1) {
             // No offset is recorded here.
@@ -209,43 +124,52 @@ void induceSortL(final String source, final int[] guessedSuffixArray, final int[
             continue;
         }
 
-        if (typeMap[j] != L_TYPE) {
+        if (typeMap.getType(j) != TypeMap.Type.L_TYPE) {
             // We're only interested in L-type suffixes right now.
             continue;
         }
 
-        char bucketIndex;
-        if (test) {
-            bucketIndex = (char) (source.charAt(j) - 'a');
-        } else {
-            bucketIndex = source.charAt(j);
-        }
+        int bucketIndex;
+//        if (test) {
+        bucketIndex = text[j];
+//        } else {
+//            bucketIndex = source.charAt(j);
+//        }
         // Add the start position at the head of the bucket...
-        guessedSuffixArray[bucketHeads.get(bucketIndex)] = j;
-        // ...and move the head pointer up.
-        bucketHeads.set(bucketIndex, bucketHeads.get(bucketIndex) + 1);
+        guessedSuffixArray[bucketHeads[bucketIndex]] = j;
 
-        showSuffixArray(guessedSuffixArray, i);
+        if (trackSteps) {
+            char c = (j < source.length()) ? source.charAt(j) : '$';
+            IO.println(c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]);
+            showSuffixArray(guessedSuffixArray, bucketHeads[bucketIndex]);
+        }
+
+        // ...and move the head pointer up.
+        bucketHeads[bucketIndex]++;
+
+//        showSuffixArray(guessedSuffixArray, i);
     }
 }
 
-List<Integer> findBucketHeads(final int[] bucketSizes) {
-    int offset = 1;
-    final List<Integer> res = new ArrayList<>();
-    for (int bucketSize : bucketSizes) {
-        res.add(offset);
-        offset += bucketSize;
+int[] findBucketHeads(final int[] bucketSizes, int alphabetSize) {
+    int[] heads = new int[alphabetSize + 1];
+
+    int sum = 0;
+    for (int i = 0; i <= alphabetSize; i++) {
+        heads[i] = sum;
+        sum += bucketSizes[i];
     }
 
-    return res;
+    return heads;
 }
 
 /**
  * Slot S-type suffixes into place
  */
-void induceSortS(final String source, final int[] guessedSuffixArray, final int[] bucketSizes, final char[] typeMap) {
-    final List<Integer> bucketTails = findBucketTails(bucketSizes);
+void induceSortS(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps) {
+    final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
+    IO.println("Inducing S-suffixes");
     for (int i = guessedSuffixArray.length - 1; i > -1; i--) {
         int j = guessedSuffixArray[i] - 1;
         if (j < 0) {
@@ -257,120 +181,38 @@ void induceSortS(final String source, final int[] guessedSuffixArray, final int[
             continue;
         }
 
-        if (typeMap[j] != S_TYPE) {
+        if (typeMap.getType(j) != TypeMap.Type.S_TYPE) {
             // We're only interested in S-type suffixes right now.
             continue;
         }
 
         // Which bucket does this suffix go into?
-        char bucketIndex;
-        if (test) {
-            bucketIndex = (char) (source.charAt(j) - 'a');
-        } else {
-            bucketIndex = source.charAt(j);
-        }
+        int bucketIndex = text[j];
         // Add the start position at the tail of the bucket...
-        guessedSuffixArray[bucketTails.get(bucketIndex)] = j;
+        guessedSuffixArray[bucketTails[bucketIndex]] = j;
+
+        if (trackSteps) {
+            char c = (j < source.length()) ? source.charAt(j) : '$';
+            IO.println(c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]);
+            showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+        }
+
         // ...and move the tail pointer down.
-        bucketTails.set(bucketIndex, bucketTails.get(bucketIndex) - 1);
+        bucketTails[bucketIndex]--;
 
-        showSuffixArray(guessedSuffixArray, i);
+//        showSuffixArray(guessedSuffixArray, i);
     }
-}
-
-/**
- * Construct a 'summary string' of the positions of LMS-substrings.
- */
-SuffixArraySummary summariseSuffixArray(final String source, final int[] guessedSuffixArray, final char[] typeMap) {
-    // We will use this array to store the names of LMS substring in the positions they appear in the original string
-    final int[] lmsNames = new int[source.length() + 1];
-    Arrays.fill(lmsNames, -1);
-
-    // Keep track of what names we've allocated
-    int currentName = 0;
-
-    // Where in the original string was the last LMS suffix we checked?
-    int lastLMSSuffixOffset = -1; // TODO: in python is None
-
-    /*
-     * We know that the first LMS-substring we'll see will always be the one
-     * representing the empty suffix, and it will always be at position 0 of
-     * suffixOffset
-     */
-    lmsNames[guessedSuffixArray[0]] = currentName;
-    lastLMSSuffixOffset = guessedSuffixArray[0];
-
-    showSuffixArray(lmsNames);
-
-    // For each suffix in the suffix array...
-    for (int i = 1; i < source.length(); i++) {
-        // ...where does this suffix appear in the original string?
-        int suffixOffset = guessedSuffixArray[i];
-
-        // We only care about LMS suffixes.
-        if (!isLmsChar(suffixOffset, typeMap)) {
-            continue;
-        }
-
-        /*
-         * If this LMS suffix starts with a different LMS substring
-         * from the last suffix we looked at...
-         */
-        if (!lmsSubstringsAreEqual(source, typeMap, lastLMSSuffixOffset, suffixOffset)) {
-            // ...then it gets a new name
-            currentName++;
-        }
-
-        // Record the last suffix we looked at.
-        lastLMSSuffixOffset = suffixOffset;
-
-        /*
-         * Store the name of this LMS suffix in lmsNames, in the same place
-         * this suffix occurs in the original string.
-         */
-        lmsNames[suffixOffset] = currentName;
-        showSuffixArray(lmsNames);
-    }
-
-    /*
-     * Now lmsNames contains all the characters of the suffix string in the correct order,
-     * but it also contains a lot of unused indexes we don't care about and which we want
-     * to remove. We also take this opportunity to build summarySuffixOffsets, which tells
-     * us which LMS-suffix each item in the summary string represents.
-     * This will be important later.
-     */
-    final List<Integer> summarySuffixOffsets = new ArrayList<>();
-    final List<Integer> summaryString = new ArrayList<>();
-    for (int i = 0; i < lmsNames.length; i++) {
-        int name = lmsNames[i];
-        if (name == -1) {
-            continue;
-        }
-
-        summarySuffixOffsets.add(i);
-        summaryString.add(name);
-    }
-
-    /*
-     * The alphabetically smallest character in the summary string is numbered zero,
-     * so the total number of characters i our alphabet is one larger than the largest
-     * numbered character.
-     */
-    int summaryAlphabetSize = currentName + 1;
-
-    // return summaryString, summaryAlphabetSize, summarySuffixOffsets
-    return new SuffixArraySummary(summaryString, summaryAlphabetSize, summarySuffixOffsets);
 }
 
 /**
  *
- * @param source  the source string
+ * @param text    the source string
  * @param typemap typemap of source string
  * @param offsetA first offset
  * @param offsetB second offset
  * @return <code>true</code> if LMS substrings at offsetA and offsetB are equal.
  */
-boolean lmsSubstringsAreEqual(final String source, final char[] typemap, final int offsetA, final int offsetB) {
+boolean lmsSubstringsAreEqual(final int[] text, final TypeMap typemap, final int offsetA, final int offsetB) {
 
     // disallow negative offsets
     if (offsetA < 0 || offsetB < 0) {
@@ -378,14 +220,14 @@ boolean lmsSubstringsAreEqual(final String source, final char[] typemap, final i
     }
 
     // no other substring is equal to the empty suffix.
-    if (offsetA == source.length() || offsetB == source.length()) {
+    if (offsetA == text.length || offsetB == text.length) {
         return false;
     }
 
     int i = 0;
     while (true) {
-        final boolean aIsLms = isLmsChar(i + offsetA, typemap);
-        final boolean bIsLms = isLmsChar(i + offsetB, typemap);
+        final boolean aIsLms = typemap.isLmsChar(i + offsetA);
+        final boolean bIsLms = typemap.isLmsChar(i + offsetB);
 
         // if we've found the start of the next LMS substrings...
         if (i > 0 && aIsLms && bIsLms) {
@@ -400,7 +242,7 @@ boolean lmsSubstringsAreEqual(final String source, final char[] typemap, final i
             return false;
         }
 
-        if (source.charAt(i + offsetA) != source.charAt(i + offsetB)) {
+        if (text[i + offsetA] != text[i + offsetB]) {
             // we found a character difference, we're done
             return false;
         }
@@ -410,127 +252,144 @@ boolean lmsSubstringsAreEqual(final String source, final char[] typemap, final i
 }
 
 /**
- * Construct a sorted suffix array of the summary string.
- */
-int[] makeSummarySuffixArray(final List<Integer> summaryString, final int summaryAlphabetSize) {
-    if (summaryAlphabetSize == summaryString.size()) {
-        /*
-         * Every character of this summary string appears once and only once,
-         * so we can make the suffix array with a bucket sort.
-         */
-        final int[] summarySuffixArray = new int[summaryString.size() + 1];
-        Arrays.fill(summarySuffixArray, -1);
-
-        // Always include the empty suffix at the beginning.
-        summarySuffixArray[0] = summaryString.size();
-
-        for (int i = 0; i < summaryString.size(); i++) {
-            int y = summaryString.get(i);
-            summarySuffixArray[y + 1] = i;
-        }
-        return summarySuffixArray;
-    } else {
-        // This summary string is a little more complex, so we'll have to use recursion
-        return makeSummarySuffixArray(summaryString, summaryAlphabetSize);
-    }
-}
-
-/**
- * Make a suffix array with LMS suffixes exactly right.
- *
- * @return
- */
-int[] accurateLMSSort(final String string, final int[] bucketSizes, final char[] typeMap, final int[] summarySuffixArray, final List<Integer> summarySuffixOffsets) {
-    // A suffix for every character, plus the empty suffix.
-    final int[] suffixOffsets = new int[string.length() + 1];
-    Arrays.fill(suffixOffsets, -1);
-
-    /*
-     * As before, we'll be adding suffixes to the ends of their respective buckets,
-     * so to keep them in the right order we'll have to iterate through summarySuffixArray
-     * in reverse order
-     */
-    final List<Integer> bucketTails = findBucketTails(bucketSizes);
-    for (int i = summarySuffixArray.length - 1; i > 1; i--) {
-        int stringIndex = summarySuffixOffsets.get(summarySuffixArray[i]);
-
-        // Which bucket does this suffix go into?
-        char bucketIndex;
-        if (test) {
-            bucketIndex = (char) (string.charAt(stringIndex) - 'a');
-        } else {
-            bucketIndex = string.charAt(stringIndex);
-        }
-        // Add the suffix at the tail of the bucket...
-        suffixOffsets[bucketTails.get(bucketIndex)] = stringIndex;
-        // ...and move the tail pointer down.
-        bucketTails.set(bucketIndex, bucketTails.get(bucketIndex) - 1);
-        showSuffixArray(suffixOffsets);
-    }
-
-    // Always include the empty suffix at the beginning
-    suffixOffsets[0] = string.length();
-
-    showSuffixArray(suffixOffsets);
-
-    return suffixOffsets;
-}
-
-/**
  * Compute the suffix array of `string` with the SA-IS algorithm.
  *
- * @param string       the string for which to create the suffix array (never <code>null</code>)
+ * @param text         the string for which to create the suffix array (never <code>null</code>)
  * @param alphabetSize the size of the alphabet
  * @return
  */
-int[] makeSuffixArrayByInducedSorting(final String string, final int alphabetSize) {
-    Objects.requireNonNull(string);
+int[] sais(final int[] text, final int alphabetSize, final boolean trackSteps) {
+    Objects.requireNonNull(text);
     if (alphabetSize < 0) {
         throw new IllegalArgumentException("alphabet size cannot be negative");
     }
 
     // Classify each character of the String as S-type of L-type
-    final char[] typeMap = buildTypeMap(string);
+//    final char[] typeMapOld = buildTypeMap(string);
+    final TypeMap typeMap = TypeMap.buildTypeMap(text);
 
     /*
      * We'll be slotting suffixes into buckets according to what
      * character they start with, so let's precompute that info now.
      */
-    final int[] bucketSizes;
-    if (test) {
-        bucketSizes = findBucketSizes(string, 26);
-    } else {
-        bucketSizes = findBucketSizes(string, alphabetSize);
-    }
+    final int[] bucketSizes = findBucketSizes(text, alphabetSize);
 
     /*
      * Usa a simple bucket-sort to insert all the LMS suffixes into
      * approximately the right place of the suffix array
      */
-    final int[] guessedSuffixArray = guessLmsSort(string, bucketSizes, typeMap);
+    final int[] guessedSuffixArray = guessLmsSort(text, bucketSizes, typeMap, alphabetSize, trackSteps);
 
     /*
      * Slot all the other suffixes into guessedSuffixArray, by using induced sorting.
      * This may move the LMS suffixes around.
      */
-    induceSortL(string, guessedSuffixArray, bucketSizes, typeMap);
-    induceSortS(string, guessedSuffixArray, bucketSizes, typeMap);
+    induceSortL(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps);
+    induceSortS(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps);
 
-    // Create a new string that summarizes the relative order of LMS suffixes in the guessed suffix array
-    final SuffixArraySummary summary = summariseSuffixArray(string, guessedSuffixArray, typeMap);
+    final int lmsCount = typeMap.getLmsCount();
 
-    // Make a sorted suffix array of the summary string.
-    final int[] summarySuffixArray = makeSummarySuffixArray(summary.summaryString(), summary.summaryAlphabetSize());
+    // lms suffixes in the sorted order
+    final int[] lmsOrder = new int[lmsCount];
+    int idx = 0;
+    for (int pos : guessedSuffixArray) {
+        if (pos >= 0 && typeMap.isLmsChar(pos)) {
+            lmsOrder[idx++] = pos;
+        }
+    }
 
-    // Using the suffix array of the summary string, determine exactly where the LMS suffixes go in our final array.
-    final int[] result = accurateLMSSort(string, bucketSizes, typeMap, summarySuffixArray, summary.summarySuffixOffsets);
+    // assign a names to lms substring
+    final int[] lmsNames = new int[text.length];
+    Arrays.fill(lmsNames, -1);
+    int currentName = 0;
+    // first lms substring always gets name 0.
+    lmsNames[lmsOrder[0]] = 0;
+    for (int i = 1; i < lmsCount; i++) {
+        int a = lmsOrder[i - 1];
+        int b = lmsOrder[i];
+
+        boolean different = !lmsSubstringsAreEqual(text, typeMap, a, b);
+
+        if (different) {
+            currentName++;
+        }
+
+        lmsNames[b] = currentName;
+    }
+
+    IO.println("LMS Order\tName");
+    for (int i = 0; i < lmsOrder.length; i++) {
+        IO.println(lmsOrder[i] + " -> " + lmsNames[lmsOrder[i]]);
+    }
+
+    // scan lms positions in text order, not suffix order.
+    final int[] reduced = new int[lmsCount];
+    final int[] lmsPositions = new int[lmsCount];
+    idx = 0;
+    for (int i = 0; i < text.length; i++) {
+        if (typeMap.isLmsChar(i)) {
+            reduced[idx] = lmsNames[i];
+            lmsPositions[idx] = i;
+            idx++;
+        }
+    }
+
+    IO.println("names in text order");
+    for (int i = 0; i < lmsPositions.length; i++) {
+        IO.println(lmsPositions[i] + " -> " + lmsNames[lmsPositions[i]]);
+    }
+
+    IO.println("reduced text: " + Arrays.toString(reduced));
+
+    final int[] reducedSa;
+    if (currentName + 1 == lmsCount) {
+        reducedSa = new int[lmsCount];
+        for (int i = 0; i < lmsCount; i++) {
+            reducedSa[reduced[i]] = i;
+        }
+    } else {
+        IO.println("Reduced sa with recursion");
+        reducedSa = sais(reduced, currentName, false);
+    }
+
+    IO.println("reduced suffix array: " + Arrays.toString(reducedSa));
+
+    final int[] result = new int[text.length];
+    Arrays.fill(result, -1);
+
+    final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
+
+    IO.println("final lms placement");
+    for (int i = reducedSa.length - 1; i >= 0; i--) {
+        int lmsIndex = reducedSa[i];
+
+        if (lmsIndex >= lmsPositions.length) {
+            continue;
+        }
+
+        int pos = lmsPositions[lmsIndex];
+        int bucketIndex = text[pos];
+        result[bucketTails[bucketIndex]] = pos;
+        if (trackSteps) {
+            char c = (pos < source.length()) ? source.charAt(pos) : '$';
+            IO.println(c + "(" + pos + ")" + " -> " + bucketTails[bucketIndex]);
+            showSuffixArray(result, bucketTails[pos]);
+        }
+        bucketTails[text[pos]]--;
+    }
 
     // * ...and once again, slot all the other suffixes into place with induced sorting.
-    induceSortL(string, result, bucketSizes, typeMap);
-    induceSortS(string, result, bucketSizes, typeMap);
+    induceSortL(text, result, bucketSizes, typeMap, alphabetSize, trackSteps);
+    induceSortS(text, result, bucketSizes, typeMap, alphabetSize, trackSteps);
 
     return result;
 }
 
-record SuffixArraySummary(List<Integer> summaryString, int summaryAlphabetSize, List<Integer> summarySuffixOffsets) {
+int[] suffixArray(final String string) {
+    final int[] text = new int[string.length() + 1];
+    for (int i = 0; i < string.length(); i++) {
+        text[i] = string.charAt(i) - 'a' + 1;
+    }
+    text[string.length()] = 0; // sentinel
+    return sais(text, 27, true);
 }
