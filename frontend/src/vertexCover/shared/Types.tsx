@@ -1,3 +1,5 @@
+import type {Dispatch, SetStateAction} from "react";
+
 export type Node = {
     x: number,
     y: number,
@@ -32,6 +34,7 @@ export type EdgesProps = {
 
 export type AnimationResponse = {
     initialState: Graph,
+    initialDegreeMap: NodeDegreePair[]
     intermediateStates: AnimationState[],
     randomSeed: number,
     timestamp: number,
@@ -41,11 +44,27 @@ export type AnimationState = {
     chosenEdge: Edge,
     chosenNodes: Node[],
     incidentEdges: Edge[],
+    degreeMap: NodeDegreePair[]
 };
+
+type NodeDegreePair = {
+    node: Node,
+    degree: number,
+}
 
 export type AnimationRequest = {
     graph: Graph,
     densityFactor: number,
     randomSeed: number,
     timestamp: number,
+};
+
+export type SVGOutputProps = {
+    output: AnimationResponse,
+    progress: number,
+    setProgress:  Dispatch<SetStateAction<number>>,
+    stepIndex: number,
+    setStepIndex:  Dispatch<SetStateAction<number>>,
+    onChangeInput: () => void;
+    createExportString: () => string;
 };

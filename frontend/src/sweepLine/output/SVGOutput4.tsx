@@ -291,6 +291,7 @@ export function SVGOutput4(props: SVGOutputProps) {
             <PseudoCodePanel
                 lines={SWEEP_LINE_PSEUDOCODE}
                 activeLineIds={step.pseudoCodeLineIds}
+                title={"Sweep Line PseudoCode"}
             />
 
         </div>
