@@ -1,24 +1,20 @@
-import type {SVGOutputProps} from "./Types.tsx";
-
-import {
-    createStepLabels,
-    getActiveLineIds,
-    getStepIndexFromTimeline,
-    RANDOM_VERTEX_COVER_PSEUDOCODE
-} from "../shared/Utils.tsx";
-import {Edges} from "../shared/Edges.tsx";
-import {Nodes} from "../shared/Nodes.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 
-import gsap from "gsap";
-import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
 import {OutputControl4} from "../../../sweepLine/output/OutputControl4.tsx";
 import {PseudoCodePanel} from "../../../sweepLine/output/PseudoCodePanel.tsx";
+import type {SVGOutputProps} from "../../shared/Types.tsx";
+import {Edges} from "../../shared/Edges.tsx";
+import {Nodes} from "../../shared/Nodes.tsx";
+import {getActiveLineIds, PSEUDOCODE} from "./PseudoCode.tsx";
 
-const STEP_DURATION = 0.5;
+import gsap from "gsap";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+
+const STEP_DURATION = 1.0;
 
 export function SVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -160,7 +156,7 @@ export function SVGOutput(props: SVGOutputProps) {
             onImport={() => {}}
         />
         <PseudoCodePanel
-            lines={RANDOM_VERTEX_COVER_PSEUDOCODE}
+            lines={PSEUDOCODE}
             activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
             title={"Vertex Cover PseudoCode"}
         />

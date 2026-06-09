@@ -3,7 +3,7 @@ import type {Graph} from "../shared/Types.tsx";
 
 import {getRandomId} from "../shared/Utils.tsx";
 import {presets} from "./Presets.tsx";
-import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
+import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 
 export function InputControl(props: InputControlProps) {
 
@@ -40,27 +40,26 @@ export function InputControl(props: InputControlProps) {
             <button onClick={resetInput} className="control-button" style={{flex: 9}} >Reset</button>
         </div>
         <div className="control-row">
-            <div className="control-button">
-                <div >Preset:</div>
-                <select
-                    value={props.selected}
-                    onChange={(e) => {
-                        const selected = e.target.value;
-                        props.setSelected(selected);
-                        if(selected === "random") {
-                            setRandomGraph();
-                        } else if (selected !== "custom") {
-                            props.onImport(presets.filter(preset => preset.name === selected)[0].importString);
-                        }
-                    }}
-                >
-                    {presets.map(preset => {
-                        return <option value={preset.name} >{preset.name}</option>;
-                    })}
-                    <option value="random" >random</option>
-                    <option value="custom" >custom</option>
-                </select>
-            </div>
+            <select
+                className="control-select"
+                style={{flex: 1}}
+                value={props.selected}
+                onChange={(e) => {
+                    const selected = e.target.value;
+                    props.setSelected(selected);
+                    if(selected === "random") {
+                        setRandomGraph();
+                    } else if (selected !== "custom") {
+                        props.onImport(presets.filter(preset => preset.name === selected)[0].importString);
+                    }
+                }}
+            >
+                {presets.map(preset => {
+                    return <option value={preset.name} >{preset.name}</option>;
+                })}
+                <option value="random" >random</option>
+                <option value="custom" >custom</option>
+            </select>
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
                 <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}

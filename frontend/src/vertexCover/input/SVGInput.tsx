@@ -7,7 +7,7 @@ import {InputControl} from "./InputControl.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import * as React from "react";
 import {useRef, useState} from "react";
-import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
+import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});

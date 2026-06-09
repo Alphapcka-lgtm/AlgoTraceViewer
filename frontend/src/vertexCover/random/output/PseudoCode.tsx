@@ -1,41 +1,4 @@
-import type { Node } from "./Types.tsx"
 import type {PseudoCodeLine} from "../../../sweepLine/shared/Types.tsx";
-
-export function getNodeById(nodes: Node[], id: string): Node{
-    return nodes.find((n) => n.id === id)!;
-}
-
-export function getRandomId(): string{
-    return "i" + Math.floor(Date.now() * Math.random()).toString()
-}
-
-export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[]): number {
-    const currTime = tl.time();
-    let stepIndex = 0;
-
-    for (let i = 0; i < labels.length; i++) {
-        const labelTime = tl.labels[labels[i]];
-        if (labelTime <= currTime + 0.0001) {
-            stepIndex = i;
-        } else {
-            break;
-        }
-    }
-
-    return stepIndex;
-}
-
-export function createStepLabels(stepCount: number): string[] {
-    return Array.from({ length: stepCount }, (_, i) => String(i));
-}
-
-export function getNodeLabel(i: number): string {
-    if(i < 26){
-        return String.fromCharCode(65 + i);
-    } else {
-        return getNodeLabel((i / 26) - 1) + String.fromCharCode(65 + (i % 26) );
-    }
-}
 
 export function getActiveLineIds(stepIndex: number, maxIndex: number) {
     if(stepIndex === 0){
@@ -53,7 +16,7 @@ export function getActiveLineIds(stepIndex: number, maxIndex: number) {
     }
 }
 
-export const RANDOM_VERTEX_COVER_PSEUDOCODE: PseudoCodeLine[] = [
+export const PSEUDOCODE: PseudoCodeLine[] = [
 
     {
         id: "initC",

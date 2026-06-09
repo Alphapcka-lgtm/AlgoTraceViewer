@@ -1,11 +1,11 @@
 import {SVGOutput} from "./output/SVGOutput.tsx";
-import {SVGInput} from "./input/SVGInput.tsx";
+import {SVGInput} from "../input/SVGInput.tsx";
 import {useState} from "react";
 
-import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
+import type {AnimationResponse, AnimationRequest} from "../shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../../sweepLine/shared/Utils.tsx";
 import type {ExportState} from "../../sweepLine/shared/Types.tsx";
-import {getNodeLabel} from "./shared/Utils.tsx";
+import {getNodeLabel} from "../shared/Utils.tsx";
 
 export function RandomVertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -22,6 +22,7 @@ export function RandomVertexCover() {
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
         intermediateStates: [],
+        initialDegreeMap: [],
         randomSeed: 0,
         timestamp: 0
     });
@@ -65,13 +66,14 @@ export function RandomVertexCover() {
                 fetchAnimation(imported.input)
                     .then(() => {
                         setProgress(imported.progress);
-                        setMode("output");
                     });
             }
         } catch (error) {
             console.error("Invalid import string", error);
         }
     };
+
+    const createExportString = () => encodeExportState({algorithm: "randomVertexCover", progress, input});
 
     return (
         <div className="algorithm-shell">
@@ -80,6 +82,7 @@ export function RandomVertexCover() {
                     setInput={setInput}
                     input={input}
                     onSubmit={submitCurrentInput}
+                    createExportString={createExportString}
                     onImport={handleImport}
                 /> :
                 <SVGOutput
@@ -89,7 +92,7 @@ export function RandomVertexCover() {
                     stepIndex={stepIndex}
                     output={output}
                     onChangeInput={() => setMode("input")}
-                    createExportString={() => encodeExportState({algorithm: "randomVertexCover", progress, input})}
+                    createExportString={createExportString}
                 />
             }
         </div>

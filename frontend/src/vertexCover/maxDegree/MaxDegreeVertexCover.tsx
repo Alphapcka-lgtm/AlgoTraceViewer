@@ -1,11 +1,11 @@
 import {SVGOutput} from "./output/SVGOutput.tsx";
-import {SVGInput} from "./input/SVGInput.tsx";
+import {SVGInput} from "../input/SVGInput.tsx";
 import {useState} from "react";
 
-import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
+import type {AnimationResponse, AnimationRequest} from "../shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../../sweepLine/shared/Utils.tsx";
 import type {ExportState} from "../../sweepLine/shared/Types.tsx";
-import {getNodeLabel} from "../random/shared/Utils.tsx";
+import {getNodeLabel} from "../shared/Utils.tsx";
 
 export function MaxDegreeVertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -21,17 +21,16 @@ export function MaxDegreeVertexCover() {
 
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
-        initialDegreeMap: [],
         intermediateStates: [],
+        initialDegreeMap: [],
         randomSeed: 0,
         timestamp: 0
     });
 
     const submitInput = (inp: AnimationRequest) => {
-        console.log(inp);
         if (inp.timestamp > output.timestamp) {
             const labeledInp = {...inp, graph: {nodes: inp.graph.nodes.map((node, index) => {
-                        return {...node, label: getNodeLabel(index)};
+                return {...node, label: getNodeLabel(index)};
                     }), edges: inp.graph.edges}};
             fetchAnimation(labeledInp)
                 .then(() => {
@@ -52,10 +51,8 @@ export function MaxDegreeVertexCover() {
         })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
                 const output = json as AnimationResponse;
-                console.log(output);
-                setInput({...input, timestamp: output.timestamp});
+                setInput({...input, randomSeed: output.randomSeed, timestamp: output.timestamp});
                 setOutput(output);
             });
     };
