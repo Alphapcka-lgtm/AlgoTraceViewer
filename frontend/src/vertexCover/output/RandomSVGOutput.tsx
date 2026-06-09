@@ -1,22 +1,21 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 
-import {IOModeTabs} from "../../../sweepLine/shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../../../sweepLine/shared/ImportExportDialog.tsx";
-import {OutputControl4} from "../../../sweepLine/output/OutputControl4.tsx";
-import {PseudoCodePanel} from "../../../sweepLine/output/PseudoCodePanel.tsx";
-import type {SVGOutputProps} from "../../shared/Types.tsx";
-import {Edges} from "../../shared/Edges.tsx";
-import {Nodes} from "../../shared/Nodes.tsx";
-import {getActiveLineIds, PSEUDOCODE} from "./PseudoCode.tsx";
-
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import type {SVGOutputProps} from "../shared/Types.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
+import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {Edges} from "../shared/Edges.tsx";
+import {Nodes} from "../shared/Nodes.tsx";
+import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.tsx";
+import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 
 const STEP_DURATION = 1.0;
 
-export function SVGOutput(props: SVGOutputProps) {
+export function RandomSVGOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -75,13 +74,13 @@ export function SVGOutput(props: SVGOutputProps) {
 
             intermediateState.chosenNodes.forEach((node, index) => {
                 if(index === 0){
-                    timeline.to("#u1" + node.id, {r: 29});
-                    timeline.to("#u2" + node.id, {r: 26}, "<");
-                    timeline.to("#u3" + node.id, {r: 20}, "<");
+                    timeline.to("#u1" + node.id, {r: 20});
+                    timeline.to("#u2" + node.id, {r: 18}, "<");
+                    timeline.to("#u3" + node.id, {r: 15}, "<");
                 } else {
-                    timeline.to("#u1" + node.id, {r: 29}, "<");
-                    timeline.to("#u2" + node.id, {r: 26}, "<");
-                    timeline.to("#u3" + node.id, {r: 20}, "<");
+                    timeline.to("#u1" + node.id, {r: 20}, "<");
+                    timeline.to("#u2" + node.id, {r: 18}, "<");
+                    timeline.to("#u3" + node.id, {r: 15}, "<");
                 }
             })
 
@@ -128,7 +127,7 @@ export function SVGOutput(props: SVGOutputProps) {
             onSubmit={() => {}}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" >
+        <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes} />
         </svg>
@@ -151,8 +150,8 @@ export function SVGOutput(props: SVGOutputProps) {
             </div>
         </div>
         <PseudoCodePanel
-            lines={PSEUDOCODE}
-            activeLineIds={getActiveLineIds(props.stepIndex, labels.length - 1)}
+            lines={PSEUDOCODE_RANDOM}
+            activeLineIds={getActiveLineIdsRandom(props.stepIndex, labels.length - 1)}
             title={"Vertex Cover PseudoCode"}
         />
         <ImportExportDialog

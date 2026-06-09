@@ -1,5 +1,5 @@
 import React from "react";
-import type {AnimationRequest} from "../../vertexCover/random/shared/Types.tsx";
+import type {AnimationRequest} from "../../vertexCover/shared/Types.tsx";
 
 export type Node = {
     x: number;
@@ -124,8 +124,8 @@ export type ModeTabsProps = {
 
 export type ExportState =
     | { algorithm: "sweepLine", progress: number, input: Node[] }
-    | { algorithm: "randomVertexCover", progress: number, input: AnimationRequest }
-    | { algorithm: "heuristicVertexCover", progress: number, input: AnimationRequest };
+    | { algorithm: "randomvertexcover", progress: number, input: AnimationRequest }
+    | { algorithm: "maxdegreevertexcover", progress: number, input: AnimationRequest };
 
 export type PseudoCodeLine = {
     id: string;

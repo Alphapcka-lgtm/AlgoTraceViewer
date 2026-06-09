@@ -68,3 +68,7 @@ export type SVGOutputProps = {
     onChangeInput: () => void;
     createExportString: () => string;
 };
+
+export type VertexCoverProps = {
+    algorithm: "randomvertexcover" | "maxdegreevertexcover";
+};

@@ -24,7 +24,7 @@ public class VertexCoverController {
         this.maxDegreeVertexCover = maxDegreeVertexCover;
     }
 
-    @PostMapping("/vertexcover/random")
+    @PostMapping("/randomvertexcover")
     public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
     }
@@ -34,7 +34,7 @@ public class VertexCoverController {
         return ResponseEntity.ok(optimalVertexCover.solve(request.graph()));
     }
 
-    @PostMapping("/vertexcover/heuristic")
+    @PostMapping("/maxdegreevertexcover")
     public ResponseEntity<AnimationResponse> heuristicVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.randomSeed()));
     }

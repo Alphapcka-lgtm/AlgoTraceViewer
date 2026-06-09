@@ -6,7 +6,7 @@ export function Nodes(props: NodesProps) {
     return props.nodes.map((n: Node, i: number) => (
         <g
             id={n.id.toString()}
-            key={n.id}
+            key={n.id + i }
             onMouseDown={(e) => {
                 e.stopPropagation();
                 if(props.onMouseDown){
@@ -32,14 +32,15 @@ export function Nodes(props: NodesProps) {
                 }
             }}
         >
-            <circle id={ "u1" + n.id } key={ "u1" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill="black" />
-            <circle id={ "u2" + n.id } key={ "u2" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill={colors.orange} />
-            <circle id={ "u4" + n.id } key={ "u4" + n.id } cx={1123 * n.x} cy={500 * n.y} r={17} fill="black" />
-            <circle id={ "u5" + n.id } key={ "u5" + n.id } cx={1123 * n.x} cy={500 * n.y} r={15} fill="white" />
-            <circle id={ "u3" + n.id } key={ "u3" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill={colors.orange} />
+            <circle id={ "u1" + n.id } key={ "u1" + n.id + i } cx={n.x} cy={n.y} r={0} fill="black" />
+            <circle id={ "u2" + n.id } key={ "u2" + n.id + i } cx={n.x} cy={n.y} r={0} fill={colors.orange} />
+            <circle id={ "u4" + n.id } key={ "u4" + n.id + i } cx={n.x} cy={n.y} r={17} fill="black" />
+            <circle id={ "u5" + n.id } key={ "u5" + n.id + i } cx={n.x} cy={n.y} r={15} fill="white" />
+            <circle id={ "u3" + n.id } key={ "u3" + n.id + i } cx={n.x} cy={n.y} r={0} fill={colors.orange} />
             <text
-                x={1123 * n.x}
-                y={500 * n.y}
+                x={n.x}
+                y={n.y}
+                key={ "u6" + n.id + i}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="black"

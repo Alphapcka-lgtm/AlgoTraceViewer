@@ -54,8 +54,8 @@ export function InputControl(props: InputControlProps) {
                     }
                 }}
             >
-                {presets.map(preset => {
-                    return <option value={preset.name} >{preset.name}</option>;
+                {presets.map((preset, index) => {
+                    return <option key={index} value={preset.name} >{preset.name}</option>;
                 })}
                 <option value="random" >random</option>
                 <option value="custom" >custom</option>
@@ -81,7 +81,7 @@ function getRandomGraph(n: number, d: number): Graph {
     for (let i = 0; i < n; i++) {
         const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
         const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
-        graph.nodes.push({x: xCoordinate, y: yCoordinate, id: getRandomId()})
+        graph.nodes.push({x: Math.floor(xCoordinate * 1123), y: Math.floor(yCoordinate * 500), id: getRandomId()})
     }
 
     for (let i = 0; i < graph.nodes.length; i++) {
