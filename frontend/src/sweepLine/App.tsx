@@ -5,6 +5,7 @@ import type {ExportState, Node, SweepLineInputState, SweepLineOutputState} from 
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "./shared/Utils.tsx";
 import "./App.css";
+import {presets} from "./input/Presets.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -18,6 +19,9 @@ export default function App() {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);    //für scrubber
+
+    const [selectedPreset, setSelectedPreset] = useState("");
+
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -136,6 +140,17 @@ export default function App() {
         });
     };
 
+
+    const handlePresetChange = async (selected: string) => {
+        setSelectedPreset(selected);
+        if (selected === "random") return;
+        if (selected === "-") return;
+        const preset = presets.find(p => p.name === selected);
+        if (!preset) return;
+
+        await handleImport(preset.importString);
+    };
+
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
@@ -153,6 +168,9 @@ export default function App() {
                     onImport={handleImport}
 
                     onSetNodeCount={handleSetNodeCount}
+
+                    selectedPreset={selectedPreset}
+                    onPresetChange={handlePresetChange}
                 />
             </div>
         );

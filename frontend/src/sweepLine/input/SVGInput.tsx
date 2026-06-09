@@ -4,6 +4,7 @@ import type {SVGInputProps, Interaction} from "../shared/Types.tsx";
 import {getRandomId} from "../shared/Utils.tsx";
 import {IOModeTabs} from "../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
+import {presets} from "./Presets.tsx";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -75,6 +76,17 @@ export function SVGInput(props: SVGInputProps) {
             </svg>
 
             <div className="control-row">
+
+                <select className="control-select"value={props.selectedPreset}
+                        onChange={(e) => props.onPresetChange(e.target.value)}
+                >
+                    <option value="-"> - </option>
+                    {presets.map((preset) => (
+                        <option key={preset.name} value={preset.name}>{preset.name}</option>
+                    ))}
+                    <option value="random">Random</option>
+                </select>
+
                 <button
                     className="control-button"
                     onClick={() => {
@@ -102,6 +114,9 @@ export function SVGInput(props: SVGInputProps) {
                     />
                 </label>
             </div>
+
+
+
         </div>
     );
 }

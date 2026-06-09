@@ -34,6 +34,9 @@ export type SVGInputProps = {
     onImport: (encoded: string) => void;
 
     onSetNodeCount: (count: number) => void;
+
+    selectedPreset: string;
+    onPresetChange: (selected: string) => void;
 };
 
 
