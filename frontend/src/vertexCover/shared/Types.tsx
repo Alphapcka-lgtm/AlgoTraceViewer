@@ -67,4 +67,9 @@ export type SVGOutputProps = {
     setStepIndex:  Dispatch<SetStateAction<number>>,
     onChangeInput: () => void;
     createExportString: () => string;
+    onImport: (encoded: string) => void;
+};
+
+export type VertexCoverProps = {
+    algorithm: "randomvertexcover" | "maxdegreevertexcover" | "staticlistvertexcover";
 };

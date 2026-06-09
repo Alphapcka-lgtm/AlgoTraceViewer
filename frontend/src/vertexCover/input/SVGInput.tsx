@@ -16,7 +16,7 @@ export function SVGInput(props: SVGInputProps) {
 
     const getRelativeCoordinates = (e: React.MouseEvent<SVGElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        return {x: (e.clientX - rect.left) / (rect.width), y: (e.clientY - rect.top) / (rect.height)};
+        return {x: Math.floor(e.clientX - rect.left), y: Math.floor(e.clientY - rect.top)};
     }
 
     const edgeExists = (a: string, b: string, edges: Edge[]) => edges.some((e) => (e.fromId === a && e.toId === b) || (e.fromId === b && e.toId === a));
