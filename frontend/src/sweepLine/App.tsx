@@ -3,8 +3,9 @@ import {SVGInput} from "./input/SVGInput.tsx";
 import useSweepLineSteps from "./Api.tsx";
 import type {ExportState, Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
 import {SVGOutput4} from "./output/SVGOutput4.tsx";
-import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel} from "./shared/Utils.tsx";
+import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "./shared/Utils.tsx";
 import "./App.css";
+import {presets} from "./input/Presets.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -18,6 +19,9 @@ export default function App() {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);    //für scrubber
+
+    const [selectedPreset, setSelectedPreset] = useState("");
+
 
     const svgHeight = 500;
     const svgWidth = 1123;
@@ -72,7 +76,8 @@ export default function App() {
             const result = await calculateSteps(labeledNodes);
             //console.log("Algorithm steps:", result);
             setOutputState({steps: result, timestamp: inputTimestamp});
-            setModeState("output");
+
+            //setModeState("output");
         } catch (error) {
             console.error(error);
         }
@@ -115,6 +120,38 @@ export default function App() {
         }
     };
 
+    //Wert von Slider soll aktuelle Anzahl Nodes zeigen
+    // Slider nach rechts -> zufällige Nodes hinzufügen
+    // Slider nach links -> Nodes am Ende entfernen
+    // Manuelles Hinzufügen oder Löschen -> Slider passt sich automatisch an
+    const handleSetNodeCount = (targetCount: number) => {
+        const PADDING = 80; // das nodes nichts zu sehr an rand sind
+        setInputState((prev) => {
+            //anzahl ist schon richitg ...
+            if (targetCount === prev.nodes.length) return prev;
+            //slider wurde nach links bewegt
+            //wenn z.b vorher: 10 Nodes und jetzt Slider: 6 dann nur ersten 6 nodes (prev.nodes.slice(0, 6))
+            if (targetCount < prev.nodes.length) {
+                return {...prev, nodes: assignLabels(prev.nodes.slice(0, targetCount)), timestamp: Date.now()};
+            }
+            //slider nach rechts
+            const missingCount:number = targetCount - prev.nodes.length;
+            const newNodes = createRandomNodes(missingCount, PADDING, svgWidth, svgHeight);
+            return {...prev, nodes: assignLabels([...prev.nodes, ...newNodes]), timestamp: Date.now()};
+        });
+    };
+
+
+    const handlePresetChange = async (selected: string) => {
+        setSelectedPreset(selected);
+        if (selected === "random") return;
+        if (selected === "-") return;
+        const preset = presets.find(p => p.name === selected);
+        if (!preset) return;
+
+        await handleImport(preset.importString);
+    };
+
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
@@ -130,6 +167,12 @@ export default function App() {
                     onSubmit={handleNormalSubmit}
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
+
+                    onSetNodeCount={handleSetNodeCount}
+
+                    selectedPreset={selectedPreset}
+                    onPresetChange={handlePresetChange}
+                    createExportString={createExportString}
                 />
             </div>
         );
@@ -149,6 +192,7 @@ export default function App() {
                 progress={progress}
                 setProgress={setProgress}
                 createExportString={createExportString}
+                onImport={handleImport}
             />
         </div>
     );

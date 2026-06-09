@@ -4,6 +4,7 @@ import type {SVGInputProps, Interaction} from "../shared/Types.tsx";
 import {getRandomId} from "../shared/Utils.tsx";
 import {IOModeTabs} from "../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
+import {presets} from "./Presets.tsx";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -75,6 +76,17 @@ export function SVGInput(props: SVGInputProps) {
             </svg>
 
             <div className="control-row">
+
+                <select className="control-select"value={props.selectedPreset}
+                        onChange={(e) => props.onPresetChange(e.target.value)}
+                >
+                    <option value="-"> - </option>
+                    {presets.map((preset) => (
+                        <option key={preset.name} value={preset.name}>{preset.name}</option>
+                    ))}
+                    <option value="random">Random</option>
+                </select>
+
                 <button
                     className="control-button"
                     onClick={() => {
@@ -84,13 +96,26 @@ export function SVGInput(props: SVGInputProps) {
                 >
                     Reset
                 </button>
+
+                <ImportExportDialog
+                    onImport={props.onImport}
+                    createExportString={props.createExportString}
+                />
+
+                <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>
+                <span style={{ width: 70 }}>Nodes: {props.nodes.length}</span>
+                    <input
+                        className="timeline-slider"
+                        type="range" min={0} max={50} value={props.nodes.length}
+                        onChange={(event) =>
+                            props.onSetNodeCount(Number(event.currentTarget.value))
+                        }
+                    />
+                </label>
             </div>
 
-            <ImportExportDialog
-                mode="input"
-                onImport={props.onImport}
-                createExportString={() => ""}
-            />
+
+
         </div>
     );
 }

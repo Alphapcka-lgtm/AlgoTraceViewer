@@ -128,6 +128,31 @@ export function createStepLabels(stepCount: number): string[] {
     return Array.from({length: stepCount}, (_, i) => String(i));
 }
 
+
+const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): Node => {
+    const minX = padding;
+    const maxX = svgWidth - padding;
+
+    const minY = padding;
+    const maxY = svgHeight - padding;
+
+    return {
+        id: getRandomId(),
+        x: minX + Math.random() * (maxX - minX),
+        y: minY + Math.random() * (maxY - minY),
+        label: "",
+    };
+};
+export const createRandomNodes = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
+    const nodes: Node[] = [];
+
+    for (let i = 0; i < count; i++) {
+        nodes.push(createRandomNode(padding, svgWidth, svgHeight));
+    }
+
+    return nodes;
+};
+
 /*
 Vllt baue ich das später noch bei initialProgress in svgOutput ein ...
 export function checkProgress(progress: number): number {
