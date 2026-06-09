@@ -155,9 +155,8 @@ export function RandomSVGOutput(props: SVGOutputProps) {
             title={"Vertex Cover PseudoCode"}
         />
         <ImportExportDialog
-            mode="output"
             createExportString={props.createExportString}
-            onImport={() => {}}
+            onImport={props.onImport}
         />
     </div>;
 }

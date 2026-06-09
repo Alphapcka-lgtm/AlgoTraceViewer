@@ -71,7 +71,6 @@ export function VertexCover(props: VertexCoverProps) {
                         setProgress(imported.progress);
                     });
             }
-            console.log(imported.input)
         } catch (error) {
             console.error("Invalid import string", error);
         }
@@ -98,6 +97,7 @@ export function VertexCover(props: VertexCoverProps) {
                         output={output}
                         onChangeInput={() => setMode("input")}
                         createExportString={createExportString}
+                        onImport={handleImport}
                     />
                 }
             </div>
@@ -123,6 +123,7 @@ export function VertexCover(props: VertexCoverProps) {
                         output={output}
                         onChangeInput={() => setMode("input")}
                         createExportString={createExportString}
+                        onImport={handleImport}
                     />
                 }
             </div>
