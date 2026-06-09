@@ -1,12 +1,13 @@
 import {SVGOutput} from "./output/SVGOutput.tsx";
-import {SVGInput} from "./input/SVGInput.tsx";
+import {SVGInput} from "../input/SVGInput.tsx";
 import {useState} from "react";
 
-import type {AnimationResponse, AnimationRequest} from "./shared/Types.tsx";
-import {decodeExportState, encodeExportState} from "../sweepLine/shared/Utils.tsx";
-import type {ExportState} from "../sweepLine/shared/Types.tsx";
+import type {AnimationResponse, AnimationRequest} from "../shared/Types.tsx";
+import {decodeExportState, encodeExportState} from "../../sweepLine/shared/Utils.tsx";
+import type {ExportState} from "../../sweepLine/shared/Types.tsx";
+import {getNodeLabel} from "../shared/Utils.tsx";
 
-export function VertexCover() {
+export function RandomVertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState(0);
@@ -21,13 +22,17 @@ export function VertexCover() {
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
         intermediateStates: [],
+        initialDegreeMap: [],
         randomSeed: 0,
         timestamp: 0
     });
 
     const submitInput = (inp: AnimationRequest) => {
         if (inp.timestamp > output.timestamp) {
-            fetchAnimation(inp)
+            const labeledInp = {...inp, graph: {nodes: inp.graph.nodes.map((node, index) => {
+                return {...node, label: getNodeLabel(index)};
+                    }), edges: inp.graph.edges}};
+            fetchAnimation(labeledInp)
                 .then(() => {
                     setProgress(0);
                     setStepIndex(0);
@@ -57,17 +62,18 @@ export function VertexCover() {
     const handleImport = async (encoded: string) => {
         try {
             const imported:ExportState = decodeExportState(encoded);
-            if (imported.algorithm === "vertexCover") {
+            if (imported.algorithm === "randomVertexCover" || imported.algorithm === "heuristicVertexCover") {
                 fetchAnimation(imported.input)
                     .then(() => {
                         setProgress(imported.progress);
-                        setMode("output");
                     });
             }
         } catch (error) {
             console.error("Invalid import string", error);
         }
     };
+
+    const createExportString = () => encodeExportState({algorithm: "randomVertexCover", progress, input});
 
     return (
         <div className="algorithm-shell">
@@ -76,6 +82,7 @@ export function VertexCover() {
                     setInput={setInput}
                     input={input}
                     onSubmit={submitCurrentInput}
+                    createExportString={createExportString}
                     onImport={handleImport}
                 /> :
                 <SVGOutput
@@ -85,7 +92,7 @@ export function VertexCover() {
                     stepIndex={stepIndex}
                     output={output}
                     onChangeInput={() => setMode("input")}
-                    createExportString={() => encodeExportState({algorithm: "vertexCover", progress, input})}
+                    createExportString={createExportString}
                 />
             }
         </div>

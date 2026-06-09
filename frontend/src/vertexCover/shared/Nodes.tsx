@@ -32,18 +32,18 @@ export function Nodes(props: NodesProps) {
                 }
             }}
         >
-            <circle id={ "u1" + n.id } key={ "u1" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill="black" />
-            <circle id={ "u2" + n.id } key={ "u2" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
-            <circle id={ "u4" + n.id } key={ "u4" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={23} fill="black" />
-            <circle id={ "u5" + n.id } key={ "u5" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={20} fill="white" />
-            <circle id={ "u3" + n.id } key={ "u3" + n.id } cx={1920 * n.x} cy={1080 * n.y} r={0} fill={colors.orange} />
+            <circle id={ "u1" + n.id } key={ "u1" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill="black" />
+            <circle id={ "u2" + n.id } key={ "u2" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill={colors.orange} />
+            <circle id={ "u4" + n.id } key={ "u4" + n.id } cx={1123 * n.x} cy={500 * n.y} r={17} fill="black" />
+            <circle id={ "u5" + n.id } key={ "u5" + n.id } cx={1123 * n.x} cy={500 * n.y} r={15} fill="white" />
+            <circle id={ "u3" + n.id } key={ "u3" + n.id } cx={1123 * n.x} cy={500 * n.y} r={0} fill={colors.orange} />
             <text
-                x={1920 * n.x}
-                y={1080 * n.y}
+                x={1123 * n.x}
+                y={500 * n.y}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="black"
-                fontSize="21"
+                fontSize="17"
                 pointerEvents="none"
             >
                 {n.label ? n.label : getNodeLabel(i)}
