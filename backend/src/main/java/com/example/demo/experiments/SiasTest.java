@@ -3,12 +3,14 @@ private final static int EXTENDED_ASCII_SIZE = 256;
 private final static char S_TYPE = 'S';
 private final static char L_TYPE = 'L';
 
+boolean test = true;
+
 void main() {
-    int[] arr = new int[]{2, -1, 4};
-    showSuffixArray(arr);
-    showSuffixArray(arr, 2);
-    IO.println(String.format("'a'=%d", (int) 'a'));
-    IO.println(String.format("'%c'=%d", (char) ((short) 0), (int) ((char) 0)));
+//    int[] arr = new int[]{2, -1, 4};
+//    showSuffixArray(arr);
+//    showSuffixArray(arr, 2);
+//    IO.println(String.format("'a'=%d", (int) 'a'));
+//    IO.println(String.format("'%c'=%d", (char) ((short) 0), (int) ((char) 0)));
 
     String source = "cabbage";
     int[] cabbageBuckets = findBucketSizes(source);
@@ -60,7 +62,12 @@ int[] guessLmsSort(final String source, final int[] bucketSizes, final char[] ty
         }
 
         // Which bucket does this suffix go into?
-        char bucketIndex = source.charAt(i);
+        char bucketIndex;
+        if (test) {
+            bucketIndex = (char) (source.charAt(i) - 'a');
+        } else {
+            bucketIndex = source.charAt(i);
+        }
         // Add the start position at the tail of the bucket...
         guessedSuffixArray[bucketTails.get(bucketIndex)] = i;
         // ... and move the tail pointer down.
@@ -132,8 +139,11 @@ int[] findBucketSizes(final String source, final int alphabetSize) {
          *  but it currently results in wrong guesses
          */
         // use this so that 'a' is at the first place of the array
-//        res[c - 'a']++;
-        res[c]++;
+        if (test) {
+            res[c - 'a']++;
+        } else {
+            res[c]++;
+        }
     }
 
     return res;
@@ -204,7 +214,12 @@ void induceSortL(final String source, final int[] guessedSuffixArray, final int[
             continue;
         }
 
-        char bucketIndex = source.charAt(j);
+        char bucketIndex;
+        if (test) {
+            bucketIndex = (char) (source.charAt(j) - 'a');
+        } else {
+            bucketIndex = source.charAt(j);
+        }
         // Add the start position at the head of the bucket...
         guessedSuffixArray[bucketHeads.get(bucketIndex)] = j;
         // ...and move the head pointer up.
@@ -248,7 +263,12 @@ void induceSortS(final String source, final int[] guessedSuffixArray, final int[
         }
 
         // Which bucket does this suffix go into?
-        char bucketIndex = source.charAt(j);
+        char bucketIndex;
+        if (test) {
+            bucketIndex = (char) (source.charAt(j) - 'a');
+        } else {
+            bucketIndex = source.charAt(j);
+        }
         // Add the start position at the tail of the bucket...
         guessedSuffixArray[bucketTails.get(bucketIndex)] = j;
         // ...and move the tail pointer down.
@@ -435,7 +455,12 @@ int[] accurateLMSSort(final String string, final int[] bucketSizes, final char[]
         int stringIndex = summarySuffixOffsets.get(summarySuffixArray[i]);
 
         // Which bucket does this suffix go into?
-        char bucketIndex = string.charAt(stringIndex);
+        char bucketIndex;
+        if (test) {
+            bucketIndex = (char) (string.charAt(stringIndex) - 'a');
+        } else {
+            bucketIndex = string.charAt(stringIndex);
+        }
         // Add the suffix at the tail of the bucket...
         suffixOffsets[bucketTails.get(bucketIndex)] = stringIndex;
         // ...and move the tail pointer down.
@@ -471,7 +496,12 @@ int[] makeSuffixArrayByInducedSorting(final String string, final int alphabetSiz
      * We'll be slotting suffixes into buckets according to what
      * character they start with, so let's precompute that info now.
      */
-    final int[] bucketSizes = findBucketSizes(string, alphabetSize);
+    final int[] bucketSizes;
+    if (test) {
+        bucketSizes = findBucketSizes(string, 26);
+    } else {
+        bucketSizes = findBucketSizes(string, alphabetSize);
+    }
 
     /*
      * Usa a simple bucket-sort to insert all the LMS suffixes into
