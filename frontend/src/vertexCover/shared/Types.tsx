@@ -70,6 +70,6 @@ export type SVGOutputProps = {
     onImport: (encoded: string) => void;
 };
 
-export type VertexCoverProps = {
-    algorithm: "randomvertexcover" | "maxdegreevertexcover" | "staticlistvertexcover";
-};
+export type VertexCoverVariant = "random" | "maxDegree" | "staticList";
+
+export type NavButtonProps = { variant: VertexCoverVariant; label: string; activeVariant: VertexCoverVariant; onTabChange: (variant: VertexCoverVariant) => void; };

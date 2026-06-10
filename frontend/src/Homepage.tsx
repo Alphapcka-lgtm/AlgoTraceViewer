@@ -13,7 +13,7 @@ export function Homepage() {
             <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
                 {activeTab === "sweepline" && <App/>}
-                {activeTab === "vertexcover" && <VertexCover algorithm={"maxdegreevertexcover"}/>}
+                {activeTab === "vertexcover" && <VertexCover/>}
                 {activeTab === "suffixarray" && <SuffixArray/>}
                 {activeTab === "ehrlichswaps" && <EhrlichSwaps />}
             </main>

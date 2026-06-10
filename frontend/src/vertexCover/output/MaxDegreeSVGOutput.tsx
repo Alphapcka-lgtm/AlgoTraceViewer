@@ -174,7 +174,7 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
                 <div>
                     <table style={{borderSpacing: "10px 10px"}}>
                         <thead>
-                        <tr style={{fontSize: 30}}>
+                        <tr>
                             {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
                                 <th key={index}>
                                     <span id={"t1" + ndp.node.id} style={{borderRadius: "9px", background: "none", textAlign: "center"}}>{ndp.node.label}</span>
@@ -183,7 +183,7 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr style={{fontSize: 30}}>
+                        <tr>
                             {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
                                 <th key={index}>
                                     <span id={"t2" + ndp.node.id} style={{borderRadius: "9px", background: "none", textAlign: "center"}}></span>
