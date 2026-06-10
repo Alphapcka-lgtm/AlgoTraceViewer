@@ -1,4 +1,4 @@
-import {getAlphabetLabel} from "../../sweepLine/shared/Utils.tsx";
+import {getAlphabetLabel} from "../../shared/Utils.tsx";
 import type {Node} from "../../sweepLine/shared/Types.tsx"
 import type {NodesProps} from "./Types.tsx";
 

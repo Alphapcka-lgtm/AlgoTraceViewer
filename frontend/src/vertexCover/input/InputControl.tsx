@@ -1,5 +1,5 @@
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
-import {getRandomId} from "../../sweepLine/shared/Utils.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {getRandomId} from "../../shared/Utils.tsx";
 import type {InputControlProps} from "./Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 import {presets} from "./Presets.tsx";

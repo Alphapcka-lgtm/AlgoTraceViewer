@@ -1,5 +1,5 @@
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
-import {getRandomId} from "../../sweepLine/shared/Utils.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {getRandomId} from "../../shared/Utils.tsx";
 import type {Interaction, SVGInputProps} from "./Types.tsx";
 import type {Node} from "../../sweepLine/shared/Types.tsx"
 import {Edges, PreviewEdge} from "../shared/Edges.tsx";

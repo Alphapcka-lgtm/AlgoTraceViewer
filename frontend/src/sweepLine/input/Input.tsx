@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import {DynamicNodes} from "../shared/Nodes.tsx";
-import type {SVGInputProps, Interaction} from "../shared/Types.tsx";
-import {getRandomId} from "../shared/Utils.tsx";
-import {IOModeTabs} from "../shared/IOModeTabs.tsx";
-import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
+import type {InputProps, Interaction} from "../shared/Types.tsx";
+import {getRandomId} from "../../shared/Utils.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {presets} from "./Presets.tsx";
 
-export function SVGInput(props: SVGInputProps) {
+export function Input(props: InputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
 
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -27,7 +27,7 @@ export function SVGInput(props: SVGInputProps) {
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
         if (interaction.type !== "idle") return;
         const {x, y} = getMousePos(e);
-        props.onAddNode({x, y, id: getRandomId(), label: ""});
+        props.onAddNode({x: Math.round(x), y: Math.round(y), id: getRandomId(), label: ""});
 
     };
 

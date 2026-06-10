@@ -6,9 +6,6 @@ type ImportExportDialogProps = {
     createExportString: () => string;
 };
 
-//Input: Import möglich, Export nicht möglich
-//Output: Export möglich, Import nicht möglich
-
 export function ImportExportDialog(props: ImportExportDialogProps) {
     const [dialogMode, setDialogMode] = useState<"import" | "export" | null>(null);
     const [importValue, setImportValue] = useState("");
@@ -33,6 +30,9 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
         if (!exportValue) return;
         await navigator.clipboard.writeText(exportValue);
         setCopied(true);
+        setTimeout(() => {
+            closeDialog();
+        }, 500);
     };
 
     const importState = () => {

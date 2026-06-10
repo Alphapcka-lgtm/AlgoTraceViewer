@@ -1,10 +1,4 @@
-import type {PseudoCodeLine} from "../shared/Types.tsx";
-
-type PseudoCodePanelProps = {
-    lines: PseudoCodeLine[];
-    activeLineIds: string[];
-    title: string;
-};
+import type {PseudoCodePanelProps} from "./Types.tsx";
 
 export function PseudoCodePanel(props: PseudoCodePanelProps) {
     return (

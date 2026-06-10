@@ -1,7 +1,8 @@
-import type {OutputControlProps4} from "../shared/Types.tsx";
-import gsap from "gsap";
 
-export function OutputControl4(props: OutputControlProps4) {
+import gsap from "gsap";
+import type {OutputControlsProps} from "./Types.tsx";
+
+export function OutputControls(props: OutputControlsProps) {
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.labels.length - 1;
 
@@ -90,7 +91,7 @@ export function OutputControl4(props: OutputControlProps4) {
             </select>
 
             <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
-                ←
+                <strong>←</strong>
             </button>
 
             <button onClick={togglePlay} className="control-button">
@@ -98,7 +99,7 @@ export function OutputControl4(props: OutputControlProps4) {
             </button>
 
             <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
-                →
+                <strong>→</strong>
             </button>
 
             <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">

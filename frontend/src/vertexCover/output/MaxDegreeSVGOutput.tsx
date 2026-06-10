@@ -1,9 +1,9 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
 import type {SVGOutputProps} from "../shared/Types.tsx";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
@@ -154,7 +154,7 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
-        <OutputControl4
+        <OutputControls
             timelineRef={tlRef}
             labels={labels}
             currentStep={props.stepIndex}

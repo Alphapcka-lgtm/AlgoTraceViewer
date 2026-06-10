@@ -1,8 +1,8 @@
 import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
-import {assignLabels, decodeExportState, encodeExportState} from "./../sweepLine/shared/Utils.tsx";
+import {assignLabels, decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
-import type {ExportState} from "./../sweepLine/shared/Types.tsx";
 import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
+import type {ExportState} from "../shared/Types.tsx";
 import {SVGInput} from "./input/SVGInput.tsx";
 import {useState} from "react";
 

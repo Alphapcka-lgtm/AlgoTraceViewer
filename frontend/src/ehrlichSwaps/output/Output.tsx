@@ -1,8 +1,8 @@
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import type {EhrlichSwapStepDTO} from "../Api.ts";
 import React, {useMemo, useRef, useState} from "react";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 
@@ -338,7 +338,7 @@ export function SwapOutput(props: SwapOutputProps) {
                 ))}
             </svg>
 
-            <OutputControl4
+            <OutputControls
                 timelineRef={timelineRef}
                 labels={labels}
                 currentStep={props.currentStep}

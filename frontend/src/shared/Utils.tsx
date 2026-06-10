@@ -1,6 +1,7 @@
 import React from "react";
-import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
 import LZString from "lz-string";
+import type {ExportState, PseudoCodeLine} from "./Types.tsx";
+import type {Node} from "../sweepLine/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -28,25 +29,8 @@ export const btnStyle: React.CSSProperties = {
     fontSize: 18
 };
 
-export const tabStyle = (active: boolean, disabled: boolean): React.CSSProperties => ({
-    ...btnStyle,
-    width: "50%",
-    opacity: disabled ? 0.45 : 1,
-    border: "2px solid black",
-    //borderBottom: active ? "3px solid black" : "1px solid #aaa",
-    fontWeight: active ? "bold" : "normal",
-    cursor: disabled ? "default" : "pointer",
-});
 
-
-/*
-0  -> A
-1  -> B
-...
-25 -> Z
-26 -> AA
-27 -> AB
-*/
+//0  -> A, 1  -> B, ..., 25 -> Z, 26 -> AA, 27 -> AB
 export function getAlphabetLabel(i: number): string {
     let result: string = "";
     let current: number = i;
@@ -88,50 +72,13 @@ export function getStepIndexFromTimeline(tl: gsap.core.Timeline, labels: string[
     return stepIndex;
 }
 
-
-function roundNumber(num:number, decimals:number):number {
-    const factor:number = 10 ** decimals;
-    return Math.round((num+Number.EPSILON) * factor) / factor;
-}
-
-function roundNodeCoordinates(nodes: Node[], decimals: number): Node[] {
-    return nodes.map((node) => ({...node, x: roundNumber(node.x, decimals), y: roundNumber(node.y, decimals)}));
-}
-
 export function encodeExportState(state: ExportState): string {
-    let exportState = state;
-
-    if (state.algorithm === "sweepLine") {
-        exportState = {...state,
-            input: roundNodeCoordinates(state.input, 4),
-            progress: roundNumber(state.progress, 4),
-
-        };
-    }
-    /*
-    else if (state.algorithm === "vertexCover") {
-        exportState = {...state,
-            input: {...state.input,
-                graph: {
-                    ...state.input.graph,
-                    nodes: roundNodeCoordinates(state.input.graph.nodes, 4),
-                },
-            },
-        };
-    }
-    */
-
-    const json = JSON.stringify(exportState);
-    //return btoa(encodeURIComponent(json));
-    return LZString.compressToEncodedURIComponent(json);
+    return LZString.compressToEncodedURIComponent(JSON.stringify(state));
 }
 
 export function decodeExportState(encoded: string): ExportState {
-    //const json = decodeURIComponent(atob(encoded));
     const json = LZString.decompressFromEncodedURIComponent(encoded);
-    if (json === null) {
-        throw new Error("Invalid export string");
-    }
+    if (json === null) throw new Error("Invalid export string");
     return JSON.parse(json) as ExportState;
 }
 
@@ -139,14 +86,11 @@ export function createStepLabels(stepCount: number): string[] {
     return Array.from({length: stepCount}, (_, i) => String(i));
 }
 
-
 const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): Node => {
     const minX = padding;
     const maxX = svgWidth - padding;
-
     const minY = padding;
     const maxY = svgHeight - padding;
-
     return {
         id: getRandomId(),
         x: minX + Math.random() * (maxX - minX),
@@ -156,23 +100,11 @@ const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): N
 };
 export const createRandomNodes = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
     const nodes: Node[] = [];
-
     for (let i = 0; i < count; i++) {
         nodes.push(createRandomNode(padding, svgWidth, svgHeight));
     }
-
     return nodes;
 };
-
-/*
-Vllt baue ich das später noch bei initialProgress in svgOutput ein ...
-export function checkProgress(progress: number): number {
-    if (progress < 0) return 0;
-    if (progress > 1) return 1;
-    return progress;
-}
- */
-
 
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
@@ -221,9 +153,6 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "init-delta", text: "δ = dist(p0, p1)"},
     {id: "insert-initial", text: "yTable.insert(p0), yTable.insert(p1)"},
     {id: "init-tail", text: "tail = 0"},
-
-
-
     {id: "for-loop", text: "for i = 2 to xQueue.size - 1:"},
     {id: "set-current", text: "current = xQueue.get(i)", indent: 1},
     {id: "while-loop", text: "while xQueue.get(tail).x ≤ current.x - δ:", indent: 1},
@@ -234,7 +163,6 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "update-delta", text: "δ = dist(current, p)", indent: 3},
     {id: "update-bestpair", text: "bestPair = (current, p)", indent: 3},
     {id: "insert-current", text: "yTable.insert(current)", indent: 1},
-
     {id: "return", text: "return (bestPair, δ)"}
 ];
 

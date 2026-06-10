@@ -1,6 +1,6 @@
 import { useState } from "react";
-import {SwapInput} from "./input/input.tsx";
-import {SwapOutput} from "./output/output.tsx";
+import {SwapInput} from "./input/Input.tsx";
+import {SwapOutput} from "./output/Output.tsx";
 import {type EhrlichSwapStepDTO, sendSwapInput} from "./Api.ts";
 
 

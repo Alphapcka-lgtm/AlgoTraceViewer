@@ -1,5 +1,4 @@
 import React from "react";
-import type {AnimationRequest} from "../../vertexCover/shared/Types.tsx";
 
 export type Node = {
     x: number;
@@ -19,8 +18,8 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
-//was SVGInput alles von App bekommt
-export type SVGInputProps = {
+//was Input alles von App bekommt
+export type InputProps = {
     height: number;
     width: number;
     mode: string;
@@ -32,15 +31,11 @@ export type SVGInputProps = {
     onSubmit: () => void;
     onChangeInput: () => void;
     onImport: (encoded: string) => void;
-
     onSetNodeCount: (count: number) => void;
-
     selectedPreset: string;
     onPresetChange: (selected: string) => void;
-
     createExportString: () => string;
 };
-
 
 export interface Result {
     p0: Node;
@@ -63,45 +58,20 @@ export interface AlgorithmStepDTO {
     pseudoCodeLineIds: string[];
 }
 
-//was SVGOutput von App bekommt
-export type SVGOutputProps = {
+//was Output von App bekommt
+export type OutputProps = {
     height: number;
     width: number;
     steps: AlgorithmStepDTO[];
     loading: boolean;
     error: string | null;
     onChangeInput: () => void;
-
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-
-    //für scrubber:
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
-
     createExportString: () => string;
-
     onImport: (encoded: string) => void;
-};
-
-export type OutputControlProps4 = {
-    timelineRef: React.RefObject<gsap.core.Timeline>
-    labels: string[];
-
-    currentStep: number;
-    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    stepCount: number;
-
-    isPlaying: boolean;
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-
-    //Für scrubber
-    progress: number;
-    setProgress: React.Dispatch<React.SetStateAction<number>>;
-
-
-    playbackSpeed: number;
-    onPlaybackSpeedChange: (speed: number) => void;
 };
 
 export type SweepLineInputState = {
@@ -114,25 +84,11 @@ export type SweepLineOutputState = {
     timestamp: number;
 };
 
+export type RingStyle = "none" | "active" | "candidate";
 
 export type XNodeProps = {
     node: Node;
     fill: string;
-};
-
-export type ModeTabsProps = {
-    mode: "input" | "output";
-    onChangeInput: () => void;
-    onSubmit: () => void;
-    canSubmit: boolean;
-};
-
-export type ExportState =
-    | { algorithm: "sweepLine", progress: number, input: Node[] }
-    | { algorithm: "vertexCover", progress: number, input: AnimationRequest };
-
-export type PseudoCodeLine = {
-    id: string;
-    text: string;
-    indent?: number;
+    scale?: number;
+    ringStyle?: RingStyle;
 };

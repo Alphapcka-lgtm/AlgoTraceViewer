@@ -1,4 +1,4 @@
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 //import React from "react";
 
 type SwapInputProps = {
