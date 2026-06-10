@@ -32,15 +32,11 @@ export type SVGInputProps = {
     onSubmit: () => void;
     onChangeInput: () => void;
     onImport: (encoded: string) => void;
-
     onSetNodeCount: (count: number) => void;
-
     selectedPreset: string;
     onPresetChange: (selected: string) => void;
-
     createExportString: () => string;
 };
-
 
 export interface Result {
     p0: Node;
@@ -71,35 +67,24 @@ export type SVGOutputProps = {
     loading: boolean;
     error: string | null;
     onChangeInput: () => void;
-
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-
-    //für scrubber:
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
-
     createExportString: () => string;
-
     onImport: (encoded: string) => void;
 };
 
 export type OutputControlProps4 = {
     timelineRef: React.RefObject<gsap.core.Timeline>
     labels: string[];
-
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
     stepCount: number;
-
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-
-    //Für scrubber
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
-
-
     playbackSpeed: number;
     onPlaybackSpeedChange: (speed: number) => void;
 };

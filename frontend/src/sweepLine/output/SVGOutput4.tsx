@@ -275,7 +275,12 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                     <div>
                         <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null
+                        <strong>Candidates:</strong>{" "}
+                        {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
+                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                            .join("; ")
+                        }
+                        {/*step.currentPoint === null
                             ? "—"
                             : shouldShowCandidateWindow(step)
                                 ? "—"
@@ -284,7 +289,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                                     : step.candidatePairs
                                         .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
                                         .join("; ")
-                        }
+                        */}
                     </div>
                 </div>
             </div>

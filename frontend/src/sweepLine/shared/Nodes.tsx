@@ -28,20 +28,11 @@ export function XNodeWithCords({ node, fill, scale = 1, ringStyle = "none"}: XNo
     const [isHovering, setIsHovering] = useState(false);
 
     return (
-        <g
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-        >
+        <g onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
             <XNode node={node} fill={fill} scale={scale} ringStyle={ringStyle} />
-
             {isHovering && (
                 <text
-                    x={node.x + 12}
-                    y={node.y + 22}
-                    fill="black"
-                    fontSize="12"
-                    fontFamily="monospace"
-                >
+                    x={node.x + 12} y={node.y + 22} fill="black" fontSize="12" fontFamily="monospace">
                     ({Math.round(node.x)}, {Math.round(node.y)})
                 </text>
             )}
@@ -51,11 +42,11 @@ export function XNodeWithCords({ node, fill, scale = 1, ringStyle = "none"}: XNo
 
 export function XNode({node, fill, scale = 1, ringStyle = "none"}: XNodeProps) {
     const NODE_SIZE = 4;
-    const HITBOX_RADIUS = 5;
+    const HITBOX_RADIUS = 3;
     const RING_RADIUS = 9;
-
+    //style={{transition: "transform 0.2s ease"}}
     return (
-        <g transform={`translate(${node.x}, ${node.y}) scale(${scale})`} style={{transition: "transform 0.2s ease"}}>
+        <g transform={`translate(${node.x}, ${node.y}) scale(${scale})`}>
             {ringStyle !== "none" && (
                 <circle
                     cx={0}

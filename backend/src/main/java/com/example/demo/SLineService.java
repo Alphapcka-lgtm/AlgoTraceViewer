@@ -88,9 +88,13 @@ public class SLineService {
             // Only for visualization: points not processed yet, so all points right of current.
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
-            String newBestMsg = "New minimum found! δ = " + String.format("%.2f", deltaAfterCandidateCheck)
-                    + " (" + bestPairAfterCandidateCheck.p0().label()
-                    + ", " + bestPairAfterCandidateCheck.p1().label() + ")";
+         //   String newBestMsg = "New minimum found! δ = " + String.format("%.2f", deltaAfterCandidateCheck) + " (" + bestPairAfterCandidateCheck.p0().label() + ", " + bestPairAfterCandidateCheck.p1().label() + ")";
+
+            String newBestMsg = "New closest pair found: " + bestPairAfterCandidateCheck.p0().label()
+                    + ", " + bestPairAfterCandidateCheck.p1().label() + " with a distance " + String.format("%.2f", deltaAfterCandidateCheck)+
+                    " This becomes the new current δ";
+
+
 
             String noNewBestMsg = "Processed point " + current.label()
                     + "; δ = " + String.format("%.2f", deltaAfterCandidateCheck)
@@ -141,6 +145,7 @@ public class SLineService {
              * Here delta and searchDelta are both the new smaller value.
              */
             if (foundNewBest) {
+          //  if (false) {
                 steps.add(new AlgorithmStepDTO(
                         "δ shrinks from " + String.format("%.2f", deltaBeforeStep)
                                 + " to " + String.format("%.2f", deltaAfterCandidateCheck)
@@ -152,7 +157,7 @@ public class SLineService {
                         new ArrayList<>(activePointsAfterShrink),     // current is still not active yet
                         xSorted,
                         bestPairAfterCandidateCheck,
-                        candidates.candidatePairs(),
+                        List.of(),
                         processedAfterShrink,
                         futurePoints,
                         List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
