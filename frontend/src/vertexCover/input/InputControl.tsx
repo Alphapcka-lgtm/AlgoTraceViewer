@@ -1,9 +1,8 @@
+import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {getRandomId} from "../../sweepLine/shared/Utils.tsx";
 import type {InputControlProps} from "./Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
-
-import {getRandomId} from "../shared/Utils.tsx";
 import {presets} from "./Presets.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 
 export function InputControl(props: InputControlProps) {
 
@@ -11,17 +10,21 @@ export function InputControl(props: InputControlProps) {
         const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;
         const density = document.getElementById("graphDensityInputSlider") as HTMLInputElement;
         const graph: Graph = getRandomGraph(size.valueAsNumber, density.valueAsNumber);
-        props.setSelected("random");
         props.setInput((input) => {
-            return {...input, densityFactor: density.valueAsNumber, graph: graph, timestamp: Date.now()};
+            return {
+                ...input,
+                densityFactor: density.valueAsNumber,
+                graph: graph,
+                preset: "random",
+                timestamp: Date.now()
+            };
         });
     };
 
     const resetInput = () => {
         props.setInput((input) => {
-            return {...input, graph: {nodes: [], edges: []}, timestamp: Date.now()};
+            return {...input, graph: {nodes: [], edges: []}, preset: "custom", timestamp: Date.now()};
         });
-        props.setSelected("custom");
         props.setInteraction({type: "idle"});
     };
 
@@ -31,28 +34,26 @@ export function InputControl(props: InputControlProps) {
                 createExportString={props.createExportString}
                 onImport={props.onImport}
             />
-            <button onClick={resetInput} className="control-button" style={{flex: 13}} >Reset</button>
+            <button onClick={resetInput} className="control-button" style={{flex: 13}}>Reset</button>
         </div>
         <div className="control-row">
             <select
                 className="control-select"
                 style={{flex: 1}}
-                value={props.selected}
+                value={props.input.preset}
                 onChange={(e) => {
                     const selected = e.target.value;
-                    props.setSelected(selected);
-                    if(selected === "random") {
+                    if (selected === "random") {
                         setRandomGraph();
                     } else if (selected !== "custom") {
-                        props.onImport(presets.filter(preset => preset.name === selected)[0].importString);
+                        const importString = presets.filter(preset => preset.name === selected)[0].importString;
+                        props.onImport(importString);
                     }
                 }}
             >
-                {presets.map((preset, index) => {
-                    return <option key={index} value={preset.name} >{preset.name}</option>;
-                })}
-                <option value="random" >random</option>
-                <option value="custom" >custom</option>
+                {presets.map((preset, index) => <option key={index} value={preset.name}>{preset.name}</option>)}
+                <option value="random">random</option>
+                <option value="custom">custom</option>
             </select>
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
@@ -75,7 +76,12 @@ function getRandomGraph(n: number, d: number): Graph {
     for (let i = 0; i < n; i++) {
         const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
         const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
-        graph.nodes.push({x: Math.floor(xCoordinate * 1123), y: Math.floor(yCoordinate * 500), id: getRandomId()})
+        graph.nodes.push({
+            x: Math.floor(xCoordinate * 1123),
+            y: Math.floor(yCoordinate * 500),
+            id: getRandomId(),
+            label: ""
+        })
     }
 
     for (let i = 0; i < graph.nodes.length; i++) {

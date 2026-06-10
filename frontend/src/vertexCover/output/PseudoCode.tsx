@@ -1,17 +1,17 @@
 import type {PseudoCodeLine} from "../../sweepLine/shared/Types.tsx";
 
 export function getActiveLineIdsMaxDegree(stepIndex: number, maxIndex: number) {
-    if(stepIndex === 0){
+    if (stepIndex === 0) {
         return ["initC", "initE"];
     } else if (stepIndex === 1) {
         return ["initN"]
-    } else if(stepIndex === maxIndex){
+    } else if (stepIndex === maxIndex) {
         return ["return"];
-    } else if(stepIndex % 3 === 2) {
+    } else if (stepIndex % 3 === 2) {
         return ["choose"]
-    } else if(stepIndex % 3 === 0) {
+    } else if (stepIndex % 3 === 0) {
         return ["add"];
-    } else if(stepIndex % 3 === 1) {
+    } else if (stepIndex % 3 === 1) {
         return ["remove"]
     } else {
         return [];
@@ -70,15 +70,15 @@ export const PSEUDOCODE_MAX_DEGREE: PseudoCodeLine[] = [
 ];
 
 export function getActiveLineIdsRandom(stepIndex: number, maxIndex: number) {
-    if(stepIndex === 0){
+    if (stepIndex === 0) {
         return ["initC", "initE"];
-    } else if(stepIndex === maxIndex){
+    } else if (stepIndex === maxIndex) {
         return ["return"];
-    } else if(stepIndex % 3 === 1) {
+    } else if (stepIndex % 3 === 1) {
         return ["choose"]
-    } else if(stepIndex % 3 === 2) {
+    } else if (stepIndex % 3 === 2) {
         return ["add"]
-    } else if(stepIndex % 3 === 0) {
+    } else if (stepIndex % 3 === 0) {
         return ["remove"]
     } else {
         return [];

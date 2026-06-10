@@ -1,17 +1,16 @@
-import {useRef, useState} from "react";
-import {useGSAP} from "@gsap/react";
-
-import gsap from "gsap";
-import DrawSVGPlugin from "gsap/DrawSVGPlugin";
-import type {SVGOutputProps} from "../shared/Types.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
-import {Edges} from "../shared/Edges.tsx";
-import {Nodes} from "../shared/Nodes.tsx";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
+import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
 import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import type {SVGOutputProps} from "../shared/Types.tsx";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import {Edges} from "../shared/Edges.tsx";
+import {Nodes} from "../shared/Nodes.tsx";
+import {useRef, useState} from "react";
+import {useGSAP} from "@gsap/react";
+import gsap from "gsap";
 
 const STEP_DURATION = 1.0;
 
@@ -73,7 +72,7 @@ export function RandomSVGOutput(props: SVGOutputProps) {
             timeline.addLabel(labels[3 * index + 2]);
 
             intermediateState.chosenNodes.forEach((node, index) => {
-                if(index === 0){
+                if (index === 0) {
                     timeline.to("#u1" + node.id, {r: 20});
                     timeline.to("#u2" + node.id, {r: 18}, "<");
                     timeline.to("#u3" + node.id, {r: 15}, "<");
@@ -124,12 +123,13 @@ export function RandomSVGOutput(props: SVGOutputProps) {
         <IOModeTabs
             mode="output"
             onChangeInput={props.onChangeInput}
-            onSubmit={() => {}}
+            onSubmit={() => {
+            }}
             canSubmit={false}
         />
         <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
-            <Nodes nodes={props.output.initialState.nodes} />
+            <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
         <OutputControl4
             timelineRef={tlRef}
