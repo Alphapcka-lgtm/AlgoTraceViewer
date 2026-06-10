@@ -2,8 +2,19 @@ import React from "react";
 import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
 import LZString from "lz-string";
 
-export function getRandomId(): string {
-    return "i" + Math.floor(Date.now() * Math.random()).toString();
+function encodeUsingChars(i: number, chars: string): string {
+    const base = chars.length;
+    let result = "";
+    do {
+        result = chars.charAt(i % base) + result;
+        i = Math.floor(i / base);
+    } while (i > 0);
+    return result;
+}
+
+export function getRandomId(): string{
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    return encodeUsingChars(Math.floor(Date.now() * Math.random()), chars + chars.toUpperCase());
 }
 
 export const btnStyle: React.CSSProperties = {

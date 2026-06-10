@@ -1,7 +1,6 @@
-import type { Edge, EdgesProps } from "./Types.tsx";
-
-import { getNodeById } from "./Utils.tsx";
+import type {Node} from "../../sweepLine/shared/Types.tsx"
 import type {PreviewEdgeProps} from "../input/Types.tsx";
+import type {Edge, EdgesProps} from "./Types.tsx";
 
 export function Edges(props: EdgesProps) {
     return props.edges.map((e: Edge, index) => {
@@ -12,26 +11,26 @@ export function Edges(props: EdgesProps) {
         const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
 
         return (
-            <g key={"a" + e.id + index} >
+            <g key={"a" + e.id + index}>
                 <path
-                    id={ "u0" + e.id.toString() }
-                    key={ "u0" + e.id + index}
+                    id={"u0" + e.id.toString()}
+                    key={"u0" + e.id + index}
                     d={p}
                     style={{opacity: 0}}
                     stroke={colors.blue}
                     strokeWidth={4}
                 />
                 <path
-                    id={ "u1" + e.id.toString() }
-                    key={ "u1" + e.id + index }
+                    id={"u1" + e.id.toString()}
+                    key={"u1" + e.id + index}
                     d={p}
                     style={{opacity: 0}}
                     stroke={colors.red}
                     strokeWidth={7}
                 />
                 <path
-                    id={ e.id.toString() }
-                    key={ e.id + index }
+                    id={e.id.toString()}
+                    key={e.id + index}
                     d={p}
                     stroke="black"
                     strokeWidth={2}
@@ -42,7 +41,7 @@ export function Edges(props: EdgesProps) {
 }
 
 export function PreviewEdge(props: PreviewEdgeProps) {
-    if(props.interaction.type === "drawing-edge" && props.interaction.to) {
+    if (props.interaction.type === "drawing-edge" && props.interaction.to) {
         const node = getNodeById(props.nodes, props.interaction.fromId);
         return <line
             key={-1}
@@ -55,5 +54,8 @@ export function PreviewEdge(props: PreviewEdgeProps) {
             strokeDasharray="4"
         />;
     }
+}
 
-    }
+function getNodeById(nodes: Node[], id: string): Node {
+    return nodes.find((n) => n.id === id)!;
+}

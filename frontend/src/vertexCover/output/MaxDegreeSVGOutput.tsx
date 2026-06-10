@@ -1,18 +1,17 @@
-import {useRef, useState} from "react";
-import {useGSAP} from "@gsap/react";
-
-import gsap from "gsap";
-import DrawSVGPlugin from "gsap/DrawSVGPlugin";
-import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
-import type {SVGOutputProps} from "../shared/Types.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
-import {Edges} from "../shared/Edges.tsx";
-import {Nodes} from "../shared/Nodes.tsx";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
-import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
 import {getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.tsx";
 import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
+import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
+import type {SVGOutputProps} from "../shared/Types.tsx";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import {Edges} from "../shared/Edges.tsx";
+import {Nodes} from "../shared/Nodes.tsx";
+import {useRef, useState} from "react";
+import {useGSAP} from "@gsap/react";
+import gsap from "gsap";
 
 const STEP_DURATION = 1.0;
 
@@ -177,7 +176,11 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
                         <tr>
                             {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
                                 <th key={index}>
-                                    <span id={"t1" + ndp.node.id} style={{borderRadius: "9px", background: "none", textAlign: "center"}}>{ndp.node.label}</span>
+                                    <span id={"t1" + ndp.node.id} style={{
+                                        borderRadius: "9px",
+                                        background: "none",
+                                        textAlign: "center"
+                                    }}>{ndp.node.label}</span>
                                 </th>
                             ))}
                         </tr>
@@ -186,7 +189,8 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
                         <tr>
                             {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
                                 <th key={index}>
-                                    <span id={"t2" + ndp.node.id} style={{borderRadius: "9px", background: "none", textAlign: "center"}}></span>
+                                    <span id={"t2" + ndp.node.id}
+                                          style={{borderRadius: "9px", background: "none", textAlign: "center"}}></span>
                                 </th>
                             ))}
                         </tr>

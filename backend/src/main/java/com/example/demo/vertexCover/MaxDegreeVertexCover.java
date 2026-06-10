@@ -12,13 +12,15 @@ import java.util.*;
 public class MaxDegreeVertexCover {
 
     public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == 0 ? System.nanoTime() : seed;
+        seed = seed == null || seed == 0 ? System.nanoTime() : seed;
+
+        List<AnimationState> intermediateStates = new ArrayList<>();
 
         Random randomGenerator = new Random(seed);
 
-        Map<Node, Integer> neighbourCount = new HashMap<>();
+        List<Edge> remainingEdges = new ArrayList<>(graph.edges());
 
-        List<AnimationState> intermediateStates = new ArrayList<>();
+        Map<Node, Integer> neighbourCount = new HashMap<>();
 
         graph.edges().forEach(edge -> {
             neighbourCount.put(getNodeById(graph.nodes(), edge.fromId()), neighbourCount.getOrDefault(getNodeById(graph.nodes(), edge.fromId()), 0) + 1);
@@ -26,8 +28,6 @@ public class MaxDegreeVertexCover {
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream().map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue())).toList();
-
-        List<Edge> remainingEdges = new ArrayList<>(graph.edges());
 
         while (!remainingEdges.isEmpty()) {
 

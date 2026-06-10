@@ -1,12 +1,10 @@
-import {useState} from "react";
-
 import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
-import {decodeExportState, encodeExportState} from "./../sweepLine/shared/Utils.tsx";
+import {assignLabels, decodeExportState, encodeExportState} from "./../sweepLine/shared/Utils.tsx";
+import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
 import type {ExportState} from "./../sweepLine/shared/Types.tsx";
-import {getNodeLabel} from "./shared/Utils.tsx";
 import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
 import {SVGInput} from "./input/SVGInput.tsx";
-import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
+import {useState} from "react";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -17,6 +15,7 @@ export function VertexCover() {
     const [input, setInput] = useState<AnimationRequest>({
         graph: {nodes: [], edges: []},
         densityFactor: 0.2,
+        preset: "custom",
         randomSeed: 0,
         timestamp: 0
     });
@@ -30,15 +29,8 @@ export function VertexCover() {
     });
 
     const submitInput = (inp: AnimationRequest) => {
-        console.log(inp);
         if (inp.timestamp > output.timestamp) {
-            const labeledInp = {
-                ...inp, graph: {
-                    nodes: inp.graph.nodes.map((node, index) => {
-                        return {...node, label: getNodeLabel(index)};
-                    }), edges: inp.graph.edges
-                }
-            };
+            const labeledInp = {...inp, graph: {nodes: assignLabels(inp.graph.nodes), edges: inp.graph.edges}};
             fetchAnimation(labeledInp)
                 .then(() => {
                     setProgress(0);
@@ -64,13 +56,10 @@ export function VertexCover() {
             });
     };
 
-    const submitCurrentInput = () => submitInput(input);
-
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm === "vertexCover") {
-
                 fetchAnimation(imported.input)
                     .then(() => {
                         setProgress(imported.progress);
@@ -81,7 +70,10 @@ export function VertexCover() {
         }
     };
 
-    const createExportString = () => encodeExportState({algorithm: "vertexCover", progress, input});
+    const createExportString = () => {
+        const labeledInp = {...input, graph: {nodes: assignLabels(input.graph.nodes), edges: input.graph.edges}};
+        return encodeExportState({algorithm: "vertexCover", input: labeledInp, progress});
+    };
 
     const onTabChange = (v: VertexCoverVariant) => {
         if (mode === "input") {
@@ -134,7 +126,7 @@ export function VertexCover() {
                     <SVGInput
                         setInput={setInput}
                         input={input}
-                        onSubmit={submitCurrentInput}
+                        onSubmit={submitInput}
                         createExportString={createExportString}
                         onImport={handleImport}
                     /> : svgOutput
