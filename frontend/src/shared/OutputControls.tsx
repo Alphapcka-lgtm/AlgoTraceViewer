@@ -1,7 +1,8 @@
-import type {OutputControlProps4} from "../shared/Types.tsx";
-import gsap from "gsap";
 
-export function OutputControl4(props: OutputControlProps4) {
+import gsap from "gsap";
+import type {OutputControlsProps} from "./Types.tsx";
+
+export function OutputControls(props: OutputControlsProps) {
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.labels.length - 1;
 

@@ -1,9 +1,9 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
-import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.tsx";
-import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
-import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import type {SVGOutputProps} from "../shared/Types.tsx";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {Edges} from "../shared/Edges.tsx";
@@ -131,7 +131,7 @@ export function RandomSVGOutput(props: SVGOutputProps) {
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
-        <OutputControl4
+        <OutputControls
             timelineRef={tlRef}
             labels={labels}
             currentStep={props.stepIndex}

@@ -1,5 +1,4 @@
 import React from "react";
-import type {AnimationRequest} from "../../vertexCover/shared/Types.tsx";
 
 export type Node = {
     x: number;
@@ -19,8 +18,8 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
-//was SVGInput alles von App bekommt
-export type SVGInputProps = {
+//was Input alles von App bekommt
+export type InputProps = {
     height: number;
     width: number;
     mode: string;
@@ -59,8 +58,8 @@ export interface AlgorithmStepDTO {
     pseudoCodeLineIds: string[];
 }
 
-//was SVGOutput von App bekommt
-export type SVGOutputProps = {
+//was Output von App bekommt
+export type OutputProps = {
     height: number;
     width: number;
     steps: AlgorithmStepDTO[];
@@ -75,20 +74,6 @@ export type SVGOutputProps = {
     onImport: (encoded: string) => void;
 };
 
-export type OutputControlProps4 = {
-    timelineRef: React.RefObject<gsap.core.Timeline>
-    labels: string[];
-    currentStep: number;
-    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    stepCount: number;
-    isPlaying: boolean;
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-    progress: number;
-    setProgress: React.Dispatch<React.SetStateAction<number>>;
-    playbackSpeed: number;
-    onPlaybackSpeedChange: (speed: number) => void;
-};
-
 export type SweepLineInputState = {
     nodes: Node[];
     timestamp: number;
@@ -99,7 +84,6 @@ export type SweepLineOutputState = {
     timestamp: number;
 };
 
-
 export type RingStyle = "none" | "active" | "candidate";
 
 export type XNodeProps = {
@@ -107,21 +91,4 @@ export type XNodeProps = {
     fill: string;
     scale?: number;
     ringStyle?: RingStyle;
-};
-
-export type ModeTabsProps = {
-    mode: "input" | "output";
-    onChangeInput: () => void;
-    onSubmit: () => void;
-    canSubmit: boolean;
-};
-
-export type ExportState =
-    | { algorithm: "sweepLine", progress: number, input: Node[] }
-    | { algorithm: "vertexCover", progress: number, input: AnimationRequest };
-
-export type PseudoCodeLine = {
-    id: string;
-    text: string;
-    indent?: number;
 };

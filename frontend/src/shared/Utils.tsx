@@ -1,6 +1,7 @@
 import React from "react";
-import type {ExportState, PseudoCodeLine, Node} from "./Types.tsx";
 import LZString from "lz-string";
+import type {ExportState, PseudoCodeLine} from "./Types.tsx";
+import type {Node} from "../sweepLine/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;

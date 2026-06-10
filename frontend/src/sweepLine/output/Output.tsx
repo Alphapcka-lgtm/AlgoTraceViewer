@@ -1,18 +1,18 @@
 import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, RingStyle, SVGOutputProps} from "../shared/Types.tsx";
-import {OutputControl4} from "./OutputControl4.tsx";
+import type {AlgorithmStepDTO, Node, RingStyle, OutputProps} from "../shared/Types.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
-import {IOModeTabs} from "../shared/IOModeTabs.tsx";
-import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../shared/Utils.tsx";
-import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "./PseudoCodePanel.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../../shared/Utils.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
-export function SVGOutput4(props: SVGOutputProps) {
+export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
@@ -240,7 +240,7 @@ export function SVGOutput4(props: SVGOutputProps) {
                 })}
             </svg>
 
-            <OutputControl4
+            <OutputControls
                 timelineRef={timelineRef}
                 labels={myLabels}
                 currentStep={props.currentStep}

@@ -1,4 +1,4 @@
-import type {PseudoCodeLine} from "../../sweepLine/shared/Types.tsx";
+import type {PseudoCodeLine} from "../../shared/Types.tsx";
 
 export function getActiveLineIdsMaxDegree(stepIndex: number, maxIndex: number) {
     if (stepIndex === 0) {

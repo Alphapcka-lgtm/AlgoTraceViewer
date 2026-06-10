@@ -1,11 +1,12 @@
 import {useState} from "react";
-import {SVGInput} from "./input/SVGInput.tsx";
+import {Input} from "./input/Input.tsx";
 import useSweepLineSteps from "./Api.tsx";
-import type {ExportState, Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
-import {SVGOutput4} from "./output/SVGOutput4.tsx";
-import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "./shared/Utils.tsx";
+import type {Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
+import {Output} from "./output/Output.tsx";
+import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "../shared/Utils.tsx";
 import "./App.css";
 import {presets} from "./input/Presets.tsx";
+import type {ExportState} from "../shared/Types.tsx";
 
 export default function App() {
     const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
@@ -155,7 +156,7 @@ export default function App() {
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
-                <SVGInput
+                <Input
                     height={svgHeight}
                     width={svgWidth}
                     mode={modeState}
@@ -180,7 +181,7 @@ export default function App() {
 
     return (
         <div className="algorithm-shell">
-            <SVGOutput4
+            <Output
                 height={svgHeight}
                 width={svgWidth}
                 steps={outputState.steps}
