@@ -123,7 +123,7 @@ export function VertexCover() {
                 width: "fit-content",
                 marginLeft: "auto",
                 marginRight: "3rem",
-                marginBottom: "1rem"
+                marginBottom: "2rem"
             }}>
                 <NavButton variant="random" label="Random" activeVariant={variant} onTabChange={onTabChange}/>
                 <NavButton variant="maxDegree" label="Max Degree" activeVariant={variant} onTabChange={onTabChange}/>
