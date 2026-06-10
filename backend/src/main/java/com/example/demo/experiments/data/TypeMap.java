@@ -1,5 +1,7 @@
 package com.example.demo.experiments.data;
 
+import java.util.Arrays;
+
 /**
  * Immutable class representing the S-type and L-type suffixes of the string.
  *
@@ -13,25 +15,26 @@ public class TypeMap {
         this.map = map;
     }
 
-    public static TypeMap buildTypeMap(final String string) {
-        Type[] map = new Type[string.length() + 1];
-        map[string.length()] = Type.S_TYPE;
+    public static TypeMap buildTypeMap(final int[] text) {
+        Type[] map = new Type[text.length];
 
-        if (string.isEmpty()) {
+        if (text.length == 1) {
             return new TypeMap(map);
         }
 
-        map[string.length() - 1] = Type.L_TYPE;
+        map[text.length - 1] = Type.L_TYPE;
 
-        for (int i = string.length() - 2; i > -1; i--) {
-            if (string.charAt(i) > string.charAt(i + 1)) {
+        for (int i = text.length - 2; i > -1; i--) {
+            if (text[i] > text[i + 1]) {
                 map[i] = Type.L_TYPE;
-            } else if (string.charAt(i) == string.charAt(i + 1) && map[i + 1] == Type.L_TYPE) {
+            } else if (text[i] == text[i + 1] && map[i + 1] == Type.L_TYPE) {
                 map[i] = Type.L_TYPE;
             } else {
                 map[i] = Type.S_TYPE;
             }
         }
+
+        map[text.length - 1] = Type.S_TYPE;
 
         return new TypeMap(map);
     }
@@ -44,6 +47,14 @@ public class TypeMap {
         return map[index];
     }
 
+    public int getLmsCount() {
+        int count = 0;
+        for (int i = 0; i < map.length; i++) {
+            if (isLmsChar(i)) count++;
+        }
+        return count;
+    }
+
     /**
      * Indicates if the char at offset is a left-most S-type
      *
@@ -51,9 +62,15 @@ public class TypeMap {
      * @return <code>true</code> if the character at offset is a left-most S-type
      */
     public boolean isLmsChar(final int offset) {
-        if (offset < 0 || offset >= length()) return false;
+        if (offset <= 0 || offset >= length()) return false;
 
         return map[offset] == Type.S_TYPE && map[offset - 1] == Type.L_TYPE;
+    }
+
+    @Override
+    public String toString() {
+        var f = Arrays.stream(map).map(Type::getValue).toArray(Character[]::new);
+        return Arrays.toString(f);
     }
 
     public enum Type {
@@ -64,6 +81,10 @@ public class TypeMap {
 
         Type(char value) {
             this.value = value;
+        }
+
+        public char getValue() {
+            return value;
         }
     }
 }

@@ -1,216 +1,132 @@
-import * as React from "react";
-import {type KeyboardEvent, useState} from "react";
-import './App.css'
-import type {BubbleSortResponseDto} from "./data/BubbleSortResponseDto.ts";
-import type {BubbleSortState} from "./data/BubbleSortState.ts";
+import {useState} from "react";
+import {SVGInput} from "./input/SVGInput.tsx";
+import useSweepLineSteps from "./Api.tsx";
+import type {AlgorithmStepDTO, ExportState, Node} from "./shared/Types.tsx";
+//import {SVGOutput} from "./SVGOutput";
+//import {SVGOutput2} from "./SVGOutput2.tsx";
+import {SVGOutput4} from "./output/SVGOutput4.tsx";
+import {decodeExportState, encodeExportState, getAlphabetLabel} from "./shared/Utils.tsx";
 
-function App() {
-    const [count, setCount] = useState(0)
-    const [response, setResponse] = useState('')
-    const [numbers, setNumbers] = useState<number[]>([])
-    const [bubbleSortResponse, setBubbleSortResponse] = useState<BubbleSortResponseDto>()
-    const [bubbleSortStates, setBubbleSortStates] = useState<React.JSX.Element[]>([])
-    const [currentSvgIndex, setCurrentSvgIndex] = useState<number>(0)
-    const [maxSvgIndex, setMaxSvgIndex] = useState<number>(0)
+export default function App() {
+    const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
+    const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
 
-    const createBubbleSortSvgs = () => {
-        let states: React.JSX.Element[] = []
-        bubbleSortResponse?.states.forEach((state) => {
-            states.push(parseBubbleSortState(state))
-        })
-        setBubbleSortStates(states)
-    }
+    const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
 
-    const parseBubbleSortState = (data: BubbleSortState) => {
-        return (<svg width={startX * 2 + numbers.length * cellWidth} height="70">
-                {data.numbers.map((num, index) => {
-                    const x = startX + index * cellWidth;
+    const {loading, error, calculateSteps} = useSweepLineSteps();
 
-                    return (
-                        <g key={num}>
-                            <rect
-                                x={x}
-                                y={startY}
-                                width={cellWidth}
-                                height={cellHeight}
-                                fill={cellFill(index)}
-                                stroke="black"
-                            />
-                            <text
-                                x={x + cellWidth / 2}
-                                y={startY + cellHeight / 2 + 6}
-                                textAnchor="middle"
-                                fontSize="18"
-                                fontFamily="Arial"
-                                fill="black"
-                            >
-                                {num}
-                            </text>
-                        </g>
-                    )
-                })}
-            </svg>
-        )
-    }
+    const [nextLabelIndex, setNextLabelIndex] = useState(0);
 
-    const svgGoForward = () => {
-        setCurrentSvgIndex((prev) => prev < bubbleSortStates.length - 1 ? prev + 1 : prev)
-    }
+    const [currentStep, setCurrentStep] = useState(0);
+    const [progress, setProgress] = useState(0);    //für scrubber
 
-    const svgGoBackward = () => {
-        setCurrentSvgIndex((prev) => prev > 0 ? prev - 1 : prev)
-    }
+    const svgHeight = 500;
+    const svgWidth = 1123;
 
-    const [inputText, setInputText] = useState('')
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            addNumber()
+    const handleAddNode = (node: Omit<Node, "label">) => {
+        const label: string = getAlphabetLabel(nextLabelIndex);
+        const newNode: Node = {...node, label};
+        setNodes((prev: Node[]) => [...prev, newNode]);
+        setNextLabelIndex((prev: number) => prev + 1);
+    };
+
+    const handleMoveNode = (id: string, x: number, y: number) => {
+        setNodes((prev: Node[]) =>
+            prev.map((n: Node) => n.id === id ? {...n, x, y} : n)
+        );
+    };
+
+    const handleDeleteNode = (id: string) => {
+        setNodes((prev: Node[]) => prev.filter(n => n.id !== id));
+    };
+
+    const handleReset = () => {
+        setNodes([]);
+        setOutputSteps([]);
+        setNextLabelIndex(0);
+
+        setCurrentStep(0);
+        setProgress(0);
+    };
+
+    //quasi die grundfunktion für handleNormalSubmit und handleImport
+    const handleSubmit = async (submittedNodes: Node[]) => {
+        try {
+            const result = await calculateSteps(submittedNodes);
+            //console.log("Algorithm steps:", result);
+            setOutputSteps(result);
+            setModeState("output");
+        } catch (error) {
+            console.error(error);
         }
-    }
+    };
 
-    const addNumber = () => {
-        if (inputText.trim() === "") return;
+    //bei normalen will man ganz normal am anfang starten...
+    const handleNormalSubmit = async (submittedNodes: Node[]) => {
+        setProgress(0);
+        setCurrentStep(0);
 
-        let num = Number(inputText)
-        if (num) {
-            setNumbers([...numbers, num])
-        } else {
-            alert('input was not a number: \'' + inputText + '\'')
+        await handleSubmit(submittedNodes);
+    };
+
+    const handleChangeInput = () => {
+        setModeState("input");
+    };
+
+    const createExportString = () => {
+        return encodeExportState({nodes, progress});
+    };
+
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported:ExportState = decodeExportState(encoded);
+
+            setNodes(imported.nodes);
+            // Damit neue Punkte nach dem Import kein bereits vergebenes Label bekommen
+            setNextLabelIndex(imported.nodes.length); // TODO: z. B. wenn importierte Labels A, C, Z, wäre nodes.length nicht wirklich richitg ...
+            setProgress(imported.progress);
+
+            await handleSubmit(imported.nodes);
+        } catch (error) {
+            console.error("Invalid import string", error);
         }
-    }
+    };
 
-    const generateNumbers = () => {
-        const nums: number[] = []
-        for (let i = 0; i < 20; i++) {
-            nums.push(randomIntFromInterval(0, 10_000))
-        }
-        setNumbers(nums)
-    }
+    if (modeState === "input") {
+        return (
+            <SVGInput
+                height={svgHeight}
+                width={svgWidth}
+                mode={modeState}
+                nodes={nodes}
 
-    const deleteNumber = (indexToDelete: number) => {
-        setNumbers((prevNumbers) => prevNumbers.filter((_, index) => index !== indexToDelete))
-    }
+                onAddNode={handleAddNode}
+                onMoveNode={handleMoveNode}
+                onDeleteNode={handleDeleteNode}
+                onReset={handleReset}
 
-    // useEffect(() => {
-    //     fetch('http://localhost:8080/algo?name=world')
-    //         .then(res => res.json())
-    //         .then(data => setResponse(JSON.stringify(data)))
-    // })
+                onSubmit={handleNormalSubmit}
+                onChangeInput={handleChangeInput}
 
-    // consts for test svg
-    const testNumbers = Array.from({length: 20}).map((_, i) => i + 1)
-    const cellWidth = 60;
-    const cellHeight = 50;
-    const startX = 10;
-    const startY = 10;
-    const cellFill = (index: number) => {
-        if ((index % 2) === 0) {
-            return "white"
-        }
-        return "yellow"
+                onImport={handleImport}
+            />
+        );
     }
 
     return (
-        <>
-            <div>
-                <p>Hello world</p>
-            </div>
-            <section id="add-numbers">
-                <div>
-                    <p>
-                        Add number: <input
-                        type="number"
-                        placeholder="enter some numbers here"
-                        name="numbers-input"
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        onKeyDown={handleKeyDown}/>
-                        <button onClick={addNumber}>add</button>
-                        <button onClick={generateNumbers}>random numbers</button>
-                    </p>
-                </div>
-            </section>
+        <SVGOutput4
+            height={svgHeight}
+            width={svgWidth}
+            steps={outputSteps}
+            loading={loading}
+            error={error}
+            onChangeInput={handleChangeInput}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+            progress={progress}
+            setProgress={setProgress}
+            createExportString={createExportString}
+        />
+    );
 
-            <section id="numbers">
-                <div>
-                    <h3>Numbers ({numbers.length}):</h3>
-                    <ul>
-                        {numbers.map((number, index) => (
-                            <li key={index}>
-                                <span>{number}</span>
-                                <button type="button" onClick={() => deleteNumber(index)}>
-                                    delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <button className="counter" onClick={() => {
-                        fetch('http://localhost:8080/bubblesort', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({'numbers': numbers})
-                        })
-                            .then(res => res.json())
-                            .then(data => {
-                                alert(data)
-                                setBubbleSortResponse(data)
-                                createBubbleSortSvgs()
-                                setCurrentSvgIndex(0)
-                                setMaxSvgIndex(bubbleSortStates.length)
-                            })
-                    }}>
-                        SEND IT!
-                    </button>
-                </div>
-                <div>
-                    <h3>response:</h3>
-                    <code>{JSON.stringify(bubbleSortResponse)}</code>
-                </div>
-            </section>
-
-            <section id="svg-test">
-                <h4>States ({bubbleSortStates.length}):</h4>
-                {/*<div>*/}
-                {/*    {bubbleSortStates.map((state, index) => {*/}
-                {/*        return (*/}
-                {/*            <div key={index}>*/}
-                {/*                {state}*/}
-                {/*                <hr/>*/}
-                {/*            </div>*/}
-                {/*        )*/}
-                {/*    })}*/}
-                {/*</div>*/}
-
-                <div>
-                    {bubbleSortStates[currentSvgIndex]}
-                </div>
-
-                <button onClick={svgGoBackward} disabled={currentSvgIndex === 0}>
-                    Previous
-                </button>
-
-                <button
-                    onClick={svgGoForward}
-                    disabled={currentSvgIndex === bubbleSortStates.length - 1}
-                >
-                    Next
-                </button>
-                <div>
-                    <p>
-                        Graphic {currentSvgIndex + 1} of {bubbleSortStates.length}
-                    </p>
-                </div>
-            </section>
-        </>
-    )
 }
-
-function randomIntFromInterval(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min) + min);
-}
-
-export default App

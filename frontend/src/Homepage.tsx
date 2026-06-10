@@ -1,0 +1,261 @@
+import React, {useState} from "react";
+import App from "./App";
+
+type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover";
+
+export function Homepage() {
+    const [activeTab, setActiveTab] = useState<Tab>("homepage");
+
+    return (
+        <div style={pageStyle}>
+            <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
+
+            <main style={mainStyle}>
+                {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
+                {activeTab === "sweepline" && <App/>}
+                {activeTab === "vertexcover" && <VertexCover/>}
+                {activeTab === "suffixarray" && <SuffixArray/>}
+            </main>
+        </div>
+    );
+}
+
+type HeaderProps = { activeTab: Tab; setActiveTab: React.Dispatch<React.SetStateAction<Tab>>; };
+function Header(props:HeaderProps) {
+    return (
+        <header style={headerStyle}>
+            <AlgoTraceLogo/>
+
+            <NavigationBar activeTab={props.activeTab} onTabChange={props.setActiveTab}/>
+        </header>
+    );
+}
+
+type NavigationBarProps = { activeTab: Tab; onTabChange: (tab: Tab) => void; };
+
+function NavigationBar(props: NavigationBarProps) {
+    return (
+        <nav style={navStyle}>
+            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+        </nav>
+    );
+}
+
+type NavButtonProps = { tab: Tab; label: string; activeTab: Tab; onTabChange: (tab: Tab) => void; };
+
+function NavButton(props: NavButtonProps) {
+    const isActive = props.activeTab === props.tab;
+
+    return (
+        <button
+            type="button"
+            onClick={() => props.onTabChange(props.tab)}
+            style={{
+                ...navButtonStyle,
+                background: isActive ? "#102E50" : "white",
+                color: isActive ? "white" : "#102E50",
+            }}
+        >
+            {props.label}
+        </button>
+    );
+}
+
+
+function VertexCover() {
+    return (
+        <h1>VertexCover</h1>
+    );
+}
+
+function SuffixArray() {
+    return <h1>suffixarray</h1>;
+}
+
+
+type HomeContentProps = {
+    onTabChange: (tab: Tab) => void;
+};
+
+function HomeContent(props: HomeContentProps) {
+    return (
+        <section>
+            <h1 style={headlineStyle}>Willkommen im Algo Trace Viewer</h1>
+
+            <p style={textStyle}>
+                Wähle einen Algorithmus aus, um seine Schritte visuell nachzuvollziehen.
+            </p>
+
+            <div style={cardGridStyle}>
+                <AlgorithmCard
+                    title="Sweepline"
+                    description="bli bla blup"
+                    onClick={() => props.onTabChange("sweepline")}
+                />
+
+                <AlgorithmCard
+                    title="Suffix Array"
+                    description="bla bla blup"
+                    onClick={() => props.onTabChange("suffixarray")}
+                />
+
+                <AlgorithmCard
+                    title="Vertex Cover"
+                    description="bup lup schup"
+                    onClick={() => props.onTabChange("vertexcover")}
+                />
+            </div>
+        </section>
+    );
+}
+
+type AlgorithmCardProps = {
+    title: string; description: string; onClick: () => void;
+};
+
+function AlgorithmCard(props: AlgorithmCardProps) {
+    return (
+        <button type="button" onClick={props.onClick} style={cardStyle}>
+            <h2 style={cardTitleStyle}>{props.title}</h2>
+            <p style={cardTextStyle}>{props.description}</p>
+        </button>
+    );
+}
+
+
+function AlgoTraceLogo() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="340"
+            height="100"
+            viewBox="0 0 370 110"
+            role="img"
+            aria-labelledby="title desc"
+        >
+            <title id="title">Algo Trace Viewer icon</title>
+            <desc id="desc">Graph path with play and pause and title Algo Trace Viewer.</desc>
+
+            <g transform="translate(5,20)">
+                <circle cx="0" cy="0" r="6" fill="#BE3D2A"/>
+                <circle cx="40" cy="0" r="6" fill="#102E50"/>
+                <circle cx="40" cy="40" r="6" fill="#102E50"/>
+                <circle cx="80" cy="40" r="6" fill="#102E50"/>
+
+                <path
+                    d="M0 0 L40 0 L40 40 L80 40"
+                    fill="none"
+                    stroke="#102E50"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+
+                <polygon points="56,14 56,26 66,20" fill="#BE3D2A"/>
+
+                <line x1="16" y1="15" x2="16" y2="25" stroke="#102E50" strokeWidth="3" strokeLinecap="round"/>
+                <line x1="24" y1="15" x2="24" y2="25" stroke="#102E50" strokeWidth="3" strokeLinecap="round"/>
+            </g>
+
+            <g transform="translate(125,45)">
+                <text
+                    x="-20"
+                    y="0"
+                    fontFamily="Arial"
+                    fontSize="28"
+                    fontWeight="600"
+                    fill="#102E50"
+                >
+                    AlgoTraceViewer
+                </text>
+            </g>
+        </svg>
+    );
+}
+
+const pageStyle: React.CSSProperties = {
+    padding: 24,
+    //fontFamily: "Inter, Segoe UI, Arial, sans-serif",
+    fontFamily: "Arial",
+};
+
+const headerStyle: React.CSSProperties = {
+    //marginBottom: 16,
+    display: "flex",
+    alignItems: "center", //vertikal gleiche Höhe
+    justifyContent: "space-between", //maximal auseinander
+    gap: 40,
+    padding: 20,
+};
+
+const navStyle: React.CSSProperties = {
+    display: "flex",
+    justifyContent: "center",
+    gap: 7,
+    padding: 9,
+    margin: "0 auto 32px auto",
+    maxWidth: 700,
+    border: "3px solid #102E50",
+    borderRadius: 999,
+    background: "white",
+};
+
+const navButtonStyle: React.CSSProperties = {
+    border: "none",
+    borderRadius: 999,
+    padding: "10px 20px",
+    fontSize: 20,
+    fontWeight: 700,
+    cursor: "pointer",
+};
+
+const mainStyle: React.CSSProperties = {
+    maxWidth: 1000,
+    margin: "0 auto",
+};
+
+const headlineStyle: React.CSSProperties = {
+    color: "#102E50",
+    fontSize: 36,
+    marginBottom: 8,
+    fontWeight: 500
+};
+
+const textStyle: React.CSSProperties = {
+    color: "#333",
+    fontSize: 18,
+    marginBottom: 28,
+};
+
+const cardGridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: 20,
+};
+
+const cardStyle: React.CSSProperties = {
+    textAlign: "left",
+    border: "2px solid #102E50",
+    borderRadius: 18,
+    padding: 20,
+    background: "white",
+    cursor: "pointer",
+};
+
+const cardTitleStyle: React.CSSProperties = {
+    color: "#BE3D2A", // frabe vom logo wieder aufgenommen
+    marginTop: 0,
+    marginBottom: 10,
+    fontWeight: 700,
+};
+
+const cardTextStyle: React.CSSProperties = {
+    color: "#333",
+    fontSize: 15,
+    lineHeight: 1.5,
+};
