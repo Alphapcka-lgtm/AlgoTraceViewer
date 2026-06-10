@@ -4,6 +4,8 @@ import com.example.demo.bubblesort.BubbleSort;
 import com.example.demo.bubblesort.dto.BubbleSortRequestDto;
 import com.example.demo.bubblesort.dto.BubbleSortResponseDto;
 import com.example.demo.bubblesort.entities.BubbleSortState;
+import com.example.demo.sais.dto.SaisRequestDto;
+import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,11 @@ public class Controller {
     public BubbleSortResponseDto bubbleSort(@RequestBody BubbleSortRequestDto requestDto) {
         final List<BubbleSortState> bubbleSortStates = BubbleSort.sort(requestDto.numbers());
         return BubbleSortResponseDto.builder().states(bubbleSortStates).build();
+    }
+
+    @PostMapping("/sais")
+    public String postSuffixArrayInducedSorting(@Valid @RequestBody SaisRequestDto saisRequestDto) {
+        return saisRequestDto.source();
     }
 
     public record Algo(String name) {
