@@ -1,14 +1,13 @@
-import type {Interaction, SVGInputProps} from "./Types.tsx";
-import type {Node} from "../../sweepLine/shared/Types.tsx"
-import type {Edge} from "../shared/Types.tsx";
-
-import {Edges, PreviewEdge} from "../shared/Edges.tsx";
-import {InputControl} from "./InputControl.tsx";
-import {Nodes} from "../shared/Nodes.tsx";
-import * as React from "react";
-import {useRef, useState} from "react";
 import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
 import {getRandomId} from "../../sweepLine/shared/Utils.tsx";
+import type {Interaction, SVGInputProps} from "./Types.tsx";
+import type {Node} from "../../sweepLine/shared/Types.tsx"
+import {Edges, PreviewEdge} from "../shared/Edges.tsx";
+import {InputControl} from "./InputControl.tsx";
+import type {Edge} from "../shared/Types.tsx";
+import {Nodes} from "../shared/Nodes.tsx";
+import {useRef, useState} from "react";
+import * as React from "react";
 
 export function SVGInput(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});

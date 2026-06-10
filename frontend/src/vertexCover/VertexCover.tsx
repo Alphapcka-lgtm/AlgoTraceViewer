@@ -1,11 +1,10 @@
-import {useState} from "react";
-
 import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
 import {assignLabels, decodeExportState, encodeExportState} from "./../sweepLine/shared/Utils.tsx";
+import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
 import type {ExportState} from "./../sweepLine/shared/Types.tsx";
 import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
 import {SVGInput} from "./input/SVGInput.tsx";
-import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
+import {useState} from "react";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");

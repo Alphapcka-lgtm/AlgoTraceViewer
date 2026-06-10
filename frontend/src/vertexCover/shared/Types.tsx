@@ -1,5 +1,5 @@
-import type {Dispatch, SetStateAction} from "react";
 import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Dispatch, SetStateAction} from "react";
 
 export type Edge = {
     fromId: string,
