@@ -1,5 +1,5 @@
 import type { AnimationRequest } from "../shared/Types.tsx";
-import type { Node } from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../sweepLine/shared/Types.tsx"
 import type { Dispatch, SetStateAction } from "react";
 
 export type Interaction =

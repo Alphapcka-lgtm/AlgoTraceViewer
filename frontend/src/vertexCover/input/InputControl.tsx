@@ -1,9 +1,9 @@
 import type {InputControlProps} from "./Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 
-import {getRandomId} from "../shared/Utils.tsx";
 import {presets} from "./Presets.tsx";
 import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {getRandomId} from "../../sweepLine/shared/Utils.tsx";
 
 export function InputControl(props: InputControlProps) {
 
