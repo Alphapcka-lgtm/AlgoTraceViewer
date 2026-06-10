@@ -51,7 +51,7 @@ public class MaxDegreeVertexCover {
             remainingEdges.removeAll(incidentEdges);
 
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
-                    .sorted(Comparator.comparing(e -> e.getKey().label()))
+                    .sorted((e1, e2) -> e1.getKey().label().length() == e2.getKey().label().length() ? e1.getKey().label().compareTo(e2.getKey().label()) : e1.getKey().label().length() -  e2.getKey().label().length())
                     .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
                     .toList();
 

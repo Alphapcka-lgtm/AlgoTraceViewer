@@ -14,7 +14,7 @@ import gsap from "gsap";
 
 const STEP_DURATION = 1.0;
 
-export function RandomSVGOutput(props: SVGOutputProps) {
+export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);

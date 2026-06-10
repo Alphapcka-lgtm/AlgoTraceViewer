@@ -1,6 +1,5 @@
 import type {Node} from "../../sweepLine/shared/Types.tsx"
-import type {PreviewEdgeProps} from "../input/Types.tsx";
-import type {Edge, EdgesProps} from "./Types.tsx";
+import type {Edge, EdgesProps, PreviewEdgeProps} from "./Types.tsx";
 
 export function Edges(props: EdgesProps) {
     return props.edges.map((e: Edge, index) => {

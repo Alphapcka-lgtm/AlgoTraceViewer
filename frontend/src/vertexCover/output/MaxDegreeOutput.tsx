@@ -15,7 +15,7 @@ import gsap from "gsap";
 
 const STEP_DURATION = 1.0;
 
-export function MaxDegreeSVGOutput(props: SVGOutputProps) {
+export function MaxDegreeOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
