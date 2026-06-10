@@ -30,7 +30,9 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
         if (!exportValue) return;
         await navigator.clipboard.writeText(exportValue);
         setCopied(true);
-        closeDialog();
+        setTimeout(() => {
+            closeDialog();
+        }, 500);
     };
 
     const importState = () => {
