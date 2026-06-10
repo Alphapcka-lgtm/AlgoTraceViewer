@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
         allowedHeaders = "*",
         methods = {RequestMethod.POST, RequestMethod.OPTIONS}
 )
+@RequestMapping("/vertexCover")
 public class VertexCoverController {
 
     RandomVertexCover randomVertexCover;
@@ -24,17 +25,17 @@ public class VertexCoverController {
         this.maxDegreeVertexCover = maxDegreeVertexCover;
     }
 
-    @PostMapping("/randomvertexcover")
+    @PostMapping("/random")
     public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
     }
 
-    @PostMapping("/vertexcover/optimal")
+    @PostMapping("/optimal")
     public ResponseEntity<AnimationResponse> optimalVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(optimalVertexCover.solve(request.graph()));
     }
 
-    @PostMapping("/maxdegreevertexcover")
+    @PostMapping("/maxDegree")
     public ResponseEntity<AnimationResponse> heuristicVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.randomSeed()));
     }

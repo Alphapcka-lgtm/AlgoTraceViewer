@@ -129,7 +129,7 @@ export type ModeTabsProps = {
 
 export type ExportState =
     | { algorithm: "sweepLine", progress: number, input: Node[] }
-    | { algorithm: "randomvertexcover" | "maxdegreevertexcover" | "staticlistvertexcover", progress: number, input: AnimationRequest };
+    | { algorithm: "vertexCover", progress: number, input: AnimationRequest };
 
 export type PseudoCodeLine = {
     id: string;
