@@ -2,10 +2,16 @@ package com.example.demo.sais;
 
 import com.example.demo.experiments.data.TypeMap;
 import com.example.demo.sais.dto.SaisResponseDto;
+import com.example.demo.sais.dto.SortStepDto;
+import com.example.demo.sais.dto.TypeMapDto;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
+@Service
 public class SuffixArray {
 
     private static String source;
@@ -27,6 +33,8 @@ public class SuffixArray {
 
         final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
+        final List<SortStepDto> guessLmsSteps = new ArrayList<>();
+
         // Bucket-sort all the LMS suffixes into their appropriate bucket.
         IO.println("Sort all lms suffixes into appropriate bucket");
         for (int i = 0; i < text.length; i++) {
@@ -44,12 +52,17 @@ public class SuffixArray {
                 char c = (i < source.length()) ? source.charAt(i) : '$';
                 IO.println(c + "(" + i + ")" + " -> " + bucketTails[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+                guessLmsSteps.add(new SortStepDto(i, bucketTails[bucketIndex]));
             }
             // ... and move the tail pointer down.
             bucketTails[bucketIndex]--;
 
             // Show the current state of the array
 //        showSuffixArray(guessedSuffixArray);
+        }
+
+        if (trackSteps) {
+            responseBuilder.guessLmsSteps(guessLmsSteps);
         }
 
         return guessedSuffixArray;
@@ -105,8 +118,10 @@ public class SuffixArray {
      * @param bucketSizes
      * @param typeMap
      */
-    private void induceSortL(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps) {
+    private void induceSortL(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps, final boolean isGuess) {
         final int[] bucketHeads = findBucketHeads(bucketSizes, alphabetSize);
+
+        final List<SortStepDto> induceLSteps = new ArrayList<>();
 
         IO.println("Inducing L-suffixes");
         for (int i = 0; i < guessedSuffixArray.length; i++) {
@@ -144,12 +159,21 @@ public class SuffixArray {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
                 IO.println(c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketHeads[bucketIndex]);
+                induceLSteps.add(new SortStepDto(j, bucketHeads[bucketIndex]));
             }
 
             // ...and move the head pointer up.
             bucketHeads[bucketIndex]++;
 
 //        showSuffixArray(guessedSuffixArray, i);
+        }
+
+        if (trackSteps) {
+            if (isGuess) {
+                responseBuilder.guessInduceL(induceLSteps);
+            } else {
+                responseBuilder.saInduceL(induceLSteps);
+            }
         }
     }
 
@@ -168,8 +192,10 @@ public class SuffixArray {
     /**
      * Slot S-type suffixes into place
      */
-    private void induceSortS(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps) {
+    private void induceSortS(final int[] text, final int[] guessedSuffixArray, final int[] bucketSizes, final TypeMap typeMap, final int alphabetSize, final boolean trackSteps, final boolean isGuess) {
         final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
+
+        final List<SortStepDto> induceSSteps = new ArrayList<>();
 
         IO.println("Inducing S-suffixes");
         for (int i = guessedSuffixArray.length - 1; i > -1; i--) {
@@ -197,12 +223,21 @@ public class SuffixArray {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
                 IO.println(c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+                induceSSteps.add(new SortStepDto(j, bucketTails[bucketIndex]));
             }
 
             // ...and move the tail pointer down.
             bucketTails[bucketIndex]--;
 
 //        showSuffixArray(guessedSuffixArray, i);
+        }
+
+        if (trackSteps) {
+            if (isGuess) {
+                responseBuilder.guessInduceS(induceSSteps);
+            } else {
+                responseBuilder.saInduceS(induceSSteps);
+            }
         }
     }
 
@@ -269,12 +304,14 @@ public class SuffixArray {
         // Classify each character of the String as S-type of L-type
 //    final char[] typeMapOld = buildTypeMap(string);
         final TypeMap typeMap = TypeMap.buildTypeMap(text);
+        if (trackSteps) responseBuilder.typeMapDto(TypeMapDto.fromTypeMap(typeMap));
 
         /*
          * We'll be slotting suffixes into buckets according to what
          * character they start with, so let's precompute that info now.
          */
         final int[] bucketSizes = findBucketSizes(text, alphabetSize);
+        if (trackSteps) responseBuilder.bucketSizes(bucketSizes);
 
         /*
          * Usa a simple bucket-sort to insert all the LMS suffixes into
@@ -286,8 +323,8 @@ public class SuffixArray {
          * Slot all the other suffixes into guessedSuffixArray, by using induced sorting.
          * This may move the LMS suffixes around.
          */
-        induceSortL(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps);
-        induceSortS(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps);
+        induceSortL(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps, true);
+        induceSortS(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps, true);
 
         final int lmsCount = typeMap.getLmsCount();
 
@@ -319,11 +356,6 @@ public class SuffixArray {
             lmsNames[b] = currentName;
         }
 
-        IO.println("LMS Order\tName");
-        for (int i = 0; i < lmsOrder.length; i++) {
-            IO.println(lmsOrder[i] + " -> " + lmsNames[lmsOrder[i]]);
-        }
-
         // scan lms positions in text order, not suffix order.
         final int[] reduced = new int[lmsCount];
         final int[] lmsPositions = new int[lmsCount];
@@ -336,12 +368,19 @@ public class SuffixArray {
             }
         }
 
-        IO.println("names in text order");
-        for (int i = 0; i < lmsPositions.length; i++) {
-            IO.println(lmsPositions[i] + " -> " + lmsNames[lmsPositions[i]]);
-        }
+        if (trackSteps) {
+            IO.println("LMS Order\tName");
+            for (int i = 0; i < lmsOrder.length; i++) {
+                IO.println(lmsOrder[i] + " -> " + lmsNames[lmsOrder[i]]);
+            }
 
-        IO.println("reduced text: " + Arrays.toString(reduced));
+            IO.println("names in text order");
+            for (int i = 0; i < lmsPositions.length; i++) {
+                IO.println(lmsPositions[i] + " -> " + lmsNames[lmsPositions[i]]);
+            }
+
+            IO.println("reduced text: " + Arrays.toString(reduced));
+        }
 
         final int[] reducedSa;
         if (currentName + 1 == lmsCount) {
@@ -350,18 +389,25 @@ public class SuffixArray {
                 reducedSa[reduced[i]] = i;
             }
         } else {
-            IO.println("Reduced sa with recursion");
+            if (trackSteps) IO.println("Reduced sa with recursion");
             reducedSa = sais(reduced, currentName, false);
         }
 
-        IO.println("reduced suffix array: " + Arrays.toString(reducedSa));
+        if (trackSteps) {
+            IO.println("reduced suffix array: " + Arrays.toString(reducedSa));
+            responseBuilder.lmsOrder(lmsOrder)
+                    .lmsNames(lmsNames)
+                    .lmsPositions(lmsPositions)
+                    .reduced(reduced)
+                    .reducedSorted(reducedSa);
+        }
 
         final int[] result = new int[text.length];
         Arrays.fill(result, -1);
 
         final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
-        IO.println("final lms placement");
+        if (trackSteps) IO.println("final lms placement");
         for (int i = reducedSa.length - 1; i >= 0; i--) {
             int lmsIndex = reducedSa[i];
 
@@ -380,9 +426,13 @@ public class SuffixArray {
             bucketTails[text[pos]]--;
         }
 
+        if (trackSteps) responseBuilder.saLmsAdded(Arrays.copyOf(result, result.length));
+
         // * ...and once again, slot all the other suffixes into place with induced sorting.
-        induceSortL(text, result, bucketSizes, typeMap, alphabetSize, trackSteps);
-        induceSortS(text, result, bucketSizes, typeMap, alphabetSize, trackSteps);
+        induceSortL(text, result, bucketSizes, typeMap, alphabetSize, trackSteps, false);
+        induceSortS(text, result, bucketSizes, typeMap, alphabetSize, trackSteps, false);
+
+        if (trackSteps) responseBuilder.sa(result);
 
         return result;
     }
@@ -394,6 +444,11 @@ public class SuffixArray {
             text[i] = string.charAt(i) - 'a' + 1;
         }
         text[string.length()] = 0; // sentinel
+        responseBuilder.source(string + "$");
         return sais(text, 27, true);
+    }
+
+    public SaisResponseDto getResponseData() {
+        return responseBuilder.build();
     }
 }
