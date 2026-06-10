@@ -4,7 +4,6 @@ import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import type {SVGOutputProps} from "../shared/Types.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../shared/Utils.tsx";
 import {IOModeTabs} from "../../sweepLine/shared/IOModeTabs.tsx";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
@@ -12,6 +11,7 @@ import {OutputControl4} from "../../sweepLine/output/OutputControl4.tsx";
 import {PseudoCodePanel} from "../../sweepLine/output/PseudoCodePanel.tsx";
 import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.tsx";
 import {ImportExportDialog} from "../../sweepLine/shared/ImportExportDialog.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../sweepLine/shared/Utils.tsx";
 
 const STEP_DURATION = 1.0;
 

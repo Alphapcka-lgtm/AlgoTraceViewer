@@ -1,4 +1,5 @@
-import type { AnimationRequest, Node } from "../shared/Types.tsx";
+import type { AnimationRequest } from "../shared/Types.tsx";
+import type { Node } from "../../sweepLine/shared/Types.tsx"
 import type { Dispatch, SetStateAction } from "react";
 
 export type Interaction =
@@ -10,7 +11,7 @@ export type Interaction =
 export type SVGInputProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
-    onSubmit: () => void;
+    onSubmit: (input: AnimationRequest) => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
 };
@@ -19,8 +20,6 @@ export type InputControlProps = {
     input: AnimationRequest,
     setInput: Dispatch<SetStateAction<AnimationRequest>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
-    selected: string,
-    setSelected: Dispatch<SetStateAction<string>>,
     createExportString: () => string;
     onImport: (encoded: string) => void;
 };

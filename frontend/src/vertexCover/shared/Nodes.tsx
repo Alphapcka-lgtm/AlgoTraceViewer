@@ -1,5 +1,6 @@
-import type { Node, NodesProps } from "./Types.tsx";
-import {getNodeLabel} from "./Utils.tsx";
+import type { Node } from "../../sweepLine/shared/Types.tsx"
+import type { NodesProps } from "./Types.tsx";
+import {getAlphabetLabel} from "../../sweepLine/shared/Utils.tsx";
 
 export function Nodes(props: NodesProps) {
     const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
@@ -47,7 +48,7 @@ export function Nodes(props: NodesProps) {
                 fontSize="17"
                 pointerEvents="none"
             >
-                {n.label ? n.label : getNodeLabel(i)}
+                {n.label === "" ? getAlphabetLabel(i) : n.label}
             </text>
         </g>
     ));
