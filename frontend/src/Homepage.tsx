@@ -6,6 +6,7 @@ type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichsw
 
 export function Homepage() {
     const [activeTab, setActiveTab] = useState<Tab>("homepage");
+    // TODO: add own component here
     return (
         <div className="app-page">
             <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
