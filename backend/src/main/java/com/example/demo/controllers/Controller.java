@@ -31,7 +31,7 @@ public class Controller {
         return BubbleSortResponseDto.builder().states(bubbleSortStates).build();
     }
 
-    @PostMapping("/sais")
+    @PostMapping("/sais_old")
     public String postSuffixArrayInducedSorting(@Valid @RequestBody SaisRequestDto saisRequestDto) {
         return saisRequestDto.source();
     }

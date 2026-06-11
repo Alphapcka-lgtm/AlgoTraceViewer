@@ -5,8 +5,9 @@ import {VertexCover} from "./vertexCover/VertexCover.tsx";
 import type {HomepageProps, Tab} from "./shared/Types.tsx";
 import {Link} from "react-router-dom";
 
-export function Homepage(props: HomepageProps) {
-    const [activeTab, setActiveTab] = useState<Tab>(props.activeTab);
+export function Homepage() {
+    const [activeTab, setActiveTab] = useState<Tab>("homepage");
+    // TODO: add own component here
     return (
         <div className="app-page">
             <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
