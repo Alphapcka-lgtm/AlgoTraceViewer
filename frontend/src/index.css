@@ -1,22 +1,42 @@
 :root {
-  --background: "white";
+  /*
+   * Global design tokens.
+   * These values define the shared visual identity of the whole app.
+   * Component-specific layout belongs in App.css.
+   */
+  --background: #ffffff;
 
-  --primary: #102E50;
-  --secondary: #BE3D2A;
+  --primary: #102e50;
+  --secondary: #be3d2a;
+  --accent: #f5c45e;
+  --orange: #e78b48;
 
   --text: #1e1e1e;
+  --muted-text: #555555;
+
   --border: #d8d8d8;
+  --strong-border: var(--primary);
 
   --card-background: #ffffff;
 
-  --shadow:
-          0 4px 12px rgba(0, 0, 0, 0.08);
+  /*
+   * Slightly blue shadow so cards fit the homepage color scheme
+   * without introducing a separate blue-gray theme.
+   */
+  --shadow: 0 4px 14px rgba(16, 46, 80, 0.14);
 
-  --font:
-          "Inter",
-          "Segoe UI",
-          Arial,
-          sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 20px;
+  --space-xl: 32px;
+
+  --font: "Inter", "Segoe UI", Arial, sans-serif;
+  --mono-font: "Consolas", "Menlo", "Courier New", monospace;
 }
 
 * {
@@ -36,22 +56,36 @@ body,
 body {
   background: var(--background);
   color: var(--text);
-
   font-family: var(--font);
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 button {
-  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 h1,
 h2,
 h3 {
   margin-top: 0;
-
   color: var(--primary);
 }
 
 p {
   line-height: 1.5;
+}
+
+svg {
+  display: block;
 }

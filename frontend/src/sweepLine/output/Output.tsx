@@ -1,18 +1,18 @@
 import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, SVGOutputProps} from "../shared/Types.tsx";
-import {OutputControl4} from "./OutputControl4.tsx";
+import type {AlgorithmStepDTO, Node, RingStyle, OutputProps} from "../shared/Types.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
-import {IOModeTabs} from "../shared/IOModeTabs.tsx";
-import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../shared/Utils.tsx";
-import {ImportExportDialog} from "../shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "./PseudoCodePanel.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../../shared/Utils.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
-export function SVGOutput4(props: SVGOutputProps) {
+export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
@@ -44,19 +44,22 @@ export function SVGOutput4(props: SVGOutputProps) {
         };
     };
 
-    const getCy = (step: AlgorithmStepDTO) =>
-        (step.currentPoint?.y ?? props.height / 2) - step.searchDelta;
-
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
         const searchDelta = step.searchDelta;
+        const currentY = step.currentPoint?.y ?? props.height / 2;
         return {
             x: step.sweepLineX - searchDelta,
-            y: getCy(step),
+            y: currentY - searchDelta,
             width: searchDelta,
-            height: searchDelta * 2
+            height: searchDelta * 2,
         };
     };
 
+    const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
+        step.pseudoCodeLineIds.includes("shrink-windows"); //dann das candidate window nicht zeigen
+
+    const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
+        step.currentPoint !== null && !isShrinkStep(step);
 
     useGSAP(() => {
         if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -101,11 +104,13 @@ export function SVGOutput4(props: SVGOutputProps) {
 
         //init state setzen
         gsap.set(activeRect, {
-            attr: getActiveRectAttrs(firstStep)
+            attr: getActiveRectAttrs(firstStep),
+            opacity: firstStep.currentPoint !== null ? 1 : 0,
         });
 
         gsap.set(candidateRect, {
-            attr: getCandidateRectAttrs(firstStep)
+            attr: getCandidateRectAttrs(firstStep),
+            opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0,
         });
 
         //startzustand label setzen
@@ -114,16 +119,17 @@ export function SVGOutput4(props: SVGOutputProps) {
         //adding tweens:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
-            const rectOpacity: number = step.currentPoint !== null ? 1 : 0; //beim final step die zwei rects ausblenden
+            const activeRectOpacity: number = step.currentPoint !== null ? 1 : 0;//beim final step die zwei rects ausblenden
+            const candidateRectOpacity: number = shouldShowCandidateWindow(step) ? 1 : 0;
 
             timeline.to(activeRect, {
                 attr: getActiveRectAttrs(step),
-                opacity: rectOpacity,
+                opacity: activeRectOpacity,
             });
 
             timeline.to(candidateRect, {
                 attr: getCandidateRectAttrs(step),
-                opacity: rectOpacity,
+                opacity: candidateRectOpacity,
             }, "<");
 
             // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
@@ -152,14 +158,16 @@ export function SVGOutput4(props: SVGOutputProps) {
 
     //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
     //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
+    const candidatePointIds = new Set(
+        step.candidatePairs.map((pair) => pair.p0.id)
+    );
 
     //für rect und line nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
     const firstStep: AlgorithmStepDTO = props.steps[0];
 
     return (
-        <div>
-
+        <div className="algorithm-panel">
             <IOModeTabs
                 mode="output"
                 onChangeInput={props.onChangeInput}
@@ -169,10 +177,9 @@ export function SVGOutput4(props: SVGOutputProps) {
             />
 
             <svg
-                width={props.width}
-                height={props.height}
-                style={{border: "2px solid black", borderRadius: "15px"}}
+                className="algorithm-canvas"
                 viewBox={`0 0 ${props.width} ${props.height}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 <rect
                     ref={activeSweepWindowRef}
@@ -202,41 +209,38 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                 {step.allPoints.map((p: Node) => {
                     const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
-                    //const isCandidate = candidatePointIds.has(p.id);
-                    //const isActive    = step.activePoints.some((a) => a.id === p.id);
+                    const isCandidate = candidatePointIds.has(p.id);
+                    const isActive    = step.activePoints.some((a) => a.id === p.id);
                     const isProcessed = step.processedPoints.some((d) => d.id === p.id);
                     const isBest = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
                     const isFuture = step.futurePoints.some((f) => f.id === p.id);
 
                     //TODO: Nochmal nachdenken ob diese darstellung wirklich gut ist!
-                    let fill = "black";
+                    let fill = "#555";
 
+                    if (isFuture) {
+                        fill = "#cccccc";
+                    }
+                    if (isProcessed) {
+                        fill = "#aaaaaa";
+                    }
                     if (isCurrent) {
-                        fill = "#BE3D2A";
-                    } else if (isBest) {
+                        fill = "black";
+                    }
+                    if (isBest) {
                         fill = "#ffd700";
                     }
-                    /*
-                    else if(isCandidate){
-                        fill = "#a855f7";  // im kleinen fenster
-                    }  else if (isActive){
-                        fill = "#4a9eff";  //im großen Fenster
-                    }
-                     */
-                    else if (isProcessed) {
+                    const scale = isCurrent ? 1.2 : 1;
 
-                        fill = "#aaaaaa"; // abgearbeitet
-                    } else if (isFuture) {
-                        fill = "#cccccc";//noch nicht betrachtet
-                    }
+                    let ringStyle: RingStyle = "none";
+                    if (isActive) ringStyle = "active";
+                    if (isCandidate) ringStyle = "candidate";
 
-                    return <XNodeWithCords key={p.id} node={p} fill={fill}/>;
+                    return <XNodeWithCords key={p.id} node={p} fill={fill} scale={scale} ringStyle={ringStyle} />;
                 })}
-
-
             </svg>
 
-            <OutputControl4
+            <OutputControls
                 timelineRef={timelineRef}
                 labels={myLabels}
                 currentStep={props.currentStep}
@@ -250,10 +254,12 @@ export function SVGOutput4(props: SVGOutputProps) {
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
-            <div style={{fontFamily: "monospace", fontSize: 15,}}>
-                <div style={{gridColumn: "1 / -1", color: "#555"}}> {step.description} </div>
 
-                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 16px"}}>
+
+            <div className="step-info">
+                <div className="step-description"> {step.description} </div>
+
+                <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
                     <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
                     <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
@@ -269,33 +275,36 @@ export function SVGOutput4(props: SVGOutputProps) {
 
                     <div>
                         <strong>Candidates:</strong>{" "}
+                        <strong>Candidates:</strong>{" "}
                         {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
                             .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
                             .join("; ")
                         }
+                        {/*step.currentPoint === null
+                            ? "—"
+                            : shouldShowCandidateWindow(step)
+                                ? "—"
+                                : step.candidatePairs.length === 0
+                                    ? "No candidates"
+                                    : step.candidatePairs
+                                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                                        .join("; ")
+                        */}
                     </div>
-                    {/*
-                        <div>
-                        <strong>Future Points:</strong>
-                        {step.futurePoints.length === 0 ? "—"
-                            : step.futurePoints.map((p) => p.label).join(", ")}
-                    </div>
-
-                    */}
-
                 </div>
-
             </div>
 
             <ImportExportDialog
-                mode="output"
+                onImport={props.onImport}
                 createExportString={props.createExportString}
             />
 
             <PseudoCodePanel
                 lines={SWEEP_LINE_PSEUDOCODE}
                 activeLineIds={step.pseudoCodeLineIds}
+                title={"Sweep Line PseudoCode"}
             />
+
         </div>
     );
 }

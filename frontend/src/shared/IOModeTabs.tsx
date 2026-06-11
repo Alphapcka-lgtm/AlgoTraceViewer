@@ -1,4 +1,3 @@
-import {tabStyle} from "./Utils.tsx";
 import type {ModeTabsProps} from "./Types.tsx";
 
 export function IOModeTabs(props: ModeTabsProps) {
@@ -6,18 +5,11 @@ export function IOModeTabs(props: ModeTabsProps) {
     const outputActive = props.mode === "output";
 
     return (
-        <div
-            style={{
-                display: "flex",
-                marginTop: "20px",
-                marginBottom: "5px",
-                gap: 4,
-            }}
-        >
+        <div className="mode-tabs">
             <button
                 onClick={props.onChangeInput}
                 disabled={inputActive}
-                style={tabStyle(inputActive, inputActive)}
+                className={`mode-tab ${inputActive ? "is-active" : ""}`}
             >
                 Input
             </button>
@@ -25,7 +17,7 @@ export function IOModeTabs(props: ModeTabsProps) {
             <button
                 onClick={props.onSubmit}
                 disabled={outputActive || !props.canSubmit}
-                style={tabStyle(outputActive, outputActive || !props.canSubmit)}
+                className={`mode-tab ${outputActive ? "is-active" : ""}`}
             >
                 Output
             </button>

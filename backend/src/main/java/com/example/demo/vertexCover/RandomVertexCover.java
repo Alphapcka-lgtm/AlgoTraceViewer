@@ -11,7 +11,7 @@ import java.util.*;
 public class RandomVertexCover {
 
     public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == 0 ? System.nanoTime() : seed;
+        seed = seed == null || seed == 0 ? System.nanoTime() : seed;
 
         List<AnimationState> intermediateStates = new ArrayList<>();
 
