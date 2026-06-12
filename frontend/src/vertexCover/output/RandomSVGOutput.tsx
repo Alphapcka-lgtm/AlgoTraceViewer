@@ -11,6 +11,7 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {CircleNodeIcon, EdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -147,6 +148,18 @@ export function RandomSVGOutput(props: SVGOutputProps) {
         <div className="step-info">
             <div className="step-info-grid">
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+
+                <div>
+                    <LegendEntry
+                        label="Node"
+                        icon={<CircleNodeIcon fill="white" />}
+                    />
+
+                    <LegendEntry
+                        label="Edge"
+                        icon={<EdgeIcon stroke="black" />}
+                    />
+                </div>
             </div>
         </div>
         <PseudoCodePanel

@@ -129,7 +129,7 @@ function AlgoTraceLogo() {
         <svg
             className="home-logo"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 370 110"
+            viewBox="-2 0 370 110"
             role="img"
             aria-labelledby="title desc"
         >
