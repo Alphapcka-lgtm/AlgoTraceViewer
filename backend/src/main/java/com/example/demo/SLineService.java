@@ -91,14 +91,12 @@ public class SLineService {
          //   String newBestMsg = "New minimum found! δ = " + String.format("%.2f", deltaAfterCandidateCheck) + " (" + bestPairAfterCandidateCheck.p0().label() + ", " + bestPairAfterCandidateCheck.p1().label() + ")";
 
             String newBestMsg = "New closest pair found: " + bestPairAfterCandidateCheck.p0().label()
-                    + ", " + bestPairAfterCandidateCheck.p1().label() + " with a distance " + String.format("%.2f", deltaAfterCandidateCheck)+
-                    " This becomes the new current δ";
-
-
+                    + " ↔ " + bestPairAfterCandidateCheck.p1().label() + " with a distance " + String.format("%.2f", deltaAfterCandidateCheck)+
+                    " This becomes the new δ ...";
 
             String noNewBestMsg = "Processed point " + current.label()
-                    + "; δ = " + String.format("%.2f", deltaAfterCandidateCheck)
-                    + "; active points: " + activePoints.size();
+                    + ". No candidate pair is closer than the current δ = " + String.format("%.2f", deltaAfterCandidateCheck) +
+                    " so δ stays unchanged.";
 
             boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
 
@@ -147,7 +145,7 @@ public class SLineService {
             if (foundNewBest) {
           //  if (false) {
                 steps.add(new AlgorithmStepDTO(
-                        "δ shrinks from " + String.format("%.2f", deltaBeforeStep)
+                        "δ decreases from " + String.format("%.2f", deltaBeforeStep)
                                 + " to " + String.format("%.2f", deltaAfterCandidateCheck)
                                 + ". The sweep windows become smaller.",
                         current,
@@ -178,9 +176,9 @@ public class SLineService {
         // currentPoint = null because the alg has finished
         Point lastPoint = xSorted.getLast();
 
-        String doneMsg = "Done! Closest pair: "
+        String doneMsg = "Done! The sweep is complete. The closest pair is"
                 + currBestPair.p0().label() + " ↔ " + currBestPair.p1().label()
-                + ", distance = " + String.format("%.2f", currBestPair.distance());
+                + " with distance = " + String.format("%.2f", currBestPair.distance());
 
         steps.add(new AlgorithmStepDTO(
                 doneMsg,

@@ -54,7 +54,7 @@ export function XNode({node, fill, scale = 1, ringStyle = "none"}: XNodeProps) {
                     r={RING_RADIUS}
                     fill="none"
                     stroke={fill}
-                    strokeWidth={1.5}
+                    strokeWidth={2.5}
                     strokeDasharray={ringStyle === "candidate" ? "3 2" : undefined}
                     pointerEvents="none"
                 />
