@@ -12,15 +12,15 @@ export function Edges(props: EdgesProps) {
         return (
             <g key={"a" + e.id + index}>
                 <path
-                    id={"u0" + e.id.toString()}
+                    id={"u0" + e.id}
                     key={"u0" + e.id + index}
                     d={p}
                     style={{opacity: 0}}
                     stroke={colors.blue}
-                    strokeWidth={4}
+                    strokeWidth={6}
                 />
                 <path
-                    id={"u1" + e.id.toString()}
+                    id={"u1" + e.id}
                     key={"u1" + e.id + index}
                     d={p}
                     style={{opacity: 0}}
@@ -28,7 +28,7 @@ export function Edges(props: EdgesProps) {
                     strokeWidth={7}
                 />
                 <path
-                    id={e.id.toString()}
+                    id={e.id}
                     key={e.id + index}
                     d={p}
                     stroke="black"

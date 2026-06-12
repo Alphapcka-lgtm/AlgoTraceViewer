@@ -1,5 +1,11 @@
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
-import {getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.tsx";
+import {
+    colors,
+    getActiveLineIdsMaxDegree, NodeDegreeMapIcon,
+    NodeIcon,
+    PSEUDOCODE_MAX_DEGREE,
+    RemainingEdgeIcon
+} from "./PseudoCode.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
@@ -12,6 +18,7 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -20,8 +27,6 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 3);
-
-    const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -91,7 +96,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 const tableElement = document.getElementById("t1" + node.id)! as HTMLDivElement;
 
                 timeline.to(tableElement, {
-                    background: colors.orange,
+                    background: colors.red,
                     onStart: () => tableElement.scrollIntoView({
                         behavior: "smooth",
                         inline: "center",
@@ -177,9 +182,26 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-info">
-            <div className="step-info-grid">
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-                <div><strong>C </strong>(Vertex <strong>C</strong>over)<strong>:</strong>orange Nodes</div>
+                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
+            </div>
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
+                <LegendEntry
+                    label="Node-Degree Map N"
+                    value={""}
+                    icon={<NodeDegreeMapIcon/>}
+                />
+                <LegendEntry
+                    label="Vertex Cover C"
+                    value={""}
+                    icon={<NodeIcon/>}
+                />
+                <LegendEntry
+                    label="Remaining Edges E'"
+                    value={""}
+                    icon={<RemainingEdgeIcon/>}
+                />
             </div>
             <div style={{display: "flex", flexWrap: "nowrap", overflowX: "auto", overflowY: "hidden", paddingBottom: "12px"}}>
                 {props.output.initialDegreeMap.map(ndp => {
