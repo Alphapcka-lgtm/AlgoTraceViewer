@@ -11,6 +11,14 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
+    public static Comparator<NodeDegreePair> NDPComp = (n1, n2) -> {
+        if(n1.node().label().length() == n2.node().label().length()){
+            return n1.node().label().compareTo(n2.node().label());
+        } else {
+            return n1.node().label().length() -  n2.node().label().length();
+        }
+    };
+
     public AnimationResponse solve(Graph graph, Long seed) {
         seed = seed == null || seed == 0 ? System.nanoTime() : seed;
 
@@ -27,7 +35,10 @@ public class MaxDegreeVertexCover {
             neighbourCount.put(getNodeById(graph.nodes(), edge.toId()), neighbourCount.getOrDefault(getNodeById(graph.nodes(), edge.toId()), 0) + 1);
         });
 
-        List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream().map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue())).toList();
+        List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
+                .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
+                .sorted(NDPComp)
+                .toList();
 
         while (!remainingEdges.isEmpty()) {
 
@@ -51,8 +62,8 @@ public class MaxDegreeVertexCover {
             remainingEdges.removeAll(incidentEdges);
 
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
-                    .sorted((e1, e2) -> e1.getKey().label().length() == e2.getKey().label().length() ? e1.getKey().label().compareTo(e2.getKey().label()) : e1.getKey().label().length() -  e2.getKey().label().length())
                     .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
+                    .sorted(NDPComp)
                     .toList();
 
             intermediateStates.add(AnimationState.builder()

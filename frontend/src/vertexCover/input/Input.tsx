@@ -82,7 +82,7 @@ export function Input(props: SVGInputProps) {
             });
             setInteraction({type: "idle"});
         } else {
-            setInteraction({type: "drawing-edge", fromId: node.id})
+            setInteraction({type: "drawing-edge", fromId: node.id, to: {x: node.x, y: node.y}})
         }
     };
 
