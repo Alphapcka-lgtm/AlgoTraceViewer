@@ -9,29 +9,18 @@ import {presets} from "./input/Presets.tsx";
 import type {ExportState} from "../shared/Types.tsx";
 
 export default function App() {
-    const [modeState, setModeState] = useState("input"); //in welchem mode man gerade ist (output -> man kann nicht ändern)
-
-    //const [nodes, setNodes] = useState<Node[]>([]); //welche nodes es gerade gibt
-    //const [outputSteps, setOutputSteps] = useState<AlgorithmStepDTO[]>([]);
-    const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});
+    const [modeState, setModeState] = useState("input");
+    const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});  //welche nodes es gerade gibt
     const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
-
     const {loading, error, calculateSteps} = useSweepLineSteps();
-
     const [currentStep, setCurrentStep] = useState(0);
-    const [progress, setProgress] = useState(0);    //für scrubber
-
+    const [progress, setProgress] = useState(0);
     const [selectedPreset, setSelectedPreset] = useState("");
-
-
     const svgHeight = 500;
     const svgWidth = 1123;
 
-    /*
-    Fügt dem input state eine neue node hinzu.
-    Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
-    Aber Lables werden vor submit "normalisiert" mit assignLabels()...
-    */
+
+    //Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
     const handleAddNode = (node: Node) => {
         setInputState(prev => {
             const labeledNode: Node = {...node, label: getAlphabetLabel(prev.nodes.length)};
@@ -49,11 +38,7 @@ export default function App() {
     const handleDeleteNode = (id: string) => {
         setInputState(prev => {
             const remainingNodes = prev.nodes.filter(n => n.id !== id);
-            return {
-                ...prev,
-                nodes: assignLabels(remainingNodes),
-                timestamp: Date.now()
-            };
+            return {...prev, nodes: assignLabels(remainingNodes), timestamp: Date.now()};
         });
     };
 
@@ -65,7 +50,7 @@ export default function App() {
         setProgress(0);
     };
 
-    //quasi die grundfunktion für handleNormalSubmit und handleImport
+    //"grundfunktion" für handleNormalSubmit und handleImport
     //bevor die nodes ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
     // die durch löschen von nodes entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
@@ -142,7 +127,6 @@ export default function App() {
         });
     };
 
-
     const handlePresetChange = async (selected: string) => {
         setSelectedPreset(selected);
         if (selected === "random") return;
@@ -168,9 +152,7 @@ export default function App() {
                     onSubmit={handleNormalSubmit}
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
-
                     onSetNodeCount={handleSetNodeCount}
-
                     selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
                     createExportString={createExportString}

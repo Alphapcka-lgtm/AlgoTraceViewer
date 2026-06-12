@@ -8,24 +8,19 @@ import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
+import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 0.9;
 const PADDING = 1;
 
 export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
-
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
-
     const activeSweepWindowRef = useRef<SVGRectElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
-
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
-    //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
-    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
-
+    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const changePlaybackSpeed = (speed: number) => {
@@ -35,7 +30,6 @@ export function Output(props: OutputProps) {
 
     const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
         const searchDelta = step.searchDelta;
-
         return {
             x: step.sweepLineX - searchDelta,
             y: PADDING,
@@ -63,18 +57,15 @@ export function Output(props: OutputProps) {
 
     useGSAP(() => {
         if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
-
         const activeRect = activeSweepWindowRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
 
         // Startzustand der Timeline aus app.
-        // Beim normalen Submit (nichts importered) ist props.progress = 0
-        // und wenn imported wurde, sind das halt die importierten Fortschritt...
+        // Beim normalen Submit (nichts importered) ist props.progress = 0 und bei import ist es der importierte progress...
         const initialProgress: number = props.progress;
 
-        // timeline erstellen:
         const timeline = gsap.timeline({
             paused: true,
             defaults: {
@@ -83,21 +74,18 @@ export function Output(props: OutputProps) {
             },
             onUpdate: () => {
                 const tl = timelineRef.current;
-
                 const now = performance.now();
                 if (now - lastProgressUpdateRef.current > 100) { // setProgress throttlen, sonst kann man playback speed nicht mehr während auotplay ändern
-                    props.setProgress(tl.progress()); //für scrubber
+                    props.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
                 const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
                 props.setCurrentStep(stepIndex);
-
             },
             onComplete: () => {
-                props.setProgress(1); //für scrubber ... und auch nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
+                props.setProgress(1); //nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
                 setIsPlaying(false);
             }
-
         });
 
         const firstStep: AlgorithmStepDTO = props.steps[0];
@@ -116,7 +104,7 @@ export function Output(props: OutputProps) {
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
-        //adding tweens:
+        //tweens hinzufügen:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
             const activeRectOpacity: number = step.currentPoint !== null ? 1 : 0;//beim final step die zwei rects ausblenden
@@ -156,13 +144,12 @@ export function Output(props: OutputProps) {
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
 
-    //const candidatePointIds = new Set(step.candidatePairs.flatMap((pair) => [pair.p0.id, pair.p1.id]));
-    //const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id)); //da current eh schon andres eingefärbt wird
-    const candidatePointIds = new Set(
-        step.candidatePairs.map((pair) => pair.p0.id)
-    );
+    const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id));
 
-    //für rect und line nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
+    const legendenValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
+        : step.activePoints.map((p) => p.label).join(", ");
+
+    //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
     const firstStep: AlgorithmStepDTO = props.steps[0];
 
@@ -171,14 +158,12 @@ export function Output(props: OutputProps) {
             <IOModeTabs
                 mode="output"
                 onChangeInput={props.onChangeInput}
-                onSubmit={() => {
-                }}
+                onSubmit={() => {}}
                 canSubmit={false}
             />
 
             <svg
-                className="algorithm-canvas"
-                viewBox={`0 0 ${props.width} ${props.height}`}
+                className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`}
                 preserveAspectRatio="xMidYMid meet"
             >
                 <rect
@@ -206,7 +191,6 @@ export function Output(props: OutputProps) {
                     rx="5"
                 />
 
-
                 {step.allPoints.map((p: Node) => {
                     const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
                     const isCandidate = candidatePointIds.has(p.id);
@@ -228,7 +212,7 @@ export function Output(props: OutputProps) {
                         fill = "black";
                     }
                     if (isBest) {
-                        fill = "#ffd700";
+                        fill = "#f5c45e";
                     }
                     const scale = isCurrent ? 1.2 : 1;
 
@@ -250,7 +234,6 @@ export function Output(props: OutputProps) {
                 setIsPlaying={setIsPlaying}
                 progress={props.progress}
                 setProgress={props.setProgress}
-
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
@@ -261,17 +244,23 @@ export function Output(props: OutputProps) {
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>δ:</strong> {step.delta.toFixed(2)}</div>
+                    <div><strong>Current δ:</strong> {step.searchDelta.toFixed(2)}</div>
                     <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
                     <div>
                         <strong> Best Pair:{" "}</strong>
                         {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
                     </div>
                     <div>
-                        <strong>Active Points:</strong>{" "}
-                        {step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
-                            : step.activePoints.map((p) => p.label).join(", ")}
+                        <LegendEntry
+                            label="Active Point: "
+                            value={legendenValue}
+                            icon={<XNodeIcon fill="#555" ringStyle="active"/>}
+                        />
+
+
                     </div>
+
+
 
                     <div>
                         <strong>Candidates:</strong>{" "}
