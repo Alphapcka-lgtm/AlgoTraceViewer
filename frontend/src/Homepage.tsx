@@ -2,20 +2,21 @@ import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
-type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
+import type {HomepageProps, Tab} from "./shared/Types.tsx";
+import {Link} from "react-router-dom";
 
-export function Homepage() {
-    const [activeTab, setActiveTab] = useState<Tab>("homepage");
+export function Homepage(props: HomepageProps) {
+    const [activeTab, setActiveTab] = useState<Tab>(props.activeTab);
     return (
         <div className="app-page">
             <Header activeTab={activeTab} setActiveTab={setActiveTab}/>
 
             <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
-                {activeTab === "sweepline" && <App/>}
-                {activeTab === "vertexcover" && <VertexCover/>}
-                {activeTab === "suffixarray" && <SuffixArray/>}
-                {activeTab === "ehrlichswaps" && <EhrlichSwaps />}
+                {activeTab === "sweepLine" && <App/>}
+                {activeTab === "vertexCover" && <VertexCover/>}
+                {activeTab === "suffixArray" && <SuffixArray/>}
+                {activeTab === "ehrlichSwap" && <EhrlichSwaps />}
             </main>
         </div>
     );
@@ -40,28 +41,30 @@ type NavigationBarProps = { activeTab: Tab; onTabChange: (tab: Tab) => void; };
 function NavigationBar(props: NavigationBarProps) {
     return (
         <nav className="home-nav">
-            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="ehrlichswaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/"}/>
+            <NavButton tab="sweepLine" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/sweepLine"}/>
+            <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
+            <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
+            <NavButton tab="ehrlichSwap" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwap"}/>
         </nav>
     );
 }
 
-type NavButtonProps = { tab: Tab; label: string; activeTab: Tab; onTabChange: (tab: Tab) => void; };
+type NavButtonProps = { tab: Tab; label: string; activeTab: Tab; onTabChange: (tab: Tab) => void; linkTo: string };
 
 function NavButton(props: NavButtonProps) {
     const isActive = props.activeTab === props.tab;
 
     return (
-        <button
-            type="button"
-            onClick={() => props.onTabChange(props.tab)}
-            className={`home-nav-button ${isActive ? "is-active" : ""}`}
-        >
-            {props.label}
-        </button>
+        <Link to={props.linkTo} style={{alignContent: "center"}}>
+            <button
+                type="button"
+                onClick={() => props.onTabChange(props.tab)}
+                className={`home-nav-button ${isActive ? "is-active" : ""}`}
+            >
+                {props.label}
+            </button>
+        </Link>
     );
 }
 
@@ -87,19 +90,19 @@ function HomeContent(props: HomeContentProps) {
                 <AlgorithmCard
                     title="Sweepline"
                     description="bli bla blup"
-                    onClick={() => props.onTabChange("sweepline")}
+                    onClick={() => props.onTabChange("sweepLine")}
                 />
 
                 <AlgorithmCard
                     title="Suffix Array"
                     description="bla bla blup"
-                    onClick={() => props.onTabChange("suffixarray")}
+                    onClick={() => props.onTabChange("suffixArray")}
                 />
 
                 <AlgorithmCard
                     title="Vertex Cover"
                     description="bup lup schup"
-                    onClick={() => props.onTabChange("vertexcover")}
+                    onClick={() => props.onTabChange("vertexCover")}
                 />
             </div>
         </section>
