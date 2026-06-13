@@ -43,7 +43,7 @@ export function VertexCover() {
     };
 
     const fetchAnimation = async (input: AnimationRequest) => {
-        return fetch("http://localhost:8080/vertexCover/" + variant, {
+        return fetch("http://localhost:8080/api/vertexCover/" + variant, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(input),

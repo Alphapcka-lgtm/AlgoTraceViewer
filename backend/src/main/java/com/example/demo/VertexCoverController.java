@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
         allowedHeaders = "*",
         methods = {RequestMethod.POST, RequestMethod.OPTIONS}
 )
-@RequestMapping("/vertexCover")
+@RequestMapping("/api/vertexCover")
 public class VertexCoverController {
 
     RandomVertexCover randomVertexCover;
