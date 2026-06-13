@@ -39,7 +39,7 @@ export type PseudoCodePanelProps = {
     title: string;
 };
 
-export type Tab = "homepage" | "sweepLine" | "suffixArray" | "vertexCover" | "ehrlichSwap";
+export type Tab = "homepage" | "sweepLine" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
 
 export type HomepageProps = {
     activeTab: Tab;

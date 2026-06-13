@@ -22,8 +22,8 @@ const router = createBrowserRouter([
         element: <Homepage activeTab={"suffixArray"}/>
     },
     {
-        path: "/ehrlichSwap",
-        element: <Homepage activeTab={"ehrlichSwap"}/>
+        path: "/ehrlichSwaps",
+        element: <Homepage activeTab={"ehrlichSwaps"}/>
     }
 ]);
 

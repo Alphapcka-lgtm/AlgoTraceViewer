@@ -16,7 +16,7 @@ export function Homepage(props: HomepageProps) {
                 {activeTab === "sweepLine" && <App/>}
                 {activeTab === "vertexCover" && <VertexCover/>}
                 {activeTab === "suffixArray" && <SuffixArray/>}
-                {activeTab === "ehrlichSwap" && <EhrlichSwaps />}
+                {activeTab === "ehrlichSwaps" && <EhrlichSwaps />}
             </main>
         </div>
     );
@@ -45,7 +45,7 @@ function NavigationBar(props: NavigationBarProps) {
             <NavButton tab="sweepLine" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/sweepLine"}/>
             <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
             <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
-            <NavButton tab="ehrlichSwap" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwap"}/>
+            <NavButton tab="ehrlichSwaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwaps"}/>
         </nav>
     );
 }
