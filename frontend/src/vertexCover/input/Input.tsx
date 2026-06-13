@@ -1,15 +1,15 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
-import type {Interaction, SVGInputProps} from "./Types.tsx";
+import type {Interaction, SVGInputProps} from "../shared/Types.tsx";
 import type {Node} from "../../sweepLine/shared/Types.tsx"
 import {Edges, PreviewEdge} from "../shared/Edges.tsx";
-import {InputControl} from "./InputControl.tsx";
+import {InputControls} from "./InputControls.tsx";
 import type {Edge} from "../shared/Types.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import * as React from "react";
 
-export function SVGInput(props: SVGInputProps) {
+export function Input(props: SVGInputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
     const didNodeMove = useRef(false);
 
@@ -82,7 +82,7 @@ export function SVGInput(props: SVGInputProps) {
             });
             setInteraction({type: "idle"});
         } else {
-            setInteraction({type: "drawing-edge", fromId: node.id})
+            setInteraction({type: "drawing-edge", fromId: node.id, to: {x: node.x, y: node.y}})
         }
     };
 
@@ -135,7 +135,7 @@ export function SVGInput(props: SVGInputProps) {
             <Edges nodes={props.input.graph.nodes} edges={props.input.graph.edges}/>
             <Nodes nodes={props.input.graph.nodes} {...eventHandler} />
         </svg>
-        <InputControl
+        <InputControls
             setInput={props.setInput}
             input={props.input}
             setInteraction={setInteraction}

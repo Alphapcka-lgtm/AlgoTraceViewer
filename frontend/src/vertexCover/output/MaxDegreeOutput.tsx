@@ -1,5 +1,11 @@
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
-import {getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.tsx";
+import {
+    colors,
+    getActiveLineIdsMaxDegree, NodeDegreeMapIcon,
+    NodeIcon,
+    PSEUDOCODE_MAX_DEGREE,
+    RemainingEdgeIcon
+} from "./PseudoCode.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
@@ -12,21 +18,22 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
-export function MaxDegreeSVGOutput(props: SVGOutputProps) {
+export function MaxDegreeOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 3);
 
-    const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
-
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
         tlRef.current.timeScale(speed);
     };
+
+    console.log(props.output)
 
     useGSAP(() => {
 
@@ -41,7 +48,7 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
             },
             onUpdate: () => {
                 const tl = tlRef.current;
-                props.setProgress(tl.progress()); //für scrubber
+                props.setProgress(tl.progress());
 
                 const stepIndex: number = getStepIndexFromTimeline(tl, labels);
 
@@ -86,8 +93,16 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
         props.output.intermediateStates.forEach((intermediateState, index) => {
 
             intermediateState.chosenNodes.forEach((node) => {
+                const tableElement = document.getElementById("t1" + node.id)! as HTMLDivElement;
 
-                timeline.to("#t1" + node.id + ",#t2" + node.id, {background: colors.red});
+                timeline.to(tableElement, {
+                    background: colors.red,
+                    onStart: () => tableElement.scrollIntoView({
+                        behavior: "smooth",
+                        inline: "center",
+                        block: "nearest"
+                    })
+                });
 
                 timeline.addLabel(labels[3 * index + 3]);
 
@@ -113,21 +128,20 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
                     }
                 });
 
-                timeline.to("#t2" + node.id + ",#t1" + node.id, {background: "none"});
-            })
+                intermediateState.degreeMap.forEach((ndp, index) => {
 
-            intermediateState.degreeMap.forEach((ndp) => {
-                let previous = props.output.initialDegreeMap.find((prev) => prev.node.id === ndp.node.id)!;
+                    if (index === 0) {
+                        timeline.to("#t2" + ndp.node.id, {
+                            scrambleText: {text: String(ndp.degree), chars: "-|"},
+                        });
+                    } else {
+                        timeline.to("#t2" + ndp.node.id, {
+                            scrambleText: {text: String(ndp.degree), chars: "-|"},
+                        }, "<");
+                    }
+                })
 
-                if (index > 0) {
-                    previous = props.output.intermediateStates[index - 1].degreeMap.find((prev) => prev.node.id === ndp.node.id)!;
-                }
-
-                if (previous.degree !== ndp.degree) {
-                    timeline.to("#t2" + ndp.node.id, {
-                        scrambleText: {text: String(ndp.degree), chars: "-|"},
-                    }, "<");
-                }
+                timeline.to(tableElement, {background: "none"});
             })
 
             timeline.addLabel(labels[3 * index + 5]);
@@ -168,35 +182,34 @@ export function MaxDegreeSVGOutput(props: SVGOutputProps) {
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-info">
-            <div className="step-info-grid">
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-                <div>
-                    <table style={{borderSpacing: "10px 10px"}}>
-                        <thead>
-                        <tr>
-                            {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
-                                <th key={index}>
-                                    <span id={"t1" + ndp.node.id} style={{
-                                        borderRadius: "9px",
-                                        background: "none",
-                                        textAlign: "center"
-                                    }}>{ndp.node.label}</span>
-                                </th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            {props.output.intermediateStates[0].degreeMap.map((ndp, index) => (
-                                <th key={index}>
-                                    <span id={"t2" + ndp.node.id}
-                                          style={{borderRadius: "9px", background: "none", textAlign: "center"}}></span>
-                                </th>
-                            ))}
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
+            </div>
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
+                <LegendEntry
+                    label="Node-Degree Map N"
+                    value={""}
+                    icon={<NodeDegreeMapIcon/>}
+                />
+                <LegendEntry
+                    label="Vertex Cover C"
+                    value={""}
+                    icon={<NodeIcon/>}
+                />
+                <LegendEntry
+                    label="Remaining Edges E'"
+                    value={""}
+                    icon={<RemainingEdgeIcon/>}
+                />
+            </div>
+            <div style={{display: "flex", flexWrap: "nowrap", overflowX: "auto", overflowY: "hidden", paddingBottom: "12px"}}>
+                {props.output.initialDegreeMap.map(ndp => {
+                    return (<div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} style={{flex: 1, fontSize: 20}}>
+                        <div style={{minWidth: "27px", border: "solid 1px", textAlign: "center", textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"}}>{ndp.node.label}</div>
+                        <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} style={{minWidth: "27px", border: "solid 1px", textAlign: "center", textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"}}></div>
+                    </div>);
+                })}
             </div>
         </div>
         <PseudoCodePanel
