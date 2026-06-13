@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
+import SuffixArrayInducedSorting from "./sais/SuffixArrayInducedSorting.tsx";
+
 type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
 
 export function Homepage() {
@@ -15,14 +17,15 @@ export function Homepage() {
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
                 {activeTab === "sweepline" && <App/>}
                 {activeTab === "vertexcover" && <VertexCover/>}
-                {activeTab === "suffixarray" && <SuffixArray/>}
-                {activeTab === "ehrlichswaps" && <EhrlichSwaps />}
+                {activeTab === "suffixarray" && <SuffixArrayInducedSorting/>}
+                {activeTab === "ehrlichswaps" && <EhrlichSwaps/>}
             </main>
         </div>
     );
 }
 
 type HeaderProps = { activeTab: Tab; setActiveTab: React.Dispatch<React.SetStateAction<Tab>>; };
+
 function Header(props: HeaderProps) {
     return (
         <header className="home-header">
@@ -43,9 +46,12 @@ function NavigationBar(props: NavigationBarProps) {
         <nav className="home-nav">
             <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
             <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
-            <NavButton tab="ehrlichswaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+            <NavButton tab="ehrlichswaps" label="Ehrlich Swaps" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
         </nav>
     );
 }
@@ -173,6 +179,7 @@ function AlgoTraceLogo() {
         </svg>
     );
 }
+
 /*
 const pageStyle: React.CSSProperties = {
     padding: 24,

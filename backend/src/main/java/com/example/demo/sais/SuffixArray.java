@@ -449,6 +449,6 @@ public class SuffixArray {
     }
 
     public SaisResponseDto getResponseData() {
-        return responseBuilder.build();
+        return responseBuilder.timestamp(System.currentTimeMillis()).build();
     }
 }

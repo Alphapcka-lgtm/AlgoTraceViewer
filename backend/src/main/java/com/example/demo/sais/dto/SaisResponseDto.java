@@ -20,5 +20,6 @@ public record SaisResponseDto(
         int[] saLmsAdded,
         List<SortStepDto> saInduceL,
         List<SortStepDto> saInduceS,
-        int[] sa) {
+        int[] sa,
+        Long timestamp) {
 }

@@ -1,4 +1,4 @@
-import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
+import type {AnimationRequest, AnimationResponse, NavButtonProps, VertexCoverVariant} from "./shared/Types.tsx";
 import {assignLabels, decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
 import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
