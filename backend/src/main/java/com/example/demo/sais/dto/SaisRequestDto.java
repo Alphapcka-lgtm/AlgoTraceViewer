@@ -4,5 +4,5 @@ import com.example.demo.sais.validatioin.SaisRequestDtoConstraint;
 import lombok.Builder;
 
 @Builder
-public record SaisRequestDto(@SaisRequestDtoConstraint String source) {
+public record SaisRequestDto(@SaisRequestDtoConstraint String source, Long timestamp) {
 }

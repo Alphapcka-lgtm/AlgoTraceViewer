@@ -2,8 +2,9 @@ import React, {useState} from "react";
 import App from "./sweepLine/App.tsx";
 import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
-import type {HomepageProps, Tab} from "./shared/Types.tsx";
-import {Link} from "react-router-dom";
+import SuffixArrayInducedSorting from "./sais/SuffixArrayInducedSorting.tsx";
+
+type Tab = "homepage" | "sweepline" | "suffixarray" | "vertexcover" | "ehrlichswaps";
 
 export function Homepage() {
     const [activeTab, setActiveTab] = useState<Tab>("homepage");
@@ -14,16 +15,17 @@ export function Homepage() {
 
             <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
-                {activeTab === "sweepLine" && <App/>}
-                {activeTab === "vertexCover" && <VertexCover/>}
-                {activeTab === "suffixArray" && <SuffixArray/>}
-                {activeTab === "ehrlichSwaps" && <EhrlichSwaps />}
+                {activeTab === "sweepline" && <App/>}
+                {activeTab === "vertexcover" && <VertexCover/>}
+                {activeTab === "suffixarray" && <SuffixArrayInducedSorting/>}
+                {activeTab === "ehrlichswaps" && <EhrlichSwaps/>}
             </main>
         </div>
     );
 }
 
 type HeaderProps = { activeTab: Tab; setActiveTab: React.Dispatch<React.SetStateAction<Tab>>; };
+
 function Header(props: HeaderProps) {
     return (
         <header className="home-header">
@@ -42,11 +44,14 @@ type NavigationBarProps = { activeTab: Tab; onTabChange: (tab: Tab) => void; };
 function NavigationBar(props: NavigationBarProps) {
     return (
         <nav className="home-nav">
-            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/"}/>
-            <NavButton tab="sweepLine" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/sweepLine"}/>
-            <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
-            <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
-            <NavButton tab="ehrlichSwaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwaps"}/>
+            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="sweepline" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange}/>
+            <NavButton tab="suffixarray" label="Suffix Array" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+            <NavButton tab="vertexcover" label="Vertex Cover" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
+            <NavButton tab="ehrlichswaps" label="Ehrlich Swaps" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange}/>
         </nav>
     );
 }
@@ -176,6 +181,7 @@ function AlgoTraceLogo() {
         </svg>
     );
 }
+
 /*
 const pageStyle: React.CSSProperties = {
     padding: 24,
