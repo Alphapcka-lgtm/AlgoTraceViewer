@@ -244,7 +244,7 @@ export function Output(props: OutputProps) {
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>Current δ:</strong> {step.searchDelta.toFixed(2)}</div>
+                    <div><strong>Window δ:</strong> {step.searchDelta.toFixed(2)}</div>
                     <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
                     <div>
                         <strong> Best Pair:{" "}</strong>
@@ -260,26 +260,29 @@ export function Output(props: OutputProps) {
 
                     </div>
 
-
-
                     <div>
                         <strong>Candidates:</strong>{" "}
-                        <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
-                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                            .join("; ")
-                        }
-                        {/*step.currentPoint === null
+                        {step.currentPoint === null
                             ? "—"
-                            : shouldShowCandidateWindow(step)
-                                ? "—"
+                            : isShrinkStep(step)
+                                ? "no candidate comparisons in this step"
                                 : step.candidatePairs.length === 0
                                     ? "No candidates"
                                     : step.candidatePairs
                                         .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
                                         .join("; ")
-                        */}
+                        }
                     </div>
+                    {/*
+                    <div>
+                        <strong>Candidates:</strong>{" "}
+                        {step.currentPoint === null ? "—" :
+                            step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
+                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                            .join("; ")
+                        }
+                    </div>
+                    */}
                 </div>
             </div>
 

@@ -42,9 +42,10 @@ public class SLineService {
         List<Point> future0 = xSorted.subList(2, xSorted.size()); // points to the right of the current point.
 
         //shortcut for the delta control+cmd+space and then search delta
-        String description = "Initialization: Points sorted by x-coordinate. "
-                + "δ = dist(" + p0.label() + ", " + p1.label() + ") = "
-                + String.format("%.2f", delta);
+        String description = "Initialization: The points are sorted by x-coordinate. "
+                + "The initial δ is computed from the first two points: dist("
+                + p0.label() + ", " + p1.label() + ") = "
+                + String.format("%.2f", delta) + ".";
 
         steps.add(new AlgorithmStepDTO(
                 description, p1, p1.x(), delta, delta,
@@ -68,7 +69,15 @@ public class SLineService {
 
             RemovalResult rm = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaBeforeStep);
             tail = rm.newTail();
-            boolean removedPoints = rm.removedAny();//für pseudo code highlighting
+            boolean removedPoints = rm.removedAny();
+
+            String activeWindowMsg = "";
+
+            if (removedPoints) {
+                String removedLabels = rm.removedPoints().stream().map(Point::label).reduce((a, b) -> a + ", " + b).orElse("");
+
+                activeWindowMsg = removedLabels + " left the active window because the x-distance to " +current.label()+" is at least δ.";
+            }
 
             /*
              * Candidate checking may find a smaller delta.
@@ -88,23 +97,39 @@ public class SLineService {
             // Only for visualization: points not processed yet, so all points right of current.
             List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
 
-         //   String newBestMsg = "New minimum found! δ = " + String.format("%.2f", deltaAfterCandidateCheck) + " (" + bestPairAfterCandidateCheck.p0().label() + ", " + bestPairAfterCandidateCheck.p1().label() + ")";
+            String newBestMsg = "New closest pair found: "
+                    + bestPairAfterCandidateCheck.p0().label() + " ↔ " + bestPairAfterCandidateCheck.p1().label()
+                    + " with distance "
+                    + String.format("%.2f", deltaAfterCandidateCheck)
+                    + ". The new smaller δ is visualized in the next step."; //This will be the new δ (see next step).";
 
-            String newBestMsg = "New closest pair found: " + bestPairAfterCandidateCheck.p0().label()
-                    + " ↔ " + bestPairAfterCandidateCheck.p1().label() + " with a distance " + String.format("%.2f", deltaAfterCandidateCheck)+
-                    " This becomes the new δ ...";
-
-            String noNewBestMsg = "Processed point " + current.label()
-                    + ". No candidate pair is closer than the current δ = " + String.format("%.2f", deltaAfterCandidateCheck) +
-                    " so δ stays unchanged.";
+            String noNewBestMsg = "δ stays unchanged because no candidate pair is closer.";
 
             boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
+            /*
+            String candidateMsg = "";
+            if (hasCandidatePairs) {
+                String candidateLabels = candidates.candidatePairs().stream()
+                        .map(r -> r.p0().label())
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("");
+                candidateMsg = "Candidate points for "
+                        + current.label()
+                        + " inside the candidate window are: "
+                        + candidateLabels
+                        + ".";
+            }
+             */
 
             List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(
                     removedPoints,
                     hasCandidatePairs,
                     foundNewBest);
 
+            String stepDescription = foundNewBest ? newBestMsg : noNewBestMsg;
+            if (!activeWindowMsg.isBlank()) {
+                stepDescription = activeWindowMsg + " " + stepDescription;
+            }
             /*
              * Step i: If a new minimum was found, the step message already shows the new delta.
              * However, searchDelta stays deltaBeforeStep so the windows still show the
@@ -112,7 +137,7 @@ public class SLineService {
              */
             // step is taken before inserting the current point beause currentPoint ist not part of activePoints
             steps.add(new AlgorithmStepDTO(
-                    foundNewBest ? newBestMsg : noNewBestMsg,
+                    stepDescription,
                     current,
                     current.x(),
                     deltaAfterCandidateCheck,
@@ -176,9 +201,9 @@ public class SLineService {
         // currentPoint = null because the alg has finished
         Point lastPoint = xSorted.getLast();
 
-        String doneMsg = "Done! The sweep is complete. The closest pair is"
+        String doneMsg = "Done! The sweep is complete. The closest pair is "
                 + currBestPair.p0().label() + " ↔ " + currBestPair.p1().label()
-                + " with distance = " + String.format("%.2f", currBestPair.distance());
+                + " with distance = " + String.format("%.2f", currBestPair.distance()) + ".";
 
         steps.add(new AlgorithmStepDTO(
                 doneMsg,
@@ -202,7 +227,7 @@ public class SLineService {
     private RemovalResult removePointsOutsideActiveSweepWindow(Point current, List<Point> xSorted, TreeSet<Point> activePoints,
             List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
 
-        boolean removedPoints = false; //für pseudo code highlighting ...
+        List<Point> removed = new ArrayList<>();
 
         //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
         //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
@@ -211,11 +236,11 @@ public class SLineService {
             Point oldPoint = xSorted.get(tail);
             activePoints.remove(oldPoint);
             processed.add(oldPoint);
+            removed.add(oldPoint);
             tail++;
-            removedPoints = true;
         }
 
-        return new RemovalResult(tail, removedPoints);
+        return new RemovalResult(tail, removed);
     }
 
 
@@ -304,7 +329,11 @@ public class SLineService {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    private record RemovalResult(int newTail, boolean removedAny) {}
+    private record RemovalResult(int newTail, List<Point> removedPoints) {
+        boolean removedAny() {
+            return !removedPoints.isEmpty();
+        }
+    }
 
     private record CandidateResult(
             double delta,
