@@ -128,16 +128,21 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                     }
                 });
 
-                intermediateState.degreeMap.forEach((ndp, index) => {
+                const previous = index == 0 ? props.output.initialDegreeMap : props.output.intermediateStates[index-1].degreeMap;
+                let first = true;
 
-                    if (index === 0) {
-                        timeline.to("#t2" + ndp.node.id, {
-                            scrambleText: {text: String(ndp.degree), chars: "-|"},
-                        });
-                    } else {
-                        timeline.to("#t2" + ndp.node.id, {
-                            scrambleText: {text: String(ndp.degree), chars: "-|"},
-                        }, "<");
+                intermediateState.degreeMap.forEach((ndp, index) => {
+                    if(previous[index].degree != ndp.degree) {
+                        if (first) {
+                            timeline.to("#t2" + ndp.node.id, {
+                                scrambleText: {text: String(ndp.degree), chars: "-|"},
+                            });
+                            first = false;
+                        } else {
+                            timeline.to("#t2" + ndp.node.id, {
+                                scrambleText: {text: String(ndp.degree), chars: "-|"},
+                            }, "<");
+                        }
                     }
                 })
 

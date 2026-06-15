@@ -95,7 +95,7 @@ export function VertexCover() {
             createExportString={createExportString}
             onImport={handleImport}
         />
-    ) : variant === "maxDegree" ? (
+    ) : variant === "maxDegree" || variant === "staticList" ? (
         <MaxDegreeOutput
             setProgress={setProgress}
             progress={progress}

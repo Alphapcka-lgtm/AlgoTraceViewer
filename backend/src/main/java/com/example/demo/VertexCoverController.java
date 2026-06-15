@@ -17,12 +17,19 @@ public class VertexCoverController {
     RandomVertexCover randomVertexCover;
     OptimalVertexCover optimalVertexCover;
     MaxDegreeVertexCover maxDegreeVertexCover;
+    StaticListVertexCover staticListVertexCover;
 
     @Autowired
-    public VertexCoverController(RandomVertexCover randomVertexCover, OptimalVertexCover optimalVertexCover,  MaxDegreeVertexCover maxDegreeVertexCover) {
+    public VertexCoverController(
+            RandomVertexCover randomVertexCover,
+            OptimalVertexCover optimalVertexCover,
+            MaxDegreeVertexCover maxDegreeVertexCover,
+            StaticListVertexCover staticListVertexCover
+    ) {
         this.randomVertexCover = randomVertexCover;
         this.optimalVertexCover = optimalVertexCover;
         this.maxDegreeVertexCover = maxDegreeVertexCover;
+        this.staticListVertexCover = staticListVertexCover;
     }
 
     @PostMapping("/random")
@@ -36,7 +43,12 @@ public class VertexCoverController {
     }
 
     @PostMapping("/maxDegree")
-    public ResponseEntity<AnimationResponse> heuristicVertexCover(@RequestBody AnimationRequest request) {
+    public ResponseEntity<AnimationResponse> maxDegreeVertexCover(@RequestBody AnimationRequest request) {
         return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.randomSeed()));
+    }
+
+    @PostMapping("/staticList")
+    public ResponseEntity<AnimationResponse> staticListVertexCover(@RequestBody AnimationRequest request) {
+        return ResponseEntity.ok(staticListVertexCover.solve(request.graph(), request.randomSeed()));
     }
 }
