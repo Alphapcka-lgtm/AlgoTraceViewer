@@ -18,6 +18,7 @@ export default function SuffixArrayInducedSorting() {
         guessLmsSteps: [],
         guessInduceL: [],
         guessInduceS: [],
+        guessedSa: [],
         lmsOrder: [],
         lmsNames: [],
         lmsPositions: [],
@@ -85,6 +86,8 @@ export default function SuffixArrayInducedSorting() {
                            value={input.source}
                            onUpdateValue={updateValue}
                 />
+                <p>immissiissippi</p>
+                <p>banana</p>
             </div>
         );
     }

@@ -1,6 +1,6 @@
 package com.example.demo.sais;
 
-import com.example.demo.experiments.data.TypeMap;
+import com.example.demo.sais.dto.BucketSizeDto;
 import com.example.demo.sais.dto.SaisResponseDto;
 import com.example.demo.sais.dto.SortStepDto;
 import com.example.demo.sais.dto.TypeMapDto;
@@ -52,7 +52,10 @@ public class SuffixArray {
                 char c = (i < source.length()) ? source.charAt(i) : '$';
                 IO.println(c + "(" + i + ")" + " -> " + bucketTails[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
-                guessLmsSteps.add(new SortStepDto(i, bucketTails[bucketIndex]));
+                guessLmsSteps.add(new SortStepDto(i,
+                        bucketTails[bucketIndex],
+                        Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
+                        "inducing lms suffixes: " + c + "(" + i + ") -> " + bucketTails[bucketIndex]));
             }
             // ... and move the tail pointer down.
             bucketTails[bucketIndex]--;
@@ -159,7 +162,10 @@ public class SuffixArray {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
                 IO.println(c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketHeads[bucketIndex]);
-                induceLSteps.add(new SortStepDto(j, bucketHeads[bucketIndex]));
+                induceLSteps.add(new SortStepDto(j,
+                        bucketHeads[bucketIndex],
+                        Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
+                        "inducing L suffixes: " + c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]));
             }
 
             // ...and move the head pointer up.
@@ -223,7 +229,10 @@ public class SuffixArray {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
                 IO.println(c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]);
                 showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
-                induceSSteps.add(new SortStepDto(j, bucketTails[bucketIndex]));
+                induceSSteps.add(new SortStepDto(j,
+                        bucketTails[bucketIndex],
+                        Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
+                        "inducing S suffixes: " + c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]));
             }
 
             // ...and move the tail pointer down.
@@ -311,7 +320,7 @@ public class SuffixArray {
          * character they start with, so let's precompute that info now.
          */
         final int[] bucketSizes = findBucketSizes(text, alphabetSize);
-        if (trackSteps) responseBuilder.bucketSizes(bucketSizes);
+        if (trackSteps) responseBuilder.bucketSizes(bucketSizeArrayToDto(bucketSizes));
 
         /*
          * Usa a simple bucket-sort to insert all the LMS suffixes into
@@ -325,6 +334,7 @@ public class SuffixArray {
          */
         induceSortL(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps, true);
         induceSortS(text, guessedSuffixArray, bucketSizes, typeMap, alphabetSize, trackSteps, true);
+        if (trackSteps) responseBuilder.guessedSa(Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length));
 
         final int lmsCount = typeMap.getLmsCount();
 
@@ -446,6 +456,19 @@ public class SuffixArray {
         text[string.length()] = 0; // sentinel
         responseBuilder.source(string + "$");
         return sais(text, 27, true);
+    }
+
+    private List<BucketSizeDto> bucketSizeArrayToDto(final int[] bucketSizes) {
+        final List<BucketSizeDto> result = new ArrayList<>();
+        result.add(new BucketSizeDto('$', bucketSizes[0]));
+        char c = 'a';
+        for (int i = 1; i < bucketSizes.length; i++) {
+            if (bucketSizes[i] > 0) {
+                result.add(new BucketSizeDto(c, bucketSizes[i]));
+            }
+            c++;
+        }
+        return result;
     }
 
     public SaisResponseDto getResponseData() {

@@ -1,6 +1,6 @@
 package com.example.demo.sais.dto;
 
-import com.example.demo.experiments.data.TypeMap;
+import com.example.demo.sais.TypeMap;
 import lombok.Builder;
 
 import java.util.Objects;
@@ -19,7 +19,7 @@ public record TypeMapDto(TypeDto[] map, int lmsCount) {
         final TypeDto[] dtoMap = new TypeDto[map.length()];
         for (int i = 0; i < dtoMap.length; i++) {
             dtoMap[i] = TypeDto.builder()
-                    .type(map.getType(i))
+                    .type(map.getType(i).getValue())
                     .isLms(map.isLmsChar(i))
                     .build();
         }
@@ -27,6 +27,6 @@ public record TypeMapDto(TypeDto[] map, int lmsCount) {
     }
 
     @Builder
-    public record TypeDto(TypeMap.Type type, boolean isLms) {
+    public record TypeDto(char type, boolean isLms) {
     }
 }

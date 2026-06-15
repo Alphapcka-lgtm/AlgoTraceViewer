@@ -7,11 +7,12 @@ import java.util.List;
 @Builder
 public record SaisResponseDto(
         String source,
-        int[] bucketSizes,
+        List<BucketSizeDto> bucketSizes,
         TypeMapDto typeMapDto,
         List<SortStepDto> guessLmsSteps,
         List<SortStepDto> guessInduceL,
         List<SortStepDto> guessInduceS,
+        int[] guessedSa,
         int[] lmsOrder,
         int[] lmsNames,
         int[] lmsPositions,

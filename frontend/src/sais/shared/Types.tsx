@@ -27,11 +27,12 @@ export type SaisRequestDto = {
 
 export type SaisResponseDto = {
     source: string,
-    bucketSizes: number[],
+    bucketSizes: BucketSize[],
     typeMapDto: TypeMapDto,
     guessLmsSteps: SortStepDto[],
     guessInduceL: SortStepDto[],
     guessInduceS: SortStepDto[],
+    guessedSa: number[],
     lmsOrder: number[],
     lmsNames: number[],
     lmsPositions: number[],
@@ -44,9 +45,15 @@ export type SaisResponseDto = {
     timestamp: number,
 }
 
+export type BucketSize = {
+    c: string,
+    size: number,
+}
+
 export type SortStepDto = {
     sourceIndex: number,
     bucketIndex: number,
+    resultingArray: number[],
 }
 
 export type TypeMapDto = {
@@ -55,7 +62,7 @@ export type TypeMapDto = {
 }
 
 export type TypeDto = {
-    type: Type,
+    type: String,
     isLms: boolean,
 }
 
