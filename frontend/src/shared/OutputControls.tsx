@@ -1,4 +1,3 @@
-
 import gsap from "gsap";
 import type {OutputControlsProps} from "./Types.tsx";
 

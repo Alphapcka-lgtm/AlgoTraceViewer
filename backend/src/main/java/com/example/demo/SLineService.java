@@ -1,21 +1,21 @@
 package com.example.demo;
-
 import dto.AlgorithmStepDTO;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 @Getter
 @Service
 public class SLineService {
-
+    //https://arxiv-org.translate.goog/html/2601.05681v1?_x_tr_sl=en&_x_tr_tl=de&_x_tr_hl=de&_x_tr_pto=sge#S2
+    //https://arxiv.org/pdf/2601.05681v1
+    //https://www.sciencedirect.com/science/article/abs/pii/0020019088901500
+    //https://pages.di.unipi.it/rossano/blog/2023/sweepline/
+    //https://www.geeksforgeeks.org/dsa/closest-pair-of-points-using-sweep-line-algorithm/
+    //https://www.jn.ethz.ch/education/script/P6_C26.pdf
     public List<AlgorithmStepDTO> nearestPoints(List<Point> points) {
         List<AlgorithmStepDTO> steps = new ArrayList<>();
 
-        if (points == null || points.size() < 2) {
-            throw new IllegalArgumentException("There must be at least two points");
-        }
+        if (points == null || points.size() < 2) throw new IllegalArgumentException("There must be at least two points");
 
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
@@ -183,8 +183,21 @@ public class SLineService {
                         List.of(),
                         processedAfterShrink,
                         futurePoints,
-                        List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
+                        List.of("update-delta", "shrink-windows")//List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
                 ));
+                /*
+                activePoints.clear();
+                activePoints.addAll(activePointsAfterShrink);
+                processed.addAll(processedAfterShrink);
+
+                 */
+
+                activePoints.removeIf(p -> current.x() - p.x() >= deltaAfterCandidateCheck);
+                processed.clear();
+                processed.addAll(processedAfterShrink);
+                while (tail < i && current.x() - xSorted.get(tail).x() >= deltaAfterCandidateCheck) {
+                    tail++;
+                }
             }
 
 
@@ -308,6 +321,29 @@ public class SLineService {
 
         ids.add("for-loop");
         ids.add("set-current");
+        ids.add("active-window-condition");
+        ids.add("candidate-window");
+
+        if (hasCandidatePairs) {
+            ids.add("check-distance");
+        }
+
+        if (foundNewBest) {
+            ids.add("update-bestpair");
+        }
+
+        return ids;
+    }
+    /*
+    private List<String> buildPseudoCodeLineIds(
+            boolean removedPoints,
+            boolean hasCandidatePairs,
+            boolean foundNewBest
+    ) {
+        List<String> ids = new ArrayList<>();
+
+        ids.add("for-loop");
+        ids.add("set-current");
 
         if (removedPoints) {
             ids.add("update-active-window");
@@ -323,10 +359,12 @@ public class SLineService {
 
         return ids;
     }
+
+     */
     public static double euclideanDistance(Point p1, Point p2) {
-        long dx = (long) p2.x() - p1.x();
-        long dy = (long) p2.y() - p1.y();
-        return Math.sqrt(dx * dx + dy * dy);
+        double dx = (double) p2.x()-p1.x();
+        double dy = (double) p2.y()-p1.y();
+        return Math.hypot(dx,dy);
     }
 
     private record RemovalResult(int newTail, List<Point> removedPoints) {
@@ -341,5 +379,16 @@ public class SLineService {
             List<Result> candidatePairs,
             boolean foundNewBest
     ) {}
+
+    //wrapper funktion für einfacheres testen
+    public Result nearestPair(List<Point> points) {
+        List<AlgorithmStepDTO> steps = nearestPoints(points);
+
+        if (steps.isEmpty()) {
+            throw new IllegalStateException("Algorithm produced no steps");
+        }
+
+        return steps.getLast().bestPair();
+    }
 
 }

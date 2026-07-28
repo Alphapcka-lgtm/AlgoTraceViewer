@@ -107,6 +107,77 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
 };
 
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
+    {
+        id: "init",
+        text: "sort points by x; initialize bestPair and δ"
+    },
+
+    {
+        id: "for-loop",
+        text: "for i = 2 to n - 1:"
+    },
+
+    {
+        id: "set-current",
+        text: "current = xSorted[i]",
+        indent: 1
+    },
+
+    {
+        id: "active-window-condition",
+        text: "remove points with current.x - p.x ≥ δ",
+        indent: 1
+    },
+
+    {
+        id: "candidate-window",
+        text: "select candidates with |current.y - p.y| < δ",
+        indent: 1
+    },
+
+    {
+        id: "check-distance",
+        text: "compare current with each candidate",
+        indent: 1
+    },
+
+
+    {
+        id: "update-bestpair",
+        text: "if a closer pair is found: update bestPair",
+        indent: 1
+    },
+
+    {
+        id: "update-delta",
+        text: "update δ to the new closest distance",
+        indent: 1
+    },
+
+
+    /*
+    {
+        id: "update-bestpair",
+        text: "if a closer pair is found: update bestPair and δ",
+        indent: 1
+    },
+
+     */
+
+    {
+        id: "insert-current",
+        text: "insert current into activePoints",
+        indent: 1
+    },
+
+    {
+        id: "return",
+        text: "return bestPair and δ"
+    }
+];
+
+/*
+export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
 
     { id: "for-loop", text: "for each point current from left to right:" },
@@ -145,7 +216,7 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
 ];
 
 
-/*
+
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "sort", text: "xQueue = sortx(P)"},
     {id: "init-ytable", text: "yTable = [ ]"},

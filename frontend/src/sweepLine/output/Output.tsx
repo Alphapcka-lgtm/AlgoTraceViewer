@@ -146,8 +146,17 @@ export function Output(props: OutputProps) {
 
     const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id));
 
-    const legendenValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
+    const legendenValueActivePoints:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
+
+    const legendenValueCandidates:string = step.currentPoint === null ? "—"
+            : isShrinkStep(step)
+                ? "no candidate comparisons in this step"
+                : step.candidatePairs.length === 0
+                    ? "No candidates"
+                    : step.candidatePairs
+                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
+                        .join("; ");
 
     //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
@@ -245,33 +254,32 @@ export function Output(props: OutputProps) {
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
                     <div><strong>Window δ:</strong> {step.searchDelta.toFixed(2)}</div>
-                    <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
+                    <LegendEntry
+                        label="Current Point: "
+                        value={step.currentPoint?.label ?? "—"}
+                        icon={<XNodeIcon fill="black" ringStyle="none" scale={1.4}/>}
+                    />
                     <div>
-                        <strong> Best Pair:{" "}</strong>
-                        {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                        <LegendEntry
+                            label="Best Pair: "
+                            value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                            icon={<XNodeIcon fill="#f5c45e" ringStyle="none"/>}
+                        />
                     </div>
                     <div>
                         <LegendEntry
                             label="Active Point: "
-                            value={legendenValue}
+                            value={legendenValueActivePoints}
                             icon={<XNodeIcon fill="#555" ringStyle="active"/>}
                         />
-
-
                     </div>
 
                     <div>
-                        <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null
-                            ? "—"
-                            : isShrinkStep(step)
-                                ? "no candidate comparisons in this step"
-                                : step.candidatePairs.length === 0
-                                    ? "No candidates"
-                                    : step.candidatePairs
-                                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                                        .join("; ")
-                        }
+                        <LegendEntry
+                            label="Candidates: "
+                            value={legendenValueCandidates}
+                            icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
+                        />
                     </div>
                     {/*
                     <div>
