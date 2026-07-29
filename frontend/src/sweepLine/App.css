@@ -258,6 +258,11 @@
     justify-content: center;
 }
 
+.control-button.icon-only {
+    flex: 0 0 42px;
+    padding: 6px;
+}
+
 .control-select {
     flex: 0 0 110px;
 }
