@@ -1,5 +1,13 @@
 import gsap from "gsap";
 import type {OutputControlsProps} from "./Types.tsx";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Play,
+    Pause,
+    RotateCcw,
+    SkipBack,
+} from "lucide-react";
 
 export function OutputControls(props: OutputControlsProps) {
     const isAtStart = props.currentStep === 0;
@@ -90,19 +98,19 @@ export function OutputControls(props: OutputControlsProps) {
             </select>
 
             <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
-                <strong>←</strong>
+                <ArrowLeft size={20}/>
             </button>
 
             <button onClick={togglePlay} className="control-button">
-                {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
+                {props.isPlaying ? <Pause size={20}/> : isAtEnd ? <RotateCcw size={20}/> : <Play size={20}/> }
             </button>
 
             <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
-                <strong>→</strong>
+                <ArrowRight size={20}/>
             </button>
 
             <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">
-                ⏮
+                <SkipBack size={20} />
             </button>
 
             <input

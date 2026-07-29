@@ -23,7 +23,6 @@ export default function EhrlichSwaps () {
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
 
-
     const createEmptyField = (): SwapInputField => {
         const newField = {id: nextFieldId.current, value: ""};
         nextFieldId.current += 1;
