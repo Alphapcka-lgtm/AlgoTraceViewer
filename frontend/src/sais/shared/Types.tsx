@@ -62,10 +62,37 @@ export type TypeMapDto = {
 }
 
 export type TypeDto = {
-    type: String,
+    type: string,
     isLms: boolean,
 }
 
-export type Type = {
-    value: string
+export type Step = {
+    phaseLabel: string,
+    title: string,
+    description: string,
+    kind: StepKind,
+    frameIndex?: number, // index into the relevant SortStepDto[] for *-frame kinds
+}
+
+export type StepKind =
+    | "intro"
+    | "guess-lms-frame"
+    | "guess-induce-l-frame"
+    | "guess-induce-s-frame"
+    | "naming"
+    | "reduced"
+    | "place-lms-frame"
+    | "sa-induce-l-frame"
+    | "sa-induce-s-frame"
+    | "final";
+
+export type SvgCellData = {
+    label: string;
+    sub?: string;
+    bg?: string;
+    border?: string;
+    color?: string;
+    bold?: boolean;
+    ringColor?: string;
+    ringWidth?: number;
 }
