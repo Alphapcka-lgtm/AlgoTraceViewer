@@ -1051,6 +1051,7 @@ export function SaisOutput(props: SaisOutputProps) {
                     }
                     return elements
                 })}
+
                 {/* induce S-types guess */}
                 {props.output.guessInduceS.map((step, j) => {
                     const elements = [];
@@ -1161,11 +1162,173 @@ export function SaisOutput(props: SaisOutputProps) {
 
                 {/* reduced */}
                 <g id={"s" + counter} key={"s" + counter}>
-                    {
-
+                    {props.output.reduced.map((pos, index) => {
+                        const y = 30;
+                        const x = 600;
+                        return <g key={index}>
+                            <rect
+                                x={x + index * 30}
+                                y={y}
+                                width={cellWidth}
+                                height={cellHeight}
+                                fill="white"
+                                stroke="black"
+                            />
+                            <text
+                                x={x + index * 30 + 15}
+                                y={y + 20}
+                                textAnchor="middle"
+                            >
+                                {pos}
+                            </text>
+                        </g>
+                    })
                     }
                 </g>
                 {counter++}
+                {/* reduced sorted */}
+                <g id={"s" + counter} key={"s" + counter}>
+                    {props.output.reducedSorted.map((pos, index) => {
+                        const y = 80;
+                        const x = 600;
+                        return <g key={index}>
+                            <rect
+                                x={x + index * 30}
+                                y={y}
+                                width={cellWidth}
+                                height={cellHeight}
+                                fill="white"
+                                stroke="black"
+                            />
+                            <text
+                                x={x + index * 30 + 15}
+                                y={y + 20}
+                                textAnchor="middle"
+                            >
+                                {pos}
+                            </text>
+                        </g>
+                    })
+                    }
+                </g>
+                {counter++}
+                {/* sa Slots */}
+                <g id={"s" + counter} key={"s" + counter}>
+                    {props.output.saLmsAdded.map((pos, index) => {
+                        const y = 120;
+                        const x = 600;
+                        return <g key={index}>
+                            <rect
+                                x={x + index * 30}
+                                y={y}
+                                width={cellWidth}
+                                height={cellHeight}
+                                fill={(lmsOffsets.includes(pos, 0)) ? "yellow" : "white"}
+                                stroke="black"
+                            />
+                            <text
+                                x={x + index * 30 + 15}
+                                y={y + 20}
+                                textAnchor="middle"
+                            >
+                                {(pos == -1) ? "" : pos}
+                            </text>
+                        </g>
+                    })
+                    }
+                </g>
+                {counter++}
+
+                {/* induce L-types final */}
+                {props.output.saInduceL.map((step, j) => {
+                    const x = 600;
+                    const y = 160;
+                    const elements = [];
+                    for (let index = 0; index < boxCount; index++) {
+                        elements.push(
+                            <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
+                                <rect
+                                    x={x + index * 30}
+                                    y={y}
+                                    width={cellWidth}
+                                    height={cellHeight}
+                                    // fill cell lightblue when it's the newly inserted one
+                                    fill={(index === step.bucketIndex) ? "lightblue" : "white"}
+                                    stroke="black"
+                                />
+                                <text
+                                    x={x + index * 30 + 15}
+                                    y={y + 20}
+                                    textAnchor="middle"
+                                >
+                                    {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
+                                </text>
+                            </g>
+                        )
+                        counter++;
+                    }
+                    return elements
+                })}
+
+                {/* induce S-types final */}
+                {props.output.saInduceS.map((step, j) => {
+                    const elements = [];
+                    for (let index = 0; index < boxCount; index++) {
+                        const x = 600;
+                        const y = 160;
+                        elements.push(
+                            <g id={"s" + counter} key={"s" + counter}>
+                                <rect
+                                    x={x + index * 30}
+                                    y={y}
+                                    width={cellWidth}
+                                    height={cellHeight}
+                                    fill={(index === step.bucketIndex) ? "lightblue" : "white"}
+                                    stroke="black"
+                                />
+                                <text
+                                    x={x + index * 30 + 15}
+                                    y={y + 20}
+                                    textAnchor="middle"
+                                >
+                                    {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
+                                </text>
+                            </g>
+                        )
+                        counter++;
+                    }
+                    return elements;
+                })}
+                {/* final suffix */}
+                {
+                    props.output.sa.map((offset, index) => {
+                        const x = 600;
+                        const y = 220;
+                        return <g id={"s" + counter} key={"s" + counter}>
+                            <text
+                                x={x}
+                                y={y + index * 30}
+                                textAnchor="start"
+                            >
+                                {index}
+                            </text>
+                            <text
+                                x={x + 30}
+                                y={y + index * 30}
+                                textAnchor="start"
+                            >
+                                {offset}
+                            </text>
+                            <text
+                                x={x + 60}
+                                y={y + index * 30}
+                                textAnchor="start"
+                            >
+                                {props.output.source.substring(offset)}
+                            </text>
+                        </g>
+                    })
+                }
             </svg>
 
             {/* step info */}
