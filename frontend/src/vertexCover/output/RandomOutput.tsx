@@ -1,7 +1,7 @@
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.tsx";
+import {getActiveLineIdsRandom, NodeIcon, PSEUDOCODE_RANDOM, ArbitraryEdgeIcon, RemainingEdgeIcon} from "./PseudoCode.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import type {SVGOutputProps} from "../shared/Types.tsx";
@@ -11,10 +11,11 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
-export function RandomSVGOutput(props: SVGOutputProps) {
+export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -145,8 +146,26 @@ export function RandomSVGOutput(props: SVGOutputProps) {
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-info">
-            <div className="step-info-grid">
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+                <div><strong>Vertex Cover Size:</strong> {Math.floor(props.stepIndex / 3) * 2}</div>
+            </div>
+            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)"}}>
+                <LegendEntry
+                    label="Arbitrary Edge e"
+                    value={""}
+                    icon={<ArbitraryEdgeIcon/>}
+                />
+                <LegendEntry
+                    label="Vertex Cover C"
+                    value={""}
+                    icon={<NodeIcon/>}
+                />
+                <LegendEntry
+                    label="Remaining Edges E'"
+                    value={""}
+                    icon={<RemainingEdgeIcon/>}
+                />
             </div>
         </div>
         <PseudoCodePanel

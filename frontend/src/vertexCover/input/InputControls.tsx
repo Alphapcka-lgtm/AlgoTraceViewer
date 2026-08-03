@@ -1,10 +1,10 @@
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
-import type {InputControlProps} from "./Types.tsx";
+import type {InputControlProps} from "../shared/Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 import {presets} from "./Presets.tsx";
 
-export function InputControl(props: InputControlProps) {
+export function InputControls(props: InputControlProps) {
 
     const setRandomGraph = () => {
         const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;

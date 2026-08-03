@@ -3,7 +3,7 @@ import type {IndexRowProps} from "./Types.tsx";
 export function IndexRow(props: IndexRowProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
     return (
-        <g key="index_row" id="index_row">
+        <g key="index_row" id="index_row" style={{opacity: 0}}>
             <rect
                 x={props.xOffsetStart}
                 y={props.yPos}

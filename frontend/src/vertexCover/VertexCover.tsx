@@ -1,9 +1,9 @@
 import type {AnimationRequest, AnimationResponse, NavButtonProps, VertexCoverVariant} from "./shared/Types.tsx";
 import {assignLabels, decodeExportState, encodeExportState} from "../shared/Utils.tsx";
-import {MaxDegreeSVGOutput} from "./output/MaxDegreeSVGOutput.tsx";
-import {RandomSVGOutput} from "./output/RandomSVGOutput.tsx";
+import {MaxDegreeOutput} from "./output/MaxDegreeOutput.tsx";
+import {RandomOutput} from "./output/RandomOutput.tsx";
 import type {ExportState} from "../shared/Types.tsx";
-import {SVGInput} from "./input/SVGInput.tsx";
+import {Input} from "./input/Input.tsx";
 import {useState} from "react";
 
 export function VertexCover() {
@@ -85,7 +85,7 @@ export function VertexCover() {
     }
 
     const svgOutput = variant === "random" ? (
-        <RandomSVGOutput
+        <RandomOutput
             setProgress={setProgress}
             progress={progress}
             setStepIndex={setStepIndex}
@@ -96,7 +96,7 @@ export function VertexCover() {
             onImport={handleImport}
         />
     ) : variant === "maxDegree" ? (
-        <MaxDegreeSVGOutput
+        <MaxDegreeOutput
             setProgress={setProgress}
             progress={progress}
             setStepIndex={setStepIndex}
@@ -123,7 +123,7 @@ export function VertexCover() {
             </nav>
             <div className="algorithm-shell">
                 {mode == "input" ?
-                    <SVGInput
+                    <Input
                         setInput={setInput}
                         input={input}
                         onSubmit={submitInput}
