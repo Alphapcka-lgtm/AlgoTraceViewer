@@ -48,7 +48,7 @@ public class SLineService {
                 + String.format("%.2f", delta) + ".";
 
         steps.add(new AlgorithmStepDTO(
-                description, p1, p1.x(), delta, delta,
+                description, p1, delta, delta,
                 new ArrayList<>(activePoints),   //p1 noch nicht drin
                 xSorted, currBestPair,
                 List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0),
@@ -139,7 +139,6 @@ public class SLineService {
             steps.add(new AlgorithmStepDTO(
                     stepDescription,
                     current,
-                    current.x(),
                     deltaAfterCandidateCheck,
                     deltaBeforeStep,                        // window size used during this candidate search check
                     new ArrayList<>(activePoints),
@@ -167,7 +166,6 @@ public class SLineService {
                                 + " to " + String.format("%.2f", deltaAfterCandidateCheck)
                                 + ". The sweep windows become smaller.",
                         current,
-                        current.x(),
                         deltaAfterCandidateCheck,
                         deltaAfterCandidateCheck,
                         new ArrayList<>(activePoints),     // current is still not active yet
@@ -201,7 +199,7 @@ public class SLineService {
         steps.add(new AlgorithmStepDTO(
                 doneMsg,
                 null, // kein currentPoint mehr
-                lastPoint.x(), delta, delta,
+                delta, delta,
                 List.of(), //aktive menge nicht mehr zeigen
                 xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of(),
                 List.of("return")

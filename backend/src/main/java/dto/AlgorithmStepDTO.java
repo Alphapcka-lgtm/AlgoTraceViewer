@@ -8,8 +8,7 @@ import java.util.List;
 /**
  * @param description        Beschreibung was in diesem Schritt passiert
  * @param currentPoint       Der Punkt, bei dem die SweepLine gerade hält
- * @param sweepLineX         Die aktuelle x Position der SweepLine (= currentPoint.x)
- * @param delta              Das aktuell bekannte minimum Abstand delta
+
  * @param activePoints       Alle Punkte, die sich aktuell im [x - delta, x]-Streifen befinden
  * @param allPoints          Alle Punkte der Eingabemenge
  * @param bestPair           Das aktuell beste Punktepaar (kann null sein, wenn noch keines gefunden)
@@ -19,9 +18,8 @@ import java.util.List;
 public record AlgorithmStepDTO(
         String description,
         Point currentPoint,
-        int sweepLineX,
-        double delta,
-        double searchDelta,
+        double deltaAfterCandidateCheck,
+        double deltaBeforeCandidateCheck,
         List<Point> activePoints,
         List<Point> allPoints,
         Result bestPair,

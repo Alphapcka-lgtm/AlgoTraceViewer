@@ -16,7 +16,8 @@ const PADDING = 1;
 export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const activeSweepWindowRef = useRef<SVGRectElement>(null);
+    const activeSweepAreaRef = useRef<SVGRectElement>(null);
+    const sweepLineRef = useRef<SVGLineElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
@@ -28,24 +29,28 @@ export function Output(props: OutputProps) {
         timelineRef.current.timeScale(speed);
     };
 
-    const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.deltaBeforeCandidateCheck;
+    const getActiveAreaAttrs = (step: AlgorithmStepDTO) => {
+        const delta = step.deltaBeforeCandidateCheck;
+        const currentX = step.currentPoint?.x ?? 0;
+
         return {
-            x: step.sweepLineX - searchDelta,
-            y: PADDING,
-            width: searchDelta,
-            height: props.height - 2 * PADDING
+            x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING
         };
     };
 
-    const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.deltaBeforeCandidateCheck;
-        const currentY = step.currentPoint?.y ?? props.height / 2;
+    const getSweepLineAttrs = (step: AlgorithmStepDTO) => {
+        const currentX = step.currentPoint?.x ?? 0;
         return {
-            x: step.sweepLineX - searchDelta,
-            y: currentY - searchDelta,
-            width: searchDelta,
-            height: searchDelta * 2,
+            x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
+    };
+
+    const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
+        const delta = step.deltaBeforeCandidateCheck;
+        const currentX = step.currentPoint?.x ?? 0;
+        const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
+
+        return {
+            x: currentX - delta, y: currentY - delta, width: delta, height: delta * 2
         };
     };
 
@@ -56,8 +61,9 @@ export function Output(props: OutputProps) {
         step.currentPoint !== null && !isShrinkStep(step);
 
     useGSAP(() => {
-        if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
-        const activeRect = activeSweepWindowRef.current;
+        if (!activeSweepAreaRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
+        const activeArea = activeSweepAreaRef.current;
+        const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
@@ -91,10 +97,9 @@ export function Output(props: OutputProps) {
         const firstStep: AlgorithmStepDTO = props.steps[0];
 
         //init state setzen
-        gsap.set(activeRect, {
-            attr: getActiveRectAttrs(firstStep),
-            opacity: firstStep.currentPoint !== null ? 1 : 0,
-        });
+        const activeElementsOpacity = firstStep.currentPoint !== null ? 1 : 0;
+        gsap.set(activeArea, {attr: getActiveAreaAttrs(firstStep), opacity: activeElementsOpacity});
+        gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: activeElementsOpacity});
 
         gsap.set(candidateRect, {
             attr: getCandidateRectAttrs(firstStep),
@@ -107,19 +112,18 @@ export function Output(props: OutputProps) {
         //tweens hinzufügen:
         props.steps.slice(1).forEach((step, index) => {
             const stepIndex: number = index + 1;
-            const activeRectOpacity: number = step.currentPoint !== null ? 1 : 0;//beim final step die zwei rects ausblenden
-            const candidateRectOpacity: number = shouldShowCandidateWindow(step) ? 1 : 0;
 
-            timeline.to(activeRect, {
-                attr: getActiveRectAttrs(step),
-                opacity: activeRectOpacity,
-            });
-
-            timeline.to(candidateRect, {
-                attr: getCandidateRectAttrs(step),
-                opacity: candidateRectOpacity,
-            }, "<");
-
+            if (step.currentPoint === null) {
+                //beim final step die zwei rects ausblenden
+                timeline.to([activeArea, sweepLine, candidateRect], {opacity: 0,});
+            } else {
+                timeline.to(activeArea, {attr: getActiveAreaAttrs(step), opacity: 1});
+                timeline.to(sweepLine, {attr: getSweepLineAttrs(step), opacity: 1}, "<");
+                timeline.to(candidateRect, {
+                    attr: getCandidateRectAttrs(step), opacity: shouldShowCandidateWindow(step) ? 1 : 0
+                    }, "<"
+                );
+            }
             // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
             timeline.addLabel(myLabels[stepIndex]);
         });
@@ -161,6 +165,10 @@ export function Output(props: OutputProps) {
     //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
     const firstStep: AlgorithmStepDTO = props.steps[0];
+    const currentX = firstStep.currentPoint?.x ?? 0;
+    const currentY = firstStep.currentPoint?.y ?? props.height / 2;
+    const delta = firstStep.deltaBeforeCandidateCheck;
+
 
     return (
         <div className="algorithm-panel">
@@ -176,28 +184,42 @@ export function Output(props: OutputProps) {
                 preserveAspectRatio="xMidYMid meet"
             >
                 <rect
-                    ref={activeSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.deltaBeforeCandidateCheck}
+                    ref={activeSweepAreaRef}
+                    x={currentX - delta}
                     y={PADDING}
-                    width={firstStep.deltaBeforeCandidateCheck}
+                    width={delta}
                     height={props.height - 2 * PADDING}
-                    fill="rgba(0, 0, 0, 0.02)"
-                    stroke="rgba(0, 0, 0, 0.75)"
-                    strokeWidth="2"
-                    //strokeDasharray="8 4"
-                    rx="2"
+                    fill="rgba(90, 90, 90, 0.14)"
+                    stroke="none"
+                    opacity={0}
+                    pointerEvents="none"
+                    rx={2}
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.deltaBeforeCandidateCheck}
-                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.deltaBeforeCandidateCheck}
-                    width={firstStep.deltaBeforeCandidateCheck}
-                    height={firstStep.deltaBeforeCandidateCheck * 2}
-                    fill="rgba(255, 241, 255, 0.75)"
-                    stroke="rgba(204, 14, 119, 0.75)"
-                    strokeWidth="2"
+                    x={currentX - delta}
+                    y={currentY - delta}
+                    width={delta}
+                    height={delta * 2}
+                    fill="rgba(255,220,245,0.75)"
+                    stroke="rgb(204,14,119)"
+                    strokeWidth={0.6}
                     strokeDasharray="6 3"
-                    rx="5"
+                    rx={2}
+                    opacity={0}
+                    pointerEvents="none"
+                />
+                <line
+                    ref={sweepLineRef}
+                    x1={currentX}
+                    x2={currentX}
+                    y1={PADDING}
+                    y2={props.height - PADDING}
+                    stroke="rgba(0, 0, 0, 0.9)"
+                    strokeWidth={2}
+                    opacity={0}
+                    pointerEvents="none"
+                    strokeLinecap="round"
                 />
 
                 {step.allPoints.map((p: Node) => {
