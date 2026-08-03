@@ -6,6 +6,11 @@ import {BucketsRow} from "../shared/BucketsRow.tsx";
 import {TypesRow} from "../shared/TypesRow.tsx";
 import {TextRow} from "../shared/TextRow.tsx";
 import {IndexRow} from "../shared/IndexRow.tsx";
+import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
+import {useGSAP} from "@gsap/react";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
+import {OutputControls} from "../../shared/OutputControls.tsx";
 
 function buildSteps(data: SaisResponseDto): Step[] {
     const steps: Step[] = [];
@@ -816,11 +821,9 @@ function cellRowBlock(cells: SvgCellData[], label?: string, cellWidth = CELL_W) 
     };
 }
 
-export function SaisOutput(props: SaisOutputProps) {
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+const STEP_DURATION = 1.0;
 
+export function SaisOutput(props: SaisOutputProps) {
     const data = props.output;
     const steps = useMemo(() => buildSteps(data), [data]);
 
@@ -880,6 +883,66 @@ export function SaisOutput(props: SaisOutputProps) {
     const arrowXStart = 10 + 10 + props.output.reduced.length * cellWidth
     const arrowXEnd = 180 + props.output.reduced.length * cellWidth
     const arrowTextX = (arrowXStart + arrowXEnd) / 2
+
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+    const labels = createStepLabels(props.output.guessLmsSteps.length
+        + props.output.guessInduceS.length
+        + props.output.guessInduceL.length
+        + 1 // for the final guessed sa
+    );
+
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        tlRef.current.timeScale(speed);
+    };
+
+    useGSAP(() => {
+        gsap.registerPlugin(DrawSVGPlugin);
+        gsap.registerPlugin(ScrambleTextPlugin);
+
+        tlRef.current?.kill();
+
+        // create timeline
+        const timeline = gsap.timeline({
+            paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut",
+            },
+            onUpdate: () => {
+                const tl = tlRef.current;
+                props.setProgress(tl.progress()); //für scrubber
+
+                const stepIndex: number = getStepIndexFromTimeline(tl, labels);
+
+                props.setStepIndex(stepIndex);
+            },
+            onComplete: () => {
+                setIsPlaying(false);
+                tlRef.current.pause();
+            },
+        });
+
+        tlRef.current = timeline;
+
+        timeline.addLabel(labels[0]);
+
+        props.output.guessLmsSteps.forEach((step, idx) => {
+            if (idx === 0) {
+
+            }
+        })
+
+        timeline.progress(props.progress);
+        setIsPlaying(false);
+
+        return () => {
+            timeline.kill();
+            tlRef.current = gsap.timeline({paused: true});
+        }
+    }, {dependencies: [props.output.timestamp]});
 
     let yOffset = 180;
 
@@ -1287,9 +1350,25 @@ export function SaisOutput(props: SaisOutputProps) {
                 }
             </svg>
 
+            {/* output control */}
+            <OutputControls
+                timelineRef={tlRef}
+                labels={labels}
+                currentStep={props.stepIndex}
+                setCurrentStep={props.setStepIndex}
+                stepCount={counter}
+                isPlaying={isPlaying}
+                setIsPlaying={setIsPlaying}
+                progress={props.progress}
+                setProgress={props.setProgress}
+                playbackSpeed={playbackSpeed}
+                onPlaybackSpeedChange={changePlaybackSpeed}
+            />
             {/* step info */}
             <div className="step-info">
-                <div className="step-description">a step description</div>
+                <div className="step-info-grid">
+                    <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+                </div>
             </div>
 
             <text>{JSON.stringify(props.output)}</text>
