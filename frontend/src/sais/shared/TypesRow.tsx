@@ -4,7 +4,7 @@ export function TypesRow(props: TypesRowProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
 
     return (
-        <g key="types_row" id="types_row">
+        <g key="types_row" id="types_row" style={{opacity: 0}}>
             <rect
                 x={props.xOffsetStart}
                 y={props.yPos}

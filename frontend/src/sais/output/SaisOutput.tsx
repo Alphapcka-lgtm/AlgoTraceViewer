@@ -927,13 +927,20 @@ export function SaisOutput(props: SaisOutputProps) {
 
         tlRef.current = timeline;
 
+        // draw initial states
         timeline.addLabel(labels[0]);
 
-        props.output.guessLmsSteps.forEach((step, idx) => {
-            if (idx === 0) {
+        {
+            timeline.set("#index_row", {opacity: 100});
+            timeline.set("#text_row", {opacity: 100},);
+            timeline.set("#buckets_row", {opacity: 100},);
+            timeline.set("#types_row", {opacity: 100},);
 
-            }
-        })
+            // timeline.from("#index_row", {drawSVG: "50% 50%"}, "<");
+            // timeline.from("#text_row", {drawSVG: "50% 50%"}, "<");
+            // timeline.from("#types_row", {drawSVG: "50% 50%"}, "<");
+            // timeline.from("#buckets_row", {drawSVG: "50% 50%"}, "<");
+        }
 
         timeline.progress(props.progress);
         setIsPlaying(false);
