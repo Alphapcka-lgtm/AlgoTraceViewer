@@ -19,20 +19,24 @@ public class MaxDegreeVertexCover {
         }
     };
 
-    public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == null || seed == 0 ? System.nanoTime() : seed;
+    public AnimationResponse solve(Graph graph, List<String> order) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
 
-        Random randomGenerator = new Random(seed);
+        if (order.isEmpty()) {
+            order.addAll(graph.getEdges().stream().map(Edge::id).toList());
+            Collections.shuffle(order);
+        }
 
-        List<Edge> remainingEdges = new ArrayList<>(graph.edges());
+        OrderComparator comparator = new OrderComparator(order);
+
+        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
-        graph.edges().forEach(edge -> {
-            neighbourCount.put(getNodeById(graph.nodes(), edge.fromId()), neighbourCount.getOrDefault(getNodeById(graph.nodes(), edge.fromId()), 0) + 1);
-            neighbourCount.put(getNodeById(graph.nodes(), edge.toId()), neighbourCount.getOrDefault(getNodeById(graph.nodes(), edge.toId()), 0) + 1);
+        graph.getEdges().forEach(edge -> {
+            neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.getOrDefault(graph.getNodeById(edge.fromId()), 0) + 1);
+            neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.getOrDefault(graph.getNodeById(edge.toId()), 0) + 1);
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
@@ -46,14 +50,12 @@ public class MaxDegreeVertexCover {
 
             List<Node> maxDegreeNodes = neighbourCount.entrySet().stream().filter(e -> e.getValue() == maxDegree).map(Map.Entry::getKey).toList();
 
-            int randomIndex = randomGenerator.nextInt(maxDegreeNodes.size());
-
-            Node maxDegreeNode = maxDegreeNodes.get(randomIndex);
+            Node maxDegreeNode = maxDegreeNodes.stream().min(comparator::compare).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> {
                 if (edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())) {
-                    neighbourCount.put(getNodeById(graph.nodes(), edge.fromId()), neighbourCount.get(getNodeById(graph.nodes(), edge.fromId())) - 1);
-                    neighbourCount.put(getNodeById(graph.nodes(), edge.toId()), neighbourCount.get(getNodeById(graph.nodes(), edge.toId())) - 1);
+                    neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.get(graph.getNodeById(edge.fromId())) - 1);
+                    neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.get(graph.getNodeById(edge.toId())) - 1);
                     return true;
                 }
                 return false;
@@ -75,14 +77,10 @@ public class MaxDegreeVertexCover {
         }
         return AnimationResponse.builder()
                 .initialState(graph)
+                .order(order)
                 .initialDegreeMap(initialDegreePairs)
                 .intermediateStates(intermediateStates)
                 .timestamp(System.currentTimeMillis())
-                .randomSeed(seed)
                 .build();
-    }
-
-    private static Node getNodeById(List<Node> nodes, String id) {
-        return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
     }
 }

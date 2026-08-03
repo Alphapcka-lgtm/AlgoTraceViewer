@@ -14,17 +14,17 @@ export function VertexCover() {
 
     const [input, setInput] = useState<AnimationRequest>({
         graph: {nodes: [], edges: []},
+        order: [],
         densityFactor: 0.2,
         preset: "custom",
-        randomSeed: 0,
         timestamp: 0
     });
 
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
+        order: [],
         intermediateStates: [],
         initialDegreeMap: [],
-        randomSeed: 0,
         timestamp: 0
     });
 
@@ -51,7 +51,7 @@ export function VertexCover() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInput({...input, randomSeed: output.randomSeed, timestamp: output.timestamp});
+                setInput({...input, order: output.order, timestamp: output.timestamp});
                 setOutput(output);
             });
     };

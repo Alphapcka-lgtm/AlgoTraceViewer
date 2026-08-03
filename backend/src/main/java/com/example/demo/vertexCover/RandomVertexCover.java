@@ -2,7 +2,6 @@ package com.example.demo.vertexCover;
 
 import com.example.demo.model.Edge;
 import com.example.demo.model.Graph;
-import com.example.demo.model.Node;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -10,18 +9,21 @@ import java.util.*;
 @Service
 public class RandomVertexCover {
 
-    public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == null || seed == 0 ? System.nanoTime() : seed;
+    public AnimationResponse solve(Graph graph, List<String> order) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
 
-        Random randomGenerator = new Random(seed);
+        if (order.isEmpty()) {
+            order.addAll(graph.getEdges().stream().map(Edge::id).toList());
+            Collections.shuffle(order);
+        }
 
-        List<Edge> remainingEdges = new ArrayList<>(graph.edges());
+        OrderComparator comparator = new OrderComparator(order);
+
+        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
 
         while (!remainingEdges.isEmpty()) {
-            Edge chosenEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
-            //remainingEdges.remove(chosenEdge);
+            Edge chosenEdge = remainingEdges.stream().min(comparator::compare).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
@@ -35,20 +37,16 @@ public class RandomVertexCover {
             intermediateStates.add(AnimationState.builder()
                     .chosenEdge(chosenEdge)
                     .incidentEdges(incidentEdges)
-                    .chosenNodes(List.of(getNodeById(graph.nodes(), chosenEdge.fromId()), getNodeById(graph.nodes(), chosenEdge.toId())))
+                    .chosenNodes(List.of(graph.getNodeById(chosenEdge.fromId()), graph.getNodeById(chosenEdge.toId())))
                     .build()
             );
         }
         return AnimationResponse.builder()
                 .initialState(graph)
+                .order(order)
                 .intermediateStates(intermediateStates)
-                .randomSeed(seed)
                 .timestamp(System.currentTimeMillis())
                 .build();
-    }
-
-    private static Node getNodeById(List<Node> nodes, String id) {
-        return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
     }
 }
 

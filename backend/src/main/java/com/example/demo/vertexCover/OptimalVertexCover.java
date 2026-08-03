@@ -13,36 +13,36 @@ public class OptimalVertexCover {
 
     public AnimationResponse solve(Graph graph) {
         final long optimalSubset;
-        Map<String, List<String>> incidentMap = graph.nodes().stream().collect(Collectors.toMap(Node::id, (node) -> new ArrayList<>()));
-        graph.edges().forEach(edge -> {
+        Map<String, List<String>> incidentMap = graph.getNodes().stream().collect(Collectors.toMap(Node::id, (node) -> new ArrayList<>()));
+        graph.getEdges().forEach(edge -> {
             incidentMap.get(edge.fromId()).add(edge.id());
             incidentMap.get(edge.toId()).add(edge.id());
         });
 
-        long k = Math.ceilDiv(graph.edges().size(), graph.nodes().size());
-        while(k < graph.nodes().size()) {
+        long k = Math.ceilDiv(graph.getEdges().size(), graph.getNodes().size());
+        while(k < graph.getNodes().size()) {
 
-            Iterator<Long> it = getSubsetIterator(graph.nodes().size(), k);
+            Iterator<Long> it = getSubsetIterator(graph.getNodes().size(), k);
 
             while (it.hasNext()) {
 
                 long subset = it.next();
                 HashSet<String> covered = new HashSet<>();
 
-                IntStream.range(0, graph.nodes().size()).forEach(index -> {
+                IntStream.range(0, graph.getNodes().size()).forEach(index -> {
                     if (((1L << index) & subset) != 0) {
-                        covered.addAll(incidentMap.get(graph.nodes().get(index).id()));
+                        covered.addAll(incidentMap.get(graph.getNodes().get(index).id()));
                     }
                 });
 
-                if(covered.size() == graph.edges().size()) {
+                if(covered.size() == graph.getEdges().size()) {
                     optimalSubset =  subset;
 
                     return AnimationResponse.builder()
                             .initialState(
-                                    new Graph(IntStream.range(0, graph.nodes().size())
+                                    new Graph(IntStream.range(0, graph.getNodes().size())
                                             .filter(index -> ((1L << index) & optimalSubset) != 0)
-                                            .mapToObj(graph.nodes()::get).toList(), List.of()))
+                                            .mapToObj(graph.getNodes()::get).toList(), List.of()))
                             .intermediateStates(List.of())
                             .build();
                 }

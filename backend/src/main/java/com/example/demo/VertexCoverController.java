@@ -34,7 +34,7 @@ public class VertexCoverController {
 
     @PostMapping("/random")
     public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
-        return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.randomSeed()));
+        return ResponseEntity.ok(randomVertexCover.solve(request.graph(), request.order()));
     }
 
     @PostMapping("/optimal")
@@ -44,11 +44,11 @@ public class VertexCoverController {
 
     @PostMapping("/maxDegree")
     public ResponseEntity<AnimationResponse> maxDegreeVertexCover(@RequestBody AnimationRequest request) {
-        return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.randomSeed()));
+        return ResponseEntity.ok(maxDegreeVertexCover.solve(request.graph(), request.order()));
     }
 
     @PostMapping("/staticList")
     public ResponseEntity<AnimationResponse> staticListVertexCover(@RequestBody AnimationRequest request) {
-        return ResponseEntity.ok(staticListVertexCover.solve(request.graph(), request.randomSeed()));
+        return ResponseEntity.ok(staticListVertexCover.solve(request.graph(), request.order()));
     }
 }
