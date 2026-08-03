@@ -29,7 +29,7 @@ export function Output(props: OutputProps) {
     };
 
     const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.searchDelta;
+        const searchDelta = step.deltaBeforeCandidateCheck;
         return {
             x: step.sweepLineX - searchDelta,
             y: PADDING,
@@ -39,7 +39,7 @@ export function Output(props: OutputProps) {
     };
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.searchDelta;
+        const searchDelta = step.deltaBeforeCandidateCheck;
         const currentY = step.currentPoint?.y ?? props.height / 2;
         return {
             x: step.sweepLineX - searchDelta,
@@ -177,9 +177,9 @@ export function Output(props: OutputProps) {
             >
                 <rect
                     ref={activeSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.searchDelta}
+                    x={firstStep.sweepLineX - firstStep.deltaBeforeCandidateCheck}
                     y={PADDING}
-                    width={firstStep.searchDelta}
+                    width={firstStep.deltaBeforeCandidateCheck}
                     height={props.height - 2 * PADDING}
                     fill="rgba(0, 0, 0, 0.02)"
                     stroke="rgba(0, 0, 0, 0.75)"
@@ -189,10 +189,10 @@ export function Output(props: OutputProps) {
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.searchDelta}
-                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.searchDelta}
-                    width={firstStep.searchDelta}
-                    height={firstStep.searchDelta * 2}
+                    x={firstStep.sweepLineX - firstStep.deltaBeforeCandidateCheck}
+                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.deltaBeforeCandidateCheck}
+                    width={firstStep.deltaBeforeCandidateCheck}
+                    height={firstStep.deltaBeforeCandidateCheck * 2}
                     fill="rgba(255, 241, 255, 0.75)"
                     stroke="rgba(204, 14, 119, 0.75)"
                     strokeWidth="2"
@@ -253,7 +253,7 @@ export function Output(props: OutputProps) {
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>Window δ:</strong> {step.searchDelta.toFixed(2)}</div>
+                    <div><strong>Window δ:</strong> {step.deltaBeforeCandidateCheck.toFixed(2)}</div>
                     <LegendEntry
                         label="Current Point: "
                         value={step.currentPoint?.label ?? "—"}

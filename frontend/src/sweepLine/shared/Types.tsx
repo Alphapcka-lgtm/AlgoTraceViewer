@@ -47,8 +47,8 @@ export interface AlgorithmStepDTO {
     description: string;
     currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
     sweepLineX: number;
-    delta: number; //neues bestes δ nach Kandidatensuche
-    searchDelta:number; //altes delta vor Kandidatensuche
+    deltaAfterCandidateCheck: number; //neues bestes δ nach Kandidatensuche
+    deltaBeforeCandidateCheck:number; //altes delta vor Kandidatensuche
     activePoints: Node[];
     allPoints: Node[];
     bestPair: Result | null;
