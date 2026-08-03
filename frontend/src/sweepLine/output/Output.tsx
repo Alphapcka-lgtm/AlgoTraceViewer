@@ -32,26 +32,19 @@ export function Output(props: OutputProps) {
     const getActiveAreaAttrs = (step: AlgorithmStepDTO) => {
         const delta = step.deltaBeforeCandidateCheck;
         const currentX = step.currentPoint?.x ?? 0;
-
-        return {
-            x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING
-        };
+        return {x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING};
     };
 
     const getSweepLineAttrs = (step: AlgorithmStepDTO) => {
         const currentX = step.currentPoint?.x ?? 0;
-        return {
-            x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
+        return {x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
     };
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
         const delta = step.deltaBeforeCandidateCheck;
         const currentX = step.currentPoint?.x ?? 0;
         const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
-
-        return {
-            x: currentX - delta, y: currentY - delta, width: delta, height: delta * 2
-        };
+        return {x: currentX - delta, y: currentY - delta, width: delta, height: delta * 2};
     };
 
     const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
@@ -120,9 +113,7 @@ export function Output(props: OutputProps) {
                 timeline.to(activeArea, {attr: getActiveAreaAttrs(step), opacity: 1});
                 timeline.to(sweepLine, {attr: getSweepLineAttrs(step), opacity: 1}, "<");
                 timeline.to(candidateRect, {
-                    attr: getCandidateRectAttrs(step), opacity: shouldShowCandidateWindow(step) ? 1 : 0
-                    }, "<"
-                );
+                    attr: getCandidateRectAttrs(step), opacity: shouldShowCandidateWindow(step) ? 1 : 0}, "<");
             }
             // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
             timeline.addLabel(myLabels[stepIndex]);
@@ -148,19 +139,21 @@ export function Output(props: OutputProps) {
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
 
-    const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id));
+    const candidatePointIds = new Set(step.candidateComparisons.map(comparison => comparison.candidate.id));
 
     const legendenValueActivePoints:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
 
-    const legendenValueCandidates:string = step.currentPoint === null ? "—"
-            : isShrinkStep(step)
-                ? "no candidate comparisons in this step"
-                : step.candidatePairs.length === 0
-                    ? "No candidates"
-                    : step.candidatePairs
-                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                        .join("; ");
+    const getLegendValueCandidates = (step: AlgorithmStepDTO,): string => {
+        if (step.currentPoint === null) return "-";
+        if (isShrinkStep(step)) return "No candidate comparisons in this step...nochmal schauen was hier jetzt anzeige";
+        if (step.candidateComparisons.length === 0) return "No candidates";
+
+        const currentPoint = step.currentPoint;
+        return step.candidateComparisons.map(({ candidate, distance }) =>
+            `dist(${currentPoint.label}, ${candidate.label}) = ${distance.toFixed(2)}`,).join(", ");
+    };
+
 
     //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
@@ -168,7 +161,6 @@ export function Output(props: OutputProps) {
     const currentX = firstStep.currentPoint?.x ?? 0;
     const currentY = firstStep.currentPoint?.y ?? props.height / 2;
     const delta = firstStep.deltaBeforeCandidateCheck;
-
 
     return (
         <div className="algorithm-panel">
@@ -299,20 +291,10 @@ export function Output(props: OutputProps) {
                     <div>
                         <LegendEntry
                             label="Candidates: "
-                            value={legendenValueCandidates}
+                            value={getLegendValueCandidates(step)}
                             icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
                         />
                     </div>
-                    {/*
-                    <div>
-                        <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null ? "—" :
-                            step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
-                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                            .join("; ")
-                        }
-                    </div>
-                    */}
                 </div>
             </div>
 

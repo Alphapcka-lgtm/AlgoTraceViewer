@@ -37,9 +37,15 @@ export type InputProps = {
     createExportString: () => string;
 };
 
-export interface Result {
+interface PointPair {
     p0: Node;
     p1: Node;
+    distance: number;
+}
+
+//Benötigt current Point nicht, da im DTO schon extra enthalten ist.
+interface CandidateComparison {
+    candidate: Node;
     distance: number;
 }
 
@@ -50,8 +56,8 @@ export interface AlgorithmStepDTO {
     deltaBeforeCandidateCheck:number;
     activePoints: Node[];
     allPoints: Node[];
-    bestPair: Result | null;
-    candidatePairs: Result[];
+    bestPair: PointPair | null;
+    candidateComparisons: CandidateComparison[];
     processedPoints: Node[];
     futurePoints: Node[];
     pseudoCodeLineIds: string[];

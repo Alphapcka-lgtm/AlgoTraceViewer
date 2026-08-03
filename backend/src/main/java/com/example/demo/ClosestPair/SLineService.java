@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.ClosestPair;
 import dto.AlgorithmStepDTO;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class SLineService {
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
         double delta = euclideanDistance(p0, p1);
-        Result currBestPair = new Result(p0, p1, delta);
+        PointPair currBestPair = new PointPair(p0, p1, delta);
 
         /*
         yTable contains the points currently inside the active sweep window:
@@ -51,7 +51,7 @@ public class SLineService {
                 description, p1, delta, delta,
                 new ArrayList<>(activePoints),   //p1 noch nicht drin
                 xSorted, currBestPair,
-                List.of(new Result(p0, p1, delta)), new ArrayList<>(processed), new ArrayList<>(future0),
+                List.of(), new ArrayList<>(processed), new ArrayList<>(future0),
                 List.of("init") //List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
@@ -75,7 +75,6 @@ public class SLineService {
 
             if (removedPoints) {
                 String removedLabels = rm.removedPoints().stream().map(Point::label).reduce((a, b) -> a + ", " + b).orElse("");
-
                 activeWindowMsg = removedLabels + " left the active window because the x-distance to " +current.label()+" is at least δ.";
             }
 
@@ -91,7 +90,7 @@ public class SLineService {
             CandidateResult candidates = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeStep, delta, currBestPair);
 
             double deltaAfterCandidateCheck = candidates.delta();
-            Result bestPairAfterCandidateCheck = candidates.bestPair();
+            PointPair bestPairAfterCandidateCheck = candidates.bestPair();
             boolean foundNewBest = candidates.foundNewBest();
 
             // Only for visualization: points not processed yet, so all points right of current.
@@ -105,7 +104,7 @@ public class SLineService {
 
             String noNewBestMsg = "δ stays unchanged because no candidate pair is closer.";
 
-            boolean hasCandidatePairs = !candidates.candidatePairs().isEmpty();
+            boolean hasCandidatePairs = !candidates.candidateComparisons().isEmpty();
             /*
             String candidateMsg = "";
             if (hasCandidatePairs) {
@@ -144,7 +143,7 @@ public class SLineService {
                     new ArrayList<>(activePoints),
                     xSorted,
                     bestPairAfterCandidateCheck,
-                    candidates.candidatePairs(),
+                    candidates.candidateComparisons(),
                     new ArrayList<>(processed),
                     futurePoints,
                     pseudoCodeLineIds
@@ -171,7 +170,7 @@ public class SLineService {
                         new ArrayList<>(activePoints),     // current is still not active yet
                         xSorted,
                         bestPairAfterCandidateCheck,
-                        candidates.candidatePairs(), //Kandidaten, die mit dem vorherigen Delta gefunden wurden. NICHT die Kandidaten des window mit neuen delta.
+                        candidates.candidateComparisons(), //Kandidaten, die mit dem vorherigen Delta gefunden wurden. NICHT die Kandidaten des window mit neuen delta.
                         new ArrayList<>(processed),
                         futurePoints,
                         List.of("update-delta", "shrink-windows")//List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
@@ -219,7 +218,6 @@ public class SLineService {
             List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
 
         List<Point> removed = new ArrayList<>();
-
         //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
         //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
         //System.out.println(current.x() +" - "+xSorted.get(tail).x() + " deltaBeforeStep " + deltaBeforeStep + " tail " + tail);
@@ -230,7 +228,6 @@ public class SLineService {
             removed.add(oldPoint);
             tail++;
         }
-
         return new RemovalResult(tail, removed);
     }
 
@@ -241,9 +238,9 @@ public class SLineService {
      * delta). Therefore, this method only needs to filter by y-distance: at most delta above or below the current point.
      */
     private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
-            Point current, TreeSet<Point> activePoints, double deltaBeforeStep, double currDelta, Result currentBestPair
+            Point current, TreeSet<Point> activePoints, double deltaBeforeStep, double currDelta, PointPair currentBestPair
     ) {
-        List<Result> candidatePairs = new ArrayList<>();
+        List<CandidateComparison> candidateComparisons = new ArrayList<>();
         boolean foundNewBest = false;
 
         for (Point activePoint : activePoints) {
@@ -251,17 +248,17 @@ public class SLineService {
             if (Math.abs(current.y() - activePoint.y()) < deltaBeforeStep) {
                 Point candidate = activePoint;
                 double distance = euclideanDistance(current, candidate);
-                candidatePairs.add(new Result(candidate, current, distance));
+                candidateComparisons.add(new CandidateComparison(candidate, distance));
 
                 if (distance < currDelta) {
                     currDelta = distance;
-                    currentBestPair = new Result(candidate, current, distance);
+                    currentBestPair = new PointPair(candidate, current, distance);
                     foundNewBest = true;
                 }
             }
         }
 
-        return new CandidateResult(currDelta, currentBestPair, candidatePairs, foundNewBest);
+        return new CandidateResult(currDelta, currentBestPair, candidateComparisons, foundNewBest);
     }
 
     /*
@@ -286,8 +283,6 @@ public class SLineService {
         ids.add("insert-current");
         return ids;
     }
-
-
      */
 
     private List<String> buildPseudoCodeLineIds(
@@ -353,20 +348,15 @@ public class SLineService {
 
     private record CandidateResult(
             double delta,
-            Result bestPair,
-            List<Result> candidatePairs,
+            PointPair bestPair,
+            List<CandidateComparison> candidateComparisons,
             boolean foundNewBest
     ) {}
 
     //wrapper funktion für einfacheres testen
-    public Result nearestPair(List<Point> points) {
+    public PointPair nearestPair(List<Point> points) {
         List<AlgorithmStepDTO> steps = nearestPoints(points);
-
-        if (steps.isEmpty()) {
-            throw new IllegalStateException("Algorithm produced no steps");
-        }
-
+        if (steps.isEmpty()) throw new IllegalStateException("Algorithm produced no steps");
         return steps.getLast().bestPair();
     }
-
 }

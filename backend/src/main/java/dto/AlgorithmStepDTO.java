@@ -1,7 +1,8 @@
 package dto;
 
-import com.example.demo.Point;
-import com.example.demo.Result;
+import com.example.demo.ClosestPair.CandidateComparison;
+import com.example.demo.ClosestPair.Point;
+import com.example.demo.ClosestPair.PointPair;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * @param activePoints       Alle Punkte, die sich aktuell im [x - delta, x]-Streifen befinden
  * @param allPoints          Alle Punkte der Eingabemenge
  * @param bestPair           Das aktuell beste Punktepaar (kann null sein, wenn noch keines gefunden)
- * @param candidatePairs     Paare, die in diesem Schritt verglichen wurden
+ * @param candidateComparisons
  * @param processedPoints    Punkte, die bereits abgearbeitet wurden (links von SweepLine)
  */
 public record AlgorithmStepDTO(
@@ -22,8 +23,8 @@ public record AlgorithmStepDTO(
         double deltaBeforeCandidateCheck,
         List<Point> activePoints,
         List<Point> allPoints,
-        Result bestPair,
-        List<Result> candidatePairs,
+        PointPair bestPair,
+        List<CandidateComparison> candidateComparisons,
         List<Point> processedPoints,
         List<Point> futurePoints,
         List<String> pseudoCodeLineIds

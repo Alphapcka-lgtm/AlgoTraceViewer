@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import com.example.demo.ClosestPair.Point;
+import com.example.demo.ClosestPair.PointPair;
+import com.example.demo.ClosestPair.SLineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,11 +40,11 @@ class SLineServiceTest {
         return new Point(x, y, id, id);
     }
 
-    private Result solve(Point... points) {
+    private PointPair solve(Point... points) {
         return service.nearestPair(List.of(points));
     }
 
-    private Result solve(List<Point> points) {
+    private PointPair solve(List<Point> points) {
         return service.nearestPair(points);
     }
 
@@ -54,7 +57,7 @@ class SLineServiceTest {
      * vorauszusetzen.
      */
     private static void assertResult(
-            Result result,
+            PointPair result,
             double expectedDistance,
             Point expectedP1,
             Point expectedP2
@@ -93,7 +96,7 @@ class SLineServiceTest {
      * minimale Distanz geprüft werden.
      */
     private static void assertMinimumDistance(
-            Result result,
+            PointPair result,
             double expectedDistance,
             List<Point> input
     ) {
@@ -158,7 +161,7 @@ class SLineServiceTest {
         Point a = p("A", 0, 0);
         Point b = p("B", 5, 0);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         assertResult(result, 5.0, a, b);
     }
@@ -168,7 +171,7 @@ class SLineServiceTest {
         Point a = p("A", 3, -2);
         Point b = p("B", 3, 4);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         assertResult(result, 6.0, a, b);
     }
@@ -178,7 +181,7 @@ class SLineServiceTest {
         Point a = p("A", 0, 0);
         Point b = p("B", 3, 4);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         assertResult(result, 5.0, a, b);
     }
@@ -188,7 +191,7 @@ class SLineServiceTest {
         Point a = p("A", -5, -7);
         Point b = p("B", -2, -3);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         assertResult(result, 5.0, a, b);
     }
@@ -203,7 +206,7 @@ class SLineServiceTest {
         Point b = p("B", 10, 10);
         Point c = p("C", 2, 1);
 
-        Result result = solve(a, b, c);
+        PointPair result = solve(a, b, c);
 
         assertResult(result, Math.sqrt(5), a, c);
     }
@@ -215,7 +218,7 @@ class SLineServiceTest {
         Point c = p("C", 20, 20);
         Point d = p("D", 40, 40);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), a, b);
     }
@@ -227,7 +230,7 @@ class SLineServiceTest {
         Point c = p("C", 11, 21);
         Point d = p("D", 30, 0);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), b, c);
     }
@@ -239,7 +242,7 @@ class SLineServiceTest {
         Point c = p("C", 50, 50);
         Point d = p("D", 51, 50);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, c, d);
     }
@@ -251,7 +254,7 @@ class SLineServiceTest {
         Point c = p("C", 0, 0);
         Point d = p("D", -50, 80);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), b, c);
     }
@@ -263,7 +266,7 @@ class SLineServiceTest {
         Point c = p("C", 13, 4);
         Point d = p("D", 30, 4);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 3.0, b, c);
     }
@@ -275,7 +278,7 @@ class SLineServiceTest {
         Point c = p("C", 5, 7);
         Point d = p("D", 5, 100);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 3.0, b, c);
     }
@@ -287,7 +290,7 @@ class SLineServiceTest {
         Point c = p("C", -2, 6);
         Point d = p("D", 20, -8);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), b, c);
     }
@@ -303,7 +306,7 @@ class SLineServiceTest {
         Point c = p("C", 5, 1);
         Point d = p("D", 20, 100);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), b, c);
     }
@@ -315,7 +318,7 @@ class SLineServiceTest {
         Point c = p("C", 10, 0);
         Point d = p("D", 11, 0);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, c, d);
     }
@@ -327,7 +330,7 @@ class SLineServiceTest {
         Point c = p("C", 2, 10);
         Point d = p("D", 3, 11);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, Math.sqrt(2), c, d);
     }
@@ -340,7 +343,7 @@ class SLineServiceTest {
         Point d = p("D", 32, 0);     // delta 4
         Point e = p("E", 33, 0);     // delta 1
 
-        Result result = solve(a, b, c, d, e);
+        PointPair result = solve(a, b, c, d, e);
 
         assertResult(result, 1.0, d, e);
     }
@@ -354,7 +357,7 @@ class SLineServiceTest {
 
         List<Point> points = List.of(a, b, c, d);
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertResult(result, Math.sqrt(2), a, c);
     }
@@ -369,7 +372,7 @@ class SLineServiceTest {
         Point b = p("B", 20, 30);
         Point c = p("C", 4, 7);
 
-        Result result = solve(a, b, c);
+        PointPair result = solve(a, b, c);
 
         assertResult(result, 0.0, a, c);
     }
@@ -380,7 +383,7 @@ class SLineServiceTest {
         Point b = p("B", 0, 0);
         Point c = p("C", 100, 100);
 
-        Result result = solve(a, b, c);
+        PointPair result = solve(a, b, c);
 
         assertResult(result, 0.0, a, b);
     }
@@ -392,7 +395,7 @@ class SLineServiceTest {
         Point c = p("C", 50, 50);
         Point d = p("D", 50, 50);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 0.0, c, d);
     }
@@ -406,7 +409,7 @@ class SLineServiceTest {
                 p("D", 20, 20)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertMinimumDistance(result, 0.0, points);
     }
@@ -424,7 +427,7 @@ class SLineServiceTest {
                 p("D", 10, 10)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertMinimumDistance(result, 10.0, points);
     }
@@ -438,7 +441,7 @@ class SLineServiceTest {
                 p("D", 12, 0)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertMinimumDistance(result, 4.0, points);
     }
@@ -451,7 +454,7 @@ class SLineServiceTest {
                 p("C", 6, 0)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertMinimumDistance(result, 5.0, points);
     }
@@ -467,7 +470,7 @@ class SLineServiceTest {
         Point c = p("C", 3, 21);
         Point d = p("D", 3, 100);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, b, c);
     }
@@ -479,7 +482,7 @@ class SLineServiceTest {
         Point c = p("C", 11, 8);
         Point d = p("D", 100, 8);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, b, c);
     }
@@ -491,7 +494,7 @@ class SLineServiceTest {
         Point c = p("C", 0, 6);
         Point d = p("D", 10, 100);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, b, c);
     }
@@ -505,7 +508,7 @@ class SLineServiceTest {
         Point a = p("A", Integer.MIN_VALUE, 0);
         Point b = p("B", Integer.MAX_VALUE, 0);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         double expected = 4_294_967_295.0;
 
@@ -517,7 +520,7 @@ class SLineServiceTest {
         Point a = p("A", Integer.MIN_VALUE, Integer.MIN_VALUE);
         Point b = p("B", Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-        Result result = solve(a, b);
+        PointPair result = solve(a, b);
 
         double difference = 4_294_967_295.0;
         double expected = Math.sqrt(
@@ -534,7 +537,7 @@ class SLineServiceTest {
         Point c = p("C", 101, 100);
         Point d = p("D", Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-        Result result = solve(a, b, c, d);
+        PointPair result = solve(a, b, c, d);
 
         assertResult(result, 1.0, b, c);
     }
@@ -612,7 +615,7 @@ class SLineServiceTest {
     @ParameterizedTest
     @MethodSource("knownCases")
     void returnsExpectedMinimumDistanceForKnownCases(KnownCase testCase) {
-        Result result = solve(testCase.points());
+        PointPair result = solve(testCase.points());
 
         assertMinimumDistance(
                 result,
@@ -635,7 +638,7 @@ class SLineServiceTest {
      * Ein absichtlich einfacher O(n²)-Algorithmus als Test-Orakel.
      * Er ist nicht effizient, aber sehr leicht auf Korrektheit zu prüfen.
      */
-    private static Result bruteForce(List<Point> points) {
+    private static PointPair bruteForce(List<Point> points) {
         if (points == null || points.size() < 2) {
             throw new IllegalArgumentException(
                     "There must be at least two points"
@@ -660,7 +663,7 @@ class SLineServiceTest {
             }
         }
 
-        return new Result(bestP0, bestP1, bestDistance);
+        return new PointPair(bestP0, bestP1, bestDistance);
     }
 
     @Test
@@ -678,8 +681,8 @@ class SLineServiceTest {
                 points.add(p("P" + i, x, y));
             }
 
-            Result expected = bruteForce(points);
-            Result actual = solve(points);
+            PointPair expected = bruteForce(points);
+            PointPair actual = solve(points);
 
             assertEquals(
                     expected.distance(),
@@ -712,8 +715,8 @@ class SLineServiceTest {
                 points.add(p("P" + i, x, y));
             }
 
-            Result expected = bruteForce(points);
-            Result actual = solve(points);
+            PointPair expected = bruteForce(points);
+            PointPair actual = solve(points);
 
             assertEquals(
                     expected.distance(),
@@ -739,8 +742,8 @@ class SLineServiceTest {
                 points.add(p("P" + i, x, y));
             }
 
-            Result expected = bruteForce(points);
-            Result actual = solve(points);
+            PointPair expected = bruteForce(points);
+            PointPair actual = solve(points);
 
             assertEquals(
                     expected.distance(),
@@ -763,7 +766,7 @@ class SLineServiceTest {
                 p("D", -2, 8)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertNotNull(result);
         assertNotNull(result.p0());
@@ -783,7 +786,7 @@ class SLineServiceTest {
                 p("D", 100, -100)
         );
 
-        Result result = solve(points);
+        PointPair result = solve(points);
 
         assertEquals(
                 distance(result.p0(), result.p1()),
