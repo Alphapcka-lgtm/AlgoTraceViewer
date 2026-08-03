@@ -96,3 +96,41 @@ export type SvgCellData = {
     ringColor?: string;
     ringWidth?: number;
 }
+
+export type BucketRowProps = {
+    cellWidth: number,
+    cellHeight: number,
+    bucketSizes: BucketSize[],
+    xOffsetStart: number,
+    yPos: number,
+    nameColWidth: number,
+}
+
+export type TypesRowProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number
+    typeMap: TypeMapDto,
+    source: string,
+    nameColWidth: number,
+}
+
+export type TextRowProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number
+    typeMap: TypeMapDto,
+    source: string,
+    nameColWidth: number,
+}
+
+export type IndexRowProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number
+    source: string,
+    nameColWidth: number,
+}

@@ -2,6 +2,10 @@ import type {SaisOutputProps, SaisResponseDto, Step, SvgCellData} from "../share
 import {useMemo, useRef, useState} from "react";
 import gsap from "gsap";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {BucketsRow} from "../shared/BucketsRow.tsx";
+import {TypesRow} from "../shared/TypesRow.tsx";
+import {TextRow} from "../shared/TextRow.tsx";
+import {IndexRow} from "../shared/IndexRow.tsx";
 
 function buildSteps(data: SaisResponseDto): Step[] {
     const steps: Step[] = [];
@@ -879,7 +883,10 @@ export function SaisOutput(props: SaisOutputProps) {
 
     let yOffset = 180;
 
-    let currentX = 10;
+    const xOffsetLeftCol = 10;
+    const rowNameColWidth = 80;
+
+    const guessesYOffset = 150;
     let counter = 0
     return (
         <div className="algorithm-panel">
@@ -904,95 +911,40 @@ export function SaisOutput(props: SaisOutputProps) {
                 {/*</foreignObject>*/}
 
                 {/* initial state with indexes and buckets */}
-                {[...props.output.source].map((_, index) => (
-                    <g key={index}>
-                        <rect
-                            x={10 + index * 30}
-                            y={30}
-                            width={cellWidth}
-                            height={cellHeight}
-                            fill="white"
-                            stroke="black"
-                        />
-                        <text
-                            x={10 + index * 30 + 15}
-                            y={50}
-                            textAnchor="middle"
-                        >
-                            {index}
-                        </text>
-                    </g>
-                ))}
-                {[...props.output.source].map((char, index) => (
-                    <g key={index}>
-                        <rect
-                            x={10 + index * 30}
-                            y={60}
-                            width={cellWidth}
-                            height={cellHeight}
-                            // fill cell yellow when suffix is lms
-                            fill={(props.output.typeMapDto.map[index].isLms) ? "yellow" : "white"}
-                            stroke="black"
-                        />
-                        <text
-                            x={10 + index * 30 + 15}
-                            y={80}
-                            textAnchor="middle"
-                        >
-                            {char}
-                        </text>
-                    </g>
-                ))}
-                {[...props.output.source].map((_, index) => (
-                    <g key={index}>
-                        <rect
-                            x={10 + index * 30}
-                            y={90}
-                            width={cellWidth}
-                            height={cellHeight}
-                            // fill cell yellow when suffix is lms
-                            fill={(props.output.typeMapDto.map[index].isLms) ? "yellow" : "white"}
-                            stroke="black"
-                        />
-                        <text
-                            x={10 + index * 30 + 15}
-                            y={110}
-                            textAnchor="middle"
-                        >
-                            {props.output.typeMapDto.map[index].type}
-                        </text>
-                    </g>
-                ))}
-                {props.output.bucketSizes.flatMap((bucket) => {
-                    const elements = [];
-
-                    for (let i = 0; i < bucket.size; i++) {
-                        const x = currentX;
-                        elements.push(
-                            <g key={`${bucket.c}-${i}`}>
-                                <rect
-                                    x={x}
-                                    y={120}
-                                    width={cellWidth}
-                                    height={cellHeight}
-                                    fill="white"
-                                    stroke="black"
-                                />
-                                <text
-                                    x={x + cellWidth / 2}
-                                    y={140}
-                                    textAnchor="middle"
-                                >
-                                    {bucket.c}
-                                </text>
-                            </g>
-                        );
-
-                        currentX += cellWidth;
-                    }
-
-                    return elements;
-                })}
+                <IndexRow
+                    cellWidth={cellWidth}
+                    cellHeight={cellHeight}
+                    xOffsetStart={xOffsetLeftCol}
+                    yPos={30}
+                    source={props.output.source}
+                    nameColWidth={rowNameColWidth}
+                />
+                <TextRow
+                    cellWidth={cellWidth}
+                    cellHeight={cellHeight}
+                    xOffsetStart={xOffsetLeftCol}
+                    yPos={60}
+                    typeMap={props.output.typeMapDto}
+                    source={props.output.source}
+                    nameColWidth={rowNameColWidth}
+                />
+                <TypesRow
+                    cellWidth={cellWidth}
+                    cellHeight={cellHeight}
+                    xOffsetStart={xOffsetLeftCol}
+                    yPos={90}
+                    typeMap={props.output.typeMapDto}
+                    source={props.output.source}
+                    nameColWidth={rowNameColWidth}
+                />
+                <BucketsRow
+                    cellWidth={cellWidth}
+                    cellHeight={cellHeight}
+                    bucketSizes={props.output.bucketSizes}
+                    xOffsetStart={xOffsetLeftCol}
+                    yPos={120}
+                    nameColWidth={rowNameColWidth}
+                />
 
                 {/* lms guesses */}
                 {props.output.guessLmsSteps.map((step, j) => {
@@ -1001,18 +953,20 @@ export function SaisOutput(props: SaisOutputProps) {
                         elements.push(
                             <g id={"s" + counter} key={"s" + counter}>
                                 <rect
-                                    x={10 + index * 30}
-                                    y={170}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
+                                    y={guessesYOffset}
                                     width={cellWidth}
                                     height={cellHeight}
                                     // fill cell yellow when suffix is lms
                                     fill={(index === step.bucketIndex) ? "lightblue" : "white"}
                                     stroke="black"
+                                    style={{opacity: 0}}
                                 />
                                 <text
-                                    x={10 + index * 30 + 15}
-                                    y={190}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
+                                    y={guessesYOffset + cellHeight * 0.7}
                                     textAnchor="middle"
+                                    style={{opacity: 0}}
                                 >
                                     {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
                                 </text>
@@ -1030,18 +984,20 @@ export function SaisOutput(props: SaisOutputProps) {
                         elements.push(
                             <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
                                 <rect
-                                    x={10 + index * 30}
-                                    y={170}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
+                                    y={guessesYOffset}
                                     width={cellWidth}
                                     height={cellHeight}
                                     // fill cell lightblue when it's the newly inserted one
                                     fill={(index === step.bucketIndex) ? "lightblue" : "white"}
                                     stroke="black"
+                                    style={{opacity: 0}}
                                 />
                                 <text
-                                    x={10 + index * 30 + 15}
-                                    y={190}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
+                                    y={guessesYOffset + cellHeight * 0.7}
                                     textAnchor="middle"
+                                    style={{opacity: 0}}
                                 >
                                     {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
                                 </text>
@@ -1057,18 +1013,18 @@ export function SaisOutput(props: SaisOutputProps) {
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter}>
+                            <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
                                 <rect
-                                    x={10 + index * 30}
-                                    y={170}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
+                                    y={guessesYOffset}
                                     width={cellWidth}
                                     height={cellHeight}
                                     fill={(index === step.bucketIndex) ? "lightblue" : "white"}
                                     stroke="black"
                                 />
                                 <text
-                                    x={10 + index * 30 + 15}
-                                    y={190}
+                                    x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
+                                    y={guessesYOffset + cellHeight * 0.7}
                                     textAnchor="middle"
                                 >
                                     {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
@@ -1081,12 +1037,12 @@ export function SaisOutput(props: SaisOutputProps) {
                 })}
 
                 {/* guessed sa */}
-                <g id={"s" + counter} key={"s" + counter}>
+                <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
                     {props.output.guessedSa.map((offset, index) => (
                         <g key={index}>
                             <rect
-                                x={10 + index * 30}
-                                y={170}
+                                x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
+                                y={guessesYOffset}
                                 width={cellWidth}
                                 height={cellHeight}
                                 // fill cell yellow when suffix is lms
@@ -1094,8 +1050,8 @@ export function SaisOutput(props: SaisOutputProps) {
                                 stroke="black"
                             />
                             <text
-                                x={10 + index * 30 + 15}
-                                y={190}
+                                x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
+                                y={guessesYOffset + cellHeight * 0.7}
                                 textAnchor="middle"
                             >
                                 {offset}
