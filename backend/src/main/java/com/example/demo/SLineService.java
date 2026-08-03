@@ -151,55 +151,35 @@ public class SLineService {
                     pseudoCodeLineIds
             ));
 
-            List<Point> activePointsAfterShrink = activePoints.stream()
-                    .filter(p -> current.x() - p.x() < deltaAfterCandidateCheck)
-                    .toList();
 
-            List<Point> processedAfterShrink = new ArrayList<>(processed);
-
-            for (Point p : activePoints) {
-                if (current.x() - p.x() >= deltaAfterCandidateCheck) {
-                    processedAfterShrink.add(p);
-                }
-            }
             /*
              * Step i+1: This step only exists when delta became smaller.
              * makes effect of the new delta visible: both sweep windows shrink at the same current point.
              * Here delta and searchDelta are both the new smaller value.
              */
             if (foundNewBest) {
-          //  if (false) {
+                RemovalResult shrinkRemoval =
+                        removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaAfterCandidateCheck);
+                tail = shrinkRemoval.newTail();
+
                 steps.add(new AlgorithmStepDTO(
                         "δ decreases from " + String.format("%.2f", deltaBeforeStep)
                                 + " to " + String.format("%.2f", deltaAfterCandidateCheck)
                                 + ". The sweep windows become smaller.",
                         current,
                         current.x(),
-                        deltaAfterCandidateCheck,          // new best distance
-                        deltaAfterCandidateCheck,          // new window size for the shrink step
-                        new ArrayList<>(activePointsAfterShrink),     // current is still not active yet
+                        deltaAfterCandidateCheck,
+                        deltaAfterCandidateCheck,
+                        new ArrayList<>(activePoints),     // current is still not active yet
                         xSorted,
                         bestPairAfterCandidateCheck,
-                        List.of(),
-                        processedAfterShrink,
+                        candidates.candidatePairs(), //Kandidaten, die mit dem vorherigen Delta gefunden wurden. NICHT die Kandidaten des window mit neuen delta.
+                        new ArrayList<>(processed),
                         futurePoints,
                         List.of("update-delta", "shrink-windows")//List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
                 ));
-                /*
-                activePoints.clear();
-                activePoints.addAll(activePointsAfterShrink);
-                processed.addAll(processedAfterShrink);
 
-                 */
-
-                activePoints.removeIf(p -> current.x() - p.x() >= deltaAfterCandidateCheck);
-                processed.clear();
-                processed.addAll(processedAfterShrink);
-                while (tail < i && current.x() - xSorted.get(tail).x() >= deltaAfterCandidateCheck) {
-                    tail++;
-                }
             }
-
 
              //From here on, the algorithm state is updated for the next iteration.
              //The smaller delta is now the "official search radius" for later points
