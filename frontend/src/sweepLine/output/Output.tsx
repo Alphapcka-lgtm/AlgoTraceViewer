@@ -47,6 +47,8 @@ export function Output(props: OutputProps) {
         return {x: currentX - delta, y: currentY - delta, width: delta, height: delta * 2};
     };
 
+
+
     const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
         step.pseudoCodeLineIds.includes("shrink-windows"); //dann das candidate window nicht zeigen
 
@@ -290,7 +292,7 @@ export function Output(props: OutputProps) {
 
                     <div>
                         <LegendEntry
-                            label="Candidates: "
+                            label="Candidates checked with previous δ: "
                             value={getLegendValueCandidates(step)}
                             icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
                         />

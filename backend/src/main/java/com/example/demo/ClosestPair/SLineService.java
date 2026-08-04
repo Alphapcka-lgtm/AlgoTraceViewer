@@ -1,9 +1,9 @@
 package com.example.demo.ClosestPair;
 import dto.AlgorithmStepDTO;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 import java.util.*;
-@Getter
+import java.util.stream.Collectors;
+
 @Service
 public class SLineService {
     //https://arxiv-org.translate.goog/html/2601.05681v1?_x_tr_sl=en&_x_tr_tl=de&_x_tr_hl=de&_x_tr_pto=sge#S2
@@ -18,28 +18,29 @@ public class SLineService {
         if (points == null || points.size() < 2) throw new IllegalArgumentException("There must be at least two points");
 
         List<Point> xSorted = new ArrayList<>(points);
-        xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y));
+        xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y).thenComparing(Point::id));
 
-        // Setting initial best pair the initial delta from the first two points before the sweep starts.
+        //Init the best pair and delta using the first two x-sorted points.
         Point p0 = xSorted.get(0);
         Point p1 = xSorted.get(1);
         double delta = euclideanDistance(p0, p1);
         PointPair currBestPair = new PointPair(p0, p1, delta);
 
         /*
-        yTable contains the points currently inside the active sweep window:
-        from xSorted[tail] inclusive up to the current point exclusive.
-        It is ordered by y-coordinate; Point::id keeps duplicate coordinates distinct.
-         */
+         * Points currently inside the active x-range [current.x - delta, current.x).
+         * The current point is inserted only after its candidates were checked.
+         * The set is ordered by y-coordinate for selection of candidate points by their y-distance.
+         * The id comparator keeps points with identical coordinates distinct.
+        */
         TreeSet<Point> activePoints = new TreeSet<>(
                 Comparator.comparingInt(Point::y).thenComparingInt(Point::x).thenComparing(Point::id));
 
-        // Points that are to the left of the tail so that have already left the active sweep window
-        List<Point> processed = new ArrayList<>(); //discarded points
-
-        // During initialization, p1 is the current point. Therefore, only p0 is part of activePoints at this moment.
+        //Previously visited points that have already left the active x-range.
+        //These points cannot form a closer pair with the current or any later point.
+        List<Point> processedPoints = new ArrayList<>();
+        //For the init snapshot, p1 is the current point and is therefore not yet shown as active (only p0).
+        //It is inserted immediately after the snapshot.
         activePoints.add(p0);
-        List<Point> future0 = xSorted.subList(2, xSorted.size()); // points to the right of the current point.
 
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: The points are sorted by x-coordinate. "
@@ -49,216 +50,197 @@ public class SLineService {
 
         steps.add(new AlgorithmStepDTO(
                 description, p1, delta, delta,
-                new ArrayList<>(activePoints),   //p1 noch nicht drin
+                new ArrayList<>(activePoints),
                 xSorted, currBestPair,
-                List.of(), new ArrayList<>(processed), new ArrayList<>(future0),
+                List.of(), new ArrayList<>(processedPoints),
+                getFuturePoints(xSorted, 1),
                 List.of("init") //List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
         ));
 
         activePoints.add(p1);
 
-        // Index of the leftmost point that is still part of the active sweep window.
-        // Points before tail have already been removed from activePoints.
+        // Index of the leftmost x-sorted point that is still part of the activePoints.
+        // Every point before tail has already been removed.
         int tail = 0;
 
         for (int i = 2; i < xSorted.size(); i++) {
             Point current = xSorted.get(i);
 
-            //Delta at beginning of this iteration. size of the search windows to find candidate pairs for the current point.
-            double deltaBeforeStep = delta;
+            /*
+             * Delta used in this iteration to:
+             * 1. remove points outside the active x-range, and
+             * 2. select points inside the candidate y-range.
+            */
+            double deltaBeforeCandidateCheck = delta;
 
-            RemovalResult rm = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaBeforeStep);
-            tail = rm.newTail();
-            boolean removedPoints = rm.removedAny();
+            //After that, all points satisfy: current.x - point.x < deltaBeforeCandidateCheck.
+            RemovalResult removalResult = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processedPoints, tail, i, deltaBeforeCandidateCheck);
+            tail = removalResult.newTail();
+            boolean removedPoints = removalResult.removedAny();
 
             String activeWindowMsg = "";
-
             if (removedPoints) {
-                String removedLabels = rm.removedPoints().stream().map(Point::label).reduce((a, b) -> a + ", " + b).orElse("");
+                String removedLabels = removalResult.removedPoints().stream().map(Point::label).collect(Collectors.joining(", "));
                 activeWindowMsg = removedLabels + " left the active window because the x-distance to " +current.label()+" is at least δ.";
             }
 
-            /*
-             * Candidate checking may find a smaller delta.
-             * Step i: "New minimum found!" The windows still show the old search delta, because that was the
-                        window in which the candidates were checked.
-             * Step i+1: "delta shrinks..." The windows shrink at the same current point to the new delta.
-             * Step i+2: The next point is processed and the smaller windows move on.
-             */
-            // Determine Candidates: checking only active points whose y-distance is smaller than delta .
-            //so activepoints in the [y-delta, y+delta]-window (candidaten window)
-            CandidateResult candidates = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeStep, delta, currBestPair);
+            //Candidate checking may find a smaller delta.
+            CandidateResult candidateResult = findAndCheckCandidatesInCandidateSweepWindow(current, activePoints, deltaBeforeCandidateCheck, delta, currBestPair);
 
-            double deltaAfterCandidateCheck = candidates.delta();
-            PointPair bestPairAfterCandidateCheck = candidates.bestPair();
-            boolean foundNewBest = candidates.foundNewBest();
+            double deltaAfterCandidateCheck = candidateResult.bestDistance();
+            PointPair bestPairAfterCandidateCheck = candidateResult.bestPair();
+            boolean foundNewBest = candidateResult.foundNewBest();
 
-            // Only for visualization: points not processed yet, so all points right of current.
-            List<Point> futurePoints = new ArrayList<>(xSorted.subList(i + 1, xSorted.size()));
+            // Points that have not yet become the current point. Used only for visualization.
+            List<Point> futurePoints = getFuturePoints(xSorted, i);
 
             String newBestMsg = "New closest pair found: "
                     + bestPairAfterCandidateCheck.p0().label() + " ↔ " + bestPairAfterCandidateCheck.p1().label()
                     + " with distance "
                     + String.format("%.2f", deltaAfterCandidateCheck)
-                    + ". The new smaller δ is visualized in the next step."; //This will be the new δ (see next step).";
+                    + ". The new smaller δ is visualized in the next step.";
 
             String noNewBestMsg = "δ stays unchanged because no candidate pair is closer.";
 
-            boolean hasCandidatePairs = !candidates.candidateComparisons().isEmpty();
-            /*
-            String candidateMsg = "";
-            if (hasCandidatePairs) {
-                String candidateLabels = candidates.candidatePairs().stream()
-                        .map(r -> r.p0().label())
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("");
-                candidateMsg = "Candidate points for "
-                        + current.label()
-                        + " inside the candidate window are: "
-                        + candidateLabels
-                        + ".";
-            }
-             */
+            boolean hasCandidateComparisons = !candidateResult.candidateComparisons().isEmpty();
 
             List<String> pseudoCodeLineIds = buildPseudoCodeLineIds(
                     removedPoints,
-                    hasCandidatePairs,
+                    hasCandidateComparisons,
                     foundNewBest);
 
             String stepDescription = foundNewBest ? newBestMsg : noNewBestMsg;
-            if (!activeWindowMsg.isBlank()) {
-                stepDescription = activeWindowMsg + " " + stepDescription;
-            }
+            if (!activeWindowMsg.isBlank()) stepDescription = activeWindowMsg + " " + stepDescription;
+
             /*
-             * Step i: If a new minimum was found, the step message already shows the new delta.
-             * However, searchDelta stays deltaBeforeStep so the windows still show the
-             * old search window in which the candidates were actually checked.
-             */
-            // step is taken before inserting the current point beause currentPoint ist not part of activePoints
+             * Snapshot before inserting current
+             * - activePoints and candidateComparisons refer to deltaBeforeCandidateCheck
+             * - bestPair already contain the result of the comparisons
+            */
             steps.add(new AlgorithmStepDTO(
                     stepDescription,
                     current,
                     deltaAfterCandidateCheck,
-                    deltaBeforeStep,                        // window size used during this candidate search check
+                    deltaBeforeCandidateCheck,
                     new ArrayList<>(activePoints),
                     xSorted,
                     bestPairAfterCandidateCheck,
-                    candidates.candidateComparisons(),
-                    new ArrayList<>(processed),
+                    candidateResult.candidateComparisons(),
+                    new ArrayList<>(processedPoints),
                     futurePoints,
                     pseudoCodeLineIds
             ));
 
 
             /*
-             * Step i+1: This step only exists when delta became smaller.
+             * This step only exists when a smaller delta was found.
              * makes effect of the new delta visible: both sweep windows shrink at the same current point.
-             * Here delta and searchDelta are both the new smaller value.
+             * current is still not part of activePoints.
              */
             if (foundNewBest) {
+                /*
+                //TODO: wird eh am amfang der nächsten interation gemacht ... überlegen was ich im shrik step zeige
                 RemovalResult shrinkRemoval =
                         removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processed, tail, i, deltaAfterCandidateCheck);
                 tail = shrinkRemoval.newTail();
-
+                 */
                 steps.add(new AlgorithmStepDTO(
-                        "δ decreases from " + String.format("%.2f", deltaBeforeStep)
+                        "δ decreases from " + String.format("%.2f", deltaBeforeCandidateCheck)
                                 + " to " + String.format("%.2f", deltaAfterCandidateCheck)
                                 + ". The sweep windows become smaller.",
                         current,
                         deltaAfterCandidateCheck,
                         deltaAfterCandidateCheck,
-                        new ArrayList<>(activePoints),     // current is still not active yet
+                        new ArrayList<>(activePoints),
                         xSorted,
                         bestPairAfterCandidateCheck,
-                        candidates.candidateComparisons(), //Kandidaten, die mit dem vorherigen Delta gefunden wurden. NICHT die Kandidaten des window mit neuen delta.
-                        new ArrayList<>(processed),
+                        candidateResult.candidateComparisons(), // Comparisons performed with the previous candidate-search delta.
+                        new ArrayList<>(processedPoints),
                         futurePoints,
                         List.of("update-delta", "shrink-windows")//List.of("shrink-windows") //List.of("update-delta", "update-bestpair")
                 ));
-
             }
 
-             //From here on, the algorithm state is updated for the next iteration.
-             //The smaller delta is now the "official search radius" for later points
-            delta = deltaAfterCandidateCheck;
+            delta = deltaAfterCandidateCheck; //The smaller delta now becomes the new "search radius" for later points
             currBestPair = bestPairAfterCandidateCheck;
 
-            // Current point becomes part of the activePoinsts/sweep window after the step
+            //current point only becomes part of the activePoints after all snapshots for this iteration were taken.
             activePoints.add(current);
         }
 
-        // Final visualization state after the sweep has finished.
-        // currentPoint = null because the alg has finished
-        Point lastPoint = xSorted.getLast();
-
+        // Final snapshot after the sweep has finished.
         String doneMsg = "Done! The sweep is complete. The closest pair is "
                 + currBestPair.p0().label() + " ↔ " + currBestPair.p1().label()
                 + " with distance = " + String.format("%.2f", currBestPair.distance()) + ".";
-
         steps.add(new AlgorithmStepDTO(
                 doneMsg,
-                null, // kein currentPoint mehr
+                null,
                 delta, delta,
-                List.of(), //aktive menge nicht mehr zeigen
-                xSorted, currBestPair, List.of(), new ArrayList<>(processed), List.of(),
+                List.of(),
+                xSorted,
+                currBestPair,
+                List.of(),
+                new ArrayList<>(xSorted),
+                List.of(),
                 List.of("return")
         ));
 
         return steps;
     }
 
+    private boolean liesOutsideActiveWindow(Point point, Point current, double delta) {
+        return current.x() - point.x() >= delta;
+    }
+
     /**
-     * Removes points that are more than delta to the left of the current point.
-     * These points are left of the active sweep window, so they cannot form
-     * a closer pair with the current point or any later point.
+     * Removes all points whose horizontal distance from current is greater than or equal to delta.
+     * Such points lie on or left of the active window's left boundary and
+     * cannot form a pair with distance smaller than delta with current or any later point.
      * Removed points are moved from activePoints to processed, and tail is
      * advanced to the new left border of the active sweep window.
      */
     private RemovalResult removePointsOutsideActiveSweepWindow(Point current, List<Point> xSorted, TreeSet<Point> activePoints,
-            List<Point> processed, int tail, int currIndex, double deltaBeforeStep) {
+            List<Point> processed, int tail, int currIndex, double delta) {
 
         List<Point> removed = new ArrayList<>();
-        //while (tail < i && current.x() - xSorted.get(tail).x() >= delta) { //> ?
-        //while (tail < i && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) { //> ?
-        //System.out.println(current.x() +" - "+xSorted.get(tail).x() + " deltaBeforeStep " + deltaBeforeStep + " tail " + tail);
-        while (tail < currIndex && current.x() - xSorted.get(tail).x() >= deltaBeforeStep) {
-            Point oldPoint = xSorted.get(tail);
-            activePoints.remove(oldPoint);
-            processed.add(oldPoint);
-            removed.add(oldPoint);
+        while (tail < currIndex && liesOutsideActiveWindow(xSorted.get(tail), current, delta)) {
+            Point pointToRemove = xSorted.get(tail);
+            activePoints.remove(pointToRemove);
+            processed.add(pointToRemove);
+            removed.add(pointToRemove);
             tail++;
         }
         return new RemovalResult(tail, removed);
     }
 
-
     /**
-     * Checks only active points that are at most delta above or below the current point, so that lie inside the candidate sweep window.
-     * activePoints already contains only points inside the active sweep window (so no points farther left than
-     * delta). Therefore, this method only needs to filter by y-distance: at most delta above or below the current point.
+     * Compares current with every active point whose vertical distance from
+     * current is strictly smaller than candidateSearchDelta.
+     * activePoints already contains only points inside the active-window x-range before
+     * this method is called, so only the vertical distance must be checked.
+     * Points exactly on the candidate window boundary are excluded.
      */
     private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
-            Point current, TreeSet<Point> activePoints, double deltaBeforeStep, double currDelta, PointPair currentBestPair
+            Point current, TreeSet<Point> activePoints, double candidateSearchDelta, double currentBestDistance, PointPair currentBestPair
     ) {
         List<CandidateComparison> candidateComparisons = new ArrayList<>();
         boolean foundNewBest = false;
 
-        for (Point activePoint : activePoints) {
-            //if (Math.abs(current.y() - candidate.y()) < delta) {
-            if (Math.abs(current.y() - activePoint.y()) < deltaBeforeStep) {
-                Point candidate = activePoint;
+        for (Point candidate : activePoints) {
+            double verticalDistance = Math.abs(current.y() - candidate.y());
+            if (verticalDistance < candidateSearchDelta) {
                 double distance = euclideanDistance(current, candidate);
                 candidateComparisons.add(new CandidateComparison(candidate, distance));
 
-                if (distance < currDelta) {
-                    currDelta = distance;
+                if (distance < currentBestDistance) {
+                    currentBestDistance = distance;
                     currentBestPair = new PointPair(candidate, current, distance);
                     foundNewBest = true;
                 }
             }
         }
 
-        return new CandidateResult(currDelta, currentBestPair, candidateComparisons, foundNewBest);
+        return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
     }
 
     /*
@@ -334,6 +316,11 @@ public class SLineService {
     }
 
      */
+
+    private List<Point> getFuturePoints(List<Point> xSorted, int currentIndex) {
+        return new ArrayList<>(xSorted.subList(currentIndex + 1, xSorted.size()));
+    }
+
     public static double euclideanDistance(Point p1, Point p2) {
         double dx = (double) p2.x()-p1.x();
         double dy = (double) p2.y()-p1.y();
@@ -347,7 +334,7 @@ public class SLineService {
     }
 
     private record CandidateResult(
-            double delta,
+            double bestDistance,
             PointPair bestPair,
             List<CandidateComparison> candidateComparisons,
             boolean foundNewBest

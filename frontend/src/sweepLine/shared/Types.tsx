@@ -53,7 +53,7 @@ export interface AlgorithmStepDTO {
     description: string;
     currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
     deltaAfterCandidateCheck: number; //neues bestes δ nach Kandidatensuche
-    deltaBeforeCandidateCheck:number;
+    deltaBeforeCandidateCheck:number; //damit wurde Active Window und Kandidaten bestimmt.
     activePoints: Node[];
     allPoints: Node[];
     bestPair: PointPair | null;
@@ -96,4 +96,13 @@ export type XNodeProps = {
     fill: string;
     scale?: number;
     ringStyle?: RingStyle;
+};
+
+export type PointDisplayState = {
+    isCurrent: boolean;
+    isBest: boolean;
+    isProcessed: boolean;
+    isFuture: boolean;
+    isActive: boolean;
+    isCandidate: boolean;
 };
