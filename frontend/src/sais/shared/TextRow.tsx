@@ -3,7 +3,7 @@ import type {TextRowProps} from "./Types.tsx";
 export function TextRow(props: TextRowProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
     return (
-        <g key="text_row" id="text_row" style={{opacity: 0}}>
+        <g key="text_row" id="text_row" style={{opacity: 100}}>
             <rect
                 key={"text_row_name_rect"}
                 x={props.xOffsetStart}

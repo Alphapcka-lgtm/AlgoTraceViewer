@@ -891,6 +891,7 @@ export function SaisOutput(props: SaisOutputProps) {
         + props.output.guessInduceS.length
         + props.output.guessInduceL.length
         + 1 // for the final guessed sa
+        + props.output.lmsOrder.length
     );
 
     const changePlaybackSpeed = (speed: number) => {
@@ -930,17 +931,60 @@ export function SaisOutput(props: SaisOutputProps) {
         // draw initial states
         timeline.addLabel(labels[0]);
 
-        {
-            timeline.set("#index_row", {opacity: 100});
-            timeline.set("#text_row", {opacity: 100},);
-            timeline.set("#buckets_row", {opacity: 100},);
-            timeline.set("#types_row", {opacity: 100},);
+        // {
+        //     timeline.set("#index_row", {opacity: 100});
+        //     timeline.set("#text_row", {opacity: 100},);
+        //     timeline.set("#buckets_row", {opacity: 100},);
+        //     timeline.set("#types_row", {opacity: 100},);
+        //
+        //     timeline.from("#index_row", {drawSVG: "50% 50%"}, "<");
+        //     timeline.from("#text_row", {drawSVG: "50% 50%"}, "<");
+        //     timeline.from("#types_row", {drawSVG: "50% 50%"}, "<");
+        //     timeline.from("#buckets_row", {drawSVG: "50% 50%"}, "<");
+        // }
 
-            // timeline.from("#index_row", {drawSVG: "50% 50%"}, "<");
-            // timeline.from("#text_row", {drawSVG: "50% 50%"}, "<");
-            // timeline.from("#types_row", {drawSVG: "50% 50%"}, "<");
-            // timeline.from("#buckets_row", {drawSVG: "50% 50%"}, "<");
-        }
+        let currentCounter = 0;
+        // lms guess steps
+        props.output.guessLmsSteps.forEach((step, index) => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // L induce steps
+        props.output.guessInduceL.forEach((step, index) => {
+            timeline.set("#s" + currentCounter, {opacity: 100},);
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // S induce steps
+        props.output.guessInduceS.forEach((step, index) => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // guessed suffix array
+        timeline.set("#s" + currentCounter, {opacity: 100});
+        timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+        timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+        timeline.addLabel(labels[currentCounter + 1]);
+        currentCounter++;
+
+        // lms names
+        props.output.lmsOrder.forEach(() => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.to("#s" + currentCounter, {drawSVG: "50% 50%"}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        })
 
         timeline.progress(props.progress);
         setIsPlaying(false);
@@ -966,20 +1010,7 @@ export function SaisOutput(props: SaisOutputProps) {
                         }}
                         canSubmit={false}/>
 
-            <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
-                {/*<text x={10} y={10}>{JSON.stringify(props.output)}</text>*/}
-                {/*<foreignObject x={10} y={30} width={100} height={150}>*/}
-                {/*    <table>*/}
-                {/*        <tbody>*/}
-                {/*        <tr>*/}
-                {/*            {[...props.output.source].map((char, index) => (*/}
-                {/*                <th>{char}</th>*/}
-                {/*            ))}*/}
-                {/*        </tr>*/}
-                {/*        </tbody>*/}
-                {/*    </table>*/}
-                {/*</foreignObject>*/}
-
+            <svg className="algorithm-canvas" viewBox="0 0 1123 700" preserveAspectRatio="xMidYMid meet">
                 {/* initial state with indexes and buckets */}
                 <IndexRow
                     cellWidth={cellWidth}
@@ -1021,7 +1052,7 @@ export function SaisOutput(props: SaisOutputProps) {
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter}>
+                            <g id={"lms_guess_" + index} key={"lms_guess_" + index}>
                                 <rect
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={guessesYOffset}
@@ -1030,29 +1061,36 @@ export function SaisOutput(props: SaisOutputProps) {
                                     // fill cell yellow when suffix is lms
                                     fill={(index === step.bucketIndex) ? "lightblue" : "white"}
                                     stroke="black"
-                                    style={{opacity: 0}}
+                                    // style={{opacity: 0}}
                                 />
                                 <text
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={guessesYOffset + cellHeight * 0.7}
                                     textAnchor="middle"
-                                    style={{opacity: 0}}
+                                    // style={{opacity: 0}}
                                 >
                                     {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
                                 </text>
                             </g>
-                        )
-                        counter++;
+                        );
+                        // counter++;
                     }
 
-                    return elements;
+                    const complete = (
+                        <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                            {elements}
+                        </g>
+                    )
+                    counter++;
+                    return complete;
                 })}
+
                 {/* induce L-types guess */}
                 {props.output.guessInduceL.map((step, j) => {
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
+                            <g id={"L_induce_guess_" + index} key={"L_induce_guess_" + index}>
                                 <rect
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={guessesYOffset}
@@ -1061,21 +1099,28 @@ export function SaisOutput(props: SaisOutputProps) {
                                     // fill cell lightblue when it's the newly inserted one
                                     fill={(index === step.bucketIndex) ? "lightblue" : "white"}
                                     stroke="black"
-                                    style={{opacity: 0}}
+                                    // style={{opacity: 0}}
                                 />
                                 <text
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={guessesYOffset + cellHeight * 0.7}
                                     textAnchor="middle"
-                                    style={{opacity: 0}}
+                                    // style={{opacity: 0}}
                                 >
                                     {(step.resultingArray[index] != -1) ? step.resultingArray[index] : ""}
                                 </text>
                             </g>
                         )
-                        counter++;
+                        // counter++;
                     }
-                    return elements
+
+                    const complete = (
+                        <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                            {elements}
+                        </g>
+                    )
+                    counter++;
+                    return complete;
                 })}
 
                 {/* induce S-types guess */}
@@ -1083,7 +1128,7 @@ export function SaisOutput(props: SaisOutputProps) {
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                            <g id={"S_induce_guess_" + index} key={"S_induce_guess_" + index}>
                                 <rect
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={guessesYOffset}
@@ -1101,13 +1146,19 @@ export function SaisOutput(props: SaisOutputProps) {
                                 </text>
                             </g>
                         )
-                        counter++;
+                        // counter++;
                     }
-                    return elements;
+                    const complete = (
+                        <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                            {elements}
+                        </g>
+                    )
+                    counter++;
+                    return complete;
                 })}
 
                 {/* guessed sa */}
-                <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
+                <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
                     {props.output.guessedSa.map((offset, index) => (
                         <g key={index}>
                             <rect
@@ -1132,7 +1183,7 @@ export function SaisOutput(props: SaisOutputProps) {
                 {counter++}
 
                 {/* naming */}
-                <g id={"s" + counter} key={"s" + counter} transform="translate(10, 0)">
+                <g id={"naming_group"} key={"naming group"} transform="translate(10, 0)">
                     {
                         data.lmsOrder.map((pos, i) => {
                             const height = 30
@@ -1146,8 +1197,13 @@ export function SaisOutput(props: SaisOutputProps) {
 
                             const badgeColor = isDup ? COLORS.rose : COLORS.amber;
                             const badgeBg = isDup ? COLORS.roseBg : COLORS.amberBg;
-                            return (
-                                <g transform={`translate(0, ${yOffset})`}>
+                            const element = (
+                                <g
+                                    id={"s" + counter}
+                                    key={"s" + counter}
+                                    style={{opacity: 0}}
+                                    transform={`translate(0, ${yOffset})`}
+                                >
                                     <rect x={0} y={0} width={width} height={height} fill="white"
                                           stroke="black" strokeWidth={1}/>
                                     <text x={12} y={height / 2} dominantBaseline="central"
@@ -1181,10 +1237,50 @@ export function SaisOutput(props: SaisOutputProps) {
                                     </text>
                                 </g>
                             );
+                            counter++;
+                            return element;
                         })
                     }
                 </g>
-                {counter++}
+
+                {/* test reduced */}
+                <g id={"test_reduced"} key={"test_reduced"} transform={`translate(10, ${yOffset + 50})`}>
+                    {
+                        props.output.reduced.map((pos, index) => {
+                            return (
+                                <g
+                                    id={"test_reduced_cell_" + index}
+                                    key={"test_reduced_cell_" + index}
+                                    transform={`translate(${cellWidth * index}, 0)`}
+                                >
+                                    <rect
+                                        x={0}
+                                        y={0}
+                                        width={cellWidth}
+                                        height={cellHeight}
+                                        fill="white"
+                                        stroke="black"
+                                    />
+                                    <text
+                                        x={cellWidth / 2}
+                                        y={cellHeight * 0.7}
+                                        textAnchor="middle"
+                                    >
+                                        {pos}
+                                    </text>
+                                </g>
+                            )
+                        })
+                    }
+                </g>
+
+                {/* possible arrow */}
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="#000000" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                </g>
 
                 {/* reduced */}
                 <g id={"s" + counter} key={"s" + counter}>
