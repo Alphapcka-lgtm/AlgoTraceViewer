@@ -49,15 +49,25 @@ interface CandidateComparison {
     distance: number;
 }
 
+export type SweepLineStepType =
+    | "INITIALIZATION"
+    | "SELECT_CURRENT"
+    | "REMOVE_INACTIVE"
+    | "CHECK_CANDIDATES"
+    | "UPDATE_BEST"
+    | "INSERT_CURRENT"
+    | "FINISHED";
+
 export interface AlgorithmStepDTO {
+    stepType: SweepLineStepType;
     description: string;
     currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
-    deltaAfterCandidateCheck: number; //neues bestes δ nach Kandidatensuche
-    deltaBeforeCandidateCheck:number; //damit wurde Active Window und Kandidaten bestimmt.
+    windowDelta: number; //Delta used to draw the sweep windows in this snapshot.
     activePoints: Node[];
     allPoints: Node[];
     bestPair: PointPair | null;
     candidateComparisons: CandidateComparison[];
+    removedPoints: Node[];
     processedPoints: Node[];
     futurePoints: Node[];
     pseudoCodeLineIds: string[];

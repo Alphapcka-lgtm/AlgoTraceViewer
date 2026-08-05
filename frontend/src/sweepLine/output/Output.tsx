@@ -30,9 +30,8 @@ export function Output(props: OutputProps) {
     };
 
     const getActiveAreaAttrs = (step: AlgorithmStepDTO) => {
-        const delta = step.deltaBeforeCandidateCheck;
         const currentX = step.currentPoint?.x ?? 0;
-        return {x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING};
+        return {x: currentX - step.windowDelta, y: PADDING, width: step.windowDelta, height: props.height - 2 * PADDING};
     };
 
     const getSweepLineAttrs = (step: AlgorithmStepDTO) => {
@@ -41,19 +40,14 @@ export function Output(props: OutputProps) {
     };
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const delta = step.deltaBeforeCandidateCheck;
         const currentX = step.currentPoint?.x ?? 0;
         const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
-        return {x: currentX - delta, y: currentY - delta, width: delta, height: delta * 2};
+
+        return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
 
-
-
-    const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
-        step.pseudoCodeLineIds.includes("shrink-windows"); //dann das candidate window nicht zeigen
-
     const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
-        step.currentPoint !== null && !isShrinkStep(step);
+        step.currentPoint !== null && (step.stepType === "CHECK_CANDIDATES" || step.stepType === "UPDATE_BEST");
 
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -141,20 +135,39 @@ export function Output(props: OutputProps) {
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
 
-    const candidatePointIds = new Set(step.candidateComparisons.map(comparison => comparison.candidate.id));
+    const candidatePointIds = new Set(
+        (step.stepType === "CHECK_CANDIDATES" || step.stepType === "UPDATE_BEST")
+            ? step.candidateComparisons.map(comparison => comparison.candidate.id) : []
+    );
 
     const legendenValueActivePoints:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
 
-    const getLegendValueCandidates = (step: AlgorithmStepDTO,): string => {
-        if (step.currentPoint === null) return "-";
-        if (isShrinkStep(step)) return "No candidate comparisons in this step...nochmal schauen was hier jetzt anzeige";
+    const getCandidateLegendLabel = (step: AlgorithmStepDTO): string =>
+        step.stepType === "UPDATE_BEST" ? "Candidates checked with search δ: " : "Candidates: ";
+
+    const getCandidateLegendValue = (step: AlgorithmStepDTO): string => {
+        if (step.currentPoint === null) return "—";
+        if (step.stepType !== "CHECK_CANDIDATES" && step.stepType !== "UPDATE_BEST") return "Not part of this step";
         if (step.candidateComparisons.length === 0) return "No candidates";
 
         const currentPoint = step.currentPoint;
-        return step.candidateComparisons.map(({ candidate, distance }) =>
-            `dist(${currentPoint.label}, ${candidate.label}) = ${distance.toFixed(2)}`,).join(", ");
+        return step.candidateComparisons
+            .map(({candidate, distance}) =>
+                `dist(${currentPoint.label}, ${candidate.label}) = ${distance.toFixed(2)}`
+            ).join(", ");
     };
+
+    const getStepDetail = (step: AlgorithmStepDTO): string => {
+        switch (step.stepType) {
+            case "REMOVE_INACTIVE":
+                return `Removed from yTable: ${step.removedPoints.map(point => point.label).join(", ")}`;
+            case "UPDATE_BEST": return "Best pair and best distance were updated.";
+            case "INSERT_CURRENT": return step.currentPoint ? `Inserted into yTable: ${step.currentPoint.label}` : "—";
+            default: return "—";
+        }
+    };
+
 
 
     //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
@@ -162,7 +175,7 @@ export function Output(props: OutputProps) {
     const firstStep: AlgorithmStepDTO = props.steps[0];
     const currentX = firstStep.currentPoint?.x ?? 0;
     const currentY = firstStep.currentPoint?.y ?? props.height / 2;
-    const delta = firstStep.deltaBeforeCandidateCheck;
+    const delta = firstStep.windowDelta;
 
     return (
         <div className="algorithm-panel">
@@ -266,10 +279,15 @@ export function Output(props: OutputProps) {
 
             <div className="step-info">
                 <div className="step-description"> {step.description} </div>
+                <div className="step-description"> {getStepDetail(step)} </div>
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>Window δ:</strong> {step.deltaBeforeCandidateCheck.toFixed(2)}</div>
+                    <div><strong>Window δ:</strong> {step.windowDelta.toFixed(2)}</div>
+                    <div>
+                        <strong>Best Distance δ:</strong>{" "}
+                        {step.bestPair?.distance.toFixed(2) ?? "—"}
+                    </div>
                     <LegendEntry
                         label="Current Point: "
                         value={step.currentPoint?.label ?? "—"}
@@ -292,23 +310,23 @@ export function Output(props: OutputProps) {
 
                     <div>
                         <LegendEntry
-                            label="Candidates checked with previous δ: "
-                            value={getLegendValueCandidates(step)}
+                            label={getCandidateLegendLabel(step)}
+                            value={getCandidateLegendValue(step)}
                             icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
                         />
                     </div>
                 </div>
             </div>
 
-            <ImportExportDialog
-                onImport={props.onImport}
-                createExportString={props.createExportString}
-            />
-
             <PseudoCodePanel
                 lines={SWEEP_LINE_PSEUDOCODE}
                 activeLineIds={step.pseudoCodeLineIds}
                 title={"Sweep Line PseudoCode"}
+            />
+
+            <ImportExportDialog
+                onImport={props.onImport}
+                createExportString={props.createExportString}
             />
 
         </div>

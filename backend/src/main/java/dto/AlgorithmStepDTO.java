@@ -3,6 +3,7 @@ package dto;
 import com.example.demo.ClosestPair.CandidateComparison;
 import com.example.demo.ClosestPair.Point;
 import com.example.demo.ClosestPair.PointPair;
+import com.example.demo.ClosestPair.SweepLineStepType;
 
 import java.util.List;
 
@@ -17,14 +18,16 @@ import java.util.List;
  * @param processedPoints    Punkte, die bereits abgearbeitet wurden (links von SweepLine)
  */
 public record AlgorithmStepDTO(
+        SweepLineStepType stepType,
         String description,
         Point currentPoint,
-        double deltaAfterCandidateCheck,
-        double deltaBeforeCandidateCheck,
+        //Delta used for the sweep windows shown in this snapshot. The current best distance is available through bestPair.distance().
+        double windowDelta,
         List<Point> activePoints,
         List<Point> allPoints,
         PointPair bestPair,
         List<CandidateComparison> candidateComparisons,
+        List<Point> removedPoints,
         List<Point> processedPoints,
         List<Point> futurePoints,
         List<String> pseudoCodeLineIds

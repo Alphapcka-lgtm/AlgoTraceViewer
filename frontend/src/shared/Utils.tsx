@@ -109,23 +109,26 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {
         id: "init",
-        text: "sort points by x; initialize bestPair and δ"
+        text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
     },
-
+    {
+        id: "init",
+        text: "initialize closestPair and δ using p[0] and p[1]"
+    },
     {
         id: "for-loop",
-        text: "for i = 2 to n - 1:"
+        text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
     },
 
     {
         id: "set-current",
-        text: "current = xSorted[i]",
+        text: "current ← p[i]", //"current = next point",
         indent: 1
     },
 
     {
         id: "active-window-condition",
-        text: "remove points with current.x - p.x ≥ δ",
+        text: "remove points outside the active window",
         indent: 1
     },
 
@@ -141,41 +144,23 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
         indent: 1
     },
 
-
     {
-        id: "update-bestpair",
-        text: "if a closer pair is found: update bestPair",
-        indent: 1
-    },
-
-    {
-        id: "update-delta",
-        text: "update δ to the new closest distance",
-        indent: 1
-    },
-
-
-    /*
-    {
-        id: "update-bestpair",
+        id: "update-best",
         text: "if a closer pair is found: update bestPair and δ",
         indent: 1
     },
 
-     */
-
     {
         id: "insert-current",
-        text: "insert current into activePoints",
+        text: "insert current into the active set",
         indent: 1
     },
 
     {
         id: "return",
-        text: "return bestPair and δ"
+        text: "return closestPair and δ"
     }
 ];
-
 /*
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
