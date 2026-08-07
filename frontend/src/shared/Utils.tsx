@@ -146,7 +146,7 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
 
     {
         id: "update-best",
-        text: "if a closer pair is found: update bestPair and δ",
+        text: "if a closer pair is found: update closestPair and δ",
         indent: 1
     },
 

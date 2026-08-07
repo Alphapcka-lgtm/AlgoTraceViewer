@@ -28,7 +28,7 @@ export function Output(props: OutputProps) {
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
-    const activeSweepAreaGhostRef = useRef<SVGRectElement>(null);
+    const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -57,9 +57,9 @@ export function Output(props: OutputProps) {
         step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
 
     useGSAP(() => {
-        if (!activeSweepAreaRef.current || !activeSweepAreaGhostRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
+        if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
         const activeArea = activeSweepAreaRef.current;
-        const activeAreaGhost = activeSweepAreaGhostRef.current;
+        const activeAreaDifference = activeSweepAreaDifferenceRef.current;
         const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
@@ -96,7 +96,7 @@ export function Output(props: OutputProps) {
         //init state setzen
         const showActiveElements = firstStep.currentPoint !== null && firstStep.stepType !== "FINISHED";
         gsap.set(activeArea, {attr: getActiveAreaAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
-        gsap.set(activeAreaGhost, {attr: getActiveAreaAttrs(firstStep), opacity: 0});//soll im "normalzustand" nie sichtbar sein
+        gsap.set(activeAreaDifference, {opacity: 0}); //soll im "normalzustand" nie sichtbar sein
         gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
         gsap.set(candidateRect, {
             attr: getCandidateRectAttrs(firstStep),
@@ -141,33 +141,38 @@ export function Output(props: OutputProps) {
 
                 case "COMMIT_ITERATION": {
                     const windowShrunk:boolean = targetStep.windowDelta < previousStep.windowDelta;
-
+                    const oldWindow = getActiveAreaAttrs(previousStep);
+                    const newWindow = getActiveAreaAttrs(targetStep);
                     timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
                     timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
                     if(windowShrunk) {
-
-                        // geometrie des "alten" active windows als "ghost" zeigen
-                        timeline.set(activeAreaGhost, {
-                            attr: getActiveAreaAttrs(previousStep),
-                            opacity: 0.85
-                        });
+                        //schraffur startet ohne breite
+                        timeline.set(activeAreaDifference, {
+                            attr: {x: oldWindow.x, y: oldWindow.y, width: 0, height: oldWindow.height}, opacity: 0.7});
 
                         //Falls kleineres δ gefunden wurde, schrumpft das "echte" Active Window
-                        //timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
                         timeline.to(activeArea, {
-                            attr: getActiveAreaAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
+                            attr: newWindow, opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
+
+                        //währed das active window kleiner wird, wächst der schraffierte bereich mit, damit die differnz in größe gut sieht
+                        timeline.to(activeAreaDifference, {
+                            attr: {width: newWindow.x - oldWindow.x},
+                            duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"
+                        }, "<");
 
                         //Normalerweise bleibt pos gleich ... zur sicherheit trotzdem stezten
-                        timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION}, "<");
+                        timeline.to(sweepLine, {attr:
+                                getSweepLineAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION}, "<");
 
-                        // Zum vorher-nachher-Vergleich beide windows kurz stehen lassen.
-                        timeline.to({}, {duration: 0.35});
+                        // kurz stehen lassen damit man den unterschied sehen kann
+                        timeline.to({}, {duration: 0.7});
 
-                        //ghost entfernen
-                        timeline.to(activeAreaGhost, {opacity: 0, duration: 0.4, ease: "power1.out"});
+                        // Schraffur wieder entfernen
+                        timeline.to(activeAreaDifference, {opacity: 0, duration: 0.35, ease: "power1.out"});
+
                     } else {
-                        //Kein neues kleineres δ gefunden, dann kein Ghost und fenster einfach "normal" weiterbewegen
-                        timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
+                        //Kein kleineres δ gefunden -> fenster "normal" weiterbewegen
+                        timeline.to(activeArea, {attr: newWindow, opacity: 1});
                         timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
                     }
                     break;
@@ -239,23 +244,24 @@ export function Output(props: OutputProps) {
                 canSubmit={false}
             />
 
-            <svg
-                className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`}
-                preserveAspectRatio="xMidYMid meet"
-            >
+            <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
+
+                <defs>
+                    <pattern id="active-window-shrink-schraffur"
+                        width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                        <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(90, 90, 90, 0.99)" strokeWidth="1" strokeDasharray="4 2" strokeLinecap="round"/>
+                    </pattern>
+                </defs>
+
                 <rect
-                    ref={activeSweepAreaGhostRef}
-                    x={currentX - delta}
+                    ref={activeSweepAreaDifferenceRef}
+                    x={0}
                     y={PADDING}
-                    width={delta}
+                    width={0}
                     height={props.height - 2 * PADDING}
-                    fill="none"
-                    stroke="rgba(90, 90, 90, 0.45)"
-                    strokeWidth={1}
-                    strokeDasharray="4 3"
+                    fill="url(#active-window-shrink-schraffur)"
                     opacity={0}
                     pointerEvents="none"
-                    rx={2}
                 />
                 <rect
                     ref={activeSweepAreaRef}

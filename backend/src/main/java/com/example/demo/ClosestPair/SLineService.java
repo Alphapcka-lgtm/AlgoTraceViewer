@@ -121,7 +121,7 @@ public class SLineService {
             String comparedPoints = candidateResult.candidateComparisons.stream().map(p->p.candidate().label()).collect(Collectors.joining(", "));
             String candidateDescription = candidateResult.candidateComparisons().isEmpty() ?
                     "No active points (points in yTable?) lie inside the candidate window."
-                    : "Compared the distance from " + current.label() + " with " + comparedPoints  + " so every active point whose y-distance is smaller than δ";
+                    : "Compared the distance from " + current.label() + " with every candidate point (" + comparedPoints + ") so every active point whose y-distance is smaller than δ";
 
            List<String> candidateLineIds = candidateResult.candidateComparisons().isEmpty() ? List.of("candidate-window"): List.of("candidate-window", "check-distance");
 
