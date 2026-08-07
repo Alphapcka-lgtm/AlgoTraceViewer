@@ -14,6 +14,7 @@ const STEP_DURATION = 0.9;
 const CANDIDATE_FADE_IN_DURATION = 0.7;
 const CANDIDATE_FADE_OUT_DURATION = 0.3;
 const CANDIDATE_AUTOPLAY_HOLD_DURATION = 1;
+const ACTIVE_WINDOW_SHRINK_DURATION = 0.75
 const PADDING = 1;
 
 export function Output(props: OutputProps) {
@@ -26,6 +27,8 @@ export function Output(props: OutputProps) {
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
+
+    const activeSweepAreaGhostRef = useRef<SVGRectElement>(null);
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -54,8 +57,9 @@ export function Output(props: OutputProps) {
         step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
 
     useGSAP(() => {
-        if (!activeSweepAreaRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
+        if (!activeSweepAreaRef.current || !activeSweepAreaGhostRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
         const activeArea = activeSweepAreaRef.current;
+        const activeAreaGhost = activeSweepAreaGhostRef.current;
         const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
@@ -92,6 +96,7 @@ export function Output(props: OutputProps) {
         //init state setzen
         const showActiveElements = firstStep.currentPoint !== null && firstStep.stepType !== "FINISHED";
         gsap.set(activeArea, {attr: getActiveAreaAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
+        gsap.set(activeAreaGhost, {attr: getActiveAreaAttrs(firstStep), opacity: 0});//soll im "normalzustand" nie sichtbar sein
         gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
         gsap.set(candidateRect, {
             attr: getCandidateRectAttrs(firstStep),
@@ -104,6 +109,7 @@ export function Output(props: OutputProps) {
         //tweens hinzufügen:
         props.steps.slice(1).forEach((targetStep, index) => {
             const stepIndex = index + 1;
+            const previousStep = props.steps[stepIndex - 1];
 
             switch (targetStep.stepType) {
                 case "INITIALIZATION": {
@@ -134,18 +140,36 @@ export function Output(props: OutputProps) {
                 }
 
                 case "COMMIT_ITERATION": {
-                    // Candidate Window wieder ausblenden
-                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION});
+                    const windowShrunk:boolean = targetStep.windowDelta < previousStep.windowDelta;
 
+                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
                     timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
+                    if(windowShrunk) {
 
-                    //Falls kleineres δ gefunden wurde, schrumpft das Active Window
-                    //timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
-                    timeline.to(activeArea, {
-                        attr: getActiveAreaAttrs(targetStep), opacity: 1, duration: 0.75, ease: "back.out(1.2)"});
+                        // geometrie des "alten" active windows als "ghost" zeigen
+                        timeline.set(activeAreaGhost, {
+                            attr: getActiveAreaAttrs(previousStep),
+                            opacity: 0.85
+                        });
 
-                    //Normalerweise bleibt pos gleich ... zur sicherheit trotzdem stezten
-                    timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                        //Falls kleineres δ gefunden wurde, schrumpft das "echte" Active Window
+                        //timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
+                        timeline.to(activeArea, {
+                            attr: getActiveAreaAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
+
+                        //Normalerweise bleibt pos gleich ... zur sicherheit trotzdem stezten
+                        timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION}, "<");
+
+                        // Zum vorher-nachher-Vergleich beide windows kurz stehen lassen.
+                        timeline.to({}, {duration: 0.35});
+
+                        //ghost entfernen
+                        timeline.to(activeAreaGhost, {opacity: 0, duration: 0.4, ease: "power1.out"});
+                    } else {
+                        //Kein neues kleineres δ gefunden, dann kein Ghost und fenster einfach "normal" weiterbewegen
+                        timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
+                        timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                    }
                     break;
                 }
 
@@ -219,6 +243,20 @@ export function Output(props: OutputProps) {
                 className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`}
                 preserveAspectRatio="xMidYMid meet"
             >
+                <rect
+                    ref={activeSweepAreaGhostRef}
+                    x={currentX - delta}
+                    y={PADDING}
+                    width={delta}
+                    height={props.height - 2 * PADDING}
+                    fill="none"
+                    stroke="rgba(90, 90, 90, 0.45)"
+                    strokeWidth={1}
+                    strokeDasharray="4 3"
+                    opacity={0}
+                    pointerEvents="none"
+                    rx={2}
+                />
                 <rect
                     ref={activeSweepAreaRef}
                     x={currentX - delta}
