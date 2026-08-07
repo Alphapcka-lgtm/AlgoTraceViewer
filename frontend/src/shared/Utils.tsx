@@ -46,7 +46,7 @@ export function getAlphabetLabel(i: number): string {
 /*
 alle vorhandenen lables werden überschrieben, sodass wenn nodes gelöscht wurden keine "beschriftungslücken"
 gibt. Das wird gemacht before die nodes ans backend geschicket werden...
-label werden nur für anzeige und explanations benuzt... deshalb gibt es noch node id
+label werden nur für anzeige und explanations benutzt... deshalb gibt es noch node id
  */
 export function assignLabels(nodes: Node[]): Node[] {
     return nodes.map((node, index) => ({...node, label: getAlphabetLabel(index)}));
@@ -107,6 +107,62 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
 };
 
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
+    {
+        id: "init",
+        text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
+    },
+    {
+        id: "init",
+        text: "initialize closestPair and δ using p[0] and p[1]"
+    },
+    {
+        id: "for-loop",
+        text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
+    },
+
+    {
+        id: "set-current",
+        text: "current ← p[i]", //"current = next point",
+        indent: 1
+    },
+
+    {
+        id: "remove-inactive",
+        text: "remove points outside the active window",
+        indent: 1
+    },
+
+    {
+        id: "candidate-window",
+        text: "select candidates with |current.y - p.y| < δ",
+        indent: 1
+    },
+
+    {
+        id: "check-distance",
+        text: "compare current with each candidate",
+        indent: 1
+    },
+
+    {
+        id: "update-best",
+        text: "if a closer pair is found: update closestPair and δ",
+        indent: 1
+    },
+
+    {
+        id: "insert-current",
+        text: "insert current into the active set",
+        indent: 1
+    },
+
+    {
+        id: "return",
+        text: "return closestPair and δ"
+    }
+];
+/*
+export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
 
     { id: "for-loop", text: "for each point current from left to right:" },
@@ -145,7 +201,7 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
 ];
 
 
-/*
+
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "sort", text: "xQueue = sortx(P)"},
     {id: "init-ytable", text: "yTable = [ ]"},

@@ -1,7 +1,7 @@
 import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, RingStyle, OutputProps} from "../shared/Types.tsx";
+import type {AlgorithmStepDTO, Node, RingStyle, OutputProps, RectAttrs, LineAttrs} from "../shared/Types.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
@@ -11,53 +11,56 @@ import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 0.9;
+const CANDIDATE_FADE_IN_DURATION = 0.7;
+const CANDIDATE_FADE_OUT_DURATION = 0.3;
+const CANDIDATE_AUTOPLAY_HOLD_DURATION = 1;
+const ACTIVE_WINDOW_SHRINK_DURATION = 0.75
 const PADDING = 1;
 
 export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const activeSweepWindowRef = useRef<SVGRectElement>(null);
+    const activeSweepAreaRef = useRef<SVGRectElement>(null);
+    const sweepLineRef = useRef<SVGLineElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
     const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
+    const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
+
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
         timelineRef.current.timeScale(speed);
     };
 
-    const getActiveRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.searchDelta;
-        return {
-            x: step.sweepLineX - searchDelta,
-            y: PADDING,
-            width: searchDelta,
-            height: props.height - 2 * PADDING
-        };
+    const getActiveAreaAttrs = (step: AlgorithmStepDTO ): RectAttrs => {
+        const currentX = step.currentPoint?.x ?? 0;
+        const delta = step.windowDelta;
+        return {x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING};
+    };
+
+    const getSweepLineAttrs = (step: AlgorithmStepDTO): LineAttrs=> {
+        const currentX = step.currentPoint?.x ?? 0;
+        return {x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
     };
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const searchDelta = step.searchDelta;
-        const currentY = step.currentPoint?.y ?? props.height / 2;
-        return {
-            x: step.sweepLineX - searchDelta,
-            y: currentY - searchDelta,
-            width: searchDelta,
-            height: searchDelta * 2,
-        };
+        const currentX = step.currentPoint?.x ?? 0;
+        const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
+
+        return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
 
-    const isShrinkStep = (step: AlgorithmStepDTO): boolean =>
-        step.pseudoCodeLineIds.includes("shrink-windows"); //dann das candidate window nicht zeigen
-
     const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
-        step.currentPoint !== null && !isShrinkStep(step);
+        step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
 
     useGSAP(() => {
-        if (!activeSweepWindowRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
-        const activeRect = activeSweepWindowRef.current;
+        if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
+        const activeArea = activeSweepAreaRef.current;
+        const activeAreaDifference = activeSweepAreaDifferenceRef.current;
+        const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
         timelineRef.current?.kill();
@@ -91,11 +94,10 @@ export function Output(props: OutputProps) {
         const firstStep: AlgorithmStepDTO = props.steps[0];
 
         //init state setzen
-        gsap.set(activeRect, {
-            attr: getActiveRectAttrs(firstStep),
-            opacity: firstStep.currentPoint !== null ? 1 : 0,
-        });
-
+        const showActiveElements = firstStep.currentPoint !== null && firstStep.stepType !== "FINISHED";
+        gsap.set(activeArea, {attr: getActiveAreaAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
+        gsap.set(activeAreaDifference, {opacity: 0}); //soll im "normalzustand" nie sichtbar sein
+        gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
         gsap.set(candidateRect, {
             attr: getCandidateRectAttrs(firstStep),
             opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0,
@@ -105,23 +107,89 @@ export function Output(props: OutputProps) {
         timeline.addLabel(myLabels[0]);
 
         //tweens hinzufügen:
-        props.steps.slice(1).forEach((step, index) => {
-            const stepIndex: number = index + 1;
-            const activeRectOpacity: number = step.currentPoint !== null ? 1 : 0;//beim final step die zwei rects ausblenden
-            const candidateRectOpacity: number = shouldShowCandidateWindow(step) ? 1 : 0;
+        props.steps.slice(1).forEach((targetStep, index) => {
+            const stepIndex = index + 1;
+            const previousStep = props.steps[stepIndex - 1];
 
-            timeline.to(activeRect, {
-                attr: getActiveRectAttrs(step),
-                opacity: activeRectOpacity,
-            });
+            switch (targetStep.stepType) {
+                case "INITIALIZATION": {
+                    timeline.to(activeArea, {
+                        attr: getActiveAreaAttrs(targetStep), opacity: targetStep.currentPoint ? 1 : 0});
+                    timeline.to(sweepLine, {
+                        attr: getSweepLineAttrs(targetStep), opacity: targetStep.currentPoint ? 1 : 0}, "<");
+                    timeline.to(candidateRect, {
+                        attr: getCandidateRectAttrs(targetStep), opacity: 0}, "<");
+                    break;
+                }
 
-            timeline.to(candidateRect, {
-                attr: getCandidateRectAttrs(step),
-                opacity: candidateRectOpacity,
-            }, "<");
+                case "ADVANCE_AND_PRUNE": {
+                    // altes Candidate Window ausblenden
+                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION});
+                    //Sweep Line und Active Window zum neuen current point bewegen
+                    timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
+                    timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                    // damit die animation einblenden besser aussieht, fährt es unsichtbar mit und so muss es bei CHECK_CANDIDATES nicht mehr bewegt werden
+                    timeline.to(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0}, "<");
+                    break;
+                }
 
-            // hier sollte der zustand vom einem step erreicht sein .... alle anderen labels setzen
-            timeline.addLabel(myLabels[stepIndex]);
+                case "CHECK_CANDIDATES": {
+                    //Candidate Window einblenden.
+                    timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_FADE_IN_DURATION, ease: "power1.inOut"});
+                    break;
+                }
+
+                case "COMMIT_ITERATION": {
+                    const windowShrunk:boolean = targetStep.windowDelta < previousStep.windowDelta;
+                    const oldWindow = getActiveAreaAttrs(previousStep);
+                    const newWindow = getActiveAreaAttrs(targetStep);
+                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
+                    timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
+                    if(windowShrunk) {
+                        //schraffur startet ohne breite
+                        timeline.set(activeAreaDifference, {
+                            attr: {x: oldWindow.x, y: oldWindow.y, width: 0, height: oldWindow.height}, opacity: 0.7});
+
+                        //Falls kleineres δ gefunden wurde, schrumpft das "echte" Active Window
+                        timeline.to(activeArea, {
+                            attr: newWindow, opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
+
+                        //währed das active window kleiner wird, wächst der schraffierte bereich mit, damit die differnz in größe gut sieht
+                        timeline.to(activeAreaDifference, {
+                            attr: {width: newWindow.x - oldWindow.x},
+                            duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"
+                        }, "<");
+
+                        //Normalerweise bleibt pos gleich ... zur sicherheit trotzdem stezten
+                        timeline.to(sweepLine, {attr:
+                                getSweepLineAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION}, "<");
+
+                        // kurz stehen lassen damit man den unterschied sehen kann
+                        timeline.to({}, {duration: 0.7});
+
+                        // Schraffur wieder entfernen
+                        timeline.to(activeAreaDifference, {opacity: 0, duration: 0.35, ease: "power1.out"});
+
+                    } else {
+                        //Kein kleineres δ gefunden -> fenster "normal" weiterbewegen
+                        timeline.to(activeArea, {attr: newWindow, opacity: 1});
+                        timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                    }
+                    break;
+                }
+
+                case "FINISHED": {
+                    timeline.to([activeArea, sweepLine, candidateRect], {opacity: 0});
+                    break;
+                }
+            }
+
+            timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
+
+            // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
+            if (targetStep.stepType === "CHECK_CANDIDATES") {
+                timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_AUTOPLAY_HOLD_DURATION, ease: "none"});
+            }
         });
 
         timelineRef.current = timeline; //store timeline in ref
@@ -144,14 +212,28 @@ export function Output(props: OutputProps) {
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
 
-    const candidatePointIds = new Set(step.candidatePairs.map((pair) => pair.p0.id));
+    const candidatePointIds = new Set(
+        step.stepType === "CHECK_CANDIDATES" ? step.candidateComparisons.map(comparison => comparison.candidate.id) : []
+    );
 
-    const legendenValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
+    const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
+
+    const getCandidateLegendValue = (step: AlgorithmStepDTO): string => {
+        if (step.currentPoint === null) return "—";
+        if (step.stepType !== "CHECK_CANDIDATES") return "Not part of this step";
+        if (step.candidateComparisons.length === 0) return "No candidates inside the candidate window";
+        return step.candidateComparisons.map(({candidate, distance}) =>
+                `dist(${step.currentPoint!.label}, ${candidate.label}) = ${distance.toFixed(2)}`
+            ).join(", ");
+    };
 
     //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
     // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
     const firstStep: AlgorithmStepDTO = props.steps[0];
+    const currentX = firstStep.currentPoint?.x ?? 0;
+    const currentY = firstStep.currentPoint?.y ?? props.height / 2;
+    const delta = firstStep.windowDelta;
 
     return (
         <div className="algorithm-panel">
@@ -162,36 +244,65 @@ export function Output(props: OutputProps) {
                 canSubmit={false}
             />
 
-            <svg
-                className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`}
-                preserveAspectRatio="xMidYMid meet"
-            >
+            <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
+
+                <defs>
+                    <pattern id="active-window-shrink-schraffur"
+                        width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                        <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(90, 90, 90, 0.99)" strokeWidth="1" strokeDasharray="4 2" strokeLinecap="round"/>
+                    </pattern>
+                </defs>
+
                 <rect
-                    ref={activeSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.searchDelta}
+                    ref={activeSweepAreaDifferenceRef}
+                    x={0}
                     y={PADDING}
-                    width={firstStep.searchDelta}
+                    width={0}
                     height={props.height - 2 * PADDING}
-                    fill="rgba(0, 0, 0, 0.02)"
-                    stroke="rgba(0, 0, 0, 0.75)"
-                    strokeWidth="2"
-                    //strokeDasharray="8 4"
-                    rx="2"
+                    fill="url(#active-window-shrink-schraffur)"
+                    opacity={0}
+                    pointerEvents="none"
+                />
+                <rect
+                    ref={activeSweepAreaRef}
+                    x={currentX - delta}
+                    y={PADDING}
+                    width={delta}
+                    height={props.height - 2 * PADDING}
+                    fill="rgba(90, 90, 90, 0.14)"
+                    stroke="none"
+                    opacity={0}
+                    pointerEvents="none"
+                    rx={2}
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={firstStep.sweepLineX - firstStep.searchDelta}
-                    y={(firstStep.currentPoint?.y ?? props.height / 2) - firstStep.searchDelta}
-                    width={firstStep.searchDelta}
-                    height={firstStep.searchDelta * 2}
-                    fill="rgba(255, 241, 255, 0.75)"
-                    stroke="rgba(204, 14, 119, 0.75)"
-                    strokeWidth="2"
+                    x={currentX - delta}
+                    y={currentY - delta}
+                    width={delta}
+                    height={delta * 2}
+                    fill="rgba(255,220,245,0.75)"
+                    stroke="rgb(204,14,119)"
+                    strokeWidth={0.6}
                     strokeDasharray="6 3"
-                    rx="5"
+                    rx={2}
+                    opacity={0}
+                    pointerEvents="none"
+                />
+                <line
+                    ref={sweepLineRef}
+                    x1={currentX}
+                    x2={currentX}
+                    y1={PADDING}
+                    y2={props.height - PADDING}
+                    stroke="rgba(0, 0, 0, 0.9)"
+                    strokeWidth={2}
+                    opacity={0}
+                    pointerEvents="none"
+                    strokeLinecap="round"
                 />
 
-                {step.allPoints.map((p: Node) => {
+                {props.steps[0].allPoints.map((p: Node) => { //step.allPoints.map()
                     const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
                     const isCandidate = candidatePointIds.has(p.id);
                     const isActive    = step.activePoints.some((a) => a.id === p.id);
@@ -208,11 +319,11 @@ export function Output(props: OutputProps) {
                     if (isProcessed) {
                         fill = "#aaaaaa";
                     }
-                    if (isCurrent) {
-                        fill = "black";
-                    }
                     if (isBest) {
                         fill = "#f5c45e";
+                    }
+                    if (isCurrent) {
+                        fill = "black";
                     }
                     const scale = isCurrent ? 1.2 : 1;
 
@@ -222,6 +333,20 @@ export function Output(props: OutputProps) {
 
                     return <XNodeWithCords key={p.id} node={p} fill={fill} scale={scale} ringStyle={ringStyle} />;
                 })}
+
+                {step.stepType === "CHECK_CANDIDATES" &&
+                    step.currentPoint && step.candidateComparisons.map(({candidate}) => (
+                        <line
+                            key={`${step.currentPoint!.id}-${candidate.id}`}
+                            className="candidate-comparison-line"
+                            x1={step.currentPoint!.x}
+                            y1={step.currentPoint!.y}
+                            x2={candidate.x}
+                            y2={candidate.y}
+                            pointerEvents="none"
+                        />
+                    ))
+                }
             </svg>
 
             <OutputControls
@@ -244,54 +369,50 @@ export function Output(props: OutputProps) {
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>Current δ:</strong> {step.searchDelta.toFixed(2)}</div>
-                    <div><strong>Current Point:</strong> {step.currentPoint?.label ?? "-"}</div>
+                    <div><strong>Window δ:</strong> {step.windowDelta.toFixed(2)}</div>
                     <div>
-                        <strong> Best Pair:{" "}</strong>
-                        {step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                        <strong>Closest pair Distance δ:</strong>{" "}
+                        {step.bestPair?.distance.toFixed(2) ?? "—"}
+                    </div>
+                    <LegendEntry
+                        label="Current Point: "
+                        value={step.currentPoint?.label ?? "—"}
+                        icon={<XNodeIcon fill="black" ringStyle="none" scale={1.4}/>}
+                    />
+                    <div>
+                        <LegendEntry
+                            label="Closest pair: "
+                            value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                            icon={<XNodeIcon fill="#f5c45e" ringStyle="none"/>}
+                        />
                     </div>
                     <div>
                         <LegendEntry
-                            label="Active Point: "
-                            value={legendenValue}
+                            label="Active Points: "
+                            value={activePointsLegendValue}
                             icon={<XNodeIcon fill="#555" ringStyle="active"/>}
                         />
-
-
                     </div>
 
-
-
                     <div>
-                        <strong>Candidates:</strong>{" "}
-                        <strong>Candidates:</strong>{" "}
-                        {step.currentPoint === null ? "—" : step.candidatePairs.length === 0 ? "No candidates" : step.candidatePairs
-                            .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                            .join("; ")
-                        }
-                        {/*step.currentPoint === null
-                            ? "—"
-                            : shouldShowCandidateWindow(step)
-                                ? "—"
-                                : step.candidatePairs.length === 0
-                                    ? "No candidates"
-                                    : step.candidatePairs
-                                        .map((res) => `dist(${res.p0.label}, ${res.p1.label}) = ${res.distance.toFixed(2)}`)
-                                        .join("; ")
-                        */}
+                        <LegendEntry
+                            label="Candidate comparisons: "
+                            value={getCandidateLegendValue(step)}
+                            icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
+                        />
                     </div>
                 </div>
             </div>
-
-            <ImportExportDialog
-                onImport={props.onImport}
-                createExportString={props.createExportString}
-            />
 
             <PseudoCodePanel
                 lines={SWEEP_LINE_PSEUDOCODE}
                 activeLineIds={step.pseudoCodeLineIds}
                 title={"Sweep Line PseudoCode"}
+            />
+
+            <ImportExportDialog
+                onImport={props.onImport}
+                createExportString={props.createExportString}
             />
 
         </div>

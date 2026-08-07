@@ -37,22 +37,35 @@ export type InputProps = {
     createExportString: () => string;
 };
 
-export interface Result {
+export interface PointPair {
     p0: Node;
     p1: Node;
     distance: number;
 }
 
+//Benötigt current Point nicht, da im DTO schon extra enthalten ist.
+export interface CandidateComparison {
+    candidate: Node;
+    distance: number;
+}
+
+export type SweepLineStepType =
+    | "INITIALIZATION"
+    | "ADVANCE_AND_PRUNE"
+    | "CHECK_CANDIDATES"
+    | "COMMIT_ITERATION"
+    | "FINISHED";
+
 export interface AlgorithmStepDTO {
+    stepType: SweepLineStepType;
     description: string;
     currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
-    sweepLineX: number;
-    delta: number; //neues bestes δ nach Kandidatensuche
-    searchDelta:number; //altes delta vor Kandidatensuche
+    windowDelta: number; //Delta used to draw the sweep windows in this snapshot.
     activePoints: Node[];
     allPoints: Node[];
-    bestPair: Result | null;
-    candidatePairs: Result[];
+    bestPair: PointPair | null;
+    candidateComparisons: CandidateComparison[];
+    removedPoints: Node[];
     processedPoints: Node[];
     futurePoints: Node[];
     pseudoCodeLineIds: string[];
@@ -91,4 +104,28 @@ export type XNodeProps = {
     fill: string;
     scale?: number;
     ringStyle?: RingStyle;
+};
+
+export type PointDisplayState = {
+    isCurrent: boolean;
+    isBest: boolean;
+    isProcessed: boolean;
+    isFuture: boolean;
+    isActive: boolean;
+    isCandidate: boolean;
+};
+
+
+export type RectAttrs = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+export type LineAttrs = {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
 };

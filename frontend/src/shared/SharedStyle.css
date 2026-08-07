@@ -1,0 +1,49 @@
+.controls-help-dialog {
+    position: relative;
+}
+
+.controls-help-dialog h2 {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+
+    color: var(--primary);
+}
+
+.controls-help-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    padding: 4px;
+
+    background: transparent;
+    color: var(--primary);
+
+    cursor: pointer;
+}
+
+.controls-help-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.controls-help-list > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.controls-help-list > div > svg {
+    flex: 0 0 24px;
+}
+
+.controls-help-list > div > span {
+    flex: 1;
+}

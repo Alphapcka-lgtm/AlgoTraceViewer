@@ -18,47 +18,17 @@ export function LegendEntry({ label, value, icon }: LegendEntryProps) {
     );
 }
 
-type CircleNodeIconProps = {
-    fill: string;
-    stroke?: string;
-};
-
-export function CircleNodeIcon({ fill, stroke = "black" }: CircleNodeIconProps) {
-    return (
-        <>
-            <circle cx={10} cy={10} r={10} fill={stroke} />
-            <circle cx={10} cy={10} r={8} fill={fill} />
-        </>
-    );
-}
-
-type EdgeIconProps = {
-    stroke: string;
-    strokeWidth?: number;
-};
-
-export function EdgeIcon({ stroke, strokeWidth = 2 }: EdgeIconProps) {
-    return (
-        <path
-            d="M 3 17 L 17 3"
-            stroke={stroke}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-        />
-    );
-}
-
 type XNodeIconProps = {
     fill: string;
     ringStyle?: RingStyle;
+    scale?: number;
 }
 
-export function XNodeIcon({fill, ringStyle = "none"}: XNodeIconProps) {
+export function XNodeIcon({fill, ringStyle = "none", scale=1}: XNodeIconProps) {
     const NODE_SIZE = 4;
     const RING_RADIUS = 9;
     return (
-        <g transform={`translate(${10}, ${10})`}>
+        <g transform={`translate(${10}, ${10}) scale(${scale})`}>
             {ringStyle !== "none" && (
                 <circle
                     cx={0}
@@ -78,6 +48,7 @@ export function XNodeIcon({fill, ringStyle = "none"}: XNodeIconProps) {
                 y2={NODE_SIZE}
                 stroke={fill}
                 strokeWidth={3}
+                strokeLinecap="round"
             />
 
             <line
@@ -87,6 +58,7 @@ export function XNodeIcon({fill, ringStyle = "none"}: XNodeIconProps) {
                 y2={NODE_SIZE}
                 stroke={fill}
                 strokeWidth={3}
+                strokeLinecap="round"
             />
         </g>
     );

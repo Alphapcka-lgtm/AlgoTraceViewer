@@ -1,4 +1,4 @@
-import type { Node, DynamicNodesProps, XNodeProps } from "./Types.tsx";
+import type {Node, DynamicNodesProps, XNodeProps} from "./Types.tsx";
 import { useState } from "react";
 
 export function DynamicNodes(props: DynamicNodesProps) {
@@ -28,7 +28,7 @@ export function XNodeWithCords({ node, fill, scale = 1, ringStyle = "none"}: XNo
     const [isHovering, setIsHovering] = useState(false);
 
     return (
-        <g onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+        <g data-point-id={node.id} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
             <XNode node={node} fill={fill} scale={scale} ringStyle={ringStyle} />
             {isHovering && (
                 <text

@@ -1,66 +1,107 @@
-import { useState } from "react";
-import {SwapInput} from "./input/Input.tsx";
-import {SwapOutput} from "./output/Output.tsx";
+import { useRef, useState } from "react";
+import { SwapInput } from "./input/Input.tsx";
+import { SwapOutput } from "./output/Output.tsx";
 import {type EhrlichSwapStepDTO, sendSwapInput} from "./Api.ts";
+import {extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
+import "./EhrlichStyle.css";
 
+const MAX_CELL_COUNT = 5;
 
-export default function EhrlichSwaps() {
-    const [modeState, setModeState] = useState("input");
-    const [values, setValues] = useState<string[]>([""]);
+export type SwapInputField = {
+    id: number;
+    value: string;
+};
+
+export default function EhrlichSwaps () {
+    const nextFieldId = useRef(1);
+    const [modeState, setModeState] = useState<"input" | "output">("input");
+    const [fields, setFields] = useState<SwapInputField[]>([{id: 0, value: ""}]);
+    const [submittedValues, setSubmittedValues] = useState<string[]>([]);
+    const [validationError, setValidationError] = useState<string | null>(null);
+
     const [ehrlichSwapsSteps, setEhrlichSwapsSteps] = useState<EhrlichSwapStepDTO[]>([]);
-
     const [currentStep, setCurrentStep] = useState(0);
-    const [progress, setProgress] = useState(0);    //für scrubber
+    const [progress, setProgress] = useState(0);
 
-    const addField = () => {
-        setValues((previousValues) => [...previousValues, ""]);
+    const createEmptyField = (): SwapInputField => {
+        const newField = {id: nextFieldId.current, value: ""};
+        nextFieldId.current += 1;
+        return newField;
     };
 
-    const removeLastField = () => {
-        setValues((previousValues) => {
-            if (previousValues.length <= 1) return previousValues;
-            return previousValues.slice(0, previousValues.length - 1);
+    const replaceFieldValue =
+        (fieldsToUpdate: SwapInputField[], fieldId: number, newValue: string): SwapInputField[] => {
+
+        return fieldsToUpdate.map((field) => {
+            if (field.id !== fieldId){
+                return field;
+            }
+            return {...field, value: newValue,};
         });
     };
 
-    const updateValue = (index: number, newValue: string) => {
-        setValues((previousValues) =>
-            previousValues.map((oldValue, currentIndex) =>
-                currentIndex === index ? newValue : oldValue
-            )
-        );
+    const appendEmptyField = (currentFields: SwapInputField[]): SwapInputField[] => {
+        const lastFieldIsFilled = currentFields[currentFields.length - 1].value.trim() !== "";
+        if (lastFieldIsFilled && currentFields.length < MAX_CELL_COUNT) {
+            return [...currentFields, createEmptyField()];
+        }
+        return currentFields;
     };
 
-    const handleSubmit  = async () => {
+    const updateFieldValue = (fieldId: number, newValue: string): void => {
+        setValidationError(null);
+        setFields((previousFields) => {
+            const updatedFields = replaceFieldValue(previousFields, fieldId, newValue);
+            return appendEmptyField(removeExtraEmptyFieldAtEnd(updatedFields));
+        });
+    };
+
+    const deleteField = (fieldId: number): void => {
+        setValidationError(null);
+
+        setFields((previousFields) => {
+            const remainingFields = previousFields.filter((field) => field.id !== fieldId);
+            if (remainingFields.length === 0) return [createEmptyField()];
+            const cleanedFields = removeExtraEmptyFieldAtEnd(remainingFields);
+            return appendEmptyField(cleanedFields);
+        });
+    };
+
+    const handleSubmit = async (): Promise<void> => {
+        setValidationError(null);
+        const enteredValues = extractEnteredValues(fields);
+        const validationMessage = validateValues(enteredValues);
+        if (validationMessage !== undefined) {
+            setValidationError(validationMessage);
+            return;
+        }
         setEhrlichSwapsSteps([]);
 
         try {
-            const response = await sendSwapInput(values);
-
-            console.log("swap result:", response);
-            console.log("is array:", Array.isArray(response));
-
+            const response = await sendSwapInput(enteredValues);
+            setSubmittedValues(enteredValues);
             setEhrlichSwapsSteps(response);
             setModeState("output");
+            setCurrentStep(0);
             setProgress(0);
         } catch (error) {
             console.error(error);
+            setValidationError("Input could be processed");
         }
     };
 
-    const handleChangeInput = () => {
-        setModeState("input");
-    };
-
+    const handleChangeInput = (): void => {setModeState("input");};
+    const canSubmit = extractEnteredValues(fields).length > 1;
 
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
                 <SwapInput
-                    values={values}
-                    onAddField={addField}
-                    onRemoveLastField={removeLastField}
-                    onUpdateValue={updateValue}
+                    fields={fields}
+                    canSubmit={canSubmit}
+                    validationError={validationError}
+                    onUpdateValue={updateFieldValue}
+                    onDeleteField={deleteField}
                     onSubmit={handleSubmit}
                     onChangeInput={handleChangeInput}
                 />
@@ -71,7 +112,7 @@ export default function EhrlichSwaps() {
     return (
         <div className="algorithm-shell">
             <SwapOutput
-                values={values}
+                values={submittedValues}
                 steps={ehrlichSwapsSteps}
                 onChangeInput={handleChangeInput}
                 currentStep={currentStep}
@@ -81,6 +122,4 @@ export default function EhrlichSwaps() {
             />
         </div>
     );
-
-
 }

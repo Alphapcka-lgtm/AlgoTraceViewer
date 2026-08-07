@@ -1,8 +1,18 @@
-
 import gsap from "gsap";
 import type {OutputControlsProps} from "./Types.tsx";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Play,
+    Pause,
+    RotateCcw,
+    SkipBack, Info,
+} from "lucide-react";
+import {useState} from "react";
+import { ControlsHelpDialog } from "./ControlsHelpDialog";
 
 export function OutputControls(props: OutputControlsProps) {
+    const [isHelpOpen, setIsHelpOpen] = useState(false);
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.labels.length - 1;
 
@@ -79,42 +89,58 @@ export function OutputControls(props: OutputControlsProps) {
     };
 
     return (
-        <div className="control-row">
-            <select
-                value={props.playbackSpeed}
-                onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
-                className="control-select"
-            >
-                <option value={0.5}>0.5x</option>
-                <option value={1}>1x</option>
-                <option value={2}>2x</option>
-            </select>
+        <>
+            <div className="control-row">
+                <button
+                    type="button"
+                    title="Controls explained"
+                    onClick={() => setIsHelpOpen(true)}
+                    className="control-button icon-only"
+                >
+                    <Info size={20}/>
+                </button>
+                <select
+                    value={props.playbackSpeed}
+                    onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
+                    className="control-select"
+                >
+                    <option value={0.5}>0.5x</option>
+                    <option value={1}>1x</option>
+                    <option value={2}>2x</option>
+                </select>
 
-            <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
-                <strong>←</strong>
-            </button>
+                <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">
+                    <ArrowLeft size={20}/>
+                </button>
 
-            <button onClick={togglePlay} className="control-button">
-                {props.isPlaying ? "⏸ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}
-            </button>
+                <button onClick={togglePlay} className="control-button">
+                    {props.isPlaying ? <Pause size={20}/> : isAtEnd ? <RotateCcw size={20}/> : <Play size={20}/> }
+                </button>
 
-            <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
-                <strong>→</strong>
-            </button>
+                <button title="Next" onClick={goNext} disabled={isAtEnd} className="control-button">
+                    <ArrowRight size={20}/>
+                </button>
 
-            <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">
-                ⏮
-            </button>
+                <button title="Reset" onClick={reset} disabled={isAtStart} className="control-button">
+                    <SkipBack size={20} />
+                </button>
 
-            <input
-                className="timeline-slider"
-                type="range"
-                min={0}
-                max={1}
-                step="any"
-                value={props.progress}
-                onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
-            />
-        </div>
+                <input
+                    className="timeline-slider"
+                    type="range"
+                    min={0}
+                    max={1}
+                    step="any"
+                    value={props.progress}
+                    onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
+                />
+            </div>
+
+            {isHelpOpen && (
+                <ControlsHelpDialog
+                    onClose={() => setIsHelpOpen(false)}
+                />
+            )}
+        </>
     );
 }

@@ -1,70 +1,59 @@
-import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-//import React from "react";
+import { IOModeTabs } from "../../shared/IOModeTabs.tsx";
+import type { SwapInputField } from "../EhrlichSwaps.tsx";
 
 type SwapInputProps = {
-    values: string[];
-    onAddField: () => void;
-    onRemoveLastField: () => void;
-    onUpdateValue: (index: number, newValue: string) => void;
+    fields: SwapInputField[];
+    canSubmit: boolean;
+    validationError: string | null;
+    onUpdateValue: (fieldId: number, newValue: string) => void;
+    onDeleteField: (fieldId: number,) => void;
     onSubmit: () => void;
     onChangeInput: () => void;
 };
 
-export function SwapInput(props: SwapInputProps) {
+const MIN_INPUT_LENGTH = 1;
+const MAX_INPUT_LENGTH = 6;
 
+export const SwapInput = (props: SwapInputProps) => {
     return (
         <div className="algorithm-panel">
             <IOModeTabs
                 mode="input"
                 onChangeInput={props.onChangeInput}
                 onSubmit={props.onSubmit}
-                canSubmit={props.values.length >= 1}
+                canSubmit={props.canSubmit}
             />
 
+            <div className="swap-input-fields">
+                {props.fields.map((field, index) => {
+                    const isEmptyLastField = index === props.fields.length - 1 && field.value.trim() === "";
+                    const inputLength = Math.max(MIN_INPUT_LENGTH, Math.min(field.value.length, MAX_INPUT_LENGTH));
+                    const className = isEmptyLastField ? "swap-input-cell swap-input-cell-empty" : "swap-input-cell";
+                    const title = isEmptyLastField ? "Enter a value" : "double click to delete";
 
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {props.values.map((value, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            width: 80,
-                            height: 55,
-                            border: "2px solid black",
-                            borderRadius: 10,
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            backgroundColor: "rgba(240, 240, 240, 0.8)",
-                        }}
-                    >
-                        <input
-                            value={value}
-                            onChange={(event) =>
-                                props.onUpdateValue(index, event.currentTarget.value)
-                            }
-                            style={{
-                                width: 60,
-                                border: "none",
-                                outline: "none",
-                                background: "transparent",
-                                textAlign: "center",
-                                fontFamily: "monospace",
-                                fontSize: 20,
-                            }}
-                        />
-                    </div>
-                ))}
+                    const handleDoubleClick = (): void => {
+                        if (!isEmptyLastField) props.onDeleteField(field.id);
+                    };
+
+                    return (
+                        <div key={field.id} className={className} title={title} onDoubleClick={handleDoubleClick}>
+                            <input
+                                value={field.value}
+                                size={inputLength}
+                                maxLength={MAX_INPUT_LENGTH}
+                                placeholder={isEmptyLastField ? "..." : ""}
+                                onChange={(event) => {
+                                    props.onUpdateValue(field.id, event.currentTarget.value);
+                                }}
+                            />
+                        </div>
+                    );
+                })}
             </div>
 
-            <div className="control-row">
-                <button className="control-button" type="button" onClick={props.onAddField}>
-                    +
-                </button>
-
-                <button className="control-button" type="button" onClick={props.onRemoveLastField} disabled={props.values.length <= 1}>
-                    -
-                </button>
-            </div>
+            {props.validationError !== null && (
+                <p className="swap-input-error" role="alert">{props.validationError}</p>
+            )}
         </div>
     );
-}
+};

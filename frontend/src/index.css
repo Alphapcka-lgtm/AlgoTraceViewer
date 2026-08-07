@@ -2,7 +2,7 @@
   /*
    * Global design tokens.
    * These values define the shared visual identity of the whole app.
-   * Component-specific layout belongs in App.css.
+   * Component-specific layout belongs in EhrlichStyle.css.
    */
   --background: #ffffff;
 
