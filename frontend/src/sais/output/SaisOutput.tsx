@@ -883,6 +883,7 @@ export function SaisOutput(props: SaisOutputProps) {
     const arrowXStart = 10 + 10 + props.output.reduced.length * cellWidth
     const arrowXEnd = 180 + props.output.reduced.length * cellWidth
     const arrowTextX = (arrowXStart + arrowXEnd) / 2
+    const arrowLen = 10;
 
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
@@ -892,6 +893,11 @@ export function SaisOutput(props: SaisOutputProps) {
         + props.output.guessInduceL.length
         + 1 // for the final guessed sa
         + props.output.lmsOrder.length
+        + 3 // +1 for reduced sa, +1 for arrow, +1 for sorted reduced sa
+        + 1 // for the placed lms
+        + props.output.saInduceL.length
+        + props.output.saInduceS.length
+        + props.output.sa.length
     );
 
     const changePlaybackSpeed = (speed: number) => {
@@ -972,16 +978,77 @@ export function SaisOutput(props: SaisOutputProps) {
         });
 
         // guessed suffix array
-        timeline.set("#s" + currentCounter, {opacity: 100});
-        timeline.set("#s" + (currentCounter - 1), {opacity: 0});
-        timeline.to("#s" + currentCounter, {opacity: 100}, "<");
-        timeline.addLabel(labels[currentCounter + 1]);
-        currentCounter++;
+        {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        }
 
         // lms names
         props.output.lmsOrder.forEach(() => {
             timeline.set("#s" + currentCounter, {opacity: 100});
             timeline.to("#s" + currentCounter, {drawSVG: "50% 50%"}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // display reduced stuff
+        // display reduced sa
+        {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        }
+
+        // display arrow
+        {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            // timeline.to("#s" + currentCounter, {opacity: 100, drawSVG: true}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        }
+
+        // display sorted reduced sa
+        {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        }
+
+        // lms placement after reduced sort
+        {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        }
+
+        // final l types induce
+        props.output.saInduceL.forEach(() => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // final s types induce
+        props.output.saInduceS.forEach(() => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.set("#s" + (currentCounter - 1), {opacity: 0});
+            timeline.to("#s" + currentCounter, {opacity: 100}, "<");
+            timeline.addLabel(labels[currentCounter + 1]);
+            currentCounter++;
+        });
+
+        // display each suffix individually
+        props.output.sa.forEach(() => {
+            timeline.set("#s" + currentCounter, {opacity: 100});
+            timeline.to("#s" + currentCounter, {duration: 0.2}, "<");
             timeline.addLabel(labels[currentCounter + 1]);
             currentCounter++;
         })
@@ -998,6 +1065,7 @@ export function SaisOutput(props: SaisOutputProps) {
     let yOffset = 180;
 
     const xOffsetLeftCol = 10;
+    const xOffsetRightCol = 600;
     const rowNameColWidth = 80;
 
     const guessesYOffset = 150;
@@ -1243,8 +1311,13 @@ export function SaisOutput(props: SaisOutputProps) {
                     }
                 </g>
 
-                {/* test reduced */}
-                <g id={"test_reduced"} key={"test_reduced"} transform={`translate(10, ${yOffset + 50})`}>
+                {/* reduced */}
+                <g
+                    id={"s" + counter}
+                    key={"s" + counter}
+                    transform={`translate(10, ${yOffset + 50})`}
+                    style={{opacity: 0}}
+                >
                     {
                         props.output.reduced.map((pos, index) => {
                             return (
@@ -1273,75 +1346,69 @@ export function SaisOutput(props: SaisOutputProps) {
                         })
                     }
                 </g>
+                {counter++}
 
-                {/* possible arrow */}
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                <g id="SVGRepo_iconCarrier">
-                    <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke="#000000" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                </g>
-
-                {/* reduced */}
-                <g id={"s" + counter} key={"s" + counter}>
-                    {props.output.reduced.map((pos, index) => {
-                        const y = 30;
-                        const x = 600;
-                        return <g key={index}>
-                            <rect
-                                x={x + index * 30}
-                                y={y}
-                                width={cellWidth}
-                                height={cellHeight}
-                                fill="white"
-                                stroke="black"
-                            />
-                            <text
-                                x={x + index * 30 + 15}
-                                y={y + 20}
-                                textAnchor="middle"
-                            >
-                                {pos}
-                            </text>
-                        </g>
-                    })
-                    }
+                {/* arrow */}
+                <g
+                    id={"s" + counter}
+                    key={"s" + counter}
+                    transform={`translate(${props.output.reduced.length * (cellWidth + 1) + 15}, ${yOffset + 53})`}
+                    style={{opacity: 0}}
+                >
+                    <path
+                        d={`M0 12H${20 + arrowLen}M${20 + arrowLen} 12L${16 + arrowLen} 8M${20 + arrowLen} 12L${16 + arrowLen} 16`}
+                        stroke="#000000"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
                 </g>
                 {counter++}
+
                 {/* reduced sorted */}
-                <g id={"s" + counter} key={"s" + counter}>
-                    {props.output.reducedSorted.map((pos, index) => {
-                        const y = 80;
-                        const x = 600;
-                        return <g key={index}>
-                            <rect
-                                x={x + index * 30}
-                                y={y}
-                                width={cellWidth}
-                                height={cellHeight}
-                                fill="white"
-                                stroke="black"
-                            />
-                            <text
-                                x={x + index * 30 + 15}
-                                y={y + 20}
-                                textAnchor="middle"
-                            >
-                                {pos}
-                            </text>
-                        </g>
-                    })
+                <g
+                    id={"s" + counter}
+                    key={"s" + counter}
+                    transform={`translate(${10 + props.output.reduced.length * (cellWidth + 1) + arrowLen + 35}, ${yOffset + 50})`}
+                    style={{opacity: 0}}
+                >
+                    {
+                        props.output.reducedSorted.map((pos, index) => {
+                            return (
+                                <g
+                                    id={"test_reduced_cell_" + index}
+                                    key={"test_reduced_cell_" + index}
+                                    transform={`translate(${cellWidth * index}, 0)`}
+                                >
+                                    <rect
+                                        x={0}
+                                        y={0}
+                                        width={cellWidth}
+                                        height={cellHeight}
+                                        fill="white"
+                                        stroke="black"
+                                    />
+                                    <text
+                                        x={cellWidth / 2}
+                                        y={cellHeight * 0.7}
+                                        textAnchor="middle"
+                                    >
+                                        {pos}
+                                    </text>
+                                </g>
+                            )
+                        })
                     }
                 </g>
                 {counter++}
+
                 {/* sa Slots */}
-                <g id={"s" + counter} key={"s" + counter}>
+                <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
                     {props.output.saLmsAdded.map((pos, index) => {
                         const y = 120;
-                        const x = 600;
-                        return <g key={index}>
+                        return <g key={"lms_slots_ele_" + index}>
                             <rect
-                                x={x + index * 30}
+                                x={xOffsetRightCol + index * 30}
                                 y={y}
                                 width={cellWidth}
                                 height={cellHeight}
@@ -1349,7 +1416,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                 stroke="black"
                             />
                             <text
-                                x={x + index * 30 + 15}
+                                x={xOffsetRightCol + index * 30 + 15}
                                 y={y + 20}
                                 textAnchor="middle"
                             >
@@ -1363,14 +1430,13 @@ export function SaisOutput(props: SaisOutputProps) {
 
                 {/* induce L-types final */}
                 {props.output.saInduceL.map((step, j) => {
-                    const x = 600;
-                    const y = 160;
+                    const y = 120;
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter} style={{opacity: 1}}>
+                            <g id={"final_l_induce_ele_" + index} key={"final_l_induce_ele_" + index}>
                                 <rect
-                                    x={x + index * 30}
+                                    x={xOffsetRightCol + index * 30}
                                     y={y}
                                     width={cellWidth}
                                     height={cellHeight}
@@ -1379,7 +1445,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     stroke="black"
                                 />
                                 <text
-                                    x={x + index * 30 + 15}
+                                    x={xOffsetRightCol + index * 30 + 15}
                                     y={y + 20}
                                     textAnchor="middle"
                                 >
@@ -1387,9 +1453,15 @@ export function SaisOutput(props: SaisOutputProps) {
                                 </text>
                             </g>
                         )
-                        counter++;
+                        // counter++;
                     }
-                    return elements
+                    const complete = (
+                        <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                            {elements}
+                        </g>
+                    )
+                    counter++;
+                    return complete
                 })}
 
                 {/* induce S-types final */}
@@ -1397,9 +1469,9 @@ export function SaisOutput(props: SaisOutputProps) {
                     const elements = [];
                     for (let index = 0; index < boxCount; index++) {
                         const x = 600;
-                        const y = 160;
+                        const y = 120;
                         elements.push(
-                            <g id={"s" + counter} key={"s" + counter}>
+                            <g id={"final_s_index_ele" + index} key={"final_s_index_ele" + index}>
                                 <rect
                                     x={x + index * 30}
                                     y={y}
@@ -1417,40 +1489,50 @@ export function SaisOutput(props: SaisOutputProps) {
                                 </text>
                             </g>
                         )
-                        counter++;
+                        // counter++;
                     }
-                    return elements;
+                    const complete = (
+                        <g id={"s" + counter} k={"s" + counter} style={{opacity: 0}}>
+                            {elements}
+                        </g>
+                    )
+                    counter++;
+                    return complete;
                 })}
                 {/* final suffix */}
-                {
-                    props.output.sa.map((offset, index) => {
-                        const x = 600;
-                        const y = 220;
-                        return <g id={"s" + counter} key={"s" + counter}>
-                            <text
-                                x={x}
-                                y={y + index * 30}
-                                textAnchor="start"
-                            >
-                                {index}
-                            </text>
-                            <text
-                                x={x + 30}
-                                y={y + index * 30}
-                                textAnchor="start"
-                            >
-                                {offset}
-                            </text>
-                            <text
-                                x={x + 60}
-                                y={y + index * 30}
-                                textAnchor="start"
-                            >
-                                {props.output.source.substring(offset)}
-                            </text>
-                        </g>
-                    })
-                }
+                <g id={"final_suffixes"}>
+                    {
+                        props.output.sa.map((offset, index) => {
+                            const y = 220;
+                            const group = (<g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
+                                    <text
+                                        x={xOffsetRightCol}
+                                        y={y + index * 30}
+                                        textAnchor="start"
+                                    >
+                                        {index}
+                                    </text>
+                                    <text
+                                        x={xOffsetRightCol + 30}
+                                        y={y + index * 30}
+                                        textAnchor="start"
+                                    >
+                                        {offset}
+                                    </text>
+                                    <text
+                                        x={xOffsetRightCol + 60}
+                                        y={y + index * 30}
+                                        textAnchor="start"
+                                    >
+                                        {props.output.source.substring(offset)}
+                                    </text>
+                                </g>
+                            );
+                            counter++;
+                            return group;
+                        })
+                    }
+                </g>
             </svg>
 
             {/* output control */}
@@ -1474,7 +1556,7 @@ export function SaisOutput(props: SaisOutputProps) {
                 </div>
             </div>
 
-            <text>{JSON.stringify(props.output)}</text>
+            {/*<text>{JSON.stringify(props.output)}</text>*/}
         </div>
     );
 
