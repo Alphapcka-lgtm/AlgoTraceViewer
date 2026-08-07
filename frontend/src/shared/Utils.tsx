@@ -46,7 +46,7 @@ export function getAlphabetLabel(i: number): string {
 /*
 alle vorhandenen lables werden überschrieben, sodass wenn nodes gelöscht wurden keine "beschriftungslücken"
 gibt. Das wird gemacht before die nodes ans backend geschicket werden...
-label werden nur für anzeige und explanations benuzt... deshalb gibt es noch node id
+label werden nur für anzeige und explanations benutzt... deshalb gibt es noch node id
  */
 export function assignLabels(nodes: Node[]): Node[] {
     return nodes.map((node, index) => ({...node, label: getAlphabetLabel(index)}));
@@ -127,7 +127,7 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     },
 
     {
-        id: "active-window-condition",
+        id: "remove-inactive",
         text: "remove points outside the active window",
         indent: 1
     },

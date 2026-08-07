@@ -37,25 +37,23 @@ export type InputProps = {
     createExportString: () => string;
 };
 
-interface PointPair {
+export interface PointPair {
     p0: Node;
     p1: Node;
     distance: number;
 }
 
 //Benötigt current Point nicht, da im DTO schon extra enthalten ist.
-interface CandidateComparison {
+export interface CandidateComparison {
     candidate: Node;
     distance: number;
 }
 
 export type SweepLineStepType =
     | "INITIALIZATION"
-    | "SELECT_CURRENT"
-    | "REMOVE_INACTIVE"
+    | "ADVANCE_AND_PRUNE"
     | "CHECK_CANDIDATES"
-    | "UPDATE_BEST"
-    | "INSERT_CURRENT"
+    | "COMMIT_ITERATION"
     | "FINISHED";
 
 export interface AlgorithmStepDTO {
@@ -115,4 +113,19 @@ export type PointDisplayState = {
     isFuture: boolean;
     isActive: boolean;
     isCandidate: boolean;
+};
+
+
+export type RectAttrs = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+export type LineAttrs = {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
 };
