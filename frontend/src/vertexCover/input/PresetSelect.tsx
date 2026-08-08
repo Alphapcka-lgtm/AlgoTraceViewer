@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import type {AnimationRequest} from "../shared/Types.tsx";
 
 type PresetSelectProps = {
@@ -10,16 +10,6 @@ export function PresetSelect(props: PresetSelectProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [presetName, setPresetName] = useState("");
     const [presets, setPresets] = useState<AnimationRequest[]>([]);
-
-    const openDialog = () => {
-        setPresetName("");
-        setDialogOpen(true);
-    };
-
-    const closeDialog = () => {
-        setDialogOpen(false);
-        setPresetName("");
-    };
 
     const fetchPresets = async () => {
         await fetch("http://localhost:8080/api/presets")
@@ -34,6 +24,20 @@ export function PresetSelect(props: PresetSelectProps) {
         });
     };
 
+    useEffect(() => {
+        void fetchPresets();
+    }, []);
+
+    const openDialog = () => {
+        setPresetName("");
+        setDialogOpen(true);
+    };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+        setPresetName("");
+    };
+
     const savePreset = async () => {
         const name = presetName.trim();
 
@@ -41,16 +45,12 @@ export function PresetSelect(props: PresetSelectProps) {
             return;
         }
 
-        console.log(name, presetName);
-
         await addPreset({...props.input, preset: name});
         await fetchPresets()
         closeDialog();
     };
 
     const canSave = presetName.trim().length > 0;
-
-    console.log(presets)
 
     return (
         <>

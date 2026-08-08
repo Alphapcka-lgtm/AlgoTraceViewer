@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class Graph {
 
     private final List<Node> nodes;
     private final List<Edge> edges;
+    @JsonIgnore
     private final Map<String, Node> map = new HashMap<>();
 
 
