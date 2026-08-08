@@ -19,25 +19,41 @@ export function LegendEntry({ label, value, icon }: LegendEntryProps) {
 }
 
 type XNodeIconProps = {
-    fill: string;
+    color: string;
     ringStyle?: RingStyle;
-    scale?: number;
-}
+    variant?: "default" | "current";
+};
 
-export function XNodeIcon({fill, ringStyle = "none", scale=1}: XNodeIconProps) {
+export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNodeIconProps) {
     const NODE_SIZE = 4;
     const RING_RADIUS = 9;
+    const CURRENT_MARKER_RADIUS = RING_RADIUS-1.25;
+
+    const DEFAULT_NODE_COLOR = "#222222";//"#555";
+    const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CANDIDATE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CURRENT_MARKER_COLOR = "#d55643";
+
     return (
-        <g transform={`translate(${10}, ${10}) scale(${scale})`}>
+        <g transform={`translate(10, 10)`}>
             {ringStyle !== "none" && (
                 <circle
                     cx={0}
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke={fill}
+                    stroke={ringStyle === "candidate" ? CANDIDATE_RING_COLOR : ACTIVE_RING_COLOR}
                     strokeWidth={2.5}
                     strokeDasharray={ringStyle === "candidate" ? "3 2" : undefined}
+                />
+            )}
+
+            {variant === "current" && (
+                <circle
+                    cx={0}
+                    cy={0}
+                    r={CURRENT_MARKER_RADIUS}
+                    fill={CURRENT_MARKER_COLOR}
                 />
             )}
 
@@ -46,7 +62,7 @@ export function XNodeIcon({fill, ringStyle = "none", scale=1}: XNodeIconProps) {
                 y1={-NODE_SIZE}
                 x2={NODE_SIZE}
                 y2={NODE_SIZE}
-                stroke={fill}
+                stroke={color}
                 strokeWidth={3}
                 strokeLinecap="round"
             />
@@ -56,7 +72,7 @@ export function XNodeIcon({fill, ringStyle = "none", scale=1}: XNodeIconProps) {
                 y1={-NODE_SIZE}
                 x2={-NODE_SIZE}
                 y2={NODE_SIZE}
-                stroke={fill}
+                stroke={color}
                 strokeWidth={3}
                 strokeLinecap="round"
             />

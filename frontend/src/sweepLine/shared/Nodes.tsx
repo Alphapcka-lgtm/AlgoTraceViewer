@@ -28,19 +28,21 @@ export function XNodeWithCords({node, registerNodeRefsInMap}: XNodeWithCordsProp
     const [isHovering, setIsHovering] = useState(false);
 
     const visualGroupRef = useRef<SVGGElement>(null);
-    const pointRef = useRef<SVGGElement>(null);
+    const nodeVisualRef = useRef<SVGGElement>(null);
+    const currentMarkerRef = useRef<SVGCircleElement>(null);
     const activeRingRef = useRef<SVGCircleElement>(null);
     const candidateRingRef = useRef<SVGCircleElement>(null);
 
     useLayoutEffect(() => {
         const group = visualGroupRef.current;
-        const point = pointRef.current;
+        const nodeVisual = nodeVisualRef.current;
+        const currentMarker = currentMarkerRef.current;
         const activeRing = activeRingRef.current;
         const candidateRing = candidateRingRef.current;
 
-        if (!group || !point || !activeRing ||!candidateRing) return;
+        if (!group || !nodeVisual || !currentMarker || !activeRing ||!candidateRing) return;
         //wenn nach rendern react die refs auf die echten svg-dom-elemente gesestzt hat, die in die map zu speichern
-        registerNodeRefsInMap?.(node.id, {group, point, activeRing, candidateRing});
+        registerNodeRefsInMap?.(node.id, {group, nodeVisual: nodeVisual, currentMarker, activeRing, candidateRing});
 
         return () => {registerNodeRefsInMap?.(node.id, null);}; //wenn punkt aus dom verschwindet ihn auch aus map entfernen
     }, [node.id, registerNodeRefsInMap]);
@@ -50,7 +52,8 @@ export function XNodeWithCords({node, registerNodeRefsInMap}: XNodeWithCordsProp
             <XNode
                 node={node}
                 visualGroupRef={visualGroupRef}
-                pointRef={pointRef}
+                currentMarkerRef={currentMarkerRef}
+                nodeVisualRef={nodeVisualRef}
                 activeRingRef={activeRingRef}
                 candidateRingRef={candidateRingRef}
             />
@@ -64,21 +67,26 @@ export function XNodeWithCords({node, registerNodeRefsInMap}: XNodeWithCordsProp
     );
 }
 
-export function XNode({node, visualGroupRef, pointRef, activeRingRef, candidateRingRef}: XNodeProps) {
+export function XNode({node, visualGroupRef, nodeVisualRef, currentMarkerRef, activeRingRef, candidateRingRef}: XNodeProps) {
     const NODE_SIZE = 4;
     const HITBOX_RADIUS = 3;
     const RING_RADIUS = 9;
 
+    const DEFAULT_NODE_COLOR = "#222222";//"#555";
+    const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CANDIDATE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CURRENT_MARKER_COLOR = "#d55643";
+
     return (
         <g transform={`translate(${node.x}, ${node.y})`}>
-            <g ref={visualGroupRef} color="black">
+            <g ref={visualGroupRef}>
                 <circle
                     ref={activeRingRef}
                     cx={0}
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke="currentColor"
+                    stroke={ACTIVE_RING_COLOR}
                     strokeWidth={2.5}
                     opacity={0}
                     pointerEvents="none"
@@ -89,7 +97,7 @@ export function XNode({node, visualGroupRef, pointRef, activeRingRef, candidateR
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke="currentColor"
+                    stroke={CANDIDATE_RING_COLOR}
                     strokeWidth={2.5}
                     strokeDasharray="3 2"
                     opacity={0}
@@ -102,7 +110,17 @@ export function XNode({node, visualGroupRef, pointRef, activeRingRef, candidateR
                     fill="transparent"
                     pointerEvents="all"
                 />
-                <g ref={pointRef} color="black">
+                <circle
+                    ref={currentMarkerRef}
+                    cx={0}
+                    cy={0}
+                    r={RING_RADIUS-1.25}
+                    fill={CURRENT_MARKER_COLOR}
+                    opacity={0}
+                    pointerEvents="none"
+                />
+                {/* farbe wird von gsap kontrolliert */}
+                <g ref={nodeVisualRef} color={DEFAULT_NODE_COLOR}>
                     <line
                         x1={-NODE_SIZE}
                         y1={-NODE_SIZE}

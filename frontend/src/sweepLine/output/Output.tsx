@@ -7,7 +7,7 @@ import type {
     OutputProps,
     RectAttrs,
     LineAttrs,
-    NodeRefs, NodeVisualState, NodeAppearance
+    NodeVisualRefs, NodeVisualState
 } from "../shared/Types.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
@@ -36,7 +36,7 @@ export function Output(props: OutputProps) {
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
-    const nodeRefsMap = useRef(new Map<string, NodeRefs>());
+    const nodeRefsMap = useRef(new Map<string, NodeVisualRefs>());
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -64,62 +64,64 @@ export function Output(props: OutputProps) {
     const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
         step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
 
-    const initializePointVisuals = (step: AlgorithmStepDTO) => {
-        step.allPoints.forEach(point => {
-            const refs = nodeRefsMap.current.get(point.id);
+    const isActiveRingVisible = (state: NodeVisualState): boolean => state.isActive && !state.isCandidate;
+
+    const initializeNodeVisuals = (step: AlgorithmStepDTO) => {
+        step.allPoints.forEach(node => {
+            const refs = nodeRefsMap.current.get(node.id);
             if (!refs) return;
+            const state = getNodeVisualState(step, node.id);
 
-            const state = getNodeVisualState(step, point.id);
-            const appearance = getPointAppearance(state);
-
-            gsap.set(refs.point, {color: appearance.color});
-            gsap.set(refs.activeRing, {opacity: appearance.showActiveRing ? 1 : 0});
-            gsap.set(refs.candidateRing, {opacity: appearance.showCandidateRing ? 1 : 0});
+            gsap.set(refs.nodeVisual, {color: getNodeColor(state)});
+            gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
+            gsap.set(refs.activeRing, {opacity: isActiveRingVisible(state) ? 1 : 0});
+            gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
         });
     };
 
-    const getNodeVisualState = (step: AlgorithmStepDTO, pointId: string): NodeVisualState => {
-        const isCurrent = step.currentPoint?.id === pointId; //step.currentPoint !== null && p.id === step.currentPoint.id;
+    const getNodeVisualState = (step: AlgorithmStepDTO, nodeId: string): NodeVisualState => {
+        const isCurrent = step.currentPoint?.id === nodeId; //step.currentPoint !== null && p.id === step.currentPoint.id;
         const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
-            step.candidateComparisons.some(({candidate}) => candidate.id === pointId);
-        const isActive = step.activePoints.some(point => point.id === pointId);
-        const isBest = step.bestPair?.p0.id === pointId ||step.bestPair?.p1.id === pointId;
-        const isProcessed = step.processedPoints.some(point => point.id === pointId);
-        const isFuture = step.futurePoints.some(point => point.id === pointId);
+            step.candidateComparisons.some(({candidate}) => candidate.id === nodeId);
+        const isActive = step.activePoints.some(point => point.id === nodeId);
+        const isBest = step.bestPair?.p0.id === nodeId ||step.bestPair?.p1.id === nodeId;
+        const isProcessed = step.processedPoints.some(point => point.id === nodeId);
+        const isFuture = step.futurePoints.some(point => point.id === nodeId);
         return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
     };
     //TODO: Ist wirklich sinvoll so? activ und candidate bekommen gleiche farbe
     const getNodeColor = (state: NodeVisualState): string => {
         if (state.isBest) return "#f5c45e";
-        if (state.isCurrent) return "#222222";
+        //if (state.isCurrent) return "#222222";
         if (state.isProcessed) return "#aaaaaa";
         if (state.isFuture) return "#cccccc";
-        return "#555";
+        return "#222222";//"#555";
     };
 
-    const getPointAppearance = (state: NodeVisualState): NodeAppearance => ({
-        color: getNodeColor(state),
-        showActiveRing: state.isActive && !state.isCandidate,
-        showCandidateRing: state.isCandidate,
-    });
-
     const animateNode = (
-        timeline: gsap.core.Timeline, refs: NodeRefs, previousState: NodeVisualState, targetState: NodeVisualState
+        timeline: gsap.core.Timeline, refs: NodeVisualRefs, previousState: NodeVisualState, targetState: NodeVisualState
     ) => {
-        const fromAppearance = getPointAppearance(previousState);
-        const toAppearance = getPointAppearance(targetState);
-
-        if (fromAppearance.color !== toAppearance.color) {
-            timeline.to(refs.point, {color: toAppearance.color, duration: 0.3, ease: "power1.inOut"}, "<");
+        const previousColor = getNodeColor(previousState);
+        const targetColor = getNodeColor(targetState);
+        if (previousColor !== targetColor) {
+            timeline.to(refs.nodeVisual, {color: targetColor, duration: 0.3, ease: "power1.inOut"}, "<");
         }
 
-        if (fromAppearance.showActiveRing !== toAppearance.showActiveRing) {
-            timeline.to(refs.activeRing, {
-                opacity: toAppearance.showActiveRing ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
+        if (previousState.isCurrent !== targetState.isCurrent) {
+            timeline.to(refs.currentMarker, {
+                opacity: targetState.isCurrent ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
             );
         }
 
-        if (fromAppearance.showCandidateRing !== toAppearance.showCandidateRing) {
+        const wasActiveRingVisible = isActiveRingVisible(previousState);
+        const isActiveRingVisibleNow = isActiveRingVisible(targetState);
+        if (wasActiveRingVisible !== isActiveRingVisibleNow) {
+            timeline.to(refs.activeRing, {
+                opacity: isActiveRingVisibleNow ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
+            );
+        }
+
+        if (previousState.isCandidate !== targetState.isCandidate) {
             timeline.to(refs.candidateRing,
                 {opacity: targetState.isCandidate ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
             );
@@ -128,17 +130,17 @@ export function Output(props: OutputProps) {
     const animateNodes = (
         timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO
     ) => {
-        targetStep.allPoints.forEach(point => {
-            const refs = nodeRefsMap.current.get(point.id);
+        targetStep.allPoints.forEach(node => {
+            const refs = nodeRefsMap.current.get(node.id);
             if (!refs) return;
 
-            const previousState = getNodeVisualState(previousStep, point.id);
-            const targetState = getNodeVisualState(targetStep, point.id);
+            const previousState = getNodeVisualState(previousStep, node.id);
+            const targetState = getNodeVisualState(targetStep, node.id);
             animateNode(timeline, refs, previousState, targetState);
         });
     };
 
-    const registerNodeRefsInMap = useCallback((nodeId: string, refs: NodeRefs | null) => {
+    const registerNodeRefsInMap = useCallback((nodeId: string, refs: NodeVisualRefs | null) => {
             if (refs) {
                 nodeRefsMap.current.set(nodeId, refs);
             } else { //wenn node aus DOM unmounted wird, dann aus map entfernen
@@ -191,7 +193,7 @@ export function Output(props: OutputProps) {
         gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
         gsap.set(candidateRect, {
             attr: getCandidateRectAttrs(firstStep), opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0});
-        initializePointVisuals(firstStep);  // Punktfarben und Ringe des ersten Steps setzen
+        initializeNodeVisuals(firstStep);  // Punktfarben und Ringe des ersten Steps setzen
 
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
@@ -428,7 +430,6 @@ export function Output(props: OutputProps) {
 
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div><strong>Window δ:</strong> {step.windowDelta.toFixed(2)}</div>
                     <div>
                         <strong>Closest pair Distance δ:</strong>{" "}
                         {step.bestPair?.distance.toFixed(2) ?? "—"}
@@ -436,20 +437,20 @@ export function Output(props: OutputProps) {
                     <LegendEntry
                         label="Current Point: "
                         value={step.currentPoint?.label ?? "—"}
-                        icon={<XNodeIcon fill="black" ringStyle="none" scale={1.4}/>}
+                        icon={<XNodeIcon color="#222222" variant="current"/>}
                     />
                     <div>
                         <LegendEntry
                             label="Closest pair: "
                             value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                            icon={<XNodeIcon fill="#f5c45e" ringStyle="none"/>}
+                            icon={<XNodeIcon color="#f5c45e" ringStyle="none"/>}
                         />
                     </div>
                     <div>
                         <LegendEntry
                             label="Active Points: "
                             value={activePointsLegendValue}
-                            icon={<XNodeIcon fill="#555" ringStyle="active"/>}
+                            icon={<XNodeIcon color="#222222" ringStyle="active"/>}
                         />
                     </div>
 
@@ -457,7 +458,7 @@ export function Output(props: OutputProps) {
                         <LegendEntry
                             label="Candidate comparisons: "
                             value={getCandidateLegendValue(step)}
-                            icon={<XNodeIcon fill="#555" ringStyle="candidate"/>}
+                            icon={<XNodeIcon color="#222222" ringStyle="candidate"/>}
                         />
                     </div>
                 </div>
