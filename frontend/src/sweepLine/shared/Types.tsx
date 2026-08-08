@@ -50,6 +50,7 @@ export interface CandidateComparison {
 }
 
 export type SweepLineStepType =
+    | "START" //zustand vor dem alg = step 0
     | "INITIALIZATION"
     | "ADVANCE_AND_PRUNE"
     | "CHECK_CANDIDATES"

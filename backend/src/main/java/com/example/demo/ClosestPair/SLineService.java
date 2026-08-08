@@ -17,6 +17,20 @@ public class SLineService {
 
         if (points == null || points.size() < 2) throw new IllegalArgumentException("There must be at least two points");
 
+        steps.add(new AlgorithmStepDTO(
+                SweepLineStepType.START,
+                "Input points. The algorithm has not started yet",
+                null,
+                0,
+                List.of(),
+                points,
+                null,
+                List.of(),
+                List.of(),
+                List.of(),
+                points
+        ));
+
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y).thenComparing(Point::id));
 

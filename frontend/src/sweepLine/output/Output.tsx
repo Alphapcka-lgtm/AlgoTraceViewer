@@ -66,23 +66,7 @@ export function Output(props: OutputProps) {
         return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
 
-    const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
-        step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
-
     const isActiveRingVisible = (state: NodeVisualState): boolean => state.isActive && !state.isCandidate;
-
-    const initializeNodeVisuals = (step: AlgorithmStepDTO) => {
-        step.allPoints.forEach(node => {
-            const refs = nodeRefsMap.current.get(node.id);
-            if (!refs) return;
-            const state = getNodeVisualState(step, node.id);
-
-            gsap.set(refs.nodeVisual, {color: getNodeColor(state)});
-            gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
-            gsap.set(refs.activeRing, {opacity: isActiveRingVisible(state) ? 1 : 0});
-            gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
-        });
-    };
 
     const getNodeVisualState = (step: AlgorithmStepDTO, nodeId: string): NodeVisualState => {
         const isCurrent = step.currentPoint?.id === nodeId; //step.currentPoint !== null && p.id === step.currentPoint.id;
@@ -189,16 +173,12 @@ export function Output(props: OutputProps) {
             }
         });
 
-        const firstStep: AlgorithmStepDTO = props.steps[0];
-
         //init state setzen
-        const showActiveElements = firstStep.currentPoint !== null && firstStep.stepType !== "FINISHED";
-        gsap.set(activeArea, {attr: getActiveAreaAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
-        gsap.set(activeAreaDifference, {opacity: 0}); //soll im "normalzustand" nie sichtbar sein
-        gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
-        gsap.set(candidateRect, {
-            attr: getCandidateRectAttrs(firstStep), opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0});
-        initializeNodeVisuals(firstStep);  // Punktfarben und Ringe des ersten Steps setzen
+        //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
+        gsap.set(activeArea, {opacity: 0});
+        gsap.set(activeAreaDifference, {opacity: 0});
+        gsap.set(sweepLine, {opacity: 0});
+        gsap.set(candidateRect, {opacity: 0});
 
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
@@ -209,12 +189,15 @@ export function Output(props: OutputProps) {
             const previousStep = props.steps[stepIndex - 1];
 
             switch (targetStep.stepType) {
+                case "START": {
+                    break; // Kann hier nie auftreten, weil START steps[0] ist.
+                }
                 case "INITIALIZATION": {
                     timeline.to(activeArea, {
-                        attr: getActiveAreaAttrs(targetStep), opacity: targetStep.currentPoint ? 1 : 0});
+                        attr: getActiveAreaAttrs(targetStep), opacity: 1});
                     timeline.to(sweepLine, {
-                        attr: getSweepLineAttrs(targetStep), opacity: targetStep.currentPoint ? 1 : 0}, "<");
-                    timeline.to(candidateRect, {
+                        attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                    timeline.set(candidateRect, { //TODO: oder .to ??
                         attr: getCandidateRectAttrs(targetStep), opacity: 0}, "<");
                     break;
                 }
@@ -233,6 +216,9 @@ export function Output(props: OutputProps) {
                 case "CHECK_CANDIDATES": {
                     //Candidate Window einblenden.
                     timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_FADE_IN_DURATION, ease: "power1.inOut"});
+
+                    // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
+                    timeline.to({}, {duration: CANDIDATE_AUTOPLAY_HOLD_DURATION});
                     break;
                 }
 
@@ -283,11 +269,6 @@ export function Output(props: OutputProps) {
             animateNodes(timeline, previousStep, targetStep);
 
             timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
-
-            // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
-            if (targetStep.stepType === "CHECK_CANDIDATES") {
-                timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_AUTOPLAY_HOLD_DURATION, ease: "none"});
-            }
         });
 
         timelineRef.current = timeline; //store timeline in ref
@@ -322,12 +303,14 @@ export function Output(props: OutputProps) {
             ).join(", ");
     };
 
-    //nicht mehr step direkt verwenden ... react setzt nur den startwert dann übernimmt gsap
-    // weil sont probleme gibt da react und gsap gleichzeitig dieselben svg attribute kontrollieren....
-    const firstStep: AlgorithmStepDTO = props.steps[0];
-    const currentX = firstStep.currentPoint?.x ?? 0;
-    const currentY = firstStep.currentPoint?.y ?? props.height / 2;
-    const delta = firstStep.windowDelta;
+    /*
+    steps[i] bzw. bei Label i = "stabiler Zustand", der bereits erreicht wurde
+        Bei Label i wird der Pseudocode von steps[i+1].stepType gehighlighted (was passiert wenn man auf next klickt)
+    Transition i->i+1 = steps[i+1].stepType wird ausgeführt/passiert visuell
+        Während der Transition i->i+1 wird weiterhin der Pseudocode von steps[i+1].stepType gehighlighted (was also gerade passiert)
+     */
+    const pseudoCodeStepIndex = Math.min(props.currentStep + 1, props.steps.length - 1);
+    const pseudoCodeStep = props.steps[pseudoCodeStepIndex];
 
     return (
         <div className="algorithm-panel">
@@ -359,9 +342,9 @@ export function Output(props: OutputProps) {
                 />
                 <rect
                     ref={activeSweepAreaRef}
-                    x={currentX - delta}
+                    x={0}
                     y={PADDING}
-                    width={delta}
+                    width={0}
                     height={props.height - 2 * PADDING}
                     fill="rgba(90, 90, 90, 0.14)"
                     stroke="none"
@@ -371,10 +354,10 @@ export function Output(props: OutputProps) {
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={currentX - delta}
-                    y={currentY - delta}
-                    width={delta}
-                    height={delta * 2}
+                    x={0}
+                    y={0}
+                    width={0}
+                    height={0}
                     fill="rgba(255,220,245,0.75)"
                     stroke="rgb(204,14,119)"
                     strokeWidth={0.6}
@@ -385,8 +368,8 @@ export function Output(props: OutputProps) {
                 />
                 <line
                     ref={sweepLineRef}
-                    x1={currentX}
-                    x2={currentX}
+                    x1={0}
+                    x2={0}
                     y1={PADDING}
                     y2={props.height - PADDING}
                     stroke="rgba(0, 0, 0, 0.9)"
@@ -434,7 +417,9 @@ export function Output(props: OutputProps) {
                     <div className="step-description"> {step.description} </div>
 
                     <div className="step-info-grid">
-                        <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
+                        {/*<div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>*/}
+                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
+
                         <div>
                             <strong>Closest pair Distance δ:</strong>{" "}
                             {step.bestPair?.distance.toFixed(2) ?? "—"}
@@ -453,7 +438,7 @@ export function Output(props: OutputProps) {
                         </div>
                         <div>
                             <LegendEntry
-                                label="Active Points: "
+                                label="Active Set: "
                                 value={activePointsLegendValue}
                                 icon={<XNodeIcon color="#222222" ringStyle="active"/>}
                             />
@@ -471,7 +456,7 @@ export function Output(props: OutputProps) {
 
                 <PseudoCodePanel
                     lines={SWEEP_LINE_PSEUDOCODE}
-                    activeLineIds={getActivePseudoCodeLineIds(step.stepType)}
+                    activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
                     title={"Sweep Line PseudoCode"}
                 />
             </div>
