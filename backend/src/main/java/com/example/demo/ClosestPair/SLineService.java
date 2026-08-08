@@ -60,7 +60,7 @@ public class SLineService {
                 List.of(),
                 new ArrayList<>(processedPoints),
                 getFuturePoints(xSorted, 1),
-                List.of("init") //List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
+                List.of("init")
         ));
 
         activePoints.add(p1);
@@ -94,8 +94,6 @@ public class SLineService {
                 advanceDescription = "Select " + current.label() + " as the current point. " + "No active points lie outside the active window so no had to be removed.";
             }
 
-            List<String> advanceLineIds = removalResult.removedAny() ? List.of("set-current", "remove-inactive") : List.of("set-current", "remove-inactive-none");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.ADVANCE_AND_PRUNE,
                     advanceDescription,
@@ -108,7 +106,7 @@ public class SLineService {
                     new ArrayList<>(removalResult.removedPoints()),
                     new ArrayList<>(processedPoints),
                     futurePoints,
-                    advanceLineIds//List.of("set-current", "remove-inactive") //List.of("set-current", "active-window-condition")
+                    List.of("set-current", "remove-inactive")
             ));
 
             //Candidate checking may find a smaller delta.
@@ -123,8 +121,6 @@ public class SLineService {
                     "No active points (points in yTable?) lie inside the candidate window."
                     : "Compared the distance from " + current.label() + " with every candidate point (" + comparedPoints + ") so every active point whose y-distance is smaller than δ";
 
-           List<String> candidateLineIds = candidateResult.candidateComparisons().isEmpty() ? List.of("candidate-window"): List.of("candidate-window", "check-distance");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.CHECK_CANDIDATES,
                     candidateDescription,
@@ -138,7 +134,7 @@ public class SLineService {
                     List.of(),
                     new ArrayList<>(processedPoints),
                     futurePoints,
-                    candidateLineIds //List.of("candidate-window", "check-distance")
+                    List.of("candidate-window", "check-distance")
             ));
 
             delta = deltaAfterCandidateCheck; //The smaller delta now becomes the new "search radius" for later points
@@ -156,11 +152,6 @@ public class SLineService {
                 commitDescription = "No candidate pair is closer. δ remains " + String.format("%.2f", delta) + ". " + current.label() + " ist now part of the active set";
             }
 
-            //List<String> commitLineIds = foundNewBest ? List.of("update-best", "insert-current") : List.of("update-best-false", "insert-current");
-            List<String> commitLineIds = foundNewBest
-                    ? List.of("update-best", "insert-current")
-                    : List.of("update-best-false", "insert-current");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.COMMIT_ITERATION,
                     commitDescription,
@@ -173,7 +164,7 @@ public class SLineService {
                     List.of(),
                     new ArrayList<>(processedPoints),
                     futurePoints,
-                    commitLineIds
+                    List.of("update-best", "insert-current")
             ));
 
         }

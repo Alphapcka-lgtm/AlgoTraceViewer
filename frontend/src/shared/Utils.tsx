@@ -108,52 +108,43 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
 
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {
-        id: "init",
-        text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
+        id: "init", text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
     },
     {
-        id: "init",
-        text: "initialize closestPair and δ using p[0] and p[1]"
+        id: "init", text: "initialize closestPair and δ using p[0] and p[1]"
     },
     {
-        id: "for-loop",
-        text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
+        id: "for-loop", text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
     },
 
     {
-        id: "set-current",
-        text: "current ← p[i]", //"current = next point",
+        id: "set-current", text: "current ← p[i]", //"current = next point",
         indent: 1
     },
 
     {
         id: "remove-inactive",
-        text: "remove points outside the active window",
-        indent: 1
+        text: "remove points outside the active window", indent: 1
     },
 
     {
         id: "candidate-window",
-        text: "select candidates with |current.y - p.y| < δ",
-        indent: 1
+        text: "select candidates with |current.y - p.y| < δ", indent: 1
     },
 
     {
         id: "check-distance",
-        text: "compare current with each candidate",
-        indent: 1
+        text: "compare current with each candidate", indent: 1
     },
 
     {
         id: "update-best",
-        text: "if a closer pair is found: update closestPair and δ",
-        indent: 1
+        text: "if a closer pair is found: update closestPair and δ", indent: 1
     },
 
     {
         id: "insert-current",
-        text: "insert current into the active set",
-        indent: 1
+        text: "insert current into the active set", indent: 1
     },
 
     {
