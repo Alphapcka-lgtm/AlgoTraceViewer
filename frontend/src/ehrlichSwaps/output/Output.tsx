@@ -28,7 +28,8 @@ const STEP_DURATION = 0.8;
 const SVG_WIDTH = 1920;
 const SVG_HEIGHT = 1080;
 
-const START_X = 140;  // X des linken Rands der ersten Box
+const ARRAY_START_X = 600;  // X des linken Rands der ersten Box
+const START_X = 140;
 const A_Y = 220;      // Y-Oberkante der a-Array-Zeile
 const B_Y = 560;      // Y-Oberkante der b-Array-Zeile
 
@@ -55,7 +56,7 @@ const ARC_LIFT_PER_SLOT = 25;
  * "Slot" = logische Position im Array (0, 1, 2, ...).
  */
 function slotX(slot: number): number {
-    return START_X + slot * (BOX_WIDTH + GAP);
+    return ARRAY_START_X + slot * (BOX_WIDTH + GAP);
 }
 
 /**
@@ -101,11 +102,9 @@ export function SwapOutput(props: SwapOutputProps) {
 
     const labels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
 
-    const maxK =  Math.max(1, ...props.steps.map(step => step.k));
+    const maxK =  props.values.length
 
     const kLabelDistance = Array.from({length: maxK-1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
-
-    console.log(kLabelDistance);
 
     const kGraph = useMemo(() => {
 
@@ -332,14 +331,34 @@ export function SwapOutput(props: SwapOutputProps) {
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 preserveAspectRatio="xMidYMid meet"
             >
-                <text x={START_X} y={A_Y - 50} fontSize="30" fontFamily="monospace">a (input)</text>
-                <text x={START_X} y={B_Y - 50} fontSize="30" fontFamily="monospace">b (swap-Tabelle)</text>
+                <text x={START_X} y={A_Y + BOX_HEIGHT / 2} fontSize="30" fontFamily="monospace">a (input)</text>
+                <text x={START_X} y={B_Y + BOX_HEIGHT / 2} fontSize="30" fontFamily="monospace">b (swap-Tabelle)</text>
 
-                {/* ── Array a ────────────────────────────────────────────────
-                 *  Einmalig gerendert. GSAP bewegt die <g>-Elemente via Transform.
-                 *  Box "a-{i}" hat immer ihren Ursprung bei slotX(i) / A_Y –
-                 *  der GSAP-Transform ist der Offset relativ dazu.
-                 */}
+                {Array.from({length: props.values.length}, (_, i) => (
+                    <>
+                        <text
+                            x={ARRAY_START_X + i * (BOX_WIDTH + GAP) + BOX_WIDTH / 2}
+                            y={A_Y - 12}
+                            textAnchor="middle"
+                            fontSize="22"
+                            fontFamily="monospace"
+                            fill="#999"
+                        >
+                            {i}
+                        </text>
+                        <text
+                            x={ARRAY_START_X + i * (BOX_WIDTH + GAP) + BOX_WIDTH / 2}
+                            y={B_Y - 12}
+                            textAnchor="middle"
+                            fontSize="22"
+                            fontFamily="monospace"
+                            fill="#999"
+                        >
+                            {i}
+                        </text>
+                    </>
+                ))}
+
                 {initialA.slice(0, count).map((value, i) => (
                     <g key={`a-${i}`} ref={el => { aRefs.current[i] = el; }}>
                         <rect
@@ -347,13 +366,6 @@ export function SwapOutput(props: SwapOutputProps) {
                             width={BOX_WIDTH} height={BOX_HEIGHT}
                             stroke="black" strokeWidth="3" fill="white" rx="10"
                         />
-                        {/* Index-Label bewegt sich mit der Box */}
-                        <text
-                            x={slotX(i) + BOX_WIDTH / 2} y={A_Y - 12}
-                            textAnchor="middle" fontSize="22" fontFamily="monospace" fill="#999"
-                        >
-                            {i}
-                        </text>
                         <text
                             x={slotX(i) + BOX_WIDTH / 2} y={A_Y + BOX_HEIGHT / 2}
                             textAnchor="middle" dominantBaseline="central"
@@ -364,10 +376,6 @@ export function SwapOutput(props: SwapOutputProps) {
                     </g>
                 ))}
 
-                {/* ── Array b ────────────────────────────────────────────────
-                 *  b startet als [0, 1, 2, ..., n-1].
-                 *  initialB enthält diese Werte als Zahlen.
-                 */}
                 {initialB.slice(0, count).map((value, i) => (
                     <g key={`b-${i}`} ref={el => { bRefs.current[i] = el; }}>
                         <rect
@@ -375,12 +383,6 @@ export function SwapOutput(props: SwapOutputProps) {
                             width={BOX_WIDTH} height={BOX_HEIGHT}
                             stroke="black" strokeWidth="3" fill="white" rx="10"
                         />
-                        <text
-                            x={slotX(i) + BOX_WIDTH / 2} y={B_Y - 12}
-                            textAnchor="middle" fontSize="22" fontFamily="monospace" fill="#999"
-                        >
-                            {i}
-                        </text>
                         <text
                             x={slotX(i) + BOX_WIDTH / 2} y={B_Y + BOX_HEIGHT / 2}
                             textAnchor="middle" dominantBaseline="central"
@@ -461,8 +463,7 @@ export function SwapOutput(props: SwapOutputProps) {
                     })}
 
                     {kGraph.coordinates.length > 0 && (() => {
-                        const current =
-                            kGraph.coordinates[kGraph.coordinates.length - 1];
+                        const current = kGraph.coordinates[kGraph.coordinates.length - 1];
 
                         return (
                             <>
@@ -472,7 +473,6 @@ export function SwapOutput(props: SwapOutputProps) {
                                     r={8}
                                     fill="black"
                                 />
-
                                 <text
                                     x={current.x + 40}
                                     y={current.y}
