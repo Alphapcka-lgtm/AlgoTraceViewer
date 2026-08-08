@@ -9,32 +9,37 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PresetService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Path file = Paths.get("data/vertexCoverPresets.json");
+    private final Path file = Paths.get("data/presets.json");
 
-    public Map<String, AnimationRequest> readAll() {
+    public List<AnimationRequest> readAll() {
         if (!Files.exists(file)) {
-            return new HashMap<>();
+            return new ArrayList<>();
         }
 
         return objectMapper.readValue(file.toFile(), new TypeReference<>() {});
     }
 
-    public void writeAll(Map<String, AnimationRequest> presets) throws IOException {
+    public void writeAll(List<AnimationRequest> presets) throws IOException {
         Files.createDirectories(file.getParent());
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), presets);
     }
 
     public AnimationRequest add(AnimationRequest request) throws IOException {
-        Map<String, AnimationRequest> presets = readAll();
-        presets.put(request.preset(), request);
-        writeAll(presets);
+        List<AnimationRequest> presets = readAll();
+        List<AnimationRequest> newPresets = new ArrayList<>(List.of(request));
+        if (presets.stream().anyMatch(p -> p.preset().equals(request.preset()))){
+            newPresets.addAll(presets.stream().filter(p -> !p.preset().equals(request.preset())).toList());
+        } else {
+            newPresets.addAll(presets);
+        }
+        writeAll(newPresets);
         return request;
     }
 }
