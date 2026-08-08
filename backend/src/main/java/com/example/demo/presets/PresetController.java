@@ -24,7 +24,7 @@ public class PresetController {
     }
 
     @GetMapping
-    public List<AnimationRequest> getItems() throws IOException {
+    public List<AnimationRequest> getItems() {
         return service.readAll();
     }
 

@@ -34,8 +34,8 @@ public class PresetService {
     public AnimationRequest add(AnimationRequest request) throws IOException {
         List<AnimationRequest> presets = readAll();
         List<AnimationRequest> newPresets = new ArrayList<>(List.of(request));
-        if (presets.stream().anyMatch(p -> p.preset().equals(request.preset()))){
-            newPresets.addAll(presets.stream().filter(p -> !p.preset().equals(request.preset())).toList());
+        if (presets.stream().anyMatch(p -> p.getPresetName().equals(request.getPresetName()))){
+            newPresets.addAll(presets.stream().filter(p -> !p.getPresetName().equals(request.getPresetName())).toList());
         } else {
             newPresets.addAll(presets);
         }

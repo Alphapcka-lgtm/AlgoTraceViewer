@@ -29,4 +29,19 @@ public class Graph {
     public Node getNodeById(String id) {
         return map.get(id);
     }
+
+    public static Graph getShortenedIdGraph(Graph graph) {
+        Map<String, String> idMap = new HashMap<>();
+        graph.getNodes().forEach(node -> idMap.put(node.id(), node.label()));
+
+        List<Node> nodes = graph.getNodes().stream().map(n -> new Node(n.x(), n.y(), idMap.get(n.id()), n.label())).toList();
+
+        List<Edge> edges = graph.getEdges().stream().map(e -> {
+            String newFromId = idMap.get(e.fromId());
+            String newToId = idMap.get(e.toId());
+            return new Edge(newFromId, newToId, newFromId + "-" + newToId);
+        }).toList();
+
+        return new Graph(nodes, edges);
+    }
 }
