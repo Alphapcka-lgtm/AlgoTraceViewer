@@ -1,7 +1,6 @@
 package com.example.demo.vertexCover;
 
 import com.example.demo.model.Edge;
-import com.example.demo.model.Graph;
 import com.example.demo.model.Node;
 import com.example.demo.model.NodeDegreePair;
 import org.springframework.stereotype.Service;
@@ -19,24 +18,26 @@ public class MaxDegreeVertexCover {
         }
     };
 
-    public AnimationResponse solve(Graph graph, List<String> order) {
+    public AnimationResponse solve(AnimationRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
+        List<String> nodeOrder = new ArrayList<>();
 
-        if (order.isEmpty()) {
-            order.addAll(graph.getEdges().stream().map(Edge::id).toList());
-            Collections.shuffle(order);
+        if (Objects.isNull(request.nodeOrder()) || request.nodeOrder().isEmpty()) {
+            nodeOrder.addAll(request.graph().getNodes().stream().map(Node::id).toList());
+            Collections.shuffle(nodeOrder);
+        } else {
+            nodeOrder.addAll(request.nodeOrder());
         }
 
-        OrderComparator comparator = new OrderComparator(order);
-
-        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
+        OrderComparator comparator = new OrderComparator(nodeOrder);
+        List<Edge> remainingEdges = new ArrayList<>(request.graph().getEdges());
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
-        graph.getEdges().forEach(edge -> {
-            neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.getOrDefault(graph.getNodeById(edge.fromId()), 0) + 1);
-            neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.getOrDefault(graph.getNodeById(edge.toId()), 0) + 1);
+        request.graph().getEdges().forEach(edge -> {
+            neighbourCount.put(request.graph().getNodeById(edge.fromId()), neighbourCount.getOrDefault(request.graph().getNodeById(edge.fromId()), 0) + 1);
+            neighbourCount.put(request.graph().getNodeById(edge.toId()), neighbourCount.getOrDefault(request.graph().getNodeById(edge.toId()), 0) + 1);
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
@@ -54,8 +55,8 @@ public class MaxDegreeVertexCover {
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> {
                 if (edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())) {
-                    neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.get(graph.getNodeById(edge.fromId())) - 1);
-                    neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.get(graph.getNodeById(edge.toId())) - 1);
+                    neighbourCount.put(request.graph().getNodeById(edge.fromId()), neighbourCount.get(request.graph().getNodeById(edge.fromId())) - 1);
+                    neighbourCount.put(request.graph().getNodeById(edge.toId()), neighbourCount.get(request.graph().getNodeById(edge.toId())) - 1);
                     return true;
                 }
                 return false;
@@ -76,8 +77,9 @@ public class MaxDegreeVertexCover {
             );
         }
         return AnimationResponse.builder()
-                .initialState(graph)
-                .order(order)
+                .initialState(request.graph())
+                .nodeOrder(nodeOrder)
+                .edgeOrder(request.edgeOrder())
                 .initialDegreeMap(initialDegreePairs)
                 .intermediateStates(intermediateStates)
                 .timestamp(System.currentTimeMillis())

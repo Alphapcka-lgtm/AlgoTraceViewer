@@ -11,38 +11,38 @@ import java.util.stream.IntStream;
 @Service
 public class OptimalVertexCover {
 
-    public AnimationResponse solve(Graph graph) {
+    public AnimationResponse solve(AnimationRequest request) {
         final long optimalSubset;
-        Map<String, List<String>> incidentMap = graph.getNodes().stream().collect(Collectors.toMap(Node::id, (node) -> new ArrayList<>()));
-        graph.getEdges().forEach(edge -> {
-            incidentMap.get(edge.fromId()).add(edge.id());
-            incidentMap.get(edge.toId()).add(edge.id());
+        Map<String, List<String>> incidenceMap = request.graph().getNodes().stream().collect(Collectors.toMap(Node::id, (node) -> new ArrayList<>()));
+        request.graph().getEdges().forEach(edge -> {
+            incidenceMap.get(edge.fromId()).add(edge.id());
+            incidenceMap.get(edge.toId()).add(edge.id());
         });
 
-        long k = Math.ceilDiv(graph.getEdges().size(), graph.getNodes().size());
-        while(k < graph.getNodes().size()) {
+        long k = Math.ceilDiv(request.graph().getEdges().size(), request.graph().getNodes().size());
+        while(k < request.graph().getNodes().size()) {
 
-            Iterator<Long> it = getSubsetIterator(graph.getNodes().size(), k);
+            Iterator<Long> it = getSubsetIterator(request.graph().getNodes().size(), k);
 
             while (it.hasNext()) {
 
                 long subset = it.next();
                 HashSet<String> covered = new HashSet<>();
 
-                IntStream.range(0, graph.getNodes().size()).forEach(index -> {
+                IntStream.range(0, request.graph().getNodes().size()).forEach(index -> {
                     if (((1L << index) & subset) != 0) {
-                        covered.addAll(incidentMap.get(graph.getNodes().get(index).id()));
+                        covered.addAll(incidenceMap.get(request.graph().getNodes().get(index).id()));
                     }
                 });
 
-                if(covered.size() == graph.getEdges().size()) {
+                if(covered.size() == request.graph().getEdges().size()) {
                     optimalSubset =  subset;
 
                     return AnimationResponse.builder()
                             .initialState(
-                                    new Graph(IntStream.range(0, graph.getNodes().size())
+                                    new Graph(IntStream.range(0, request.graph().getNodes().size())
                                             .filter(index -> ((1L << index) & optimalSubset) != 0)
-                                            .mapToObj(graph.getNodes()::get).toList(), List.of()))
+                                            .mapToObj(request.graph().getNodes()::get).toList(), List.of()))
                             .intermediateStates(List.of())
                             .build();
                 }

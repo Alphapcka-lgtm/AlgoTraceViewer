@@ -1,9 +1,7 @@
 package com.example.demo.vertexCover;
 import com.example.demo.model.Identifiable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class OrderComparator {
@@ -15,7 +13,17 @@ public class OrderComparator {
     }
 
     public int compare(Identifiable o1, Identifiable o2) {
-        return map.get(o1.id()).compareTo(map.get(o2.id()));
+        if(o1 == null){
+            return 1;
+        } else if(o2 == null){
+            return -1;
+        } else if (!map.containsKey(o1.id())){
+            return 1;
+        } else if (!map.containsKey(o2.id())){
+            return -1;
+        } else {
+            return map.get(o1.id()).compareTo(map.get(o2.id()));
+        }
     }
 
 }
