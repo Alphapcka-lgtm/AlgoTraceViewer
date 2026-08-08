@@ -27,7 +27,8 @@ export type EdgesProps = {
 
 export type AnimationResponse = {
     initialState: Graph,
-    order: string[],
+    nodeOrder: string[],
+    edgeOrder: string[],
     initialDegreeMap: NodeDegreePair[]
     intermediateStates: AnimationState[],
     timestamp: number,
@@ -47,7 +48,8 @@ type NodeDegreePair = {
 
 export type AnimationRequest = {
     graph: Graph,
-    order: string[],
+    nodeOrder: string[],
+    edgeOrder: string[],
     densityFactor: number,
     preset: string,
     timestamp: number,

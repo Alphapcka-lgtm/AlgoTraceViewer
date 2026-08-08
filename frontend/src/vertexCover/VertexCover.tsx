@@ -14,7 +14,8 @@ export function VertexCover() {
 
     const [input, setInput] = useState<AnimationRequest>({
         graph: {nodes: [], edges: []},
-        order: [],
+        nodeOrder: [],
+        edgeOrder: [],
         densityFactor: 0.2,
         preset: "custom",
         timestamp: 0
@@ -22,7 +23,8 @@ export function VertexCover() {
 
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
-        order: [],
+        nodeOrder: [],
+        edgeOrder: [],
         intermediateStates: [],
         initialDegreeMap: [],
         timestamp: 0
@@ -51,7 +53,7 @@ export function VertexCover() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInput({...input, order: output.order, timestamp: output.timestamp});
+                setInput({...input, nodeOrder: output.nodeOrder, edgeOrder: output.edgeOrder, timestamp: output.timestamp});
                 setOutput(output);
             });
     };

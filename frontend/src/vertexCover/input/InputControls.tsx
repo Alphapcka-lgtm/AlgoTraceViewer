@@ -2,7 +2,7 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import type {InputControlProps} from "../shared/Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
-import {presets} from "./Presets.tsx";
+import {PresetSelect} from "./PresetSelect.tsx";
 
 export function InputControls(props: InputControlProps) {
 
@@ -15,6 +15,8 @@ export function InputControls(props: InputControlProps) {
                 ...input,
                 densityFactor: density.valueAsNumber,
                 graph: graph,
+                nodeOrder: [],
+                edgeOrder: [],
                 preset: "random",
                 timestamp: Date.now()
             };
@@ -37,24 +39,7 @@ export function InputControls(props: InputControlProps) {
             <button onClick={resetInput} className="control-button" style={{flex: 13}}>Reset</button>
         </div>
         <div className="control-row">
-            <select
-                className="control-select"
-                style={{flex: 1}}
-                value={props.input.preset}
-                onChange={(e) => {
-                    const selected = e.target.value;
-                    if (selected === "random") {
-                        setRandomGraph();
-                    } else if (selected !== "custom") {
-                        const importString = presets.filter(preset => preset.name === selected)[0].importString;
-                        props.onImport(importString);
-                    }
-                }}
-            >
-                {presets.map((preset, index) => <option key={index} value={preset.name}>{preset.name}</option>)}
-                <option value="random">random</option>
-                <option value="custom">custom</option>
-            </select>
+            <PresetSelect input={props.input} setInput={props.setInput}/>
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
                 <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}
