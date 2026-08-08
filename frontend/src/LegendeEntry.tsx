@@ -32,7 +32,7 @@ export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNod
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
     const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
     const CANDIDATE_RING_COLOR = DEFAULT_NODE_COLOR;
-    const CURRENT_MARKER_COLOR = "#d55643";
+    const CURRENT_MARKER_COLOR = "#F25C54";
 
     return (
         <g transform={`translate(10, 10)`}>

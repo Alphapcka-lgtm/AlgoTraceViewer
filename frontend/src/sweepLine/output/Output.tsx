@@ -20,7 +20,7 @@ import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
 const STEP_DURATION = 0.9;
 const CANDIDATE_FADE_IN_DURATION = 0.7;
 const CANDIDATE_FADE_OUT_DURATION = 0.3;
-const CANDIDATE_AUTOPLAY_HOLD_DURATION = 1;
+const CANDIDATE_AUTOPLAY_HOLD_DURATION = 2;
 const ACTIVE_WINDOW_SHRINK_DURATION = 0.75
 const PADDING = 1;
 
@@ -424,51 +424,52 @@ export function Output(props: OutputProps) {
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
+            <div className="step-layout">
+                <div className="step-info">
+                    <div className="step-description"> {step.description} </div>
 
-            <div className="step-info">
-                <div className="step-description"> {step.description} </div>
+                    <div className="step-info-grid">
+                        <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
+                        <div>
+                            <strong>Closest pair Distance δ:</strong>{" "}
+                            {step.bestPair?.distance.toFixed(2) ?? "—"}
+                        </div>
+                        <LegendEntry
+                            label="Current Point: "
+                            value={step.currentPoint?.label ?? "—"}
+                            icon={<XNodeIcon color="#222222" variant="current"/>}
+                        />
+                        <div>
+                            <LegendEntry
+                                label="Closest pair: "
+                                value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
+                                icon={<XNodeIcon color="#f5c45e" ringStyle="none"/>}
+                            />
+                        </div>
+                        <div>
+                            <LegendEntry
+                                label="Active Points: "
+                                value={activePointsLegendValue}
+                                icon={<XNodeIcon color="#222222" ringStyle="active"/>}
+                            />
+                        </div>
 
-                <div className="step-info-grid">
-                    <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
-                    <div>
-                        <strong>Closest pair Distance δ:</strong>{" "}
-                        {step.bestPair?.distance.toFixed(2) ?? "—"}
-                    </div>
-                    <LegendEntry
-                        label="Current Point: "
-                        value={step.currentPoint?.label ?? "—"}
-                        icon={<XNodeIcon color="#222222" variant="current"/>}
-                    />
-                    <div>
-                        <LegendEntry
-                            label="Closest pair: "
-                            value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                            icon={<XNodeIcon color="#f5c45e" ringStyle="none"/>}
-                        />
-                    </div>
-                    <div>
-                        <LegendEntry
-                            label="Active Points: "
-                            value={activePointsLegendValue}
-                            icon={<XNodeIcon color="#222222" ringStyle="active"/>}
-                        />
-                    </div>
-
-                    <div>
-                        <LegendEntry
-                            label="Candidate comparisons: "
-                            value={getCandidateLegendValue(step)}
-                            icon={<XNodeIcon color="#222222" ringStyle="candidate"/>}
-                        />
+                        <div>
+                            <LegendEntry
+                                label="Candidate comparisons: "
+                                value={getCandidateLegendValue(step)}
+                                icon={<XNodeIcon color="#222222" ringStyle="candidate"/>}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <PseudoCodePanel
-                lines={SWEEP_LINE_PSEUDOCODE}
-                activeLineIds={step.pseudoCodeLineIds}
-                title={"Sweep Line PseudoCode"}
-            />
+                <PseudoCodePanel
+                    lines={SWEEP_LINE_PSEUDOCODE}
+                    activeLineIds={step.pseudoCodeLineIds}
+                    title={"Sweep Line PseudoCode"}
+                />
+            </div>
 
             <ImportExportDialog
                 onImport={props.onImport}
