@@ -101,12 +101,25 @@ export type RingStyle = "none" | "active" | "candidate";
 
 export type XNodeProps = {
     node: Node;
-    fill: string;
-    scale?: number;
-    ringStyle?: RingStyle;
+    visualGroupRef: React.RefObject<SVGGElement | null>;
+    pointRef: React.RefObject<SVGGElement | null>;
+    activeRingRef: React.RefObject<SVGCircleElement | null>;
+    candidateRingRef: React.RefObject<SVGCircleElement | null>;
 };
 
-export type PointDisplayState = {
+export type XNodeWithCordsProps = {
+    node: Node;
+    registerNodeRefsInMap?: (nodeId: string, refs: NodeRefs | null) => void; //"?" damit DynamicNodes auch benutzen kann, weil die keine refs braucht
+};
+
+export type NodeRefs = {
+    group: SVGGElement; //ist das SVG <g> element, das nur X und Ringe enthält.
+    point: SVGGElement;
+    activeRing: SVGCircleElement;
+    candidateRing: SVGCircleElement;
+};
+
+export type NodeVisualState = {
     isCurrent: boolean;
     isBest: boolean;
     isProcessed: boolean;
@@ -115,6 +128,11 @@ export type PointDisplayState = {
     isCandidate: boolean;
 };
 
+export type NodeAppearance = {
+    color: string;
+    showActiveRing: boolean;
+    showCandidateRing: boolean;
+};
 
 export type RectAttrs = {
     x: number;

@@ -1,7 +1,14 @@
-import {useMemo, useRef, useState} from "react";
+import {useCallback, useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {AlgorithmStepDTO, Node, RingStyle, OutputProps, RectAttrs, LineAttrs} from "../shared/Types.tsx";
+import type {
+    AlgorithmStepDTO,
+    Node,
+    OutputProps,
+    RectAttrs,
+    LineAttrs,
+    NodeRefs, NodeVisualState, NodeAppearance
+} from "../shared/Types.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
@@ -29,6 +36,7 @@ export function Output(props: OutputProps) {
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
+    const nodeRefsMap = useRef(new Map<string, NodeRefs>());
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -55,6 +63,89 @@ export function Output(props: OutputProps) {
 
     const shouldShowCandidateWindow = (step: AlgorithmStepDTO): boolean =>
         step.currentPoint !== null && step.stepType === "CHECK_CANDIDATES";
+
+    const initializePointVisuals = (step: AlgorithmStepDTO) => {
+        step.allPoints.forEach(point => {
+            const refs = nodeRefsMap.current.get(point.id);
+            if (!refs) return;
+
+            const state = getNodeVisualState(step, point.id);
+            const appearance = getPointAppearance(state);
+
+            gsap.set(refs.point, {color: appearance.color});
+            gsap.set(refs.activeRing, {opacity: appearance.showActiveRing ? 1 : 0});
+            gsap.set(refs.candidateRing, {opacity: appearance.showCandidateRing ? 1 : 0});
+        });
+    };
+
+    const getNodeVisualState = (step: AlgorithmStepDTO, pointId: string): NodeVisualState => {
+        const isCurrent = step.currentPoint?.id === pointId; //step.currentPoint !== null && p.id === step.currentPoint.id;
+        const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
+            step.candidateComparisons.some(({candidate}) => candidate.id === pointId);
+        const isActive = step.activePoints.some(point => point.id === pointId);
+        const isBest = step.bestPair?.p0.id === pointId ||step.bestPair?.p1.id === pointId;
+        const isProcessed = step.processedPoints.some(point => point.id === pointId);
+        const isFuture = step.futurePoints.some(point => point.id === pointId);
+        return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
+    };
+    //TODO: Ist wirklich sinvoll so? activ und candidate bekommen gleiche farbe
+    const getNodeColor = (state: NodeVisualState): string => {
+        if (state.isBest) return "#f5c45e";
+        if (state.isCurrent) return "#222222";
+        if (state.isProcessed) return "#aaaaaa";
+        if (state.isFuture) return "#cccccc";
+        return "#555";
+    };
+
+    const getPointAppearance = (state: NodeVisualState): NodeAppearance => ({
+        color: getNodeColor(state),
+        showActiveRing: state.isActive && !state.isCandidate,
+        showCandidateRing: state.isCandidate,
+    });
+
+    const animateNode = (
+        timeline: gsap.core.Timeline, refs: NodeRefs, previousState: NodeVisualState, targetState: NodeVisualState
+    ) => {
+        const fromAppearance = getPointAppearance(previousState);
+        const toAppearance = getPointAppearance(targetState);
+
+        if (fromAppearance.color !== toAppearance.color) {
+            timeline.to(refs.point, {color: toAppearance.color, duration: 0.3, ease: "power1.inOut"}, "<");
+        }
+
+        if (fromAppearance.showActiveRing !== toAppearance.showActiveRing) {
+            timeline.to(refs.activeRing, {
+                opacity: toAppearance.showActiveRing ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
+            );
+        }
+
+        if (fromAppearance.showCandidateRing !== toAppearance.showCandidateRing) {
+            timeline.to(refs.candidateRing,
+                {opacity: targetState.isCandidate ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
+            );
+        }
+    };
+    const animateNodes = (
+        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO
+    ) => {
+        targetStep.allPoints.forEach(point => {
+            const refs = nodeRefsMap.current.get(point.id);
+            if (!refs) return;
+
+            const previousState = getNodeVisualState(previousStep, point.id);
+            const targetState = getNodeVisualState(targetStep, point.id);
+            animateNode(timeline, refs, previousState, targetState);
+        });
+    };
+
+    const registerNodeRefsInMap = useCallback((nodeId: string, refs: NodeRefs | null) => {
+            if (refs) {
+                nodeRefsMap.current.set(nodeId, refs);
+            } else { //wenn node aus DOM unmounted wird, dann aus map entfernen
+                nodeRefsMap.current.delete(nodeId);   // um zu verhindert, dass die map irgendwann Referenzen auf svgs enthält, die gar nicht mehr existieren.
+            }
+        }, []
+    );
 
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -99,9 +190,8 @@ export function Output(props: OutputProps) {
         gsap.set(activeAreaDifference, {opacity: 0}); //soll im "normalzustand" nie sichtbar sein
         gsap.set(sweepLine, {attr: getSweepLineAttrs(firstStep), opacity: showActiveElements ? 1 : 0});
         gsap.set(candidateRect, {
-            attr: getCandidateRectAttrs(firstStep),
-            opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0,
-        });
+            attr: getCandidateRectAttrs(firstStep), opacity: shouldShowCandidateWindow(firstStep) ? 1 : 0});
+        initializePointVisuals(firstStep);  // Punktfarben und Ringe des ersten Steps setzen
 
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
@@ -183,6 +273,7 @@ export function Output(props: OutputProps) {
                     break;
                 }
             }
+            animateNodes(timeline, previousStep, targetStep);
 
             timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
 
@@ -211,10 +302,6 @@ export function Output(props: OutputProps) {
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
     if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
     if (!step) return <></>;
-
-    const candidatePointIds = new Set(
-        step.stepType === "CHECK_CANDIDATES" ? step.candidateComparisons.map(comparison => comparison.candidate.id) : []
-    );
 
     const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
@@ -302,37 +389,9 @@ export function Output(props: OutputProps) {
                     strokeLinecap="round"
                 />
 
-                {props.steps[0].allPoints.map((p: Node) => { //step.allPoints.map()
-                    const isCurrent = step.currentPoint !== null && p.id === step.currentPoint.id;
-                    const isCandidate = candidatePointIds.has(p.id);
-                    const isActive    = step.activePoints.some((a) => a.id === p.id);
-                    const isProcessed = step.processedPoints.some((d) => d.id === p.id);
-                    const isBest = p.id === step.bestPair?.p0?.id || p.id === step.bestPair?.p1?.id;
-                    const isFuture = step.futurePoints.some((f) => f.id === p.id);
-
-                    //TODO: Nochmal nachdenken ob diese darstellung wirklich gut ist!
-                    let fill = "#555";
-
-                    if (isFuture) {
-                        fill = "#cccccc";
-                    }
-                    if (isProcessed) {
-                        fill = "#aaaaaa";
-                    }
-                    if (isBest) {
-                        fill = "#f5c45e";
-                    }
-                    if (isCurrent) {
-                        fill = "black";
-                    }
-                    const scale = isCurrent ? 1.2 : 1;
-
-                    let ringStyle: RingStyle = "none";
-                    if (isActive) ringStyle = "active";
-                    if (isCandidate) ringStyle = "candidate";
-
-                    return <XNodeWithCords key={p.id} node={p} fill={fill} scale={scale} ringStyle={ringStyle} />;
-                })}
+                {props.steps[0].allPoints.map((point: Node) => ( //step.allPoints.map()
+                    <XNodeWithCords key={point.id} node={point} registerNodeRefsInMap={registerNodeRefsInMap} />
+                ))}
 
                 {step.stepType === "CHECK_CANDIDATES" &&
                     step.currentPoint && step.candidateComparisons.map(({candidate}) => (
