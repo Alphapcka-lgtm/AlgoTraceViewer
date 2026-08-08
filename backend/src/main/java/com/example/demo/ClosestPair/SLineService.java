@@ -59,8 +59,7 @@ public class SLineService {
                 List.of(),
                 List.of(),
                 new ArrayList<>(processedPoints),
-                getFuturePoints(xSorted, 1),
-                List.of("init")
+                getFuturePoints(xSorted, 1)
         ));
 
         activePoints.add(p1);
@@ -105,8 +104,7 @@ public class SLineService {
                     List.of(),
                     new ArrayList<>(removalResult.removedPoints()),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    List.of("set-current", "remove-inactive")
+                    futurePoints
             ));
 
             //Candidate checking may find a smaller delta.
@@ -133,8 +131,7 @@ public class SLineService {
                     candidateResult.candidateComparisons(),
                     List.of(),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    List.of("candidate-window", "check-distance")
+                    futurePoints
             ));
 
             delta = deltaAfterCandidateCheck; //The smaller delta now becomes the new "search radius" for later points
@@ -163,8 +160,7 @@ public class SLineService {
                     List.of(),
                     List.of(),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    List.of("update-best", "insert-current")
+                    futurePoints
             ));
 
         }
@@ -184,8 +180,7 @@ public class SLineService {
                 List.of(),
                 List.of(),
                 new ArrayList<>(xSorted),
-                List.of(),
-                List.of("return")
+                List.of()
         ));
 
         return steps;

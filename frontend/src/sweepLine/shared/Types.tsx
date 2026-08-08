@@ -68,7 +68,6 @@ export interface AlgorithmStepDTO {
     removedPoints: Node[];
     processedPoints: Node[];
     futurePoints: Node[];
-    pseudoCodeLineIds: string[];
 }
 
 //was Output von App bekommt

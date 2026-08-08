@@ -12,7 +12,12 @@ import type {
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import {getStepIndexFromTimeline, createStepLabels, SWEEP_LINE_PSEUDOCODE} from "../../shared/Utils.tsx";
+import {
+    getStepIndexFromTimeline,
+    createStepLabels,
+    SWEEP_LINE_PSEUDOCODE,
+    getActivePseudoCodeLineIds
+} from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
@@ -466,7 +471,7 @@ export function Output(props: OutputProps) {
 
                 <PseudoCodePanel
                     lines={SWEEP_LINE_PSEUDOCODE}
-                    activeLineIds={step.pseudoCodeLineIds}
+                    activeLineIds={getActivePseudoCodeLineIds(step.stepType)}
                     title={"Sweep Line PseudoCode"}
                 />
             </div>

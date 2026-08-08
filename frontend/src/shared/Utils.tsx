@@ -1,7 +1,7 @@
 import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node} from "../sweepLine/shared/Types.tsx"
+import type {Node, SweepLineStepType} from "../sweepLine/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -106,49 +106,42 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
     return nodes;
 };
 
-export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
-    {
-        id: "init", text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
-    },
-    {
-        id: "init", text: "initialize closestPair and δ using p[0] and p[1]"
-    },
-    {
-        id: "for-loop", text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
-    },
+export function getActivePseudoCodeLineIds(stepType: SweepLineStepType): string[] {
+    switch (stepType) {
+        case "INITIALIZATION": return ["sort", "init"];
+        case "ADVANCE_AND_PRUNE": return ["set-current", "remove-inactive"];
+        case "CHECK_CANDIDATES": return ["candidate-window", "check-distance"];
+        case "COMMIT_ITERATION":return ["update-best", "insert-current"];
+        case "FINISHED": return ["return"];
+    }
+}
 
-    {
-        id: "set-current", text: "current ← p[i]", //"current = next point",
+export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
+    {id: "sort", text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
+    },
+    {id: "init", text: "initialize closestPair and δ using p[0] and p[1]"
+    },
+    {id: "for-loop", text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
+    },
+    {id: "set-current", text: "current ← p[i]", //"current = next point",
         indent: 1
     },
-
-    {
-        id: "remove-inactive",
+    {id: "remove-inactive",
         text: "remove points outside the active window", indent: 1
     },
-
-    {
-        id: "candidate-window",
+    {id: "candidate-window",
         text: "select candidates with |current.y - p.y| < δ", indent: 1
     },
-
-    {
-        id: "check-distance",
+    {id: "check-distance",
         text: "compare current with each candidate", indent: 1
     },
-
-    {
-        id: "update-best",
+    {id: "update-best",
         text: "if a closer pair is found: update closestPair and δ", indent: 1
     },
-
-    {
-        id: "insert-current",
+    {id: "insert-current",
         text: "insert current into the active set", indent: 1
     },
-
-    {
-        id: "return",
+    {id: "return",
         text: "return closestPair and δ"
     }
 ];
