@@ -45,7 +45,7 @@ export function PresetSelect(props: PresetSelectProps) {
             return;
         }
 
-        await addPreset({...props.input, preset: name});
+        await addPreset({...props.input, presetName: name});
         await fetchPresets()
         closeDialog();
     };
@@ -60,7 +60,7 @@ export function PresetSelect(props: PresetSelectProps) {
                     defaultValue=""
                     onChange={(event) => {
                         const preset = presets.find(
-                            preset => preset.preset === event.currentTarget.value
+                            preset => preset.presetName === event.currentTarget.value
                         );
 
                         if (preset) {
@@ -72,8 +72,8 @@ export function PresetSelect(props: PresetSelectProps) {
                     </option>
 
                     {presets.map(preset => (
-                        <option key={preset.preset} value={preset.preset}>
-                            {preset.preset}
+                        <option key={preset.presetName} value={preset.presetName}>
+                            {preset.presetName}
                         </option>
                     ))}
                 </select>

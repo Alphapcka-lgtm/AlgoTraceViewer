@@ -51,7 +51,7 @@ export type AnimationRequest = {
     nodeOrder: string[],
     edgeOrder: string[],
     densityFactor: number,
-    preset: string,
+    presetName: string,
     timestamp: number,
 };
 

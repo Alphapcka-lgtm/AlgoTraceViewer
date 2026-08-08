@@ -17,7 +17,7 @@ export function InputControls(props: InputControlProps) {
                 graph: graph,
                 nodeOrder: [],
                 edgeOrder: [],
-                preset: "random",
+                presetName: "random",
                 timestamp: Date.now()
             };
         });
@@ -25,7 +25,7 @@ export function InputControls(props: InputControlProps) {
 
     const resetInput = () => {
         props.setInput((input) => {
-            return {...input, graph: {nodes: [], edges: []}, preset: "custom", timestamp: Date.now()};
+            return {...input, graph: {nodes: [], edges: []}, presetName: "custom", timestamp: Date.now()};
         });
         props.setInteraction({type: "idle"});
     };

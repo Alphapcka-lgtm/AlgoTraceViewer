@@ -17,7 +17,7 @@ export function VertexCover() {
         nodeOrder: [],
         edgeOrder: [],
         densityFactor: 0.2,
-        preset: "custom",
+        presetName: "custom",
         timestamp: 0
     });
 
@@ -29,6 +29,20 @@ export function VertexCover() {
         initialDegreeMap: [],
         timestamp: 0
     });
+
+    const fetchAnimation = async (input: AnimationRequest) => {
+        return fetch("http://localhost:8080/api/vertexCover/" + variant, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(input),
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                const output = json as AnimationResponse;
+                setInput({...input, graph: output.initialState, nodeOrder: output.nodeOrder, edgeOrder: output.edgeOrder, timestamp: output.timestamp});
+                setOutput(output);
+            });
+    };
 
     const submitInput = (inp: AnimationRequest) => {
         if (inp.timestamp > output.timestamp) {
@@ -42,20 +56,6 @@ export function VertexCover() {
         } else {
             setMode("output");
         }
-    };
-
-    const fetchAnimation = async (input: AnimationRequest) => {
-        return fetch("http://localhost:8080/api/vertexCover/" + variant, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(input),
-        })
-            .then((response) => response.json())
-            .then((json) => {
-                const output = json as AnimationResponse;
-                setInput({...input, nodeOrder: output.nodeOrder, edgeOrder: output.edgeOrder, timestamp: output.timestamp});
-                setOutput(output);
-            });
     };
 
     const handleImport = async (encoded: string) => {
