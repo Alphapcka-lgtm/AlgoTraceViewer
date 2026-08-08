@@ -38,6 +38,11 @@ const GAP = 24;
 
 const MAX_ELEMENTS = 8;
 
+const K_GRAPH_X = START_X;
+const K_GRAPH_Y = 800;
+const K_GRAPH_WIDTH = 1640;
+const K_GRAPH_HEIGHT = 220;
+
 // Bogenhöhe: skaliert mit dem Abstand zwischen den tauschenden Boxen,
 // damit sich die Bögen beider Boxen nicht überlagern.
 const ARC_LIFT_BASE = 100;
@@ -95,6 +100,55 @@ export function SwapOutput(props: SwapOutputProps) {
     const lastProgressUpdateRef = useRef(0);
 
     const labels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
+
+    const maxK =  Math.max(1, ...props.steps.map(step => step.k));
+
+    const kLabelDistance = Array.from({length: maxK-1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
+
+    console.log(kLabelDistance);
+
+    const kGraph = useMemo(() => {
+
+        const currentIndex = props.currentStep;
+
+        const coordinates = props.steps
+            .slice(0, currentIndex + 1)
+            .map((step, index) => {
+                // Abstand zum aktuellen/neuesten Punkt
+                const distanceFromCurrent =
+                    currentIndex - index;
+
+                // Aktueller Punkt steht ganz rechts.
+                // Ältere Punkte wandern nach links.
+                const x =
+                    K_GRAPH_X +
+                    K_GRAPH_WIDTH -
+                    distanceFromCurrent * (K_GRAPH_WIDTH / (props.steps.length - 1));
+
+                const normalizedK = step.k / (maxK + 1);
+
+                const y =
+                    K_GRAPH_Y +
+                    K_GRAPH_HEIGHT -
+                    normalizedK * K_GRAPH_HEIGHT;
+
+                return {
+                    x,
+                    y,
+                    k: step.k,
+                    i: index
+                };
+            })
+            // Alles abschneiden, was links aus dem Fenster gelaufen ist.
+            .filter(point => point.x >= K_GRAPH_X);
+
+        return {
+            coordinates,
+            points: coordinates
+                .map(point => `${point.x},${point.y}`)
+                .join(" ")
+        };
+    }, [props.steps, props.currentStep, maxK]);
 
     const step: EhrlichSwapStepDTO | undefined = props.steps[props.currentStep];
 
@@ -336,6 +390,102 @@ export function SwapOutput(props: SwapOutputProps) {
                         </text>
                     </g>
                 ))}
+
+                <g>
+                    <rect
+                        x={K_GRAPH_X}
+                        y={K_GRAPH_Y}
+                        width={K_GRAPH_WIDTH}
+                        height={K_GRAPH_HEIGHT}
+                        fill="none"
+                        stroke="#aaa"
+                        strokeWidth="2"
+                        rx="30"
+                    />
+
+                    {Array.from({length: maxK}, (_, index) => {
+                        const k = index + 1;
+
+                        const y =
+                            K_GRAPH_Y +
+                            K_GRAPH_HEIGHT -
+                            (k / (maxK+1)) * K_GRAPH_HEIGHT;
+
+                        return (
+                            <g key={`k-line-${k}`}>
+                                <line
+                                    x1={K_GRAPH_X}
+                                    y1={y}
+                                    x2={K_GRAPH_X + K_GRAPH_WIDTH}
+                                    y2={y}
+                                    stroke="#ddd"
+                                    strokeWidth="1"
+                                />
+
+                                <text
+                                    x={K_GRAPH_X - 10}
+                                    y={y}
+                                    textAnchor="end"
+                                    dominantBaseline="central"
+                                    fontSize="18"
+                                    fontFamily="monospace"
+                                    fill="#777"
+                                >
+                                    {k}
+                                </text>
+                            </g>
+                        );
+                    })}
+
+                    <polyline
+                        points={kGraph.points}
+                        fill="none"
+                        stroke="black"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                    />
+
+                    {kGraph.coordinates.filter(c  => (c.i + 1) % kLabelDistance === 0).map(c => {
+                        return <text
+                            x={c.x}
+                            y={K_GRAPH_Y + K_GRAPH_HEIGHT + 20}
+                            textAnchor="end"
+                            dominantBaseline="central"
+                            fontSize="18"
+                            fontFamily="monospace"
+                            fill="#777"
+                        >
+                            {c.i + 1}
+                        </text>;
+                    })}
+
+                    {kGraph.coordinates.length > 0 && (() => {
+                        const current =
+                            kGraph.coordinates[kGraph.coordinates.length - 1];
+
+                        return (
+                            <>
+                                <circle
+                                    cx={current.x}
+                                    cy={current.y}
+                                    r={8}
+                                    fill="black"
+                                />
+
+                                <text
+                                    x={current.x + 40}
+                                    y={current.y}
+                                    textAnchor="end"
+                                    fontSize="30"
+                                    fontFamily="monospace"
+                                >
+                                    {current.k}
+                                </text>
+                            </>
+                        );
+                    })()}
+                </g>
             </svg>
 
             <OutputControls
