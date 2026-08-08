@@ -5,6 +5,8 @@ import {OutputControls} from "../../shared/OutputControls.tsx";
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
+import {getActiveLineIdsEhrlich, PSEUDOCODE_EHRLICH_SWAPS} from "./PseudoCode.tsx";
 
 // Kein MotionPathPlugin mehr – wir bauen den Bogen selbst über zwei parallele
 // Tweens (x und y), das ist einfacher und hat keine Koordinaten-Fallstricke.
@@ -23,15 +25,15 @@ type SwapOutputProps = {
 
 // ─── Layout-Konstanten ────────────────────────────────────────────────────────
 
-const STEP_DURATION = 0.8;
+const STEP_DURATION = 1.0;
 
 const SVG_WIDTH = 1920;
 const SVG_HEIGHT = 1080;
 
-const ARRAY_START_X = 600;  // X des linken Rands der ersten Box
+const ARRAY_START_X = 600;
 const START_X = 140;
-const A_Y = 220;      // Y-Oberkante der a-Array-Zeile
-const B_Y = 560;      // Y-Oberkante der b-Array-Zeile
+const A_Y = 220;
+const B_Y = 560;
 
 const BOX_WIDTH = 160;
 const BOX_HEIGHT = 90;
@@ -75,20 +77,21 @@ function slotX(slot: number): number {
  * @param lift      Wie weit der Bogen ausschlagen soll (immer positiv)
  * @param goUp      Ob der Bogen nach oben (true) oder nach unten (false) geht
  * @param timeline  Die GSAP-Timeline, in die die Tweens eingefügt werden
- * @param position  GSAP-Zeitposition in der Timeline (z.B. Label-String)
+ * @param newPosition  GSAP-Zeitposition in der Timeline (z.B. Label-String)
  */
-function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boolean, timeline: gsap.core.Timeline, position: string | number): void {
+function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boolean, timeline: gsap.core.Timeline, newPosition: boolean): void {
     const yDirection = goUp ? -1 : 1;
 
     // x-Tween: bewegt die Box horizontal zum Ziel-Slot
-    timeline.to(el, {x: `+=${deltaX}`, duration: STEP_DURATION, ease: "power2.inOut"}, position);
+    if(newPosition) {
+        timeline.to(el, {x: `+=${deltaX}`, duration: STEP_DURATION, ease: "power2.inOut"});
+    } else {
+        timeline.to(el, {x: `+=${deltaX}`, duration: STEP_DURATION, ease: "power2.inOut"}, "<");
+    }
 
     // y-Tween: erzeugt den Bogen – geht zur Mitte hoch/runter, dann zurück
     // repeat:1 + yoyo:true bedeutet: hin und zurück, also insgesamt STEP_DURATION
-    timeline.to(el,
-        {y: `+=${yDirection * lift}`, duration: STEP_DURATION / 2, ease: "power1.in", repeat: 1, yoyo: true},
-        position  // "<" würde hier auch gehen, aber position ist klarer
-    );
+    timeline.to(el, {y: `+=${yDirection * lift}`, duration: STEP_DURATION / 2, ease: "power1.in", repeat: 1, yoyo: true}, "<");
 }
 
 // ─── Komponente ───────────────────────────────────────────────────────────────
@@ -100,22 +103,21 @@ export function SwapOutput(props: SwapOutputProps) {
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline({paused: true}));
     const lastProgressUpdateRef = useRef(0);
 
-    const labels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
+    const labels = useMemo(() => createStepLabels(3 * props.steps.length), [props.steps.length]);
 
     const maxK =  props.values.length
+
+    const algorithmStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.currentStep - 2) / 3)));
 
     const kLabelDistance = Array.from({length: maxK-1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
 
     const kGraph = useMemo(() => {
 
-        const currentIndex = props.currentStep;
-
         const coordinates = props.steps
-            .slice(0, currentIndex + 1)
+            .slice(0, algorithmStepIndex + 1)
             .map((step, index) => {
                 // Abstand zum aktuellen/neuesten Punkt
-                const distanceFromCurrent =
-                    currentIndex - index;
+                const distanceFromCurrent = algorithmStepIndex - index;
 
                 // Aktueller Punkt steht ganz rechts.
                 // Ältere Punkte wandern nach links.
@@ -147,9 +149,9 @@ export function SwapOutput(props: SwapOutputProps) {
                 .map(point => `${point.x},${point.y}`)
                 .join(" ")
         };
-    }, [props.steps, props.currentStep, maxK]);
+    }, [props.steps, algorithmStepIndex, maxK]);
 
-    const step: EhrlichSwapStepDTO | undefined = props.steps[props.currentStep];
+    const step: EhrlichSwapStepDTO | undefined = props.steps[algorithmStepIndex];
 
     // Initiale Werte aus Schritt 0. React rendert die Boxen genau einmal damit.
     // Danach ist GSAP alleiniger Eigentümer der Box-Positionen im DOM.
@@ -204,6 +206,10 @@ export function SwapOutput(props: SwapOutputProps) {
 
         const timeline = gsap.timeline({
             paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut",
+            },
             onUpdate: () => {
                 const tl = timelineRef.current;
                 const now = performance.now();
@@ -219,12 +225,26 @@ export function SwapOutput(props: SwapOutputProps) {
             },
         });
 
+        timeline.addLabel(labels[0])
+
+        Array.from({length: props.values.length}, (_, index) => {
+            if(index === 0){
+                timeline.from("#swapTable" + index, {opacity: 0});
+            } else {
+                timeline.from("#swapTable" + index, {opacity: 0} , "<");
+            }
+        });
+
+        timeline.addLabel(labels[1])
+
+        timeline.from("#current_k", {opacity: 0});
+
+        timeline.addLabel(labels[2])
+
         props.steps.forEach((s, stepIdx) => {
-            timeline.addLabel(labels[stepIdx]);
 
             // Letzter Schritt ("Done") → kein Tausch, nur Zeit vergehen lassen
             if (s.swapIndex < 0) {
-                timeline.to({}, {duration: STEP_DURATION});
                 return;
             }
 
@@ -256,10 +276,12 @@ export function SwapOutput(props: SwapOutputProps) {
 
             if (elA0 && elASwap) {
                 // Box auf Slot 0 → fährt nach oben über die anderen Boxen
-                animateSwapArc(elA0,    aDeltaFor0,    lift, true,  timeline, labels[stepIdx]);
+                animateSwapArc(elA0,    aDeltaFor0,    lift, true,  timeline, true);
                 // Box auf swapIndex → fährt nach unten (die Bögen kreuzen sich nicht)
-                animateSwapArc(elASwap, aDeltaForSwap, lift, false, timeline, labels[stepIdx]);
+                animateSwapArc(elASwap, aDeltaForSwap, lift, false, timeline, false);
             }
+
+            timeline.addLabel(labels[3*stepIdx + 3])
 
             // Slot-Tracking SOFORT aktualisieren (nicht via .call),
             // weil der Wert beim Aufbau der nächsten Schritte schon korrekt sein muss.
@@ -276,6 +298,10 @@ export function SwapOutput(props: SwapOutputProps) {
             let leftIdx  = 1;
             let rightIdx = s.k - 1;
 
+            if(rightIdx <= leftIdx) {
+                timeline.to({}, {duration: STEP_DURATION/3});
+            }
+
             while (leftIdx < rightIdx) {
                 const bBoxAtLeft  = bCurrentSlot.current.indexOf(leftIdx);
                 const bBoxAtRight = bCurrentSlot.current.indexOf(rightIdx);
@@ -291,8 +317,8 @@ export function SwapOutput(props: SwapOutputProps) {
 
                 if (elBLeft && elBRight) {
                     // Alle b-Tausche eines Schritts starten gleichzeitig ("<")
-                    timeline.to(elBLeft,  {x: `+=${bDeltaForLeft}`,  duration: STEP_DURATION, ease: "power2.inOut"}, "<");
-                    timeline.to(elBRight, {x: `+=${bDeltaForRight}`, duration: STEP_DURATION, ease: "power2.inOut"}, "<");
+                    timeline.to(elBLeft,  {x: `+=${bDeltaForLeft}`}, "<");
+                    timeline.to(elBRight, {x: `+=${bDeltaForRight}`}, "<");
                 }
 
                 // Slot-Tracking sofort aktualisieren (gleiche Begründung wie bei a)
@@ -302,6 +328,13 @@ export function SwapOutput(props: SwapOutputProps) {
                 leftIdx++;
                 rightIdx--;
             }
+
+            timeline.addLabel(labels[3*stepIdx + 4])
+
+            timeline.to({}, {duration: STEP_DURATION/3});
+
+            timeline.addLabel(labels[3*stepIdx + 5])
+
         });
 
         timelineRef.current = timeline;
@@ -335,7 +368,7 @@ export function SwapOutput(props: SwapOutputProps) {
                 <text x={START_X} y={B_Y + BOX_HEIGHT / 2} fontSize="30" fontFamily="monospace">b (swap-Tabelle)</text>
 
                 {Array.from({length: props.values.length}, (_, i) => (
-                    <>
+                    <React.Fragment key={`index-label-${i}`}>
                         <text
                             x={ARRAY_START_X + i * (BOX_WIDTH + GAP) + BOX_WIDTH / 2}
                             y={A_Y - 12}
@@ -346,6 +379,7 @@ export function SwapOutput(props: SwapOutputProps) {
                         >
                             {i}
                         </text>
+
                         <text
                             x={ARRAY_START_X + i * (BOX_WIDTH + GAP) + BOX_WIDTH / 2}
                             y={B_Y - 12}
@@ -356,7 +390,7 @@ export function SwapOutput(props: SwapOutputProps) {
                         >
                             {i}
                         </text>
-                    </>
+                    </React.Fragment>
                 ))}
 
                 {initialA.slice(0, count).map((value, i) => (
@@ -384,6 +418,7 @@ export function SwapOutput(props: SwapOutputProps) {
                             stroke="black" strokeWidth="3" fill="white" rx="10"
                         />
                         <text
+                            id={"swapTable" + i}
                             x={slotX(i) + BOX_WIDTH / 2} y={B_Y + BOX_HEIGHT / 2}
                             textAnchor="middle" dominantBaseline="central"
                             fontSize="28" fontFamily="monospace"
@@ -447,26 +482,29 @@ export function SwapOutput(props: SwapOutputProps) {
                         strokeLinejoin="round"
                         strokeLinecap="round"
                     />
-
-                    {kGraph.coordinates.filter(c  => (c.i + 1) % kLabelDistance === 0).map(c => {
-                        return <text
-                            x={c.x}
-                            y={K_GRAPH_Y + K_GRAPH_HEIGHT + 20}
-                            textAnchor="end"
-                            dominantBaseline="central"
-                            fontSize="18"
-                            fontFamily="monospace"
-                            fill="#777"
-                        >
-                            {c.i + 1}
-                        </text>;
-                    })}
+                    {kGraph.coordinates
+                        .filter(c => (c.i + 1) % kLabelDistance === 0)
+                        .map(c => (
+                            <text
+                                key={`k-label-${c.i}`}
+                                x={c.x}
+                                y={K_GRAPH_Y + K_GRAPH_HEIGHT + 20}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                fontSize="18"
+                                fontFamily="monospace"
+                                fill="#777"
+                            >
+                                {c.i + 1}
+                            </text>
+                        ))
+                    }
 
                     {kGraph.coordinates.length > 0 && (() => {
                         const current = kGraph.coordinates[kGraph.coordinates.length - 1];
 
                         return (
-                            <>
+                            <g id={"current_k"}>
                                 <circle
                                     cx={current.x}
                                     cy={current.y}
@@ -482,7 +520,7 @@ export function SwapOutput(props: SwapOutputProps) {
                                 >
                                     {current.k}
                                 </text>
-                            </>
+                            </g>
                         );
                     })()}
                 </g>
@@ -493,7 +531,7 @@ export function SwapOutput(props: SwapOutputProps) {
                 labels={labels}
                 currentStep={props.currentStep}
                 setCurrentStep={props.setCurrentStep}
-                stepCount={props.steps.length}
+                stepCount={labels.length}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
                 progress={props.progress}
@@ -505,7 +543,7 @@ export function SwapOutput(props: SwapOutputProps) {
             <div className="step-info">
                 <div className="step-description">{step.description}</div>
                 <div className="step-info-grid">
-                    <div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>
+                    <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
                     <div><strong>k:</strong> {step.k}</div>
                     <div><strong>Swap index:</strong> {step.swapIndex < 0 ? "—" : step.swapIndex}</div>
                     <div><strong>Values before:</strong> {step.valuesBefore.join(", ")}</div>
@@ -514,6 +552,11 @@ export function SwapOutput(props: SwapOutputProps) {
                     <div><strong>b after:</strong> {step.bAfter.join(", ")}</div>
                 </div>
             </div>
+            <PseudoCodePanel
+                lines={PSEUDOCODE_EHRLICH_SWAPS}
+                activeLineIds={getActiveLineIdsEhrlich(props.currentStep, labels.length - 1)}
+                title={"Ehrlich Swaps PseudoCode"}
+            />
         </div>
     );
 }
