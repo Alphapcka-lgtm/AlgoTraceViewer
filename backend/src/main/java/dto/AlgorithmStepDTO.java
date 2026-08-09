@@ -29,6 +29,5 @@ public record AlgorithmStepDTO(
         List<CandidateComparison> candidateComparisons,
         List<Point> removedPoints,
         List<Point> processedPoints,
-        List<Point> futurePoints,
-        List<String> pseudoCodeLineIds
+        List<Point> futurePoints
 ) {}
