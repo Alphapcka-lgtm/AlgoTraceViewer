@@ -31,23 +31,32 @@ export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNod
 
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
     const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
-    const CANDIDATE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
     const CURRENT_MARKER_COLOR = "#F25C54";
 
     return (
         <g transform={`translate(10, 10)`}>
-            {ringStyle !== "none" && (
+            {(ringStyle === "active" || ringStyle === "candidate") && (
                 <circle
                     cx={0}
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke={ringStyle === "candidate" ? CANDIDATE_RING_COLOR : ACTIVE_RING_COLOR}
+                    stroke={ACTIVE_RING_COLOR}
                     strokeWidth={2.5}
-                    strokeDasharray={ringStyle === "candidate" ? "3 2" : undefined}
                 />
             )}
-
+            {ringStyle === "candidate" && (
+                <circle
+                    cx={0}
+                    cy={0}
+                    r={RING_RADIUS + 2}
+                    fill="none"
+                    stroke={CANDIDATE_RING_COLOR}
+                    strokeWidth={2.5}
+                    strokeDasharray="3 2"
+                />
+            )}
             {variant === "current" && (
                 <circle
                     cx={0}
@@ -56,7 +65,6 @@ export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNod
                     fill={CURRENT_MARKER_COLOR}
                 />
             )}
-
             <line
                 x1={-NODE_SIZE}
                 y1={-NODE_SIZE}
@@ -66,7 +74,6 @@ export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNod
                 strokeWidth={3}
                 strokeLinecap="round"
             />
-
             <line
                 x1={NODE_SIZE}
                 y1={-NODE_SIZE}

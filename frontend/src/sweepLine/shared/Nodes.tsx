@@ -74,7 +74,7 @@ export function XNode({node, visualGroupRef, nodeVisualRef, currentMarkerRef, ac
 
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
     const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
-    const CANDIDATE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
     const CURRENT_MARKER_COLOR = "#F25C54";
 
     return (
@@ -95,7 +95,7 @@ export function XNode({node, visualGroupRef, nodeVisualRef, currentMarkerRef, ac
                     ref={candidateRingRef}
                     cx={0}
                     cy={0}
-                    r={RING_RADIUS}
+                    r={RING_RADIUS+2}
                     fill="none"
                     stroke={CANDIDATE_RING_COLOR}
                     strokeWidth={2.5}

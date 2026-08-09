@@ -167,50 +167,30 @@ export function Output(props: OutputProps) {
         timeline.to(refsOfRemoved.map(refs => refs.activeRing), {opacity: 0, duration: 0.3, ease: "power1.out"});
     };
 
-    const animateCandidateSelectionIn = (
-        timeline: gsap.core.Timeline,
-        step: AlgorithmStepDTO,
-        position?: gsap.Position
+    const animateCandidateRingsIn = (
+        timeline: gsap.core.Timeline, step: AlgorithmStepDTO, position?: gsap.Position
     ) => {
         const candidateRefs = getRefsForNodes(
-            step.candidateComparisons.map(
-                comparison => comparison.candidate
-            )
+            step.candidateComparisons.map(comparison => comparison.candidate)
         );
-
         if (candidateRefs.length === 0) return;
 
         timeline.to(
-            candidateRefs.map(ref => ref.activeRing),
-            {opacity: 0, duration: 0.25, ease: "power1.inOut"}, position
-        );
-
-        timeline.to(candidateRefs.map(refs => refs.candidateRing),
-            {opacity: 1, duration: 0.25, ease: "power1.inOut"}, "<"
+            candidateRefs.map(ref => ref.candidateRing),
+            {opacity: 1, duration: 0.25, ease: "power1.inOut"}, position
         );
     };
 
-    const animateCandidateSelectionOut = (
-        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position
+    const animateCandidateRingsOut = (
+        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, position?: gsap.Position
     ) => {
-        const candidates = previousStep.candidateComparisons.map(comparison => comparison.candidate);
-
-        const candidateRefs = getRefsForNodes(candidates);
+        const candidateRefs = getRefsForNodes(previousStep.candidateComparisons
+            .map(comparison => comparison.candidate));
         if (candidateRefs.length === 0) return;
 
         timeline.to(candidateRefs.map(refs => refs.candidateRing),
             {opacity: 0, duration: 0.25, ease: "power1.out"}, position
         );
-
-        const stillActiveRefs = getRefsForNodes(
-            candidates.filter(candidate => targetStep.activePoints.some(active => active.id === candidate.id))
-        );
-
-        if (stillActiveRefs.length > 0) {
-            timeline.to(stillActiveRefs.map(ref => ref.activeRing),
-                {opacity: 1, duration: 0.25, ease: "power1.inOut"}, "<"
-            );
-        }
     };
 
     const animateCurrentInsertion = (timeline: gsap.core.Timeline, step: AlgorithmStepDTO) => {
@@ -219,7 +199,6 @@ export function Output(props: OutputProps) {
         if (!refs) return;
         timeline.to(refs.activeRing, {opacity: 1, duration: 0.3, ease: "power1.inOut"});
     };
-
 
     const animateClosestPairUpdate = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO) => {
         if (isSamePair(previousStep.bestPair, targetStep.bestPair)) return;
@@ -245,7 +224,6 @@ export function Output(props: OutputProps) {
             firstTween = false;
         });
     };
-
 
     const animateDeltaUpdate = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO) => {
         if (targetStep.windowDelta >= previousStep.windowDelta) return;
@@ -360,14 +338,13 @@ export function Output(props: OutputProps) {
                     //Candidate Window einblenden.
                     timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_FADE_IN_DURATION, ease: "power1.inOut"});
 
-                    animateCandidateSelectionIn(timeline, targetStep, "<");
-
+                    animateCandidateRingsIn(timeline, targetStep, "<");
                     // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
                     timeline.to({}, {duration: CANDIDATE_AUTOPLAY_HOLD_DURATION});
                     break;
                 }
                 case "COMMIT_ITERATION": {
-                    animateCandidateSelectionOut(timeline, previousStep, targetStep);
+                    animateCandidateRingsOut(timeline, previousStep);
                     timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}, "<"); // Candidate Window wieder ausblenden
                     timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
 
