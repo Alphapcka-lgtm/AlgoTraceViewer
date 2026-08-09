@@ -124,8 +124,8 @@ export function Output(props: OutputProps) {
         timeline.set(candidateSweepWindowRef.current, {attr: getCandidateRectAttrs(targetStep), opacity: 0}); //set ok weil opacity 0
     };
 
-    //nicht in COMMIT_ITERATION aufrufen (bei if(windowShrunk)) , weil da kümmert sich animateClosestPairUpdate um die farbänderung
-    //bei advance_and_prune kann es aufgerufen werden, weil dort sich bestpair nicht ändert
+    /**nicht in COMMIT_ITERATION aufrufen (bei if(windowShrunk)) , weil da kümmert sich animateClosestPairUpdate um die farbänderung
+    bei advance_and_prune kann es aufgerufen werden, weil dort sich bestpair nicht ändert */
     const animateNodeColors = (
         timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position
     ) => {
@@ -147,8 +147,8 @@ export function Output(props: OutputProps) {
     };
 
     const animateCurrentChange = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
+        let firstTween = true;
         targetStep.allPoints.forEach(node => {
-            let firstTween = true;
             const refs = getNodeRefs(node.id);
             if (!refs) return;
             const wasCurrent = previousStep.currentPoint?.id === node.id;
@@ -350,13 +350,10 @@ export function Output(props: OutputProps) {
                     timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
                     timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
                     animateCurrentChange(timeline, previousStep, targetStep, "<"); //current <- p[i]
-
+                    animateNodeColors(timeline, previousStep, targetStep, "<");
                     // damit die animation einblenden besser aussieht, fährt es unsichtbar mit und so muss es bei CHECK_CANDIDATES nicht mehr bewegt werden
                     timeline.set(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0});
-
-                    animateNodeColors(timeline, previousStep, targetStep, "<");
                     animateRemoveActiveRings(timeline, targetStep); //enfernen der außerhalb liegende active Rings animieren
-
                     break;
                 }
                 case "CHECK_CANDIDATES": {
