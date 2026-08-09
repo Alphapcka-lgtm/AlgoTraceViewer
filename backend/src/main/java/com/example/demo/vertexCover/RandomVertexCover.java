@@ -10,18 +10,32 @@ import java.util.*;
 @Service
 public class RandomVertexCover {
 
-    public AnimationResponse solve(Graph graph, Long seed) {
-        seed = seed == null || seed == 0 ? System.nanoTime() : seed;
+    public AnimationResponse solve(AnimationRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
+        List<String> nodeOrder = new ArrayList<>();
+        List<String> edgeOrder = new ArrayList<>();
+        Graph graph = Graph.getShortenedIdGraph(request.getGraph());
 
-        Random randomGenerator = new Random(seed);
+        if (Objects.isNull(request.getNodeOrder()) || request.getNodeOrder().isEmpty()) {
+            nodeOrder.addAll(graph.getNodes().stream().map(Node::id).toList());
+            Collections.shuffle(nodeOrder);
+        } else {
+            nodeOrder.addAll(request.getNodeOrder());
+        }
 
-        List<Edge> remainingEdges = new ArrayList<>(graph.edges());
+        if (Objects.isNull(request.getEdgeOrder()) || request.getEdgeOrder().isEmpty()) {
+            edgeOrder.addAll(graph.getEdges().stream().map(Edge::id).toList());
+            Collections.shuffle(edgeOrder);
+        } else {
+            edgeOrder.addAll(request.getEdgeOrder());
+        }
+
+        OrderComparator comparator = new OrderComparator(edgeOrder);
+        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
 
         while (!remainingEdges.isEmpty()) {
-            Edge chosenEdge = remainingEdges.get(randomGenerator.nextInt(remainingEdges.size()));
-            //remainingEdges.remove(chosenEdge);
+            Edge chosenEdge = remainingEdges.stream().min(comparator::compare).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->
@@ -35,20 +49,17 @@ public class RandomVertexCover {
             intermediateStates.add(AnimationState.builder()
                     .chosenEdge(chosenEdge)
                     .incidentEdges(incidentEdges)
-                    .chosenNodes(List.of(getNodeById(graph.nodes(), chosenEdge.fromId()), getNodeById(graph.nodes(), chosenEdge.toId())))
+                    .chosenNodes(List.of(graph.getNodeById(chosenEdge.fromId()), graph.getNodeById(chosenEdge.toId())))
                     .build()
             );
         }
         return AnimationResponse.builder()
                 .initialState(graph)
+                .nodeOrder(nodeOrder)
+                .edgeOrder(edgeOrder)
                 .intermediateStates(intermediateStates)
-                .randomSeed(seed)
                 .timestamp(System.currentTimeMillis())
                 .build();
-    }
-
-    private static Node getNodeById(List<Node> nodes, String id) {
-        return nodes.stream().filter(node -> node.id().equals(id)).findFirst().orElseThrow();
     }
 }
 

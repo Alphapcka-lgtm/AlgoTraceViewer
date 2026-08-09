@@ -5,7 +5,7 @@ import {type EhrlichSwapStepDTO, sendSwapInput} from "./Api.ts";
 import {extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
 import "./EhrlichStyle.css";
 
-const MAX_CELL_COUNT = 5;
+const MAX_CELL_COUNT = 6;
 
 export type SwapInputField = {
     id: number;

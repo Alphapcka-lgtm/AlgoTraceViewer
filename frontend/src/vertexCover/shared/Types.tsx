@@ -27,9 +27,10 @@ export type EdgesProps = {
 
 export type AnimationResponse = {
     initialState: Graph,
+    nodeOrder: string[],
+    edgeOrder: string[],
     initialDegreeMap: NodeDegreePair[]
     intermediateStates: AnimationState[],
-    randomSeed: number,
     timestamp: number,
 };
 
@@ -47,9 +48,10 @@ type NodeDegreePair = {
 
 export type AnimationRequest = {
     graph: Graph,
+    nodeOrder: string[],
+    edgeOrder: string[],
     densityFactor: number,
-    preset: string,
-    randomSeed: number,
+    presetName: string,
     timestamp: number,
 };
 

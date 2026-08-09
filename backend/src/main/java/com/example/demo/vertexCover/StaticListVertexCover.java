@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class MaxDegreeVertexCover {
+public class StaticListVertexCover {
 
     public static Comparator<NodeDegreePair> NDPComp = (n1, n2) -> {
         if(n1.node().label().length() == n2.node().label().length()){
@@ -63,14 +63,8 @@ public class MaxDegreeVertexCover {
 
             Node maxDegreeNode = maxDegreeNodes.stream().min(comparator::compare).orElseThrow();
 
-            List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> {
-                if (edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())) {
-                    neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.get(graph.getNodeById(edge.fromId())) - 1);
-                    neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.get(graph.getNodeById(edge.toId())) - 1);
-                    return true;
-                }
-                return false;
-            }).toList();
+            List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())).toList();
+            neighbourCount.put(graph.getNodeById(maxDegreeNode.id()), 0);
 
             remainingEdges.removeAll(incidentEdges);
 

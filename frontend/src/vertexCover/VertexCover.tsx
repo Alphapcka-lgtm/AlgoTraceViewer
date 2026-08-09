@@ -14,19 +14,35 @@ export function VertexCover() {
 
     const [input, setInput] = useState<AnimationRequest>({
         graph: {nodes: [], edges: []},
+        nodeOrder: [],
+        edgeOrder: [],
         densityFactor: 0.2,
-        preset: "custom",
-        randomSeed: 0,
+        presetName: "custom",
         timestamp: 0
     });
 
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
+        nodeOrder: [],
+        edgeOrder: [],
         intermediateStates: [],
         initialDegreeMap: [],
-        randomSeed: 0,
         timestamp: 0
     });
+
+    const fetchAnimation = async (input: AnimationRequest) => {
+        return fetch("http://localhost:8080/api/vertexCover/" + variant, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(input),
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                const output = json as AnimationResponse;
+                setInput({...input, graph: output.initialState, nodeOrder: output.nodeOrder, edgeOrder: output.edgeOrder, timestamp: output.timestamp});
+                setOutput(output);
+            });
+    };
 
     const submitInput = (inp: AnimationRequest) => {
         if (inp.timestamp > output.timestamp) {
@@ -40,20 +56,6 @@ export function VertexCover() {
         } else {
             setMode("output");
         }
-    };
-
-    const fetchAnimation = async (input: AnimationRequest) => {
-        return fetch("http://localhost:8080/vertexCover/" + variant, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(input),
-        })
-            .then((response) => response.json())
-            .then((json) => {
-                const output = json as AnimationResponse;
-                setInput({...input, randomSeed: output.randomSeed, timestamp: output.timestamp});
-                setOutput(output);
-            });
     };
 
     const handleImport = async (encoded: string) => {
@@ -95,7 +97,7 @@ export function VertexCover() {
             createExportString={createExportString}
             onImport={handleImport}
         />
-    ) : variant === "maxDegree" ? (
+    ) : variant === "maxDegree" || variant === "staticList" ? (
         <MaxDegreeOutput
             setProgress={setProgress}
             progress={progress}

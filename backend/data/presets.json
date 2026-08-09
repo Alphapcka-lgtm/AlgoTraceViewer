@@ -1,0 +1,544 @@
+[ {
+  "graph" : {
+    "nodes" : [ {
+      "x" : 102.0,
+      "y" : 50.0,
+      "id" : "A",
+      "label" : "A"
+    }, {
+      "x" : 204.0,
+      "y" : 50.0,
+      "id" : "B",
+      "label" : "B"
+    }, {
+      "x" : 306.0,
+      "y" : 50.0,
+      "id" : "C",
+      "label" : "C"
+    }, {
+      "x" : 408.0,
+      "y" : 50.0,
+      "id" : "D",
+      "label" : "D"
+    }, {
+      "x" : 510.0,
+      "y" : 50.0,
+      "id" : "E",
+      "label" : "E"
+    }, {
+      "x" : 612.0,
+      "y" : 50.0,
+      "id" : "F",
+      "label" : "F"
+    }, {
+      "x" : 714.0,
+      "y" : 50.0,
+      "id" : "G",
+      "label" : "G"
+    }, {
+      "x" : 816.0,
+      "y" : 50.0,
+      "id" : "H",
+      "label" : "H"
+    }, {
+      "x" : 918.0,
+      "y" : 50.0,
+      "id" : "I",
+      "label" : "I"
+    }, {
+      "x" : 1020.0,
+      "y" : 50.0,
+      "id" : "J",
+      "label" : "J"
+    }, {
+      "x" : 40.0,
+      "y" : 450.0,
+      "id" : "K",
+      "label" : "K"
+    }, {
+      "x" : 80.0,
+      "y" : 450.0,
+      "id" : "L",
+      "label" : "L"
+    }, {
+      "x" : 120.0,
+      "y" : 450.0,
+      "id" : "M",
+      "label" : "M"
+    }, {
+      "x" : 160.0,
+      "y" : 450.0,
+      "id" : "N",
+      "label" : "N"
+    }, {
+      "x" : 200.0,
+      "y" : 450.0,
+      "id" : "O",
+      "label" : "O"
+    }, {
+      "x" : 240.0,
+      "y" : 450.0,
+      "id" : "P",
+      "label" : "P"
+    }, {
+      "x" : 280.0,
+      "y" : 450.0,
+      "id" : "Q",
+      "label" : "Q"
+    }, {
+      "x" : 320.0,
+      "y" : 450.0,
+      "id" : "R",
+      "label" : "R"
+    }, {
+      "x" : 360.0,
+      "y" : 450.0,
+      "id" : "S",
+      "label" : "S"
+    }, {
+      "x" : 400.0,
+      "y" : 450.0,
+      "id" : "T",
+      "label" : "T"
+    }, {
+      "x" : 440.0,
+      "y" : 450.0,
+      "id" : "U",
+      "label" : "U"
+    }, {
+      "x" : 480.0,
+      "y" : 450.0,
+      "id" : "V",
+      "label" : "V"
+    }, {
+      "x" : 520.0,
+      "y" : 450.0,
+      "id" : "W",
+      "label" : "W"
+    }, {
+      "x" : 560.0,
+      "y" : 450.0,
+      "id" : "X",
+      "label" : "X"
+    }, {
+      "x" : 600.0,
+      "y" : 450.0,
+      "id" : "Y",
+      "label" : "Y"
+    }, {
+      "x" : 640.0,
+      "y" : 450.0,
+      "id" : "Z",
+      "label" : "Z"
+    }, {
+      "x" : 680.0,
+      "y" : 450.0,
+      "id" : "AA",
+      "label" : "AA"
+    }, {
+      "x" : 720.0,
+      "y" : 450.0,
+      "id" : "AB",
+      "label" : "AB"
+    }, {
+      "x" : 760.0,
+      "y" : 450.0,
+      "id" : "AC",
+      "label" : "AC"
+    }, {
+      "x" : 800.0,
+      "y" : 450.0,
+      "id" : "AD",
+      "label" : "AD"
+    }, {
+      "x" : 840.0,
+      "y" : 450.0,
+      "id" : "AE",
+      "label" : "AE"
+    }, {
+      "x" : 880.0,
+      "y" : 450.0,
+      "id" : "AF",
+      "label" : "AF"
+    }, {
+      "x" : 920.0,
+      "y" : 450.0,
+      "id" : "AG",
+      "label" : "AG"
+    }, {
+      "x" : 960.0,
+      "y" : 450.0,
+      "id" : "AH",
+      "label" : "AH"
+    }, {
+      "x" : 1000.0,
+      "y" : 450.0,
+      "id" : "AI",
+      "label" : "AI"
+    }, {
+      "x" : 1040.0,
+      "y" : 450.0,
+      "id" : "AJ",
+      "label" : "AJ"
+    }, {
+      "x" : 1080.0,
+      "y" : 450.0,
+      "id" : "AK",
+      "label" : "AK"
+    } ],
+    "edges" : [ {
+      "fromId" : "K",
+      "toId" : "A",
+      "id" : "K-A"
+    }, {
+      "fromId" : "L",
+      "toId" : "B",
+      "id" : "L-B"
+    }, {
+      "fromId" : "M",
+      "toId" : "C",
+      "id" : "M-C"
+    }, {
+      "fromId" : "N",
+      "toId" : "D",
+      "id" : "N-D"
+    }, {
+      "fromId" : "O",
+      "toId" : "E",
+      "id" : "O-E"
+    }, {
+      "fromId" : "P",
+      "toId" : "F",
+      "id" : "P-F"
+    }, {
+      "fromId" : "Q",
+      "toId" : "G",
+      "id" : "Q-G"
+    }, {
+      "fromId" : "R",
+      "toId" : "H",
+      "id" : "R-H"
+    }, {
+      "fromId" : "S",
+      "toId" : "I",
+      "id" : "S-I"
+    }, {
+      "fromId" : "T",
+      "toId" : "J",
+      "id" : "T-J"
+    }, {
+      "fromId" : "U",
+      "toId" : "A",
+      "id" : "U-A"
+    }, {
+      "fromId" : "U",
+      "toId" : "B",
+      "id" : "U-B"
+    }, {
+      "fromId" : "V",
+      "toId" : "C",
+      "id" : "V-C"
+    }, {
+      "fromId" : "V",
+      "toId" : "D",
+      "id" : "V-D"
+    }, {
+      "fromId" : "W",
+      "toId" : "E",
+      "id" : "W-E"
+    }, {
+      "fromId" : "W",
+      "toId" : "F",
+      "id" : "W-F"
+    }, {
+      "fromId" : "X",
+      "toId" : "G",
+      "id" : "X-G"
+    }, {
+      "fromId" : "X",
+      "toId" : "H",
+      "id" : "X-H"
+    }, {
+      "fromId" : "Y",
+      "toId" : "I",
+      "id" : "Y-I"
+    }, {
+      "fromId" : "Y",
+      "toId" : "J",
+      "id" : "Y-J"
+    }, {
+      "fromId" : "Z",
+      "toId" : "A",
+      "id" : "Z-A"
+    }, {
+      "fromId" : "Z",
+      "toId" : "B",
+      "id" : "Z-B"
+    }, {
+      "fromId" : "Z",
+      "toId" : "C",
+      "id" : "Z-C"
+    }, {
+      "fromId" : "AA",
+      "toId" : "D",
+      "id" : "AA-D"
+    }, {
+      "fromId" : "AA",
+      "toId" : "E",
+      "id" : "AA-E"
+    }, {
+      "fromId" : "AA",
+      "toId" : "F",
+      "id" : "AA-F"
+    }, {
+      "fromId" : "AB",
+      "toId" : "G",
+      "id" : "AB-G"
+    }, {
+      "fromId" : "AB",
+      "toId" : "H",
+      "id" : "AB-H"
+    }, {
+      "fromId" : "AB",
+      "toId" : "I",
+      "id" : "AB-I"
+    }, {
+      "fromId" : "AC",
+      "toId" : "A",
+      "id" : "AC-A"
+    }, {
+      "fromId" : "AC",
+      "toId" : "B",
+      "id" : "AC-B"
+    }, {
+      "fromId" : "AC",
+      "toId" : "C",
+      "id" : "AC-C"
+    }, {
+      "fromId" : "AC",
+      "toId" : "D",
+      "id" : "AC-D"
+    }, {
+      "fromId" : "AD",
+      "toId" : "E",
+      "id" : "AD-E"
+    }, {
+      "fromId" : "AD",
+      "toId" : "F",
+      "id" : "AD-F"
+    }, {
+      "fromId" : "AD",
+      "toId" : "G",
+      "id" : "AD-G"
+    }, {
+      "fromId" : "AD",
+      "toId" : "H",
+      "id" : "AD-H"
+    }, {
+      "fromId" : "AE",
+      "toId" : "A",
+      "id" : "AE-A"
+    }, {
+      "fromId" : "AE",
+      "toId" : "B",
+      "id" : "AE-B"
+    }, {
+      "fromId" : "C",
+      "toId" : "AE",
+      "id" : "C-AE"
+    }, {
+      "fromId" : "D",
+      "toId" : "AE",
+      "id" : "D-AE"
+    }, {
+      "fromId" : "E",
+      "toId" : "AE",
+      "id" : "E-AE"
+    }, {
+      "fromId" : "AF",
+      "toId" : "F",
+      "id" : "AF-F"
+    }, {
+      "fromId" : "AF",
+      "toId" : "G",
+      "id" : "AF-G"
+    }, {
+      "fromId" : "AF",
+      "toId" : "H",
+      "id" : "AF-H"
+    }, {
+      "fromId" : "AF",
+      "toId" : "I",
+      "id" : "AF-I"
+    }, {
+      "fromId" : "AF",
+      "toId" : "J",
+      "id" : "AF-J"
+    }, {
+      "fromId" : "AG",
+      "toId" : "A",
+      "id" : "AG-A"
+    }, {
+      "fromId" : "AG",
+      "toId" : "B",
+      "id" : "AG-B"
+    }, {
+      "fromId" : "AG",
+      "toId" : "C",
+      "id" : "AG-C"
+    }, {
+      "fromId" : "AG",
+      "toId" : "D",
+      "id" : "AG-D"
+    }, {
+      "fromId" : "AG",
+      "toId" : "E",
+      "id" : "AG-E"
+    }, {
+      "fromId" : "AG",
+      "toId" : "F",
+      "id" : "AG-F"
+    }, {
+      "fromId" : "AH",
+      "toId" : "A",
+      "id" : "AH-A"
+    }, {
+      "fromId" : "AH",
+      "toId" : "B",
+      "id" : "AH-B"
+    }, {
+      "fromId" : "AH",
+      "toId" : "C",
+      "id" : "AH-C"
+    }, {
+      "fromId" : "AH",
+      "toId" : "D",
+      "id" : "AH-D"
+    }, {
+      "fromId" : "AH",
+      "toId" : "E",
+      "id" : "AH-E"
+    }, {
+      "fromId" : "AH",
+      "toId" : "F",
+      "id" : "AH-F"
+    }, {
+      "fromId" : "AH",
+      "toId" : "G",
+      "id" : "AH-G"
+    }, {
+      "fromId" : "AI",
+      "toId" : "A",
+      "id" : "AI-A"
+    }, {
+      "fromId" : "B",
+      "toId" : "AI",
+      "id" : "B-AI"
+    }, {
+      "fromId" : "C",
+      "toId" : "AI",
+      "id" : "C-AI"
+    }, {
+      "fromId" : "D",
+      "toId" : "AI",
+      "id" : "D-AI"
+    }, {
+      "fromId" : "E",
+      "toId" : "AI",
+      "id" : "E-AI"
+    }, {
+      "fromId" : "F",
+      "toId" : "AI",
+      "id" : "F-AI"
+    }, {
+      "fromId" : "G",
+      "toId" : "AI",
+      "id" : "G-AI"
+    }, {
+      "fromId" : "H",
+      "toId" : "AI",
+      "id" : "H-AI"
+    }, {
+      "fromId" : "AJ",
+      "toId" : "A",
+      "id" : "AJ-A"
+    }, {
+      "fromId" : "B",
+      "toId" : "AJ",
+      "id" : "B-AJ"
+    }, {
+      "fromId" : "C",
+      "toId" : "AJ",
+      "id" : "C-AJ"
+    }, {
+      "fromId" : "D",
+      "toId" : "AJ",
+      "id" : "D-AJ"
+    }, {
+      "fromId" : "E",
+      "toId" : "AJ",
+      "id" : "E-AJ"
+    }, {
+      "fromId" : "F",
+      "toId" : "AJ",
+      "id" : "F-AJ"
+    }, {
+      "fromId" : "G",
+      "toId" : "AJ",
+      "id" : "G-AJ"
+    }, {
+      "fromId" : "H",
+      "toId" : "AJ",
+      "id" : "H-AJ"
+    }, {
+      "fromId" : "I",
+      "toId" : "AJ",
+      "id" : "I-AJ"
+    }, {
+      "fromId" : "AK",
+      "toId" : "A",
+      "id" : "AK-A"
+    }, {
+      "fromId" : "B",
+      "toId" : "AK",
+      "id" : "B-AK"
+    }, {
+      "fromId" : "C",
+      "toId" : "AK",
+      "id" : "C-AK"
+    }, {
+      "fromId" : "D",
+      "toId" : "AK",
+      "id" : "D-AK"
+    }, {
+      "fromId" : "E",
+      "toId" : "AK",
+      "id" : "E-AK"
+    }, {
+      "fromId" : "F",
+      "toId" : "AK",
+      "id" : "F-AK"
+    }, {
+      "fromId" : "G",
+      "toId" : "AK",
+      "id" : "G-AK"
+    }, {
+      "fromId" : "H",
+      "toId" : "AK",
+      "id" : "H-AK"
+    }, {
+      "fromId" : "I",
+      "toId" : "AK",
+      "id" : "I-AK"
+    }, {
+      "fromId" : "J",
+      "toId" : "AK",
+      "id" : "J-AK"
+    } ]
+  },
+  "nodeOrder" : [ "AK", "AJ", "AI", "AH", "AG", "AF", "AE", "AD", "AC", "AB", "AA", "Z", "Y", "X", "W", "V", "U", "T", "S", "R", "Q", "P", "O", "N", "M", "L", "K" ],
+  "edgeOrder" : [ "AJ-A", "G-AK", "C-AJ", "AD-G", "AF-F", "AE-A", "D-AE", "AC-B", "V-D", "F-AJ", "AF-G", "F-AI", "Z-B", "AC-D", "AB-I", "G-AI", "Y-I", "N-D", "U-B", "AB-H", "B-AK", "AD-E", "AG-F", "Z-A", "AK-A", "AC-A", "G-AJ", "AH-C", "AD-F", "AB-G", "AA-E", "T-J", "AI-A", "C-AE", "E-AK", "K-A", "W-F", "I-AK", "D-AI", "Q-G", "P-F", "X-G", "B-AJ", "C-AK", "AG-B", "AG-A", "F-AK", "C-AI", "AE-B", "Z-C", "H-AJ", "AH-G", "V-C", "L-B", "S-I", "B-AI", "E-AE", "H-AI", "J-AK", "O-E", "AF-H", "Y-J", "X-H", "U-A", "AD-H", "AC-C", "AF-J", "W-E", "AF-I", "D-AK", "R-H", "AH-D", "AA-D", "AA-F", "M-C", "H-AK", "AH-A", "AG-E", "E-AJ", "AH-E", "AH-F", "E-AI", "AG-C", "I-AJ", "AH-B", "AG-D", "D-AJ" ],
+  "densityFactor" : 0.13,
+  "presetName" : "preset-1",
+  "timestamp" : 1786193953236
+} ]
