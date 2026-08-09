@@ -2,12 +2,7 @@ import {useCallback, useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {
-    AlgorithmStepDTO,
-    Node,
-    OutputProps,
-    RectAttrs,
-    LineAttrs,
-    NodeVisualRefs, NodeVisualState
+    AlgorithmStepDTO, Node, OutputProps, RectAttrs, LineAttrs, NodeVisualRefs, NodeVisualState
 } from "../shared/Types.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XNodeWithCords} from "../shared/Nodes.tsx";
@@ -25,7 +20,7 @@ import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
 const STEP_DURATION = 0.9;
 const CANDIDATE_FADE_IN_DURATION = 0.7;
 const CANDIDATE_FADE_OUT_DURATION = 0.3;
-const CANDIDATE_AUTOPLAY_HOLD_DURATION = 2;
+const CANDIDATE_AUTOPLAY_HOLD_DURATION = 0.9;
 const ACTIVE_WINDOW_SHRINK_DURATION = 0.75
 const PADDING = 1;
 
@@ -66,8 +61,11 @@ export function Output(props: OutputProps) {
         return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
 
+    const hasCurrentDisplayed = (step: AlgorithmStepDTO): boolean =>
+        step.currentPoint !== null && step.stepType !== "START" && step.stepType !== "INITIALIZATION" && step.stepType !== "FINISHED";
+
     const getNodeVisualState = (step: AlgorithmStepDTO, nodeId: string): NodeVisualState => {
-        const isCurrent = step.currentPoint?.id === nodeId; //step.currentPoint !== null && p.id === step.currentPoint.id;
+        const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === nodeId;
         const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
             step.candidateComparisons.some(({candidate}) => candidate.id === nodeId);
         const isActive = step.activePoints.some(point => point.id === nodeId);
@@ -76,12 +74,11 @@ export function Output(props: OutputProps) {
         const isFuture = step.futurePoints.some(point => point.id === nodeId);
         return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
     };
-    //TODO: Ist wirklich sinvoll so? activ und candidate bekommen gleiche farbe
+
     const getNodeColor = (state: NodeVisualState): string => {
         if (state.isBest) return "#f5c45e";
-        //if (state.isCurrent) return "#222222";
-        if (state.isProcessed) return "#aaaaaa";
-        if (state.isFuture) return "#cccccc";
+        if (state.isProcessed) return "#cccccc";
+        if (state.isFuture) return "#808080";
         return "#222222";//"#555";
     };
 
@@ -114,8 +111,9 @@ export function Output(props: OutputProps) {
         timeline.to(sweepLineRef.current, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
         // Initiales Best Pair und Future nodes colors
         animateNodeColors(timeline, startStep, targetStep, "<");
-        // initial Current Marker
-        animateCurrentChange(timeline, startStep, targetStep, "<");
+
+        // initial Current Marker animateCurrentChange(timeline, startStep, targetStep, "<");
+
         // Active Ring für initial aktive Punkte
         const activeRefs = getRefsForNodes(targetStep.activePoints);
         if (activeRefs.length > 0) {
@@ -263,6 +261,8 @@ export function Output(props: OutputProps) {
         if (activeRefs.length > 0) {
             timeline.to(activeRefs.map(ref => ref.activeRing), {opacity: 0, duration: 0.35}, "<");
         }
+        // Alle Punkte sind processed und werden so angzeigt. closestPair bleibt gold wegen getNodeColor() Prio
+        animateNodeColors(timeline, previousStep, targetStep, "<");
     };
 
     useGSAP(() => {
@@ -300,13 +300,26 @@ export function Output(props: OutputProps) {
             }
         });
 
+        const setNodeVisualsToStep = (step: AlgorithmStepDTO) => {
+            step.allPoints.forEach(node => {
+                const refs = getNodeRefs(node.id);
+                if (!refs) return;
+                const state = getNodeVisualState(step, node.id);
+                gsap.set(refs.nodeVisual, {color: getNodeColor(state)});
+                gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
+                gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
+                gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
+            });
+        };
+
         //init state setzen
         //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
+        const firstStep = props.steps[0];
         gsap.set(activeArea, {opacity: 0});
         gsap.set(activeAreaDifference, {opacity: 0});
         gsap.set(sweepLine, {opacity: 0});
         gsap.set(candidateRect, {opacity: 0});
-
+        setNodeVisualsToStep(firstStep);
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
@@ -375,7 +388,7 @@ export function Output(props: OutputProps) {
             timelineRef.current = gsap.timeline({paused: true}); //damit eine pausierte leere timeline erzeugt wird... aber eigentlich egal finde es nur schöner so
         };
     }, {
-        dependencies: [props.steps],
+        dependencies: [props.steps]
     });
 
     if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
@@ -385,14 +398,12 @@ export function Output(props: OutputProps) {
     const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
 
-    const getCandidateLegendValue = (step: AlgorithmStepDTO): string => {
-        if (step.currentPoint === null) return "—";
-        if (step.stepType !== "CHECK_CANDIDATES") return "Not part of this step";
-        if (step.candidateComparisons.length === 0) return "No candidates inside the candidate window";
-        return step.candidateComparisons.map(({candidate, distance}) =>
-                `dist(${step.currentPoint!.label}, ${candidate.label}) = ${distance.toFixed(2)}`
-            ).join(", ");
-    };
+    const candidateDistances = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
+        ? "No comparisons" : step.candidateComparisons.map(({candidate, distance}) =>
+                `d(${step.currentPoint!.label}, ${candidate.label}) = ${distance.toFixed(2)}`).join(", ");
+
+    const candidateLabels = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
+        ? "None" : step.candidateComparisons.map(({candidate}) => candidate.label) .join(", ");
 
     /*
     steps[i] bzw. bei Label i = "stabiler Zustand", der bereits erreicht wurde
@@ -473,20 +484,6 @@ export function Output(props: OutputProps) {
                 {props.steps[0].allPoints.map((point: Node) => ( //step.allPoints.map()
                     <XNodeWithCords key={point.id} node={point} registerNodeRefsInMap={registerNodeRefsInMap} />
                 ))}
-
-                {step.stepType === "CHECK_CANDIDATES" &&
-                    step.currentPoint && step.candidateComparisons.map(({candidate}) => (
-                        <line
-                            key={`${step.currentPoint!.id}-${candidate.id}`}
-                            className="candidate-comparison-line"
-                            x1={step.currentPoint!.x}
-                            y1={step.currentPoint!.y}
-                            x2={candidate.x}
-                            y2={candidate.y}
-                            pointerEvents="none"
-                        />
-                    ))
-                }
             </svg>
 
             <OutputControls
@@ -515,9 +512,10 @@ export function Output(props: OutputProps) {
                             <strong>Closest pair Distance δ:</strong>{" "}
                             {step.bestPair?.distance.toFixed(2) ?? "—"}
                         </div>
+
                         <LegendEntry
                             label="Current Point: "
-                            value={step.currentPoint?.label ?? "—"}
+                            value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "-"}
                             icon={<XNodeIcon color="#222222" variant="current"/>}
                         />
                         <div>
@@ -537,10 +535,15 @@ export function Output(props: OutputProps) {
 
                         <div>
                             <LegendEntry
-                                label="Candidate comparisons: "
-                                value={getCandidateLegendValue(step)}
+                                label="Candidates: "
+                                value={candidateLabels}
                                 icon={<XNodeIcon color="#222222" ringStyle="candidate"/>}
                             />
+                        </div>
+
+                        <div>
+                            <strong>Distances to current:</strong>{" "}
+                            {candidateDistances}
                         </div>
                     </div>
                 </div>

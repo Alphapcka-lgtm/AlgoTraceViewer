@@ -52,9 +52,8 @@ public class SLineService {
         //Previously visited points that have already left the active x-range.
         //These points cannot form a closer pair with the current or any later point.
         List<Point> processedPoints = new ArrayList<>();
-        //For the init snapshot, p1 is the current point and is therefore not yet shown as active (only p0).
-        //It is inserted immediately after the snapshot.
         activePoints.add(p0);
+        activePoints.add(p1);
 
         //shortcut for the delta control+cmd+space and then search delta
         String description = "Initialization: The points are sorted by x-coordinate. "
@@ -75,8 +74,6 @@ public class SLineService {
                 new ArrayList<>(processedPoints),
                 getFuturePoints(xSorted, 1)
         ));
-
-        activePoints.add(p1);
 
         // Index of the leftmost x-sorted point that is still part of the activePoints.
         // Every point before tail has already been removed.

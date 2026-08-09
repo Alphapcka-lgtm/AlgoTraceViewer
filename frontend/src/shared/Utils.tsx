@@ -131,10 +131,11 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
         text: "remove points outside the active window", indent: 1
     },
     {id: "candidate-window",
-        text: "select candidates with |current.y - p.y| < δ", indent: 1
+        text: "C ← active points with |current.y − p.y| < δ", indent: 1 //select candidates with |current.y - p.y| < δ
     },
-    {id: "check-distance",
-        text: "compare current with each candidate", indent: 1
+    {
+        id: "check-distance",
+        text: "compare current with each p ∈ C", indent: 1 //compare current with each candidate
     },
     {id: "update-best",
         text: "if a closer pair is found: update δ and closestPair", indent: 1
