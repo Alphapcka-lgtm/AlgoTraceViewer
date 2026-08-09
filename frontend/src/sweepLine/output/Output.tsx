@@ -357,8 +357,8 @@ export function Output(props: OutputProps) {
                     break;
                 }
                 case "COMMIT_ITERATION": {
-                    animateCandidateRingsOut(timeline, previousStep);
-                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}, "<"); // Candidate Window wieder ausblenden
+                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
+                    animateCandidateRingsOut(timeline, previousStep, "<");
                     timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
 
                     animateDeltaUpdate(timeline, previousStep, targetStep);
