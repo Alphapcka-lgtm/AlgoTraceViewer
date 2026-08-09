@@ -16,7 +16,7 @@ import {
     getStepIndexFromTimeline,
     createStepLabels,
     SWEEP_LINE_PSEUDOCODE,
-    getActivePseudoCodeLineIds
+    getActivePseudoCodeLineIds, isSamePair
 } from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -66,8 +66,6 @@ export function Output(props: OutputProps) {
         return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
 
-    const isActiveRingVisible = (state: NodeVisualState): boolean => state.isActive && !state.isCandidate;
-
     const getNodeVisualState = (step: AlgorithmStepDTO, nodeId: string): NodeVisualState => {
         const isCurrent = step.currentPoint?.id === nodeId; //step.currentPoint !== null && p.id === step.currentPoint.id;
         const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
@@ -87,48 +85,6 @@ export function Output(props: OutputProps) {
         return "#222222";//"#555";
     };
 
-    const animateNode = (
-        timeline: gsap.core.Timeline, refs: NodeVisualRefs, previousState: NodeVisualState, targetState: NodeVisualState
-    ) => {
-        const previousColor = getNodeColor(previousState);
-        const targetColor = getNodeColor(targetState);
-        if (previousColor !== targetColor) {
-            timeline.to(refs.nodeVisual, {color: targetColor, duration: 0.3, ease: "power1.inOut"}, "<");
-        }
-
-        if (previousState.isCurrent !== targetState.isCurrent) {
-            timeline.to(refs.currentMarker, {
-                opacity: targetState.isCurrent ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
-            );
-        }
-
-        const wasActiveRingVisible = isActiveRingVisible(previousState);
-        const isActiveRingVisibleNow = isActiveRingVisible(targetState);
-        if (wasActiveRingVisible !== isActiveRingVisibleNow) {
-            timeline.to(refs.activeRing, {
-                opacity: isActiveRingVisibleNow ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
-            );
-        }
-
-        if (previousState.isCandidate !== targetState.isCandidate) {
-            timeline.to(refs.candidateRing,
-                {opacity: targetState.isCandidate ? 1 : 0, duration: 0.25, ease: "power1.inOut"}, "<"
-            );
-        }
-    };
-    const animateNodes = (
-        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO
-    ) => {
-        targetStep.allPoints.forEach(node => {
-            const refs = nodeRefsMap.current.get(node.id);
-            if (!refs) return;
-
-            const previousState = getNodeVisualState(previousStep, node.id);
-            const targetState = getNodeVisualState(targetStep, node.id);
-            animateNode(timeline, refs, previousState, targetState);
-        });
-    };
-
     const registerNodeRefsInMap = useCallback((nodeId: string, refs: NodeVisualRefs | null) => {
             if (refs) {
                 nodeRefsMap.current.set(nodeId, refs);
@@ -137,6 +93,199 @@ export function Output(props: OutputProps) {
             }
         }, []
     );
+
+    const getNodeRefs = (nodeId: string): NodeVisualRefs | undefined =>
+        nodeRefsMap.current.get(nodeId);
+
+    const getRefsForNodes = (nodes: Node[]): NodeVisualRefs[] => {
+        const res: NodeVisualRefs[] = [];
+        nodes.forEach(node => {
+            const refs = getNodeRefs(node.id);
+            if (refs) res.push(refs);
+        });
+        return res;
+    };
+
+    const animateInitialization = (
+        timeline: gsap.core.Timeline, startStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO
+    ) => {
+        // initiales Active Window + Sweep Line
+        timeline.to(activeSweepAreaRef.current, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
+        timeline.to(sweepLineRef.current, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+        // Initiales Best Pair und Future nodes colors
+        animateNodeColors(timeline, startStep, targetStep, "<");
+        // initial Current Marker
+        animateCurrentChange(timeline, startStep, targetStep, "<");
+        // Active Ring für initial aktive Punkte
+        const activeRefs = getRefsForNodes(targetStep.activePoints);
+        if (activeRefs.length > 0) {
+            timeline.to(activeRefs.map(ref => ref.activeRing), {opacity: 1, duration: 0.3}, "<");
+        }
+        timeline.set(candidateSweepWindowRef.current, {attr: getCandidateRectAttrs(targetStep), opacity: 0}); //set ok weil opacity 0
+    };
+
+    //nicht in COMMIT_ITERATION aufrufen (bei if(windowShrunk)) , weil da kümmert sich animateClosestPairUpdate um die farbänderung
+    //bei advance_and_prune kann es aufgerufen werden, weil dort sich bestpair nicht ändert
+    const animateNodeColors = (
+        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position
+    ) => {
+        let firstTween = true; //damit bei position === undefined nicht jeder punkt nacheinander animiert wird
+        targetStep.allPoints.forEach(node => {
+            const refs = getNodeRefs(node.id);
+            if (!refs) return;
+            const previousState = getNodeVisualState(previousStep, node.id);
+            const targetState = getNodeVisualState(targetStep, node.id);
+
+            const targetColor = getNodeColor(targetState);
+            if (getNodeColor(previousState) === targetColor) return;
+
+            timeline.to(refs.nodeVisual, {color: targetColor, duration: 0.3, ease: "power1.inOut"},
+                firstTween ? position : "<"
+            );
+            firstTween = false;
+        });
+    };
+
+    const animateCurrentChange = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
+        targetStep.allPoints.forEach(node => {
+            let firstTween = true;
+            const refs = getNodeRefs(node.id);
+            if (!refs) return;
+            const wasCurrent = previousStep.currentPoint?.id === node.id;
+            const isCurrent = targetStep.currentPoint?.id === node.id;
+            if (wasCurrent === isCurrent) return;
+            timeline.to(refs.currentMarker, {opacity: isCurrent ? 1 : 0, duration: 0.25, ease: "power1.inOut"},
+                firstTween ? position : "<"
+            );
+            firstTween = false;
+        });
+    };
+
+    const animateRemoveActiveRings = (timeline: gsap.core.Timeline, step: AlgorithmStepDTO) => {
+        const refsOfRemoved = getRefsForNodes(step.removedPoints);
+        if (refsOfRemoved.length === 0) return;
+        timeline.to(refsOfRemoved.map(refs => refs.activeRing), {opacity: 0, duration: 0.3, ease: "power1.out"});
+    };
+
+    const animateCandidateSelectionIn = (
+        timeline: gsap.core.Timeline,
+        step: AlgorithmStepDTO,
+        position?: gsap.Position
+    ) => {
+        const candidateRefs = getRefsForNodes(
+            step.candidateComparisons.map(
+                comparison => comparison.candidate
+            )
+        );
+
+        if (candidateRefs.length === 0) return;
+
+        timeline.to(
+            candidateRefs.map(ref => ref.activeRing),
+            {opacity: 0, duration: 0.25, ease: "power1.inOut"}, position
+        );
+
+        timeline.to(candidateRefs.map(refs => refs.candidateRing),
+            {opacity: 1, duration: 0.25, ease: "power1.inOut"}, "<"
+        );
+    };
+
+    const animateCandidateSelectionOut = (
+        timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position
+    ) => {
+        const candidates = previousStep.candidateComparisons.map(comparison => comparison.candidate);
+
+        const candidateRefs = getRefsForNodes(candidates);
+        if (candidateRefs.length === 0) return;
+
+        timeline.to(candidateRefs.map(refs => refs.candidateRing),
+            {opacity: 0, duration: 0.25, ease: "power1.out"}, position
+        );
+
+        const stillActiveRefs = getRefsForNodes(
+            candidates.filter(candidate => targetStep.activePoints.some(active => active.id === candidate.id))
+        );
+
+        if (stillActiveRefs.length > 0) {
+            timeline.to(stillActiveRefs.map(ref => ref.activeRing),
+                {opacity: 1, duration: 0.25, ease: "power1.inOut"}, "<"
+            );
+        }
+    };
+
+    const animateCurrentInsertion = (timeline: gsap.core.Timeline, step: AlgorithmStepDTO) => {
+        if (!step.currentPoint) return;
+        const refs = getNodeRefs(step.currentPoint.id);
+        if (!refs) return;
+        timeline.to(refs.activeRing, {opacity: 1, duration: 0.3, ease: "power1.inOut"});
+    };
+
+
+    const animateClosestPairUpdate = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO) => {
+        if (isSamePair(previousStep.bestPair, targetStep.bestPair)) return;
+
+        const affectedIds = new Set<string>();
+        if (previousStep.bestPair) {
+            affectedIds.add(previousStep.bestPair.p0.id);
+            affectedIds.add(previousStep.bestPair.p1.id);
+        }
+        if (targetStep.bestPair) {
+            affectedIds.add(targetStep.bestPair.p0.id);
+            affectedIds.add(targetStep.bestPair.p1.id);
+        }
+        let firstTween = true;
+        affectedIds.forEach(nodeId => {
+            const refs = getNodeRefs(nodeId);
+            if (!refs) return;
+            const targetState = getNodeVisualState(targetStep, nodeId);
+            timeline.to(
+                refs.nodeVisual, {color: getNodeColor(targetState), duration: 0.3, ease: "power1.inOut"},
+                firstTween ? undefined : "<"
+            );
+            firstTween = false;
+        });
+    };
+
+
+    const animateDeltaUpdate = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO) => {
+        if (targetStep.windowDelta >= previousStep.windowDelta) return;
+        const oldWindow = getActiveAreaAttrs(previousStep);
+        const newWindow = getActiveAreaAttrs(targetStep);
+        const activeArea = activeSweepAreaRef.current;
+        const activeAreaDifference = activeSweepAreaDifferenceRef.current;
+        if (!activeArea || !activeAreaDifference) return;
+
+        //schraffur startet ohne breite
+        timeline.set(activeAreaDifference, {
+            attr: {x: oldWindow.x, y: oldWindow.y, width: 0, height: oldWindow.height}, opacity: 0.7});
+        //Falls kleineres δ gefunden wurde, schrumpft das "echte" Active Window
+        timeline.to(activeArea, {
+            attr: newWindow, opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
+
+        //währed das active window kleiner wird, wächst der schraffierte bereich mit, damit die differnz in größe gut sieht
+        timeline.to(activeAreaDifference, {
+            attr: {width: newWindow.x - oldWindow.x},
+            duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"
+        }, "<");
+        // kurz stehen lassen damit man den unterschied sehen kann
+        timeline.to({}, {duration: 0.7});
+        // Schraffur wieder entfernen
+        timeline.to(activeAreaDifference, {opacity: 0, duration: 0.35, ease: "power1.out"});
+    };
+
+    const animateFinish = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO) => {
+        timeline.to(
+            [activeSweepAreaRef.current, activeSweepAreaDifferenceRef.current, sweepLineRef.current, candidateSweepWindowRef.current],
+            {opacity: 0, duration: 0.5}
+        );
+
+        animateCurrentChange(timeline, previousStep, targetStep, "<");
+
+        const activeRefs = getRefsForNodes(previousStep.activePoints);
+        if (activeRefs.length > 0) {
+            timeline.to(activeRefs.map(ref => ref.activeRing), {opacity: 0, duration: 0.35}, "<");
+        }
+    };
 
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
@@ -193,80 +342,48 @@ export function Output(props: OutputProps) {
                     break; // Kann hier nie auftreten, weil START steps[0] ist.
                 }
                 case "INITIALIZATION": {
-                    timeline.to(activeArea, {
-                        attr: getActiveAreaAttrs(targetStep), opacity: 1});
-                    timeline.to(sweepLine, {
-                        attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
-                    timeline.set(candidateRect, { //TODO: oder .to ??
-                        attr: getCandidateRectAttrs(targetStep), opacity: 0}, "<");
+                    animateInitialization(timeline, previousStep, targetStep);
                     break;
                 }
-
                 case "ADVANCE_AND_PRUNE": {
-                    // altes Candidate Window ausblenden
-                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION});
                     //Sweep Line und Active Window zum neuen current point bewegen
                     timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
                     timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
+                    animateCurrentChange(timeline, previousStep, targetStep, "<"); //current <- p[i]
+
                     // damit die animation einblenden besser aussieht, fährt es unsichtbar mit und so muss es bei CHECK_CANDIDATES nicht mehr bewegt werden
-                    timeline.to(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0}, "<");
+                    timeline.set(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0});
+
+                    animateNodeColors(timeline, previousStep, targetStep, "<");
+                    animateRemoveActiveRings(timeline, targetStep); //enfernen der außerhalb liegende active Rings animieren
+
                     break;
                 }
-
                 case "CHECK_CANDIDATES": {
                     //Candidate Window einblenden.
                     timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_FADE_IN_DURATION, ease: "power1.inOut"});
+
+                    animateCandidateSelectionIn(timeline, targetStep, "<");
 
                     // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
                     timeline.to({}, {duration: CANDIDATE_AUTOPLAY_HOLD_DURATION});
                     break;
                 }
-
                 case "COMMIT_ITERATION": {
-                    const windowShrunk:boolean = targetStep.windowDelta < previousStep.windowDelta;
-                    const oldWindow = getActiveAreaAttrs(previousStep);
-                    const newWindow = getActiveAreaAttrs(targetStep);
-                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
+                    animateCandidateSelectionOut(timeline, previousStep, targetStep);
+                    timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}, "<"); // Candidate Window wieder ausblenden
                     timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
-                    if(windowShrunk) {
-                        //schraffur startet ohne breite
-                        timeline.set(activeAreaDifference, {
-                            attr: {x: oldWindow.x, y: oldWindow.y, width: 0, height: oldWindow.height}, opacity: 0.7});
 
-                        //Falls kleineres δ gefunden wurde, schrumpft das "echte" Active Window
-                        timeline.to(activeArea, {
-                            attr: newWindow, opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"});
-
-                        //währed das active window kleiner wird, wächst der schraffierte bereich mit, damit die differnz in größe gut sieht
-                        timeline.to(activeAreaDifference, {
-                            attr: {width: newWindow.x - oldWindow.x},
-                            duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"
-                        }, "<");
-
-                        //Normalerweise bleibt pos gleich ... zur sicherheit trotzdem stezten
-                        timeline.to(sweepLine, {attr:
-                                getSweepLineAttrs(targetStep), opacity: 1, duration: ACTIVE_WINDOW_SHRINK_DURATION}, "<");
-
-                        // kurz stehen lassen damit man den unterschied sehen kann
-                        timeline.to({}, {duration: 0.7});
-
-                        // Schraffur wieder entfernen
-                        timeline.to(activeAreaDifference, {opacity: 0, duration: 0.35, ease: "power1.out"});
-
-                    } else {
-                        //Kein kleineres δ gefunden -> fenster "normal" weiterbewegen
-                        timeline.to(activeArea, {attr: newWindow, opacity: 1});
-                        timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
-                    }
+                    animateDeltaUpdate(timeline, previousStep, targetStep);
+                    animateClosestPairUpdate(timeline, previousStep, targetStep);
+                    animateCurrentInsertion(timeline, targetStep);
                     break;
                 }
-
                 case "FINISHED": {
-                    timeline.to([activeArea, sweepLine, candidateRect], {opacity: 0});
+                    animateFinish(timeline, previousStep, targetStep);
                     break;
                 }
             }
-            animateNodes(timeline, previousStep, targetStep);
 
             timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
         });
@@ -465,7 +582,6 @@ export function Output(props: OutputProps) {
                 onImport={props.onImport}
                 createExportString={props.createExportString}
             />
-
         </div>
     );
 }

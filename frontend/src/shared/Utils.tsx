@@ -1,7 +1,7 @@
 import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node, SweepLineStepType} from "../sweepLine/shared/Types.tsx"
+import type {Node, PointPair, SweepLineStepType} from "../sweepLine/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -137,7 +137,7 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
         text: "compare current with each candidate", indent: 1
     },
     {id: "update-best",
-        text: "if a closer pair is found: update closestPair and δ", indent: 1
+        text: "if a closer pair is found: update δ and closestPair", indent: 1
     },
     {id: "insert-current",
         text: "insert current into the active set", indent: 1
@@ -146,3 +146,11 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
         text: "return closestPair and δ"
     }
 ];
+
+export const isSamePair = (a: PointPair | null, b: PointPair | null): boolean => {
+    // Wenn eines der paare null ist, sind sie nur gleich, wenn BEIDE null sind
+    if (!a || !b) return a === b;
+    const normalMatch = a.p0.id === b.p0.id && a.p1.id === b.p1.id;
+    const flippedMatch = a.p0.id === b.p1.id && a.p1.id === b.p0.id;
+    return normalMatch || flippedMatch;
+};
