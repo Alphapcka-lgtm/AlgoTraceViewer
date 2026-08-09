@@ -33,8 +33,6 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
         tlRef.current.timeScale(speed);
     };
 
-    console.log(props.output)
-
     useGSAP(() => {
 
         gsap.registerPlugin(DrawSVGPlugin);

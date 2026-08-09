@@ -43,7 +43,8 @@ const MAX_ELEMENTS = 8;
 
 const K_GRAPH_X = START_X;
 const K_GRAPH_Y = 800;
-const K_GRAPH_WIDTH = 1640;
+const K_WIDTH = 50;
+const K_GRAPH_WIDTH = 1640 - K_WIDTH;
 const K_GRAPH_HEIGHT = 220;
 
 // Bogenhöhe: skaliert mit dem Abstand zwischen den tauschenden Boxen,
@@ -103,21 +104,21 @@ export function SwapOutput(props: SwapOutputProps) {
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline({paused: true}));
     const lastProgressUpdateRef = useRef(0);
 
-    const labels = useMemo(() => createStepLabels(3 * props.steps.length), [props.steps.length]);
+    const labels = useMemo(() => createStepLabels(3 * (props.steps.length - 1) + 2), [props.steps.length]);
 
     const maxK =  props.values.length
-
-    const algorithmStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.currentStep - 2) / 3)));
 
     const kLabelDistance = Array.from({length: maxK-1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
 
     const kGraph = useMemo(() => {
 
+        const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.currentStep - 1) / 3)));
+
         const coordinates = props.steps
-            .slice(0, algorithmStepIndex + 1)
+            .slice(0, kGraphStepIndex + 1)
             .map((step, index) => {
                 // Abstand zum aktuellen/neuesten Punkt
-                const distanceFromCurrent = algorithmStepIndex - index;
+                const distanceFromCurrent = kGraphStepIndex - index;
 
                 // Aktueller Punkt steht ganz rechts.
                 // Ältere Punkte wandern nach links.
@@ -139,9 +140,7 @@ export function SwapOutput(props: SwapOutputProps) {
                     k: step.k,
                     i: index
                 };
-            })
-            // Alles abschneiden, was links aus dem Fenster gelaufen ist.
-            .filter(point => point.x >= K_GRAPH_X);
+            });
 
         return {
             coordinates,
@@ -149,9 +148,11 @@ export function SwapOutput(props: SwapOutputProps) {
                 .map(point => `${point.x},${point.y}`)
                 .join(" ")
         };
-    }, [props.steps, algorithmStepIndex, maxK]);
+    }, [props.steps, props.currentStep, maxK]);
 
-    const step: EhrlichSwapStepDTO | undefined = props.steps[algorithmStepIndex];
+    const stepIndex = Math.max(0, Math.floor((props.currentStep-1)/3));
+
+    const step: EhrlichSwapStepDTO = props.steps[stepIndex];
 
     // Initiale Werte aus Schritt 0. React rendert die Boxen genau einmal damit.
     // Danach ist GSAP alleiniger Eigentümer der Box-Positionen im DOM.
@@ -235,11 +236,9 @@ export function SwapOutput(props: SwapOutputProps) {
             }
         });
 
+        timeline.from("#current_k", {opacity: 0}, "<");
+
         timeline.addLabel(labels[1])
-
-        timeline.from("#current_k", {opacity: 0});
-
-        timeline.addLabel(labels[2])
 
         props.steps.forEach((s, stepIdx) => {
 
@@ -281,7 +280,7 @@ export function SwapOutput(props: SwapOutputProps) {
                 animateSwapArc(elASwap, aDeltaForSwap, lift, false, timeline, false);
             }
 
-            timeline.addLabel(labels[3*stepIdx + 3])
+            timeline.addLabel(labels[3*stepIdx + 2])
 
             // Slot-Tracking SOFORT aktualisieren (nicht via .call),
             // weil der Wert beim Aufbau der nächsten Schritte schon korrekt sein muss.
@@ -299,7 +298,9 @@ export function SwapOutput(props: SwapOutputProps) {
             let rightIdx = s.k - 1;
 
             if(rightIdx <= leftIdx) {
-                timeline.to({}, {duration: STEP_DURATION/3});
+                timeline.to({}, {duration: STEP_DURATION/5});
+            } else {
+                timeline.to({}, {duration: 0});
             }
 
             while (leftIdx < rightIdx) {
@@ -316,7 +317,6 @@ export function SwapOutput(props: SwapOutputProps) {
                 const elBRight = bRefs.current[bBoxAtRight];
 
                 if (elBLeft && elBRight) {
-                    // Alle b-Tausche eines Schritts starten gleichzeitig ("<")
                     timeline.to(elBLeft,  {x: `+=${bDeltaForLeft}`}, "<");
                     timeline.to(elBRight, {x: `+=${bDeltaForRight}`}, "<");
                 }
@@ -329,12 +329,11 @@ export function SwapOutput(props: SwapOutputProps) {
                 rightIdx--;
             }
 
+            timeline.addLabel(labels[3*stepIdx + 3])
+
+            timeline.to({}, {duration: STEP_DURATION/5});
+
             timeline.addLabel(labels[3*stepIdx + 4])
-
-            timeline.to({}, {duration: STEP_DURATION/3});
-
-            timeline.addLabel(labels[3*stepIdx + 5])
-
         });
 
         timelineRef.current = timeline;
@@ -432,13 +431,21 @@ export function SwapOutput(props: SwapOutputProps) {
                     <rect
                         x={K_GRAPH_X}
                         y={K_GRAPH_Y}
-                        width={K_GRAPH_WIDTH}
+                        width={K_GRAPH_WIDTH + K_WIDTH}
                         height={K_GRAPH_HEIGHT}
                         fill="none"
                         stroke="#aaa"
                         strokeWidth="2"
                         rx="30"
                     />
+                    <line
+                        x1={K_GRAPH_X + K_GRAPH_WIDTH}
+                        y1={K_GRAPH_Y}
+                        x2={K_GRAPH_X + K_GRAPH_WIDTH}
+                        y2={K_GRAPH_Y + K_GRAPH_HEIGHT}
+
+                        stroke="#aaa"
+                          strokeWidth="2"/>
 
                     {Array.from({length: maxK}, (_, index) => {
                         const k = index + 1;
@@ -453,7 +460,7 @@ export function SwapOutput(props: SwapOutputProps) {
                                 <line
                                     x1={K_GRAPH_X}
                                     y1={y}
-                                    x2={K_GRAPH_X + K_GRAPH_WIDTH}
+                                    x2={K_GRAPH_X + K_GRAPH_WIDTH + K_WIDTH}
                                     y2={y}
                                     stroke="#ddd"
                                     strokeWidth="1"
@@ -473,6 +480,18 @@ export function SwapOutput(props: SwapOutputProps) {
                             </g>
                         );
                     })}
+
+                    <text
+                        x={K_GRAPH_X - 10}
+                        y={K_GRAPH_Y}
+                        textAnchor="end"
+                        dominantBaseline="central"
+                        fontSize="18"
+                        fontFamily="monospace"
+                        fill="#777"
+                    >
+                        {"k"}
+                    </text>
 
                     <polyline
                         points={kGraph.points}
@@ -495,10 +514,21 @@ export function SwapOutput(props: SwapOutputProps) {
                                 fontFamily="monospace"
                                 fill="#777"
                             >
-                                {c.i + 1}
+                                {c.i}
                             </text>
                         ))
                     }
+                    <text
+                        x={K_GRAPH_X + 100}
+                        y={K_GRAPH_Y + K_GRAPH_HEIGHT + 20}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize="18"
+                        fontFamily="monospace"
+                        fill="#777"
+                    >
+                        {"loop index"}
+                    </text>
 
                     {kGraph.coordinates.length > 0 && (() => {
                         const current = kGraph.coordinates[kGraph.coordinates.length - 1];
@@ -512,8 +542,8 @@ export function SwapOutput(props: SwapOutputProps) {
                                     fill="black"
                                 />
                                 <text
-                                    x={current.x + 40}
-                                    y={current.y}
+                                    x={current.x + 33}
+                                    y={current.y - 7}
                                     textAnchor="end"
                                     fontSize="30"
                                     fontFamily="monospace"
@@ -541,15 +571,10 @@ export function SwapOutput(props: SwapOutputProps) {
             />
 
             <div className="step-info">
-                <div className="step-description">{step.description}</div>
                 <div className="step-info-grid">
                     <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
-                    <div><strong>k:</strong> {step.k}</div>
-                    <div><strong>Swap index:</strong> {step.swapIndex < 0 ? "—" : step.swapIndex}</div>
-                    <div><strong>Values before:</strong> {step.valuesBefore.join(", ")}</div>
-                    <div><strong>Values after:</strong> {step.valuesAfter.join(", ")}</div>
-                    <div><strong>b before:</strong> {step.bBefore.join(", ")}</div>
-                    <div><strong>b after:</strong> {step.bAfter.join(", ")}</div>
+                    <div><strong>k:</strong> {props.currentStep == 0 ? "" : step.k}</div>
+                    <div><strong>b[k]:</strong> {props.currentStep == 0 ? "" : step.swapIndex}</div>
                 </div>
             </div>
             <PseudoCodePanel

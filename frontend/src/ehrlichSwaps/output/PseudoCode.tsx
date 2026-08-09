@@ -1,18 +1,15 @@
 import type {PseudoCodeLine} from "../../shared/Types.tsx";
 
 export function getActiveLineIdsEhrlich(stepIndex: number, maxIndex: number) {
-    console.log(stepIndex)
     if (stepIndex === 0) {
-        return ["initB"];
-    } else if (stepIndex === 1) {
-        return ["initK"]
+        return ["initB", "initK"];
     } else if (stepIndex === maxIndex) {
         return ["return"];
-    } else if (stepIndex % 3 === 2) {
-        return ["swapA"]
-    } else if (stepIndex % 3 === 0) {
-        return ["flipB"];
     } else if (stepIndex % 3 === 1) {
+        return ["swapA"]
+    } else if (stepIndex % 3 === 2) {
+        return ["flipB"];
+    } else if (stepIndex % 3 === 0) {
         return ["getNextK"]
     } else {
         return [];
@@ -47,13 +44,13 @@ export const PSEUDOCODE_EHRLICH_SWAPS: PseudoCodeLine[] = [
 
     {
         id: "flipB",
-        text: "flip in b the subarray b[1...k-1]",
+        text: "flip the subarray b[1...k-1]",
         indent: 1
     },
 
     {
         id: "getNextK",
-        text: "compute next k",
+        text: "find next k",
         indent: 1
     },
 
