@@ -17,6 +17,20 @@ public class SLineService {
 
         if (points == null || points.size() < 2) throw new IllegalArgumentException("There must be at least two points");
 
+        steps.add(new AlgorithmStepDTO(
+                SweepLineStepType.START,
+                "Input points. The algorithm has not started yet",
+                null,
+                0,
+                List.of(),
+                points,
+                null,
+                List.of(),
+                List.of(),
+                List.of(),
+                points
+        ));
+
         List<Point> xSorted = new ArrayList<>(points);
         xSorted.sort(Comparator.comparingInt(Point::x).thenComparingInt(Point::y).thenComparing(Point::id));
 
@@ -59,8 +73,7 @@ public class SLineService {
                 List.of(),
                 List.of(),
                 new ArrayList<>(processedPoints),
-                getFuturePoints(xSorted, 1),
-                List.of("init") //List.of("sort", "init-ytable", "init-bestpair", "init-delta", "insert-initial", "init-tail")
+                getFuturePoints(xSorted, 1)
         ));
 
         activePoints.add(p1);
@@ -94,8 +107,6 @@ public class SLineService {
                 advanceDescription = "Select " + current.label() + " as the current point. " + "No active points lie outside the active window so no had to be removed.";
             }
 
-            List<String> advanceLineIds = removalResult.removedAny() ? List.of("set-current", "remove-inactive") : List.of("set-current", "remove-inactive-none");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.ADVANCE_AND_PRUNE,
                     advanceDescription,
@@ -107,8 +118,7 @@ public class SLineService {
                     List.of(),
                     new ArrayList<>(removalResult.removedPoints()),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    advanceLineIds//List.of("set-current", "remove-inactive") //List.of("set-current", "active-window-condition")
+                    futurePoints
             ));
 
             //Candidate checking may find a smaller delta.
@@ -123,8 +133,6 @@ public class SLineService {
                     "No active points (points in yTable?) lie inside the candidate window."
                     : "Compared the distance from " + current.label() + " with every candidate point (" + comparedPoints + ") so every active point whose y-distance is smaller than δ";
 
-           List<String> candidateLineIds = candidateResult.candidateComparisons().isEmpty() ? List.of("candidate-window"): List.of("candidate-window", "check-distance");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.CHECK_CANDIDATES,
                     candidateDescription,
@@ -137,8 +145,7 @@ public class SLineService {
                     candidateResult.candidateComparisons(),
                     List.of(),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    candidateLineIds //List.of("candidate-window", "check-distance")
+                    futurePoints
             ));
 
             delta = deltaAfterCandidateCheck; //The smaller delta now becomes the new "search radius" for later points
@@ -156,11 +163,6 @@ public class SLineService {
                 commitDescription = "No candidate pair is closer. δ remains " + String.format("%.2f", delta) + ". " + current.label() + " ist now part of the active set";
             }
 
-            //List<String> commitLineIds = foundNewBest ? List.of("update-best", "insert-current") : List.of("update-best-false", "insert-current");
-            List<String> commitLineIds = foundNewBest
-                    ? List.of("update-best", "insert-current")
-                    : List.of("update-best-false", "insert-current");
-
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.COMMIT_ITERATION,
                     commitDescription,
@@ -172,8 +174,7 @@ public class SLineService {
                     List.of(),
                     List.of(),
                     new ArrayList<>(processedPoints),
-                    futurePoints,
-                    commitLineIds
+                    futurePoints
             ));
 
         }
@@ -193,8 +194,7 @@ public class SLineService {
                 List.of(),
                 List.of(),
                 new ArrayList<>(xSorted),
-                List.of(),
-                List.of("return")
+                List.of()
         ));
 
         return steps;

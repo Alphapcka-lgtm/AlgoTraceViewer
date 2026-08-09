@@ -1,7 +1,7 @@
 import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node} from "../sweepLine/shared/Types.tsx"
+import type {Node, PointPair, SweepLineStepType} from "../sweepLine/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -106,120 +106,51 @@ export const createRandomNodes = (count: number, padding: number, svgWidth:numbe
     return nodes;
 };
 
+export function getActivePseudoCodeLineIds(stepType: SweepLineStepType): string[] {
+    switch (stepType) {
+        case "START": return [];
+        case "INITIALIZATION": return ["sort", "init"];
+        case "ADVANCE_AND_PRUNE": return ["set-current", "remove-inactive"];
+        case "CHECK_CANDIDATES": return ["candidate-window", "check-distance"];
+        case "COMMIT_ITERATION":return ["update-best", "insert-current"];
+        case "FINISHED": return ["return"];
+    }
+}
+
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
-    {
-        id: "init",
-        text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
+    {id: "sort", text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
     },
-    {
-        id: "init",
-        text: "initialize closestPair and δ using p[0] and p[1]"
+    {id: "init", text: "initialize closestPair and δ using p[0] and p[1]"
     },
-    {
-        id: "for-loop",
-        text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
+    {id: "for-loop", text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
     },
-
-    {
-        id: "set-current",
-        text: "current ← p[i]", //"current = next point",
+    {id: "set-current", text: "current ← p[i]", //"current = next point",
         indent: 1
     },
-
-    {
-        id: "remove-inactive",
-        text: "remove points outside the active window",
-        indent: 1
+    {id: "remove-inactive",
+        text: "remove points outside the active window", indent: 1
     },
-
-    {
-        id: "candidate-window",
-        text: "select candidates with |current.y - p.y| < δ",
-        indent: 1
+    {id: "candidate-window",
+        text: "select candidates with |current.y - p.y| < δ", indent: 1
     },
-
-    {
-        id: "check-distance",
-        text: "compare current with each candidate",
-        indent: 1
+    {id: "check-distance",
+        text: "compare current with each candidate", indent: 1
     },
-
-    {
-        id: "update-best",
-        text: "if a closer pair is found: update closestPair and δ",
-        indent: 1
+    {id: "update-best",
+        text: "if a closer pair is found: update δ and closestPair", indent: 1
     },
-
-    {
-        id: "insert-current",
-        text: "insert current into the active set",
-        indent: 1
+    {id: "insert-current",
+        text: "insert current into the active set", indent: 1
     },
-
-    {
-        id: "return",
+    {id: "return",
         text: "return closestPair and δ"
     }
 ];
-/*
-export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
-    { id: "init", text: "initialize xQueue, yTable, bestPair and δ" },
 
-    { id: "for-loop", text: "for each point current from left to right:" },
-
-    {
-        id: "update-active-window",
-        text: "remove points outside the active sweep window",
-        indent: 1
-    },
-
-    {
-        id: "check-candidate-window",
-        text: "compare current with points inside the candidate sweep window",
-        indent: 1
-    },
-
-    {
-        id: "update-bestpair",
-        text: "if a closer pair was found: update bestPair and δ",
-        indent: 1
-    },
-
-    {
-        id: "shrink-windows",
-        text: "shrink sweep windows to the new δ",
-        indent: 1
-    },
-
-    {
-        id: "insert-current",
-        text: "insert current into yTable",
-        indent: 1
-    },
-
-    { id: "return", text: "return bestPair and δ" }
-];
-
-
-
-export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
-    {id: "sort", text: "xQueue = sortx(P)"},
-    {id: "init-ytable", text: "yTable = [ ]"},
-    {id: "init-bestpair", text: "bestPair = (p0, p1)"},
-    {id: "init-delta", text: "δ = dist(p0, p1)"},
-    {id: "insert-initial", text: "yTable.insert(p0), yTable.insert(p1)"},
-    {id: "init-tail", text: "tail = 0"},
-    {id: "for-loop", text: "for i = 2 to xQueue.size - 1:"},
-    {id: "set-current", text: "current = xQueue.get(i)", indent: 1},
-    {id: "while-loop", text: "while xQueue.get(tail).x ≤ current.x - δ:", indent: 1},
-    {id: "remove-point", text: "yTable.delete(xQueue.get(tail))", indent: 2},
-    {id: "increment-tail", text: "tail += 1", indent: 2},
-    {id: "candidate-range", text: "for all points p in yTable where |p.y - current.y| < δ:", indent: 1},
-    {id: "check-distance", text: "if p != current && dist(current, p) < δ:", indent: 2},
-    {id: "update-delta", text: "δ = dist(current, p)", indent: 3},
-    {id: "update-bestpair", text: "bestPair = (current, p)", indent: 3},
-    {id: "insert-current", text: "yTable.insert(current)", indent: 1},
-    {id: "return", text: "return (bestPair, δ)"}
-];
-
- */
+export const isSamePair = (a: PointPair | null, b: PointPair | null): boolean => {
+    // Wenn eines der paare null ist, sind sie nur gleich, wenn BEIDE null sind
+    if (!a || !b) return a === b;
+    const normalMatch = a.p0.id === b.p0.id && a.p1.id === b.p1.id;
+    const flippedMatch = a.p0.id === b.p1.id && a.p1.id === b.p0.id;
+    return normalMatch || flippedMatch;
+};

@@ -302,8 +302,8 @@
 
 .step-info-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 16px;
 }
 
 /*
@@ -405,6 +405,20 @@
     stroke-dasharray: 0 4;
     animation: candidate-line-appear 180ms ease-out;
     stroke-linecap: round;
+}
+
+.step-layout {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.step-layout .step-info {
+    flex: 1;
+}
+
+.step-layout .pseudocode-panel {
+    flex: 0.7;
 }
 
 @keyframes candidate-line-appear {
