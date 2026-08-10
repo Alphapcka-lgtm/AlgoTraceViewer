@@ -1,9 +1,9 @@
 import {useState} from "react";
 import {Input} from "./input/Input.tsx";
 import useSweepLineSteps from "./Api.tsx";
-import type {Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
+import type {Point, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
-import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "../shared/Utils.tsx";
+import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomPoints} from "../shared/Utils.tsx";
 import "./App.css";
 import {presets} from "./input/Presets.tsx";
 import type {ExportState} from "../shared/Types.tsx";
@@ -11,7 +11,7 @@ import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
-    const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});  //welche nodes es gerade gibt
+    const [inputState, setInputState] = useState<SweepLineInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
     const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
     const {loading, error, calculateSteps} = useSweepLineSteps();
     const [currentStep, setCurrentStep] = useState(0);
@@ -22,29 +22,29 @@ export default function ClosestPair() {
 
 
     //Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
-    const handleAddNode = (node: Node) => {
+    const handleAddPoint = (point: Point) => {
         setInputState(prev => {
-            const labeledNode: Node = {...node, label: getAlphabetLabel(prev.nodes.length)};
-            return {nodes: [...prev.nodes, labeledNode], timestamp: Date.now()};
+            const labeledPoint: Point = {...point, label: getAlphabetLabel(prev.points.length)};
+            return {points: [...prev.points, labeledPoint], timestamp: Date.now()};
         });
     };
 
-    const handleMoveNode = (id: string, x: number, y: number) => {
+    const handleMovePoint = (id: string, x: number, y: number) => {
         setInputState(prev => ({
-            nodes:  prev.nodes.map((n: Node) => n.id === id ? {...n, x, y} : n),
+            points:  prev.points.map((n: Point) => n.id === id ? {...n, x, y} : n),
             timestamp: Date.now()
         }));
     };
 
-    const handleDeleteNode = (id: string) => {
+    const handleDeletePoint = (id: string) => {
         setInputState(prev => {
-            const remainingNodes = prev.nodes.filter(n => n.id !== id);
-            return {...prev, nodes: assignLabels(remainingNodes), timestamp: Date.now()};
+            const remainingPoints = prev.points.filter(n => n.id !== id);
+            return {...prev, points: assignLabels(remainingPoints), timestamp: Date.now()};
         });
     };
 
     const handleReset = () => {
-        setInputState({nodes: [], timestamp: Date.now()});
+        setInputState({points: [], timestamp: Date.now()});
         setOutputState({steps: [], timestamp: -1});
 
         setCurrentStep(0);
@@ -52,15 +52,15 @@ export default function ClosestPair() {
     };
 
     //"grundfunktion" für handleNormalSubmit und handleImport
-    //bevor die nodes ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
-    // die durch löschen von nodes entsehen können.
+    //bevor die points ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
+    // die durch löschen von points entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
-    const calculateOutput = async (submittedNodes: Node[], inputTimestamp: number) => {
+    const calculateOutput = async (submittedPoints: Point[], inputTimestamp: number) => {
         try {
-            const labeledNodes: Node[] = assignLabels(submittedNodes);
-            setInputState({nodes: labeledNodes, timestamp: inputTimestamp});
+            const labeledPoints: Point[] = assignLabels(submittedPoints);
+            setInputState({points: labeledPoints, timestamp: inputTimestamp});
 
-            const result = await calculateSteps(labeledNodes);
+            const result = await calculateSteps(labeledPoints);
             //console.log("Algorithm steps:", result);
             setOutputState({steps: result, timestamp: inputTimestamp});
 
@@ -81,7 +81,7 @@ export default function ClosestPair() {
         setProgress(0);
         setCurrentStep(0);
 
-        await calculateOutput(inputState.nodes, inputState.timestamp);
+        await calculateOutput(inputState.points, inputState.timestamp);
     };
 
     const handleChangeInput = () => {
@@ -89,7 +89,7 @@ export default function ClosestPair() {
     };
 
     const createExportString = () => {
-        return encodeExportState({algorithm: "closestPair", input: inputState.nodes, progress});
+        return encodeExportState({algorithm: "closestPair", input: inputState.points, progress});
     };
 
     const handleImport = async (encoded: string) => {
@@ -99,32 +99,32 @@ export default function ClosestPair() {
                 return;
             }
             const importTimestamp = Date.now();
-            const importedNodes = imported.input; //assign labels wird dann in calculateOutput geamacht ...
+            const importedPoints = imported.input; //assign labels wird dann in calculateOutput geamacht ...
             setProgress(imported.progress);
-            await calculateOutput(importedNodes, importTimestamp);
+            await calculateOutput(importedPoints, importTimestamp);
         } catch (error) {
             console.error("Invalid import string", error);
         }
     };
 
-    //Wert von Slider soll aktuelle Anzahl Nodes zeigen
-    // Slider nach rechts -> zufällige Nodes hinzufügen
-    // Slider nach links -> Nodes am Ende entfernen
+    //Wert von Slider soll aktuelle Anzahl Points zeigen
+    // Slider nach rechts -> zufällige Points hinzufügen
+    // Slider nach links -> Points am Ende entfernen
     // Manuelles Hinzufügen oder Löschen -> Slider passt sich automatisch an
-    const handleSetNodeCount = (targetCount: number) => {
-        const PADDING = 80; // das nodes nichts zu sehr an rand sind
+    const handleSetPointCount = (targetCount: number) => {
+        const PADDING = 80; // das points nichts zu sehr an rand sind
         setInputState((prev) => {
             //anzahl ist schon richitg ...
-            if (targetCount === prev.nodes.length) return prev;
+            if (targetCount === prev.points.length) return prev;
             //slider wurde nach links bewegt
-            //wenn z.b vorher: 10 Nodes und jetzt Slider: 6 dann nur ersten 6 nodes (prev.nodes.slice(0, 6))
-            if (targetCount < prev.nodes.length) {
-                return {...prev, nodes: assignLabels(prev.nodes.slice(0, targetCount)), timestamp: Date.now()};
+            //wenn z.b vorher: 10 Points und jetzt Slider: 6 dann nur ersten 6 points (prev.points.slice(0, 6))
+            if (targetCount < prev.points.length) {
+                return {...prev, points: assignLabels(prev.points.slice(0, targetCount)), timestamp: Date.now()};
             }
             //slider nach rechts
-            const missingCount:number = targetCount - prev.nodes.length;
-            const newNodes = createRandomNodes(missingCount, PADDING, svgWidth, svgHeight);
-            return {...prev, nodes: assignLabels([...prev.nodes, ...newNodes]), timestamp: Date.now()};
+            const missingCount:number = targetCount - prev.points.length;
+            const newPoints = createRandomPoints(missingCount, PADDING, svgWidth, svgHeight);
+            return {...prev, points: assignLabels([...prev.points, ...newPoints]), timestamp: Date.now()};
         });
     };
 
@@ -147,15 +147,15 @@ export default function ClosestPair() {
                     height={svgHeight}
                     width={svgWidth}
                     mode={modeState}
-                    nodes={inputState.nodes}
-                    onAddNode={handleAddNode}
-                    onMoveNode={handleMoveNode}
-                    onDeleteNode={handleDeleteNode}
+                    points={inputState.points}
+                    onAddPoint={handleAddPoint}
+                    onMovePoint={handleMovePoint}
+                    onDeletePoint={handleDeletePoint}
                     onReset={handleReset}
                     onSubmit={handleNormalSubmit}
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
-                    onSetNodeCount={handleSetNodeCount}
+                    onSetPointCount={handleSetPointCount}
                     selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
                     createExportString={createExportString}

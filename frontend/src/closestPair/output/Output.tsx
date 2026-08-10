@@ -2,10 +2,10 @@ import {useCallback, useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import type {
-    AlgorithmStepDTO, Node, OutputProps, RectAttrs, LineAttrs, NodeVisualRefs, NodeVisualState
+    AlgorithmStepDTO, Point, OutputProps, RectAttrs, LineAttrs, PointVisualRefs, PointVisualState
 } from "../shared/Types.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
-import {XNodeWithCords} from "../shared/Nodes.tsx";
+import {XPointWithCords} from "../shared/Points.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {
     getStepIndexFromTimeline,
@@ -15,7 +15,7 @@ import {
 } from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {LegendEntry, XNodeIcon} from "../../LegendeEntry.tsx";
+import {LegendEntry, XPointIcon} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 0.9;
 const CANDIDATE_FADE_IN_DURATION = 0.7;
@@ -36,7 +36,7 @@ export function Output(props: OutputProps) {
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
-    const nodeRefsMap = useRef(new Map<string, NodeVisualRefs>());
+    const pointRefsMap = useRef(new Map<string, PointVisualRefs>());
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -64,40 +64,40 @@ export function Output(props: OutputProps) {
     const hasCurrentDisplayed = (step: AlgorithmStepDTO): boolean =>
         step.currentPoint !== null && step.stepType !== "START" && step.stepType !== "INITIALIZATION" && step.stepType !== "FINISHED";
 
-    const getNodeVisualState = (step: AlgorithmStepDTO, nodeId: string): NodeVisualState => {
-        const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === nodeId;
+    const getPointVisualState = (step: AlgorithmStepDTO, pointId: string): PointVisualState => {
+        const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === pointId;
         const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
-            step.candidateComparisons.some(({candidate}) => candidate.id === nodeId);
-        const isActive = step.activePoints.some(point => point.id === nodeId);
-        const isBest = step.bestPair?.p0.id === nodeId ||step.bestPair?.p1.id === nodeId;
-        const isProcessed = step.processedPoints.some(point => point.id === nodeId);
-        const isFuture = step.futurePoints.some(point => point.id === nodeId);
+            step.candidateComparisons.some(({candidate}) => candidate.id === pointId);
+        const isActive = step.activePoints.some(point => point.id === pointId);
+        const isBest = step.bestPair?.p0.id === pointId ||step.bestPair?.p1.id === pointId;
+        const isProcessed = step.processedPoints.some(point => point.id === pointId);
+        const isFuture = step.futurePoints.some(point => point.id === pointId);
         return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
     };
 
-    const getNodeColor = (state: NodeVisualState): string => {
+    const getPointColor = (state: PointVisualState): string => {
         if (state.isBest) return "#f5c45e";
         if (state.isProcessed) return "#cccccc";
         if (state.isFuture) return "#808080";
         return "#222222";//"#555";
     };
 
-    const registerNodeRefsInMap = useCallback((nodeId: string, refs: NodeVisualRefs | null) => {
+    const registerPointRefsInMap = useCallback((pointId: string, refs: PointVisualRefs | null) => {
             if (refs) {
-                nodeRefsMap.current.set(nodeId, refs);
-            } else { //wenn node aus DOM unmounted wird, dann aus map entfernen
-                nodeRefsMap.current.delete(nodeId);   // um zu verhindert, dass die map irgendwann Referenzen auf svgs enthält, die gar nicht mehr existieren.
+                pointRefsMap.current.set(pointId, refs);
+            } else { //wenn point aus DOM unmounted wird, dann aus map entfernen
+                pointRefsMap.current.delete(pointId);   // um zu verhindert, dass die map irgendwann Referenzen auf svgs enthält, die gar nicht mehr existieren.
             }
         }, []
     );
 
-    const getNodeRefs = (nodeId: string): NodeVisualRefs | undefined =>
-        nodeRefsMap.current.get(nodeId);
+    const getPointRefs = (pointId: string): PointVisualRefs | undefined =>
+        pointRefsMap.current.get(pointId);
 
-    const getRefsForNodes = (nodes: Node[]): NodeVisualRefs[] => {
-        const res: NodeVisualRefs[] = [];
-        nodes.forEach(node => {
-            const refs = getNodeRefs(node.id);
+    const getRefsForPoints = (points: Point[]): PointVisualRefs[] => {
+        const res: PointVisualRefs[] = [];
+        points.forEach(point => {
+            const refs = getPointRefs(point.id);
             if (refs) res.push(refs);
         });
         return res;
@@ -109,13 +109,13 @@ export function Output(props: OutputProps) {
         // initiales Active Window + Sweep Line
         timeline.to(activeSweepAreaRef.current, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
         timeline.to(sweepLineRef.current, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
-        // Initiales Best Pair und Future nodes colors
-        animateNodeColors(timeline, startStep, targetStep, "<");
+        // Initiales Best Pair und Future points colors
+        animatePointColors(timeline, startStep, targetStep, "<");
 
         // initial Current Marker animateCurrentChange(timeline, startStep, targetStep, "<");
 
         // Active Ring für initial aktive Punkte
-        const activeRefs = getRefsForNodes(targetStep.activePoints);
+        const activeRefs = getRefsForPoints(targetStep.activePoints);
         if (activeRefs.length > 0) {
             timeline.to(activeRefs.map(ref => ref.activeRing), {opacity: 1, duration: 0.3}, "<");
         }
@@ -124,20 +124,20 @@ export function Output(props: OutputProps) {
 
     /**nicht in COMMIT_ITERATION aufrufen (bei if(windowShrunk)) , weil da kümmert sich animateClosestPairUpdate um die farbänderung
     bei advance_and_prune kann es aufgerufen werden, weil dort sich bestpair nicht ändert */
-    const animateNodeColors = (
+    const animatePointColors = (
         timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position
     ) => {
         let firstTween = true; //damit bei position === undefined nicht jeder punkt nacheinander animiert wird
-        targetStep.allPoints.forEach(node => {
-            const refs = getNodeRefs(node.id);
+        targetStep.allPoints.forEach(point => {
+            const refs = getPointRefs(point.id);
             if (!refs) return;
-            const previousState = getNodeVisualState(previousStep, node.id);
-            const targetState = getNodeVisualState(targetStep, node.id);
+            const previousState = getPointVisualState(previousStep, point.id);
+            const targetState = getPointVisualState(targetStep, point.id);
 
-            const targetColor = getNodeColor(targetState);
-            if (getNodeColor(previousState) === targetColor) return;
+            const targetColor = getPointColor(targetState);
+            if (getPointColor(previousState) === targetColor) return;
 
-            timeline.to(refs.nodeVisual, {color: targetColor, duration: 0.3, ease: "power1.inOut"},
+            timeline.to(refs.pointVisual, {color: targetColor, duration: 0.3, ease: "power1.inOut"},
                 firstTween ? position : "<"
             );
             firstTween = false;
@@ -146,11 +146,11 @@ export function Output(props: OutputProps) {
 
     const animateCurrentChange = (timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
         let firstTween = true;
-        targetStep.allPoints.forEach(node => {
-            const refs = getNodeRefs(node.id);
+        targetStep.allPoints.forEach(point => {
+            const refs = getPointRefs(point.id);
             if (!refs) return;
-            const wasCurrent = previousStep.currentPoint?.id === node.id;
-            const isCurrent = targetStep.currentPoint?.id === node.id;
+            const wasCurrent = previousStep.currentPoint?.id === point.id;
+            const isCurrent = targetStep.currentPoint?.id === point.id;
             if (wasCurrent === isCurrent) return;
             timeline.to(refs.currentMarker, {opacity: isCurrent ? 1 : 0, duration: 0.25, ease: "power1.inOut"},
                 firstTween ? position : "<"
@@ -160,7 +160,7 @@ export function Output(props: OutputProps) {
     };
 
     const animateRemoveActiveRings = (timeline: gsap.core.Timeline, step: AlgorithmStepDTO) => {
-        const refsOfRemoved = getRefsForNodes(step.removedPoints);
+        const refsOfRemoved = getRefsForPoints(step.removedPoints);
         if (refsOfRemoved.length === 0) return;
         timeline.to(refsOfRemoved.map(refs => refs.activeRing), {opacity: 0, duration: 0.3, ease: "power1.out"});
     };
@@ -168,7 +168,7 @@ export function Output(props: OutputProps) {
     const animateCandidateRingsIn = (
         timeline: gsap.core.Timeline, step: AlgorithmStepDTO, position?: gsap.Position
     ) => {
-        const candidateRefs = getRefsForNodes(
+        const candidateRefs = getRefsForPoints(
             step.candidateComparisons.map(comparison => comparison.candidate)
         );
         if (candidateRefs.length === 0) return;
@@ -182,7 +182,7 @@ export function Output(props: OutputProps) {
     const animateCandidateRingsOut = (
         timeline: gsap.core.Timeline, previousStep: AlgorithmStepDTO, position?: gsap.Position
     ) => {
-        const candidateRefs = getRefsForNodes(previousStep.candidateComparisons
+        const candidateRefs = getRefsForPoints(previousStep.candidateComparisons
             .map(comparison => comparison.candidate));
         if (candidateRefs.length === 0) return;
 
@@ -193,7 +193,7 @@ export function Output(props: OutputProps) {
 
     const animateCurrentInsertion = (timeline: gsap.core.Timeline, step: AlgorithmStepDTO) => {
         if (!step.currentPoint) return;
-        const refs = getNodeRefs(step.currentPoint.id);
+        const refs = getPointRefs(step.currentPoint.id);
         if (!refs) return;
         timeline.to(refs.activeRing, {opacity: 1, duration: 0.3, ease: "power1.inOut"});
     };
@@ -211,12 +211,12 @@ export function Output(props: OutputProps) {
             affectedIds.add(targetStep.bestPair.p1.id);
         }
         let firstTween = true;
-        affectedIds.forEach(nodeId => {
-            const refs = getNodeRefs(nodeId);
+        affectedIds.forEach(pointId => {
+            const refs = getPointRefs(pointId);
             if (!refs) return;
-            const targetState = getNodeVisualState(targetStep, nodeId);
+            const targetState = getPointVisualState(targetStep, pointId);
             timeline.to(
-                refs.nodeVisual, {color: getNodeColor(targetState), duration: 0.3, ease: "power1.inOut"},
+                refs.pointVisual, {color: getPointColor(targetState), duration: 0.3, ease: "power1.inOut"},
                 firstTween ? undefined : "<"
             );
             firstTween = false;
@@ -257,12 +257,12 @@ export function Output(props: OutputProps) {
 
         animateCurrentChange(timeline, previousStep, targetStep, "<");
 
-        const activeRefs = getRefsForNodes(previousStep.activePoints);
+        const activeRefs = getRefsForPoints(previousStep.activePoints);
         if (activeRefs.length > 0) {
             timeline.to(activeRefs.map(ref => ref.activeRing), {opacity: 0, duration: 0.35}, "<");
         }
-        // Alle Punkte sind processed und werden so angzeigt. closestPair bleibt gold wegen getNodeColor() Prio
-        animateNodeColors(timeline, previousStep, targetStep, "<");
+        // Alle Punkte sind processed und werden so angzeigt. closestPair bleibt gold wegen getPointColor() Prio
+        animatePointColors(timeline, previousStep, targetStep, "<");
     };
 
     useGSAP(() => {
@@ -300,12 +300,12 @@ export function Output(props: OutputProps) {
             }
         });
 
-        const setNodeVisualsToStep = (step: AlgorithmStepDTO) => {
-            step.allPoints.forEach(node => {
-                const refs = getNodeRefs(node.id);
+        const setPointVisualsToStep = (step: AlgorithmStepDTO) => {
+            step.allPoints.forEach(point => {
+                const refs = getPointRefs(point.id);
                 if (!refs) return;
-                const state = getNodeVisualState(step, node.id);
-                gsap.set(refs.nodeVisual, {color: getNodeColor(state)});
+                const state = getPointVisualState(step, point.id);
+                gsap.set(refs.pointVisual, {color: getPointColor(state)});
                 gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
                 gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
                 gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
@@ -319,7 +319,7 @@ export function Output(props: OutputProps) {
         gsap.set(activeAreaDifference, {opacity: 0});
         gsap.set(sweepLine, {opacity: 0});
         gsap.set(candidateRect, {opacity: 0});
-        setNodeVisualsToStep(firstStep);
+        setPointVisualsToStep(firstStep);
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
@@ -341,7 +341,7 @@ export function Output(props: OutputProps) {
                     timeline.to(activeArea, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
                     timeline.to(sweepLine, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
                     animateCurrentChange(timeline, previousStep, targetStep, "<"); //current <- p[i]
-                    animateNodeColors(timeline, previousStep, targetStep, "<");
+                    animatePointColors(timeline, previousStep, targetStep, "<");
                     // damit die animation einblenden besser aussieht, fährt es unsichtbar mit und so muss es bei CHECK_CANDIDATES nicht mehr bewegt werden
                     timeline.set(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0});
                     animateRemoveActiveRings(timeline, targetStep); //enfernen der außerhalb liegende active Rings animieren
@@ -481,8 +481,8 @@ export function Output(props: OutputProps) {
                     strokeLinecap="round"
                 />
 
-                {props.steps[0].allPoints.map((point: Node) => ( //step.allPoints.map()
-                    <XNodeWithCords key={point.id} node={point} registerNodeRefsInMap={registerNodeRefsInMap} />
+                {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
+                    <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
                 ))}
             </svg>
 
@@ -516,20 +516,20 @@ export function Output(props: OutputProps) {
                         <LegendEntry
                             label="Current Point: "
                             value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "-"}
-                            icon={<XNodeIcon color="#222222" variant="current"/>}
+                            icon={<XPointIcon color="#222222" variant="current"/>}
                         />
                         <div>
                             <LegendEntry
                                 label="Closest pair: "
                                 value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                                icon={<XNodeIcon color="#f5c45e" ringStyle="none"/>}
+                                icon={<XPointIcon color="#f5c45e" ringStyle="none"/>}
                             />
                         </div>
                         <div>
                             <LegendEntry
                                 label="Active Set: "
                                 value={activePointsLegendValue}
-                                icon={<XNodeIcon color="#222222" ringStyle="active"/>}
+                                icon={<XPointIcon color="#222222" ringStyle="active"/>}
                             />
                         </div>
 
@@ -537,7 +537,7 @@ export function Output(props: OutputProps) {
                             <LegendEntry
                                 label="Candidates: "
                                 value={candidateLabels}
-                                icon={<XNodeIcon color="#222222" ringStyle="candidate"/>}
+                                icon={<XPointIcon color="#222222" ringStyle="candidate"/>}
                             />
                         </div>
 

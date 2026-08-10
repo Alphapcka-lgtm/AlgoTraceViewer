@@ -18,13 +18,13 @@ export function LegendEntry({ label, value, icon }: LegendEntryProps) {
     );
 }
 
-type XNodeIconProps = {
+type XPointIconProps = {
     color: string;
     ringStyle?: RingStyle;
     variant?: "default" | "current";
 };
 
-export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNodeIconProps) {
+export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPointIconProps) {
     const NODE_SIZE = 4;
     const RING_RADIUS = 9;
     const CURRENT_MARKER_RADIUS = RING_RADIUS-1.25;

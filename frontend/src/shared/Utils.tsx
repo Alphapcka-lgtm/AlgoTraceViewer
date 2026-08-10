@@ -98,7 +98,7 @@ const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): N
         label: "",
     };
 };
-export const createRandomNodes = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
+export const createRandomPoints = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
     const nodes: Node[] = [];
     for (let i = 0; i < count; i++) {
         nodes.push(createRandomNode(padding, svgWidth, svgHeight));

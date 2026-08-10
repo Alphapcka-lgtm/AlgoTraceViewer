@@ -1,4 +1,4 @@
-import type {AlgorithmStepDTO, Node} from "./shared/Types.tsx";
+import type {AlgorithmStepDTO, Point} from "./shared/Types.tsx";
 import {useState} from "react";
 
 export default function useSweepLineSteps() {
@@ -6,12 +6,12 @@ export default function useSweepLineSteps() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const calculateSteps = async (nodes: Node[]) => {
+    const calculateSteps = async (points: Point[]) => {
         setLoading(true);
         setError(null);
 
         try {
-            const result = await sendPointsAndGetSteps(nodes);
+            const result = await sendPointsAndGetSteps(points);
             setAlgoSteps(result);
             return result;
         } catch (error) {
@@ -25,11 +25,11 @@ export default function useSweepLineSteps() {
     return { algoSteps, loading, error, calculateSteps };
 }
 
-async function sendPointsAndGetSteps(nodes: Node[]): Promise<AlgorithmStepDTO[]> {
+async function sendPointsAndGetSteps(points: Point[]): Promise<AlgorithmStepDTO[]> {
     const requestOptions = {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(nodes),
+        body: JSON.stringify(points),
     }
 
     const response = await fetch("http://localhost:8080/api/closestPair/steps", requestOptions);
