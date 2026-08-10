@@ -7,8 +7,9 @@ import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, cr
 import "./App.css";
 import {presets} from "./input/Presets.tsx";
 import type {ExportState} from "../shared/Types.tsx";
+import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
-export default function App() {
+export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
     const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});  //welche nodes es gerade gibt
     const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
@@ -88,13 +89,13 @@ export default function App() {
     };
 
     const createExportString = () => {
-        return encodeExportState({algorithm: "sweepLine", input: inputState.nodes, progress});
+        return encodeExportState({algorithm: "closestPair", input: inputState.nodes, progress});
     };
 
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
-            if (imported.algorithm !== "sweepLine") {
+            if (imported.algorithm !== "closestPair") {
                 return;
             }
             const importTimestamp = Date.now();
@@ -140,6 +141,8 @@ export default function App() {
     if (modeState === "input") {
         return (
             <div className="algorithm-shell">
+                <AlgorithmOverviewBox algoTyp={"closestPair"}/>
+
                 <Input
                     height={svgHeight}
                     width={svgWidth}

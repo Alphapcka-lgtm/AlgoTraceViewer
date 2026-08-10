@@ -1,4 +1,4 @@
-import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {Edge, EdgesProps, PreviewEdgeProps} from "./Types.tsx";
 
 export function Edges(props: EdgesProps) {

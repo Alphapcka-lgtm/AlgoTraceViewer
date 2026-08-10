@@ -1,7 +1,7 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import type {Interaction, SVGInputProps} from "../shared/Types.tsx";
-import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../closestPair/shared/Types.tsx"
 import {Edges, PreviewEdge} from "../shared/Edges.tsx";
 import {InputControls} from "./InputControls.tsx";
 import type {Edge} from "../shared/Types.tsx";

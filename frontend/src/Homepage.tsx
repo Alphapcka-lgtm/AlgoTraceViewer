@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import App from "./sweepLine/App.tsx";
+import ClosestPair from "./closestPair/ClosestPair.tsx";
 import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
 import type {HomepageProps, Tab} from "./shared/Types.tsx";
@@ -13,7 +13,7 @@ export function Homepage(props: HomepageProps) {
 
             <main className="app-main">
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
-                {activeTab === "sweepLine" && <App/>}
+                {activeTab === "closestPair" && <ClosestPair/>}
                 {activeTab === "vertexCover" && <VertexCover/>}
                 {activeTab === "suffixArray" && <SuffixArray/>}
                 {activeTab === "ehrlichSwaps" && <EhrlichSwaps />}
@@ -42,7 +42,7 @@ function NavigationBar(props: NavigationBarProps) {
     return (
         <nav className="home-nav">
             <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/"}/>
-            <NavButton tab="sweepLine" label="Sweepline" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/sweepLine"}/>
+            <NavButton tab="closestPair" label="Closest Pair" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/closestPair"}/>
             <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
             <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
             <NavButton tab="ehrlichSwaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwaps"}/>
@@ -88,9 +88,9 @@ function HomeContent(props: HomeContentProps) {
 
             <div className="algorithm-card-grid">
                 <AlgorithmCard
-                    title="Sweepline"
-                    description="bli bla blup"
-                    onClick={() => props.onTabChange("sweepLine")}
+                    title="Closest Pair"
+                    description="Finds the closest pair of points in 2D using a left-to-right sweep-line algorithm."
+                    onClick={() => props.onTabChange("closestPair")}
                 />
 
                 <AlgorithmCard

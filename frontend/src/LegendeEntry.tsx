@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type {RingStyle} from "./sweepLine/shared/Types.tsx";
+import type {RingStyle} from "./closestPair/shared/Types.tsx";
 
 type LegendEntryProps = {
     label: string;

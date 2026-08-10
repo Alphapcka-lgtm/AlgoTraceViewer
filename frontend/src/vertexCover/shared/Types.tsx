@@ -1,4 +1,4 @@
-import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {Dispatch, SetStateAction} from "react";
 
 export type Edge = {

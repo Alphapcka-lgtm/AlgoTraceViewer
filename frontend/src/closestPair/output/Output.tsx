@@ -509,7 +509,7 @@ export function Output(props: OutputProps) {
                         <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
 
                         <div>
-                            <strong>Closest pair Distance δ:</strong>{" "}
+                            <strong>Closest distance δ:</strong>{" "}
                             {step.bestPair?.distance.toFixed(2) ?? "—"}
                         </div>
 
@@ -551,7 +551,7 @@ export function Output(props: OutputProps) {
                 <PseudoCodePanel
                     lines={SWEEP_LINE_PSEUDOCODE}
                     activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
-                    title={"Sweep Line PseudoCode"}
+                    title={"Closest Pair Pseudocode"}
                 />
             </div>
 

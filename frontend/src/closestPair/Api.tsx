@@ -32,7 +32,7 @@ async function sendPointsAndGetSteps(nodes: Node[]): Promise<AlgorithmStepDTO[]>
         body: JSON.stringify(nodes),
     }
 
-    const response = await fetch("http://localhost:8080/api/sweepline/steps", requestOptions);
+    const response = await fetch("http://localhost:8080/api/closestPair/steps", requestOptions);
 
     if (!response.ok) {
         //throw new Error("Request failed");

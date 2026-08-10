@@ -18,7 +18,7 @@ export type DynamicNodesProps = {
     onDoubleClick: (id: string) => void;
 };
 
-//was Input alles von App bekommt
+//was Input alles von ClosestPair bekommt
 export type InputProps = {
     height: number;
     width: number;
@@ -71,7 +71,7 @@ export interface AlgorithmStepDTO {
     futurePoints: Node[];
 }
 
-//was Output von App bekommt
+//was Output von ClosestPair bekommt
 export type OutputProps = {
     height: number;
     width: number;
