@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Input} from "./input/Input.tsx";
 import useSweepLineSteps from "./Api.tsx";
-import type {Node, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
+import type {Node, ClosestPairInputState, ClosestPairOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomNodes} from "../shared/Utils.tsx";
 import "./App.css";
@@ -11,8 +11,8 @@ import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
-    const [inputState, setInputState] = useState<SweepLineInputState>({nodes: [], timestamp: 0});  //welche nodes es gerade gibt
-    const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
+    const [inputState, setInputState] = useState<ClosestPairInputState>({nodes: [], timestamp: 0});  //welche nodes es gerade gibt
+    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: -1,});
     const {loading, error, calculateSteps} = useSweepLineSteps();
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);

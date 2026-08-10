@@ -27,7 +27,6 @@ export function Input(props: SVGInputProps) {
                 return {
                     ...input,
                     graph: {...input.graph, nodes: [...input.graph.nodes, {x, y, id: getRandomId(), label: ""}]},
-                    presetName: "custom",
                     timestamp: Date.now()
                 };
             });
@@ -50,7 +49,6 @@ export function Input(props: SVGInputProps) {
                         ...input.graph,
                         nodes: input.graph.nodes.map((node) => node.id === interaction.nodeId ? {...node, ...pos} : node)
                     },
-                    presetName: "custom",
                     timestamp: Date.now()
                 };
             });
@@ -75,7 +73,6 @@ export function Input(props: SVGInputProps) {
                                 id: getRandomId()
                             }]
                         },
-                        presetName: "custom",
                         timestamp: Date.now()
                     };
                 }
@@ -107,7 +104,6 @@ export function Input(props: SVGInputProps) {
                     nodes: input.graph.nodes.filter((n) => n.id !== nodeId),
                     edges: input.graph.edges.filter((e) => e.fromId !== nodeId && e.toId !== nodeId)
                 },
-                presetName: "custom",
                 timestamp: Date.now()
             };
         })

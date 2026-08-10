@@ -87,12 +87,14 @@ export type OutputProps = {
     onImport: (encoded: string) => void;
 };
 
-export type SweepLineInputState = {
+export type ClosestPairInputState = {
     nodes: Node[];
     timestamp: number;
 };
 
-export type SweepLineOutputState = {
+export type ClosestPairRequest = ClosestPairInputState;
+
+export type ClosestPairOutputState = {
     steps: AlgorithmStepDTO[];
     timestamp: number;
 };

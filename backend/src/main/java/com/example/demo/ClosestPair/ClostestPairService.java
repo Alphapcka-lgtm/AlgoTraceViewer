@@ -5,15 +5,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class SLineService {
+public class ClostestPairService {
     //https://arxiv-org.translate.goog/html/2601.05681v1?_x_tr_sl=en&_x_tr_tl=de&_x_tr_hl=de&_x_tr_pto=sge#S2
     //https://arxiv.org/pdf/2601.05681v1
     //https://www.sciencedirect.com/science/article/abs/pii/0020019088901500
     //https://pages.di.unipi.it/rossano/blog/2023/sweepline/
     //https://www.geeksforgeeks.org/dsa/closest-pair-of-points-using-sweep-line-algorithm/
     //https://www.jn.ethz.ch/education/script/P6_C26.pdf
-    public List<AlgorithmStepDTO> nearestPoints(List<Point> points) {
+    public List<AlgorithmStepDTO> nearestPoints(ClosestPairRequest closestPairRequest) {
         List<AlgorithmStepDTO> steps = new ArrayList<>();
+        List<Point> points = closestPairRequest.getPoints();
 
         if (points == null || points.size() < 2) throw new IllegalArgumentException("There must be at least two points");
 
@@ -292,7 +293,7 @@ public class SLineService {
 
     //wrapper funktion für einfacheres testen
     public PointPair nearestPair(List<Point> points) {
-        List<AlgorithmStepDTO> steps = nearestPoints(points);
+        List<AlgorithmStepDTO> steps = nearestPoints(ClosestPairRequest.builder().points(points).build());
         if (steps.isEmpty()) throw new IllegalStateException("Algorithm produced no steps");
         return steps.getLast().bestPair();
     }

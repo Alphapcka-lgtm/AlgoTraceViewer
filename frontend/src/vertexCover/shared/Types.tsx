@@ -46,12 +46,10 @@ type NodeDegreePair = {
     degree: number,
 }
 
-export type AnimationRequest = {
+export type VertexCoverRequest = {
     graph: Graph,
     nodeOrder: string[],
     edgeOrder: string[],
-    densityFactor: number,
-    presetName: string,
     timestamp: number,
 };
 
@@ -81,16 +79,16 @@ export type Interaction =
 };
 
 export type SVGInputProps = {
-    input: AnimationRequest,
-    setInput: Dispatch<SetStateAction<AnimationRequest>>,
-    onSubmit: (input: AnimationRequest) => void;
+    input: VertexCoverRequest,
+    setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
+    onSubmit: (input: VertexCoverRequest) => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
 };
 
 export type InputControlProps = {
-    input: AnimationRequest,
-    setInput: Dispatch<SetStateAction<AnimationRequest>>,
+    input: VertexCoverRequest,
+    setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
     createExportString: () => string;
     onImport: (encoded: string) => void;
