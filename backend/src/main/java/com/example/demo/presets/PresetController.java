@@ -1,6 +1,5 @@
 package com.example.demo.presets;
 
-import com.example.demo.vertexCover.AnimationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +14,7 @@ import java.util.List;
 )
 @RequestMapping("/api/presets")
 public class PresetController {
-
+    public record SavePresetRequest(String name, String exportString) {}
     private final PresetService service;
 
     @Autowired
@@ -23,13 +22,15 @@ public class PresetController {
         this.service = service;
     }
 
-    @GetMapping
-    public List<AnimationRequest> getItems() {
-        return service.readAll();
+    //um alle presets für den alg zu bekommen
+    @GetMapping("/{algorithm}")
+    public List<PresetService.Preset> getPresets(@PathVariable String algorithm) throws IOException {
+        return service.getPresets(algorithm);
     }
 
-    @PostMapping
-    public AnimationRequest addItem(@RequestBody AnimationRequest request) throws IOException {
-        return service.add(request);
+    //um presets zu speichern
+    @PostMapping("/{algorithm}")
+    public List<PresetService.Preset> addPreset(@PathVariable String algorithm, @RequestBody SavePresetRequest request) throws IOException {
+        return service.add(algorithm, request.name(), request.exportString());
     }
 }

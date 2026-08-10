@@ -1,32 +1,31 @@
 import React, {useEffect, useState} from "react";
-import type {AnimationRequest} from "../shared/Types.tsx";
+
+export type Preset = {
+    name: string;
+    importString: string;
+};
 
 type PresetSelectProps = {
-    input: AnimationRequest;
-    setInput: (preset: AnimationRequest) => void;
+    algorithm: string;
+    exportString: string;
+    selectedPreset: string;
+    onPresetChange: (selected: string) => void;
+    onImport: (importString: string) => Promise<void> | void;
 };
 
 export function PresetSelect(props: PresetSelectProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [presetName, setPresetName] = useState("");
-    const [presets, setPresets] = useState<AnimationRequest[]>([]);
-
-    const fetchPresets = async () => {
-        await fetch("http://localhost:8080/api/presets")
-            .then((response) => response.json()).then(setPresets);
-    };
-
-    const addPreset = async (input: AnimationRequest) => {
-        await fetch("http://localhost:8080/api/presets", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(input)
-        });
-    };
+    const [presets, setPresets] = useState<Preset[]>([]);
 
     useEffect(() => {
-        void fetchPresets();
-    }, []);
+        const loadPresets = async () => {
+            const response = await fetch(`/api/presets/${props.algorithm}`);
+            const data: Preset[] = await response.json();
+            setPresets(data);
+        };
+        void loadPresets();
+    }, [props.algorithm]);
 
     const openDialog = () => {
         setPresetName("");
@@ -38,15 +37,34 @@ export function PresetSelect(props: PresetSelectProps) {
         setPresetName("");
     };
 
+    const handlePresetChange = async (selected: string) => {
+        props.onPresetChange(selected);
+        if (selected === "random" || selected === "-") return;
+        const preset = presets.find(preset => preset.name === selected);
+        if (!preset) return;
+        await props.onImport(preset.importString);
+    };
+
     const savePreset = async () => {
         const name = presetName.trim();
+        if (!name) return;
+        const response = await fetch(
+            `http://localhost:8080/api/presets/${encodeURIComponent(props.algorithm)}`,
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    name,
+                    exportString: props.exportString
+                })
+            }
+        );
 
-        if (!name || name === "custom") {
-            return;
-        }
+        if (!response.ok) throw new Error(`Could not save preset: ${response.status}`);
 
-        await addPreset({...props.input, presetName: name});
-        await fetchPresets()
+        const updatedPresets: Preset[] = await response.json();
+        setPresets(updatedPresets);
+        props.onPresetChange(name);
         closeDialog();
     };
 
@@ -57,25 +75,18 @@ export function PresetSelect(props: PresetSelectProps) {
             <div style={presetRowStyle}>
                 <select
                     className="control-select"
-                    defaultValue=""
-                    onChange={(event) => {
-                        const preset = presets.find(
-                            preset => preset.presetName === event.currentTarget.value
-                        );
-
-                        if (preset) {
-                            props.setInput({...preset, timestamp: Date.now()});
-                        }
-                    }}
+                    value={props.selectedPreset}
+                    onChange={(event) => void handlePresetChange(event.currentTarget.value)}
                 >
-                    <option value="">Select preset...
-                    </option>
+                    <option value="-"> - </option>
 
-                    {presets.map(preset => (
-                        <option key={preset.presetName} value={preset.presetName}>
-                            {preset.presetName}
+                    {presets.map((preset) => (
+                        <option key={preset.name} value={preset.name}>
+                            {preset.name}
                         </option>
                     ))}
+
+                    <option value="random">Random</option>
                 </select>
 
                 <button
@@ -100,9 +111,7 @@ export function PresetSelect(props: PresetSelectProps) {
                         <input
                             type="text"
                             value={presetName}
-                            onChange={(event) =>
-                                setPresetName(event.currentTarget.value)
-                            }
+                            onChange={(event) => setPresetName(event.currentTarget.value)}
                             onKeyDown={(event) => {
                                 if (event.key === "Enter" && canSave) {
                                     void savePreset();

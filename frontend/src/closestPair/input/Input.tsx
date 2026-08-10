@@ -77,7 +77,7 @@ export function Input(props: InputProps) {
 
             <div className="control-row">
 
-                <select className="control-select"value={props.selectedPreset}
+                <select className="control-select" value={props.selectedPreset}
                         onChange={(e) => props.onPresetChange(e.target.value)}
                 >
                     <option value="-"> - </option>
@@ -113,9 +113,6 @@ export function Input(props: InputProps) {
                     />
                 </label>
             </div>
-
-
-
         </div>
     );
 }
