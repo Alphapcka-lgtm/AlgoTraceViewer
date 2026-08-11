@@ -1,51 +1,53 @@
 import React from "react";
 
-export type Node = {
+export type Point = {
     x: number;
     y: number;
     id: string;
     label: string;
 };
 
+export type Node = Point;
+
 export type Interaction =
     | { type: "idle" }
-    | { type: "dragging"; nodeId: string };
+    | { type: "dragging"; pointId: string };
 
-export type DynamicNodesProps = {
-    nodes: Node[];
+export type DynamicPointsProps = {
+    points: Point[];
     onMouseDown: (id: string) => void;
     onMouseUp: () => void;
     onDoubleClick: (id: string) => void;
 };
 
-//was Input alles von App bekommt
+//was Input alles von ClosestPair bekommt
 export type InputProps = {
     height: number;
     width: number;
     mode: string;
-    nodes: Node[];
-    onAddNode: (node: Node) => void;
-    onMoveNode: (id: string, x: number, y: number) => void;
-    onDeleteNode: (id: string) => void;
+    points: Point[];
+    onAddPoint: (point: Point) => void;
+    onMovePoint: (id: string, x: number, y: number) => void;
+    onDeletePoint: (id: string) => void;
     onReset: () => void;
     onSubmit: () => void;
     onChangeInput: () => void;
     onImport: (encoded: string) => void;
-    onSetNodeCount: (count: number) => void;
+    onSetPointCount: (count: number) => void;
     selectedPreset: string;
     onPresetChange: (selected: string) => void;
     createExportString: () => string;
 };
 
 export interface PointPair {
-    p0: Node;
-    p1: Node;
+    p0: Point;
+    p1: Point;
     distance: number;
 }
 
 //Benötigt current Point nicht, da im DTO schon extra enthalten ist.
 export interface CandidateComparison {
-    candidate: Node;
+    candidate: Point;
     distance: number;
 }
 
@@ -60,18 +62,18 @@ export type SweepLineStepType =
 export interface AlgorithmStepDTO {
     stepType: SweepLineStepType;
     description: string;
-    currentPoint: Node | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
+    currentPoint: Point | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
     windowDelta: number; //Delta used to draw the sweep windows in this snapshot.
-    activePoints: Node[];
-    allPoints: Node[];
+    activePoints: Point[];
+    allPoints: Point[];
     bestPair: PointPair | null;
     candidateComparisons: CandidateComparison[];
-    removedPoints: Node[];
-    processedPoints: Node[];
-    futurePoints: Node[];
+    removedPoints: Point[];
+    processedPoints: Point[];
+    futurePoints: Point[];
 }
 
-//was Output von App bekommt
+//was Output von ClosestPair bekommt
 export type OutputProps = {
     height: number;
     width: number;
@@ -88,7 +90,7 @@ export type OutputProps = {
 };
 
 export type SweepLineInputState = {
-    nodes: Node[];
+    points: Point[];
     timestamp: number;
 };
 
@@ -99,29 +101,29 @@ export type SweepLineOutputState = {
 
 export type RingStyle = "none" | "active" | "candidate";
 
-export type XNodeProps = {
-    node: Node;
+export type XPointProps = {
+    point: Point;
     visualGroupRef: React.RefObject<SVGGElement | null>;
     currentMarkerRef: React.RefObject<SVGCircleElement | null>;
-    nodeVisualRef: React.RefObject<SVGGElement | null>;
+    pointVisualRef: React.RefObject<SVGGElement | null>;
     activeRingRef: React.RefObject<SVGCircleElement | null>;
     candidateRingRef: React.RefObject<SVGCircleElement | null>;
 };
 
-export type XNodeWithCordsProps = {
-    node: Node;
-    registerNodeRefsInMap?: (nodeId: string, refs: NodeVisualRefs | null) => void; //"?" damit DynamicNodes auch benutzen kann, weil die keine refs braucht
+export type XPointWithCordsProps = {
+    point: Point;
+    registerPointRefsInMap?: (pointId: string, refs: PointVisualRefs | null) => void; //"?" damit DynamicPoints auch benutzen kann, weil die keine refs braucht
 };
 
-export type NodeVisualRefs = {
+export type PointVisualRefs = {
     group: SVGGElement; //ist das SVG <g> element, das nur X und Ringe enthält.
-    nodeVisual: SVGGElement;
+    pointVisual: SVGGElement;
     currentMarker: SVGCircleElement;
     activeRing: SVGCircleElement;
     candidateRing: SVGCircleElement;
 };
 
-export type NodeVisualState = {
+export type PointVisualState = {
     isCurrent: boolean;
     isBest: boolean;
     isProcessed: boolean;

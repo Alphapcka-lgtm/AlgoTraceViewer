@@ -1,14 +1,63 @@
-import {ArrowLeft, ArrowRight, Pause, Play, RotateCcw, SkipBack, X} from "lucide-react";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Gauge, Info,
+    MousePointerClick,
+    Move,
+    MoveHorizontal,
+    Pause,
+    Play,
+    RotateCcw,
+    SkipBack,
+    X
+} from "lucide-react";
 import "../shared/SharedStyle.css"
-type ControlsHelpDialogProps = {
-    onClose: () => void;
+import {useState} from "react";
+
+
+type ControlsHelpProps = {
+    tab: "input" | "output";
+    algorithm: alg;
 };
 
-export function ControlsHelpDialog({onClose}: ControlsHelpDialogProps) {
+export function ControlsHelp({tab, algorithm}: ControlsHelpProps) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <button
+                type="button"
+                title="Controls explained"
+                onClick={() => setIsOpen(true)}
+                className="control-button icon-only"
+            >
+                <Info size={20}/>
+            </button>
+
+            {isOpen && (
+                <ControlsHelpDialog
+                    onClose={() => setIsOpen(false)}
+                    tab={tab}
+                    algorithm={algorithm}
+                />
+            )}
+        </>
+    );
+}
+
+
+type alg = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
+type ControlsHelpDialogProps = {
+    onClose: () => void;
+    tab: "input" | "output"
+    algorithm:alg
+};
+
+export function ControlsHelpDialog(props: ControlsHelpDialogProps) {
     return (
         <div
             className="dialog-overlay"
-            onClick={onClose}
+            onClick={props.onClose}
         >
             <div
                 className="dialog-card controls-help-dialog"
@@ -20,44 +69,112 @@ export function ControlsHelpDialog({onClose}: ControlsHelpDialogProps) {
                 <button
                     type="button"
                     className="controls-help-close" //control-button
-                    onClick={onClose}
+                    onClick={props.onClose}
                 >
                     <X size={14}/>
                 </button>
 
-                <h2 id="controls-help-title">Controls explained </h2>
-
                 <div className="controls-help-list">
-                    <div>
-                        <ArrowLeft size={20}/> <span>Show previous step.</span>
-                    </div>
 
-                    <div>
-                        <Play size={20}/>
-                        <span>Starts automatic playback.</span>
-                    </div>
+                    {props.tab === "output" && (
+                        <>
+                            <h2 id="controls-help-title">Controls explained </h2>
+                            <OutputHelpGeneral/>
+                        </>
+                    )}
 
-                    <div>
-                        <Pause size={20}/>
-                        <span>Pauses automatic playback.</span>
-                    </div>
-
-                    <div>
-                        <RotateCcw size={20}/>
-                        <span>Restart automatic playback.</span>
-                    </div>
-
-                    <div>
-                        <ArrowRight size={20}/>
-                        <span>Show next step.</span>
-                    </div>
-
-                    <div>
-                        <SkipBack size={20}/> <span>Resets the visualization.</span>
-                    </div>
-
+                    {props.tab === "input" && (
+                        <>
+                            <h2 id="controls-help-title">Input explained </h2>
+                            <InputHelp algorithm={props.algorithm}/>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
+    );
+}
+
+function InputHelp({algorithm}: {algorithm: alg}) {
+    switch (algorithm) {
+        case "closestPair":
+            return (
+                <>
+                    <div>
+                        <MousePointerClick size={20}/>
+                        <span>Click on the canvas to add a point.</span>
+                    </div>
+
+                    <div>
+                        <MousePointerClick size={20}/>
+                        <span>Double-click a point to remove it.</span>
+                    </div>
+
+                    <div>
+                        <Move size={20}/>
+                        <span>Drag a point to change its position.</span>
+                    </div>
+                </>
+            );
+        case "suffixArray":
+            return (
+                <>
+
+                </>
+            );
+        case "vertexCover":
+            return (
+                <>
+                    <h3>Graph editing</h3>
+
+                </>
+            );
+        case "ehrlichSwaps":
+            return (
+                <>
+                    <h3>...</h3>
+
+                </>
+            );
+    }
+}
+
+function OutputHelpGeneral() {
+    return (
+        <>
+            <div>
+                <Gauge size={20}/>
+                <span>Adjust playback speed.</span>
+            </div>
+            <div>
+                <ArrowLeft size={20}/>
+                <span>Show previous step.</span>
+            </div>
+            <div>
+                <Play size={20}/>
+                <span>Start automatic playback.</span>
+            </div>
+            <div>
+                <Pause size={20}/>
+                <span>Pause automatic playback.</span>
+            </div>
+            <div>
+                <RotateCcw size={20}/>
+                <span>Restart automatic playback.</span>
+            </div>
+            <div>
+                <ArrowRight size={20}/>
+                <span>Show next step.</span>
+            </div>
+            <div>
+                <SkipBack size={20}/>
+                <span>Reset the visualization.</span>
+            </div>
+            <div>
+                <MoveHorizontal size={20}/>
+                <span>Drag the timeline to move through the animation.</span>
+            </div>
+
+        </>
     );
 }

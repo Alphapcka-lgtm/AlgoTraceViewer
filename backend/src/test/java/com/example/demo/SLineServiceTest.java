@@ -2,7 +2,7 @@ package com.example.demo;
 
 import com.example.demo.ClosestPair.Point;
 import com.example.demo.ClosestPair.PointPair;
-import com.example.demo.ClosestPair.SLineService;
+import com.example.demo.ClosestPair.ClosestPairService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,11 +21,11 @@ class SLineServiceTest {
 
     private static final double EPSILON = 1e-9;
 
-    private SLineService service;
+    private ClosestPairService service;
 
     @BeforeEach
     void setUp() {
-        service = new SLineService();
+        service = new ClosestPairService();
     }
 
     /*
@@ -49,7 +49,7 @@ class SLineServiceTest {
     }
 
     private static double distance(Point p1, Point p2) {
-        return SLineService.euclideanDistance(p1, p2);
+        return ClosestPairService.euclideanDistance(p1, p2);
     }
 
     /**

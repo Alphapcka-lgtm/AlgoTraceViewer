@@ -1,7 +1,7 @@
 import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node, PointPair, SweepLineStepType} from "../sweepLine/shared/Types.tsx"
+import type {Node, PointPair, SweepLineStepType} from "../closestPair/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -98,7 +98,7 @@ const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): N
         label: "",
     };
 };
-export const createRandomNodes = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
+export const createRandomPoints = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
     const nodes: Node[] = [];
     for (let i = 0; i < count; i++) {
         nodes.push(createRandomNode(padding, svgWidth, svgHeight));
@@ -120,7 +120,7 @@ export function getActivePseudoCodeLineIds(stepType: SweepLineStepType): string[
 export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
     {id: "sort", text: "p ← points sorted by x-coordinate" //text: "sort points by x; initialize bestPair and δ"
     },
-    {id: "init", text: "initialize closestPair and δ using p[0] and p[1]"
+    {id: "init", text: "initialize closestPair, δ and activeSet with p[0], p[1]"
     },
     {id: "for-loop", text: "for i ← 2 to |p| − 1 do"//"for each remaining point:"
     },
@@ -128,19 +128,20 @@ export const SWEEP_LINE_PSEUDOCODE: PseudoCodeLine[] = [
         indent: 1
     },
     {id: "remove-inactive",
-        text: "remove points outside the active window", indent: 1
+        text: "remove points left of the δ-wide activeWindow from activeSet", indent: 1
     },
     {id: "candidate-window",
-        text: "select candidates with |current.y - p.y| < δ", indent: 1
+        text: "C ← points in activeSet with |current.y − p.y| < δ", indent: 1 //select candidates with |current.y - p.y| < δ
     },
-    {id: "check-distance",
-        text: "compare current with each candidate", indent: 1
+    {
+        id: "check-distance",
+        text: "compare current with each p ∈ C", indent: 1 //compare current with each candidate
     },
     {id: "update-best",
         text: "if a closer pair is found: update δ and closestPair", indent: 1
     },
     {id: "insert-current",
-        text: "insert current into the active set", indent: 1
+        text: "insert current into activeSet", indent: 1
     },
     {id: "return",
         text: "return closestPair and δ"

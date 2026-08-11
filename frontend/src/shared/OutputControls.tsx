@@ -6,13 +6,11 @@ import {
     Play,
     Pause,
     RotateCcw,
-    SkipBack, Info,
+    SkipBack,
 } from "lucide-react";
-import {useState} from "react";
-import { ControlsHelpDialog } from "./ControlsHelpDialog";
+import {ControlsHelp} from "./ControlsHelpDialog.tsx";
 
 export function OutputControls(props: OutputControlsProps) {
-    const [isHelpOpen, setIsHelpOpen] = useState(false);
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.labels.length - 1;
 
@@ -91,14 +89,7 @@ export function OutputControls(props: OutputControlsProps) {
     return (
         <>
             <div className="control-row">
-                <button
-                    type="button"
-                    title="Controls explained"
-                    onClick={() => setIsHelpOpen(true)}
-                    className="control-button icon-only"
-                >
-                    <Info size={20}/>
-                </button>
+                <ControlsHelp tab={"output"} algorithm={"closestPair"}/>
                 <select
                     value={props.playbackSpeed}
                     onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
@@ -135,12 +126,6 @@ export function OutputControls(props: OutputControlsProps) {
                     onInput={(e) => scrub(e.currentTarget.valueAsNumber)}
                 />
             </div>
-
-            {isHelpOpen && (
-                <ControlsHelpDialog
-                    onClose={() => setIsHelpOpen(false)}
-                />
-            )}
         </>
     );
 }

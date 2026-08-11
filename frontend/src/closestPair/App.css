@@ -295,9 +295,21 @@
     font-size: 15px;
 }
 
+
 .step-description {
-    margin-bottom: 8px;
-    color: var(--muted-text);
+    margin-top: 8px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+
+    height: 3lh;
+
+    overflow-y: auto;
+    /*color: var(--muted-text);*/
+
+}
+
+.candidate-distances {
+    margin-top: 0.7rem;
 }
 
 .step-info-grid {
@@ -399,13 +411,46 @@
     margin-top: var(--space-md);
 }
 
-.candidate-comparison-line {
-    stroke: rgba(204, 14, 119, 0.9);
+.svg-activeSweepAreaDifference {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.svg-activeSweepArea {
+    stroke: none;
+    fill: rgba(90, 90, 90, 0.14);
+    rx: 2px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.svg-candidateSweepWindow {
+    fill: rgba(255,220,245,0.75);
+    stroke: rgb(204,14,119);
+    stroke-dasharray: 6 3;
+    rx: 2px;
+    stroke-width: 0.6;
+    opacity: 0;
+    pointer-events: none;
+
+}
+.svg-sweepLine {
+    stroke: rgba(0, 0, 0, 0.9);
     stroke-width: 2;
-    stroke-dasharray: 0 4;
-    animation: candidate-line-appear 180ms ease-out;
+    opacity: 0;
+    pointer-events: none;
     stroke-linecap: round;
 }
+
+.svg-closestPairLine {
+    stroke: #0000CD; /*rgba(204, 14, 119, 0.9);*/
+    stroke-width: 2;
+    stroke-dasharray: 1 3;
+    stroke-linecap: round;
+    pointer-events: none;
+    opacity: 0;
+}
+
 
 .step-layout {
     display: flex;
@@ -418,8 +463,47 @@
 }
 
 .step-layout .pseudocode-panel {
-    flex: 0.7;
+    flex: 0.9;
 }
+
+
+
+
+
+.algorithm-overview {
+    width: 100%;
+}
+
+.algorithm-overview h2 {
+    margin: 0 0 0.75rem;
+}
+
+.algorithm-overview__content {
+    height: 220px;
+    overflow-y: auto;
+
+    padding: 1rem 1.25rem;
+
+    border: 2px solid var(--primary);
+    border-radius: 15px;
+
+    line-height: 1.55;
+}
+
+.algorithm-overview__content p {
+    margin: 0 0 1rem;
+}
+
+.algorithm-overview__content p:last-child {
+    margin-bottom: 0;
+}
+
+
+
+
+
+
+
 
 @keyframes candidate-line-appear {
     from {

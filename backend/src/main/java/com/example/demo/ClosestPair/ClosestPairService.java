@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class SLineService {
+public class ClosestPairService {
     //https://arxiv-org.translate.goog/html/2601.05681v1?_x_tr_sl=en&_x_tr_tl=de&_x_tr_hl=de&_x_tr_pto=sge#S2
     //https://arxiv.org/pdf/2601.05681v1
     //https://www.sciencedirect.com/science/article/abs/pii/0020019088901500
@@ -19,7 +19,7 @@ public class SLineService {
 
         steps.add(new AlgorithmStepDTO(
                 SweepLineStepType.START,
-                "Input points. The algorithm has not started yet",
+                "The Input points are shown. The sweep has not started yet.",
                 null,
                 0,
                 List.of(),
@@ -52,15 +52,14 @@ public class SLineService {
         //Previously visited points that have already left the active x-range.
         //These points cannot form a closer pair with the current or any later point.
         List<Point> processedPoints = new ArrayList<>();
-        //For the init snapshot, p1 is the current point and is therefore not yet shown as active (only p0).
-        //It is inserted immediately after the snapshot.
         activePoints.add(p0);
+        activePoints.add(p1);
 
         //shortcut for the delta control+cmd+space and then search delta
-        String description = "Initialization: The points are sorted by x-coordinate. "
-                + "The initial δ is computed from the first two points: dist("
-                + p0.label() + ", " + p1.label() + ") = "
-                + String.format("%.2f", delta) + ".";
+        String description = "The points were sorted by x-coordinate, and the closest pair, δ and the active set "
+                        + "were initialized with " + p0.label() + " and " + p1.label()
+                        + ". Their distance is the initial δ, the shortest distance found so far.";
+        //therefore determines the initial width of search windows.";
 
         steps.add(new AlgorithmStepDTO(
                 SweepLineStepType.INITIALIZATION,
@@ -75,8 +74,6 @@ public class SLineService {
                 new ArrayList<>(processedPoints),
                 getFuturePoints(xSorted, 1)
         ));
-
-        activePoints.add(p1);
 
         // Index of the leftmost x-sorted point that is still part of the activePoints.
         // Every point before tail has already been removed.
@@ -96,15 +93,15 @@ public class SLineService {
             tail = removalResult.newTail();
 
             String advanceDescription;
-
             if (removalResult.removedAny()) {
                 String removedLabels = removalResult.removedPoints().stream().map(Point::label).collect(Collectors.joining(", "));
-
-                advanceDescription = "Select " + current.label() + " as the current point. "
-                                + "Remove " + removedLabels
-                                + " from active window because their x-distance is at least (>=) δ.";
+                advanceDescription = current.label() + " is now the current point. "
+                                + removedLabels + " were removed from the active set because they lie "
+                                + "to the left of the δ-wide active window. "
+                                + "They cannot form a closer pair with the current or any future point.";
             } else {
-                advanceDescription = "Select " + current.label() + " as the current point. " + "No active points lie outside the active window so no had to be removed.";
+                advanceDescription = current.label() + " is now the current point. "
+                                + "No active points lie to the left of the δ-wide active window, so none were discarded.";
             }
 
             steps.add(new AlgorithmStepDTO(
@@ -128,10 +125,16 @@ public class SLineService {
             PointPair bestPairAfterCandidateCheck = candidateResult.bestPair();
             boolean foundNewBest = candidateResult.foundNewBest();
 
-            String comparedPoints = candidateResult.candidateComparisons.stream().map(p->p.candidate().label()).collect(Collectors.joining(", "));
-            String candidateDescription = candidateResult.candidateComparisons().isEmpty() ?
-                    "No active points (points in yTable?) lie inside the candidate window."
-                    : "Compared the distance from " + current.label() + " with every candidate point (" + comparedPoints + ") so every active point whose y-distance is smaller than δ";
+            String candidateDescription = "";
+            if(candidateResult.candidateComparisons().isEmpty()){
+                candidateDescription = "No active points have a vertical distance from " + current.label()
+                                + " smaller than δ, so the δ × 2δ candidate window contains no candidates. "
+                                + "Therefore, no pair with the current point can improve δ.";
+            } else {
+                candidateDescription = "Active points with a vertical distance from " + current.label()
+                                + " smaller than δ, and therefore inside the δ × 2δ candidate window, were selected as candidates. "
+                                + "Their distances to the " + current.label() + " were checked for a closer pair.";
+            }
 
             steps.add(new AlgorithmStepDTO(
                     SweepLineStepType.CHECK_CANDIDATES,
@@ -156,11 +159,20 @@ public class SLineService {
 
             String commitDescription;
             if (foundNewBest) {
-                commitDescription = "A new closer pair was found: " + currBestPair.p0().label() + " ↔ "
-                                + currBestPair.p1().label() + " with distance " + String.format("%.2f", delta)
-                                + ". Update δ and insert " + current.label() + " into the active set.";
+                commitDescription =
+                        "A closer pair was found. δ was updated to "
+                                + String.format("%.2f", delta)
+                                + " and the closest pair to "
+                                + currBestPair.p0().label() + " ↔ "
+                                + currBestPair.p1().label()
+                                + ". The smaller δ caused both windows to shrink. "
+                                + current.label() + " was then inserted into the active set.";
             } else {
-                commitDescription = "No candidate pair is closer. δ remains " + String.format("%.2f", delta) + ". " + current.label() + " ist now part of the active set";
+                commitDescription =
+                        "No candidate distance was smaller than δ, so δ remains "
+                                + String.format("%.2f", delta)
+                                + " and the closest pair is unchanged. "
+                                + current.label() + " was inserted into the active set.";
             }
 
             steps.add(new AlgorithmStepDTO(
@@ -180,9 +192,9 @@ public class SLineService {
         }
 
         // Final snapshot after the sweep has finished.
-        String doneMsg = "Done! The sweep is complete. The closest pair is "
+        String doneMsg = "Done! The sweep is complete and all points have been processed. The final closest pair is "
                 + currBestPair.p0().label() + " ↔ " + currBestPair.p1().label()
-                + " with distance = " + String.format("%.2f", currBestPair.distance()) + ".";
+                + " with distance δ = " + String.format("%.2f", currBestPair.distance()) + ".";
         steps.add(new AlgorithmStepDTO(
                 SweepLineStepType.FINISHED,
                 doneMsg,

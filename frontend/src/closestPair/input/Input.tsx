@@ -1,14 +1,14 @@
 import React, {useState} from "react";
-import {DynamicNodes} from "../shared/Nodes.tsx";
+import {DynamicPoints} from "../shared/Points.tsx";
 import type {InputProps, Interaction} from "../shared/Types.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {presets} from "./Presets.tsx";
+import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 
 export function Input(props: InputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
-
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const svg = e.currentTarget;
         const rect = svg.getBoundingClientRect();
@@ -16,7 +16,7 @@ export function Input(props: InputProps) {
         /*
          * The SVG is responsive: its visual size can differ from the internal viewBox size.
          * Mouse coordinates are measured in screen pixels, so they are
-         * convert them back into the SVG coordinate system used by the nodes.
+         * convert them back into the SVG coordinate system used by the points.
          */
         return {
             x: ((e.clientX - rect.left) / rect.width) * props.width,
@@ -27,26 +27,26 @@ export function Input(props: InputProps) {
     const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
         if (interaction.type !== "idle") return;
         const {x, y} = getMousePos(e);
-        props.onAddNode({x: Math.round(x), y: Math.round(y), id: getRandomId(), label: ""});
+        props.onAddPoint({x: Math.round(x), y: Math.round(y), id: getRandomId(), label: ""});
 
     };
 
     const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
         if (interaction.type !== "dragging") return;
         const pos = getMousePos(e);
-        props.onMoveNode(interaction.nodeId, pos.x, pos.y);
+        props.onMovePoint(interaction.pointId, pos.x, pos.y);
     };
 
-    const handleNodeMouseDown = (nodeId: string) => {
-        setInteraction({type: "dragging", nodeId});
+    const handlePointMouseDown = (pointId: string) => {
+        setInteraction({type: "dragging", pointId});
     };
 
-    const handleNodeMouseUp = () => {
+    const handlePointMouseUp = () => {
         setInteraction({type: "idle"});
     };
 
-    const handleNodeDoubleClick = (nodeId: string) => {
-        props.onDeleteNode(nodeId);
+    const handlePointDoubleClick = (pointId: string) => {
+        props.onDeletePoint(pointId);
         setInteraction({type: "idle"});
     };
 
@@ -56,28 +56,29 @@ export function Input(props: InputProps) {
                 mode="input"
                 onChangeInput={props.onChangeInput}
                 onSubmit={props.onSubmit}
-                canSubmit={props.nodes.length >= 2}
+                canSubmit={props.points.length >= 2}
             />
 
             <svg
                 className="algorithm-canvas"
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
-                onMouseUp={handleNodeMouseUp}
+                onMouseUp={handlePointMouseUp}
                 viewBox={`0 0 ${props.width} ${props.height}`}
                 preserveAspectRatio="xMidYMid meet"
             >
-                <DynamicNodes
-                    nodes={props.nodes}
-                    onMouseDown={handleNodeMouseDown}
-                    onMouseUp={handleNodeMouseUp}
-                    onDoubleClick={handleNodeDoubleClick}
+                <DynamicPoints
+                    points={props.points}
+                    onMouseDown={handlePointMouseDown}
+                    onMouseUp={handlePointMouseUp}
+                    onDoubleClick={handlePointDoubleClick}
                 />
             </svg>
 
             <div className="control-row">
+                <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <select className="control-select"value={props.selectedPreset}
+                <select className="control-select" value={props.selectedPreset}
                         onChange={(e) => props.onPresetChange(e.target.value)}
                 >
                     <option value="-"> - </option>
@@ -103,19 +104,16 @@ export function Input(props: InputProps) {
                 />
 
                 <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>
-                <span style={{ width: 70 }}>Nodes: {props.nodes.length}</span>
+                <span style={{ width: 70 }}>Points: {props.points.length}</span>
                     <input
                         className="timeline-slider"
-                        type="range" min={0} max={50} value={props.nodes.length}
+                        type="range" min={0} max={50} value={props.points.length}
                         onChange={(event) =>
-                            props.onSetNodeCount(Number(event.currentTarget.value))
+                            props.onSetPointCount(Number(event.currentTarget.value))
                         }
                     />
                 </label>
             </div>
-
-
-
         </div>
     );
 }

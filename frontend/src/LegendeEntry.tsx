@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type {RingStyle} from "./sweepLine/shared/Types.tsx";
+import type {RingStyle} from "./closestPair/shared/Types.tsx";
 
 type LegendEntryProps = {
     label: string;
@@ -18,13 +18,13 @@ export function LegendEntry({ label, value, icon }: LegendEntryProps) {
     );
 }
 
-type XNodeIconProps = {
+type XPointIconProps = {
     color: string;
     ringStyle?: RingStyle;
     variant?: "default" | "current";
 };
 
-export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNodeIconProps) {
+export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPointIconProps) {
     const NODE_SIZE = 4;
     const RING_RADIUS = 9;
     const CURRENT_MARKER_RADIUS = RING_RADIUS-1.25;
@@ -32,7 +32,7 @@ export function XNodeIcon({color, ringStyle = "none", variant = "default"}: XNod
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
     const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
     const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
-    const CURRENT_MARKER_COLOR = "#F25C54";
+    const CURRENT_MARKER_COLOR = "#ff0000"; //"#ff3333";//"#F25C54";
 
     return (
         <g transform={`translate(10, 10)`}>
