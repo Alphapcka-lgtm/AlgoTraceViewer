@@ -1,4 +1,4 @@
-package com.example.demo.EhrlichSwapsAlgorithm;
+package com.example.demo.ehrlichSwaps;
 
 import dto.EhrlichSwapStepDTO;
 import lombok.Getter;
@@ -12,9 +12,8 @@ import java.util.stream.IntStream;
 @Service
 public class EhrlichSwapsService {
 
-    public List<EhrlichSwapStepDTO> ehrlichSwaps(EhrlichSwapsRequest ehrlichSwapsRequest) {
+    public List<EhrlichSwapStepDTO> ehrlichSwaps(List<String> inputValues) {
         List<EhrlichSwapStepDTO> steps = new ArrayList<>();
-        List<String> inputValues = ehrlichSwapsRequest.getInputValues();
 
         if (inputValues == null || inputValues.isEmpty()) throw new IllegalArgumentException("Input must not be empty");
 
@@ -51,9 +50,6 @@ public class EhrlichSwapsService {
             String leftValue = a[0];
             String rightValue = a[swapIndex];
 
-            //System.out.println("Welche Position als nächstes mit Position 0 getauscht wird = b[k] = "+b[k]);
-            //System.out.println("=> es wurde "+ a[0] + " mit " + a[b[k]] + " getauscht");
-
             swap(a, 0, swapIndex);
 
             int leftIndex = 1; //left index des zu drehenden Bereichs
@@ -87,8 +83,6 @@ public class EhrlichSwapsService {
     public static int calcNextK(int[] c, int SIZE){
         int k=1;
         while (k < SIZE && k == c[k - 1]) {
-            System.out.println("c[k - 1]= " + c[k - 1]);
-            System.out.println("k= " + k);
             c[k - 1] = 0;
             k++;
         }

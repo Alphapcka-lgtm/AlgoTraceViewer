@@ -11,8 +11,7 @@ export function PseudoCodePanel(props: PseudoCodePanelProps) {
                 return (
                     <div
                         key={line.id}
-                        className={`pseudocode-line ${active ? "is-active" : ""}`}
-                        style={{paddingLeft: 6 + (line.indent ?? 0) * 24}}
+                        className={`pseudocode-line ${line.indent ? `pseudocode-line--indent-${line.indent}` : ""} ${active ? "is-active" : ""}`}
                     >
                         {line.text}
                     </div>

@@ -1,8 +1,7 @@
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {
     colors,
-    getActiveLineIdsMaxDegree,
-    NodeDegreeMapIcon,
+    getActiveLineIdsMaxDegree, NodeDegreeMapIcon,
     NodeIcon,
     PSEUDOCODE_MAX_DEGREE,
     RemainingEdgeIcon
@@ -67,9 +66,9 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             if (index == 0) {
                 timeline.set("#u0" + edge.id, {opacity: 100});
             } else {
-                timeline.set("#u0" + edge.id, {opacity: 100}, ">");
+                timeline.set("#u0" + edge.id, {opacity: 100}, "<");
             }
-            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, ">");
+            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
         })
 
         timeline.addLabel(labels[1]);
@@ -186,11 +185,11 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-info">
-            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
+            <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
                 <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
             </div>
-            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
+            <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
                 <LegendEntry
                     label="Node-Degree Map N"
                     value={""}
@@ -207,27 +206,11 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                     icon={<RemainingEdgeIcon/>}
                 />
             </div>
-            <div style={{
-                display: "flex",
-                flexWrap: "nowrap",
-                overflowX: "auto",
-                overflowY: "hidden",
-                paddingBottom: "12px"
-            }}>
+            <div className="vertex-cover-degree-table">
                 {props.output.initialDegreeMap.map(ndp => {
-                    return (<div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} style={{flex: 1, fontSize: 20}}>
-                        <div style={{
-                            minWidth: "27px",
-                            border: "solid 1px",
-                            textAlign: "center",
-                            textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"
-                        }}>{ndp.node.label}</div>
-                        <div id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} style={{
-                            minWidth: "27px",
-                            border: "solid 1px",
-                            textAlign: "center",
-                            textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"
-                        }}></div>
+                    return (<div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-column">
+                        <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
+                        <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-cell"></div>
                     </div>);
                 })}
             </div>

@@ -1,0 +1,120 @@
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    width: min(100%, 1123px);
+    margin: 0 auto 24px;
+    padding: 20px 0;
+}
+
+.home-logo {
+    flex: 0 0 auto;
+    max-width: 340px;
+    width: 100%;
+    height: auto;
+}
+
+.home-nav {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px;
+    border: 3px solid var(--primary);
+    border-radius: 999px;
+    background: var(--card-background);
+    box-shadow: var(--shadow);
+}
+
+.home-nav-link {
+    align-content: center;
+}
+
+.home-nav-button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    background: white;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.home-nav-button:hover {
+    transform: translateY(-1px);
+}
+
+.home-nav-button.is-active {
+    background: var(--primary);
+    color: white;
+}
+
+.home-headline {
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 36px;
+    font-weight: 500;
+}
+
+.home-text {
+    margin-bottom: 28px;
+    color: #333333;
+    font-size: 18px;
+}
+
+.algorithm-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.algorithm-card {
+    text-align: left;
+    border: 2px solid var(--primary);
+    border-radius: 18px;
+    padding: 20px;
+    background: var(--card-background);
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.algorithm-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(16, 46, 80, 0.18);
+}
+
+.algorithm-card-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--secondary);
+    font-weight: 700;
+}
+
+.algorithm-card-text {
+    margin: 0;
+    color: #333333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .home-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .home-logo {
+        max-width: 300px;
+    }
+
+    .home-nav {
+        flex-wrap: wrap;
+        border-radius: 18px;
+    }
+
+    .home-nav-button {
+        flex: 1 1 160px;
+    }
+}

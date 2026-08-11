@@ -1,4 +1,4 @@
-package com.example.demo.EhrlichSwapsAlgorithm;
+package com.example.demo.ehrlichSwaps;
 
 import com.example.demo.model.AnimationRequest;
 import lombok.AllArgsConstructor;

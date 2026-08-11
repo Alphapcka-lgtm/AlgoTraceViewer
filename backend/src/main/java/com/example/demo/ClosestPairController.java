@@ -1,7 +1,7 @@
 package com.example.demo;
 
-import com.example.demo.ClosestPair.ClosestPairService;
-import com.example.demo.ClosestPair.Point;
+import com.example.demo.closestPair.ClosestPairService;
+import com.example.demo.closestPair.Point;
 import dto.AlgorithmStepDTO;
 import org.springframework.web.bind.annotation.*;
 

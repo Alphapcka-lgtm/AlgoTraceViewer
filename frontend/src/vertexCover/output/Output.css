@@ -1,0 +1,29 @@
+.vertex-cover-step-summary,
+.vertex-cover-legend-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.vertex-cover-step-summary,
+.vertex-cover-legend-grid--spaced {
+    margin-bottom: 15px;
+}
+
+.vertex-cover-degree-table {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 12px;
+}
+
+.vertex-cover-degree-column {
+    flex: 1;
+    font-size: 20px;
+}
+
+.vertex-cover-degree-cell {
+    min-width: 27px;
+    border: solid 1px;
+    text-align: center;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 1);
+}

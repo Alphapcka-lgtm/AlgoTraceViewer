@@ -1,7 +1,7 @@
 package com.example.demo.model;
 
-import com.example.demo.ClosestPair.ClosestPairRequest;
-import com.example.demo.EhrlichSwapsAlgorithm.EhrlichSwapsRequest;
+import com.example.demo.closestPair.ClosestPairRequest;
+import com.example.demo.ehrlichSwaps.EhrlichSwapsRequest;
 import com.example.demo.vertexCover.VertexCoverRequest;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -407,8 +407,8 @@ export function Output(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    if (props.loading) return <p style={{fontFamily: "monospace"}}>Loading...</p>;
-    if (props.error) return <p style={{fontFamily: "monospace", color: "red"}}>Error: {props.error}</p>;
+    if (props.loading) return <p className="closest-pair-loading">Loading...</p>;
+    if (props.error) return <p className="closest-pair-error">Error: {props.error}</p>;
     if (!step) return <></>;
 
     const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
@@ -528,12 +528,12 @@ export function Output(props: OutputProps) {
                             />
                         </div>
                     </div>
-                    <div className="candidate-distances">
+                    <div className="closest-pair-candidate-distances">
                         <strong>Distances to current:</strong>{" "}
                         {candidateDistances}
                     </div>
 
-                    <div className="step-description"> {step.description} </div>
+                    <div className="closest-pair-step-description"> {step.description} </div>
                 </div>
 
                 <PseudoCodePanel
