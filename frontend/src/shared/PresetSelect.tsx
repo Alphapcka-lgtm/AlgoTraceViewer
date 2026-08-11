@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import type {AnimationRequest} from "../../shared/Types.tsx";
+import type {AnimationRequest} from "./Types.tsx";
 
 export type Preset = {
     request: AnimationRequest;

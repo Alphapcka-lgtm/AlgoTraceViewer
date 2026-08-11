@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Input} from "./input/Input.tsx";
-import useSweepLineSteps from "./Api.tsx";
-import type {Point, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
+import useClosestPairSteps from "./Api.tsx";
+import type {Point, ClosestPairInputState, ClosestPairOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomPoints} from "../shared/Utils.tsx";
 import "./App.css";
@@ -11,9 +11,9 @@ import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
-    const [inputState, setInputState] = useState<SweepLineInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
-    const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
-    const {loading, error, calculateSteps} = useSweepLineSteps();
+    const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
+    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: -1,});
+    const {loading, error, calculateSteps} = useClosestPairSteps();
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
     const [selectedPreset, setSelectedPreset] = useState("");
@@ -159,6 +159,8 @@ export default function ClosestPair() {
                     selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
                     createExportString={createExportString}
+                    setInputState={setInputState}
+                    inputState={inputState}
                 />
             </div>
         );

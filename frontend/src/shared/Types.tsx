@@ -1,6 +1,6 @@
 import React from "react";
 import type {VertexCoverRequest} from "../vertexCover/shared/Types.tsx";
-import type {Node} from "../closestPair/shared/Types.tsx"
+import type {ClosestPairRequest, Node} from "../closestPair/shared/Types.tsx"
 import type {EhrlichSwapsRequest} from "../ehrlichSwaps/shared/Types.tsx";
 
 export type OutputControlsProps = {
@@ -46,4 +46,4 @@ export type HomepageProps = {
     activeTab: Tab;
 }
 
-export type AnimationRequest = EhrlichSwapsRequest | VertexCoverRequest; //ClosestPairRequest
+export type AnimationRequest = EhrlichSwapsRequest | VertexCoverRequest | ClosestPairRequest

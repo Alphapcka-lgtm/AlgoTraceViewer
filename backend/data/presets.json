@@ -546,5 +546,60 @@
       "algorithm" : "vertexCover",
       "name" : "preset-1"
     }
+  },
+  "closestPair" : {
+    "abcd" : {
+      "request" : {
+        "points" : [ {
+          "x" : 635,
+          "y" : 334,
+          "id" : "RcbZTCl",
+          "label" : "A"
+        }, {
+          "x" : 279,
+          "y" : 312,
+          "id" : "qWFtwiX",
+          "label" : "B"
+        }, {
+          "x" : 209,
+          "y" : 249,
+          "id" : "bqhifpIY",
+          "label" : "C"
+        }, {
+          "x" : 167,
+          "y" : 181,
+          "id" : "NpnOJgS",
+          "label" : "D"
+        }, {
+          "x" : 172,
+          "y" : 400,
+          "id" : "bxEPWzKi",
+          "label" : "E"
+        }, {
+          "x" : 581,
+          "y" : 396,
+          "id" : "bbcgAYsR",
+          "label" : "F"
+        }, {
+          "x" : 741,
+          "y" : 401,
+          "id" : "XhcRazj",
+          "label" : "G"
+        }, {
+          "x" : 329,
+          "y" : 407,
+          "id" : "fGeefLM",
+          "label" : "H"
+        }, {
+          "x" : 297,
+          "y" : 283,
+          "id" : "HtXDtHg",
+          "label" : "I"
+        } ],
+        "timestamp" : 1786468414712
+      },
+      "algorithm" : "closestPair",
+      "name" : "abcd"
+    }
   }
 }

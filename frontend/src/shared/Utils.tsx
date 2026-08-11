@@ -1,7 +1,7 @@
 import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node, PointPair, SweepLineStepType} from "../closestPair/shared/Types.tsx"
+import type {Node, PointPair, ClosestPairStepType} from "../closestPair/shared/Types.tsx"
 
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
@@ -106,7 +106,7 @@ export const createRandomPoints = (count: number, padding: number, svgWidth:numb
     return nodes;
 };
 
-export function getActivePseudoCodeLineIds(stepType: SweepLineStepType): string[] {
+export function getActivePseudoCodeLineIds(stepType: ClosestPairStepType): string[] {
     switch (stepType) {
         case "START": return [];
         case "INITIALIZATION": return ["sort", "init"];
