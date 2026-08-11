@@ -1,22 +1,20 @@
 import {useState} from "react";
 import {Input} from "./input/Input.tsx";
-import useSweepLineSteps from "./Api.tsx";
-import type {Point, SweepLineInputState, SweepLineOutputState} from "./shared/Types.tsx";
+import useClosestPairSteps from "./Api.tsx";
+import type {Point, ClosestPairInputState, ClosestPairOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomPoints} from "../shared/Utils.tsx";
 import "./App.css";
-import {presets} from "./input/Presets.tsx";
-import type {ExportState} from "../shared/Types.tsx";
+import type {AnimationRequest, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
-    const [inputState, setInputState] = useState<SweepLineInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
-    const [outputState, setOutputState] = useState<SweepLineOutputState>({steps: [], timestamp: -1,});
-    const {loading, error, calculateSteps} = useSweepLineSteps();
+    const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
+    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: 0,});
+    const {loading, error, calculateSteps} = useClosestPairSteps();
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
-    const [selectedPreset, setSelectedPreset] = useState("");
     const svgHeight = 500;
     const svgWidth = 1123;
 
@@ -55,16 +53,14 @@ export default function ClosestPair() {
     //bevor die points ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
     // die durch löschen von points entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
-    const calculateOutput = async (submittedPoints: Point[], inputTimestamp: number) => {
+    const calculateOutput = async (submittedPoints: Point[]) => {
         try {
             const labeledPoints: Point[] = assignLabels(submittedPoints);
-            setInputState({points: labeledPoints, timestamp: inputTimestamp});
+            setInputState({...inputState, points: labeledPoints});
 
             const result = await calculateSteps(labeledPoints);
             //console.log("Algorithm steps:", result);
-            setOutputState({steps: result, timestamp: inputTimestamp});
-
-            //setModeState("output");
+            setOutputState({steps: result, timestamp: Date.now()});
         } catch (error) {
             console.error(error);
         }
@@ -72,16 +68,15 @@ export default function ClosestPair() {
 
     //bei normalen will man ganz normal am anfang starten...
     const handleNormalSubmit = async () => {
-        const outputIsStillValid = outputState.steps.length > 0 && inputState.timestamp <= outputState.timestamp;
-        if (outputIsStillValid) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
+        if (inputState.timestamp < outputState.timestamp) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
             setModeState("output");
             return;
         }
         //wenn input neu/verändert bei 0 starten
         setProgress(0);
         setCurrentStep(0);
-
-        await calculateOutput(inputState.points, inputState.timestamp);
+        await calculateOutput(inputState.points);
+        setModeState("output");
     };
 
     const handleChangeInput = () => {
@@ -98,10 +93,9 @@ export default function ClosestPair() {
             if (imported.algorithm !== "closestPair") {
                 return;
             }
-            const importTimestamp = Date.now();
             const importedPoints = imported.input; //assign labels wird dann in calculateOutput geamacht ...
             setProgress(imported.progress);
-            await calculateOutput(importedPoints, importTimestamp);
+            await calculateOutput(importedPoints);
         } catch (error) {
             console.error("Invalid import string", error);
         }
@@ -128,15 +122,9 @@ export default function ClosestPair() {
         });
     };
 
-    const handlePresetChange = async (selected: string) => {
-        setSelectedPreset(selected);
-        if (selected === "random") return;
-        if (selected === "-") return;
-        const preset = presets.find(p => p.name === selected);
-        if (!preset) return;
-
-        await handleImport(preset.importString);
-    };
+    const handlePresetChange = (input: AnimationRequest) => {
+        setInputState(input as ClosestPairInputState);
+    }
 
     if (modeState === "input") {
         return (
@@ -156,7 +144,6 @@ export default function ClosestPair() {
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
                     onSetPointCount={handleSetPointCount}
-                    selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
                     createExportString={createExportString}
                 />

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import type {AnimationRequest} from "../../shared/Types.tsx";
+import type {AnimationRequest} from "./Types.tsx";
 
 export type Preset = {
     request: AnimationRequest;
@@ -40,18 +40,20 @@ export function PresetSelect(props: PresetSelectProps) {
     };
 
     const handlePresetChange = async (selected: string) => {
-        if (presetName === "random" || presetName === "-") return;
-        const preset = presets.find(preset => preset.name === selected);
-        if (!preset) return;
-        setPresetName(preset.name);
-        props.setInput(preset.request);
+        if (selected === "") {
+            setPresetName("");
+        } else {
+            const preset = presets.find(preset => preset.name === selected);
+            if (!preset) return;
+            setPresetName(preset.name);
+            props.setInput(preset.request);
+        }
     };
 
     const savePreset = async () => {
         const name = presetName.trim();
         if (!name) return;
         const preset = {name, algorithm: props.algorithm, request: props.input};
-        console.log(preset);
         const response = await fetch(
             `http://localhost:8080/api/presets/${props.algorithm}`,
             {
@@ -66,7 +68,7 @@ export function PresetSelect(props: PresetSelectProps) {
         const updatedPresets: Preset[] = await response.json();
         setPresets(updatedPresets);
         setPresetName(name);
-        closeDialog();
+        setDialogOpen(false);
     };
 
     const canSave = presetName.trim().length > 0;
@@ -79,15 +81,13 @@ export function PresetSelect(props: PresetSelectProps) {
                     value={presetName}
                     onChange={(event) => void handlePresetChange(event.currentTarget.value)}
                 >
-                    <option value="-"> - </option>
+                    <option value="">Select preset...</option>
 
                     {presets.map((preset) => (
                         <option key={preset.name} value={preset.name}>
                             {preset.name}
                         </option>
                     ))}
-
-                    <option value="random">Random</option>
                 </select>
 
                 <button

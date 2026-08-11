@@ -1,4 +1,4 @@
-import React from "react";
+import type {AnimationRequest} from "../../shared/Types.tsx";
 
 export type Point = {
     x: number;
@@ -34,8 +34,7 @@ export type InputProps = {
     onChangeInput: () => void;
     onImport: (encoded: string) => void;
     onSetPointCount: (count: number) => void;
-    selectedPreset: string;
-    onPresetChange: (selected: string) => void;
+    onPresetChange: (request: AnimationRequest) => void;
     createExportString: () => string;
 };
 
@@ -51,7 +50,7 @@ export interface CandidateComparison {
     distance: number;
 }
 
-export type SweepLineStepType =
+export type ClosestPairStepType =
     | "START" //zustand vor dem alg = step 0
     | "INITIALIZATION"
     | "ADVANCE_AND_PRUNE"
@@ -60,7 +59,7 @@ export type SweepLineStepType =
     | "FINISHED";
 
 export interface AlgorithmStepDTO {
-    stepType: SweepLineStepType;
+    stepType: ClosestPairStepType;
     description: string;
     currentPoint: Point | null; //null weil wenn Algorithmus fertig ist gibt es keinen current point mehr (es wird ja keiner mehr verarbeitet)
     windowDelta: number; //Delta used to draw the sweep windows in this snapshot.
@@ -89,12 +88,14 @@ export type OutputProps = {
     onImport: (encoded: string) => void;
 };
 
-export type SweepLineInputState = {
+export type ClosestPairInputState = {
     points: Point[];
     timestamp: number;
 };
 
-export type SweepLineOutputState = {
+export type ClosestPairRequest = ClosestPairInputState
+
+export type ClosestPairOutputState = {
     steps: AlgorithmStepDTO[];
     timestamp: number;
 };

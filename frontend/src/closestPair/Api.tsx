@@ -1,7 +1,7 @@
 import type {AlgorithmStepDTO, Point} from "./shared/Types.tsx";
 import {useState} from "react";
 
-export default function useSweepLineSteps() {
+export default function useClosestPairSteps() {
     const [algoSteps, setAlgoSteps] = useState<AlgorithmStepDTO[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

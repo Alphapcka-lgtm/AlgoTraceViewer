@@ -4,8 +4,8 @@ import type {InputProps, Interaction} from "../shared/Types.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import {presets} from "./Presets.tsx";
 import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
+import {PresetSelect} from "../../shared/PresetSelect.tsx";
 
 export function Input(props: InputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -78,15 +78,7 @@ export function Input(props: InputProps) {
             <div className="control-row">
                 <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <select className="control-select" value={props.selectedPreset}
-                        onChange={(e) => props.onPresetChange(e.target.value)}
-                >
-                    <option value="-"> - </option>
-                    {presets.map((preset) => (
-                        <option key={preset.name} value={preset.name}>{preset.name}</option>
-                    ))}
-                    <option value="random">Random</option>
-                </select>
+                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={{points: props.points, timestamp: -1}}/>
 
                 <button
                     className="control-button"

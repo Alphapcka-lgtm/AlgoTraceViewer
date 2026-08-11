@@ -2,7 +2,7 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import type {InputControlProps, VertexCoverRequest} from "../shared/Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
-import {PresetSelect} from "./PresetSelect.tsx";
+import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {useState} from "react";
 import type {AnimationRequest} from "../../shared/Types.tsx";
 
