@@ -1,6 +1,7 @@
 import React from "react";
-import type {AnimationRequest} from "../vertexCover/shared/Types.tsx";
-import type {Node} from "../closestPair/shared/Types.tsx"
+import type {VertexCoverRequest} from "../vertexCover/shared/Types.tsx";
+import type {ClosestPairRequest, Node} from "../closestPair/shared/Types.tsx"
+import type {EhrlichSwapsRequest} from "../ehrlichSwaps/shared/Types.tsx";
 
 export type OutputControlsProps = {
     timelineRef: React.RefObject<gsap.core.Timeline>
@@ -25,7 +26,7 @@ export type ModeTabsProps = {
 
 export type ExportState =
     | { algorithm: "closestPair", progress: number, input: Node[] }
-    | { algorithm: "vertexCover", progress: number, input: AnimationRequest };
+    | { algorithm: "vertexCover", progress: number, input: VertexCoverRequest };
 
 export type PseudoCodeLine = {
     id: string;
@@ -44,3 +45,5 @@ export type Tab = "homepage" | "closestPair" | "suffixArray" | "vertexCover" | "
 export type HomepageProps = {
     activeTab: Tab;
 }
+
+export type AnimationRequest = EhrlichSwapsRequest | ClosestPairRequest | VertexCoverRequest;

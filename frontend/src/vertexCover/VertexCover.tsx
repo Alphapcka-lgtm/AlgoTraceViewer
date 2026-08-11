@@ -1,4 +1,4 @@
-import type {AnimationResponse, AnimationRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
+import type {AnimationResponse, VertexCoverRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
 import {assignLabels, decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 import {MaxDegreeOutput} from "./output/MaxDegreeOutput.tsx";
 import {RandomOutput} from "./output/RandomOutput.tsx";
@@ -12,12 +12,10 @@ export function VertexCover() {
     const [stepIndex, setStepIndex] = useState(0);
     const [variant, setVariant] = useState<VertexCoverVariant>("random");
 
-    const [input, setInput] = useState<AnimationRequest>({
+    const [input, setInput] = useState<VertexCoverRequest>({
         graph: {nodes: [], edges: []},
         nodeOrder: [],
         edgeOrder: [],
-        densityFactor: 0.2,
-        presetName: "custom",
         timestamp: 0
     });
 
@@ -30,7 +28,7 @@ export function VertexCover() {
         timestamp: 0
     });
 
-    const fetchAnimation = async (input: AnimationRequest) => {
+    const fetchAnimation = async (input: VertexCoverRequest) => {
         return fetch("http://localhost:8080/api/vertexCover/" + variant, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -44,7 +42,7 @@ export function VertexCover() {
             });
     };
 
-    const submitInput = (inp: AnimationRequest) => {
+    const submitInput = (inp: VertexCoverRequest) => {
         if (inp.timestamp > output.timestamp) {
             const labeledInp = {...inp, graph: {nodes: assignLabels(inp.graph.nodes), edges: inp.graph.edges}};
             fetchAnimation(labeledInp)

@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 @Service
 public class OptimalVertexCover {
 
-    public AnimationResponse solve(AnimationRequest request) {
+    public AnimationResponse solve(VertexCoverRequest request) {
         final long optimalSubset;
         Map<String, List<String>> incidenceMap = request.getGraph().getNodes().stream().collect(Collectors.toMap(Node::id, (node) -> new ArrayList<>()));
         request.getGraph().getEdges().forEach(edge -> {

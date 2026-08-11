@@ -12,8 +12,9 @@ import java.util.stream.IntStream;
 @Service
 public class EhrlichSwapsService {
 
-    public List<EhrlichSwapStepDTO> ehrlichSwaps(List<String> inputValues){
+    public List<EhrlichSwapStepDTO> ehrlichSwaps(EhrlichSwapsRequest ehrlichSwapsRequest) {
         List<EhrlichSwapStepDTO> steps = new ArrayList<>();
+        List<String> inputValues = ehrlichSwapsRequest.getInputValues();
 
         if (inputValues == null || inputValues.isEmpty()) throw new IllegalArgumentException("Input must not be empty");
 
@@ -56,7 +57,7 @@ public class EhrlichSwapsService {
             swap(a, 0, swapIndex);
 
             int leftIndex = 1; //left index des zu drehenden Bereichs
-            int rightIndex = k - 1; ////right index des zu drehenden Bereichs
+            int rightIndex = k - 1; //right index des zu drehenden Bereichs
             while (leftIndex < rightIndex) {
                 swap(b, leftIndex, rightIndex);
                 leftIndex++;

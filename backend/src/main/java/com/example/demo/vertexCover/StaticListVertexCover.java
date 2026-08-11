@@ -19,7 +19,7 @@ public class StaticListVertexCover {
         }
     };
 
-    public AnimationResponse solve(AnimationRequest request) {
+    public AnimationResponse solve(VertexCoverRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
         List<String> nodeOrder = new ArrayList<>();

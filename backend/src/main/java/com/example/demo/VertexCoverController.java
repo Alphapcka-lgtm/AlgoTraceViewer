@@ -33,22 +33,22 @@ public class VertexCoverController {
     }
 
     @PostMapping("/random")
-    public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody AnimationRequest request) {
+    public ResponseEntity<AnimationResponse> randomVertexCover(@RequestBody VertexCoverRequest request) {
         return ResponseEntity.ok(randomVertexCover.solve(request));
     }
 
     @PostMapping("/optimal")
-    public ResponseEntity<AnimationResponse> optimalVertexCover(@RequestBody AnimationRequest request) {
+    public ResponseEntity<AnimationResponse> optimalVertexCover(@RequestBody VertexCoverRequest request) {
         return ResponseEntity.ok(optimalVertexCover.solve(request));
     }
 
     @PostMapping("/maxDegree")
-    public ResponseEntity<AnimationResponse> maxDegreeVertexCover(@RequestBody AnimationRequest request) {
+    public ResponseEntity<AnimationResponse> maxDegreeVertexCover(@RequestBody VertexCoverRequest request) {
         return ResponseEntity.ok(maxDegreeVertexCover.solve(request));
     }
 
     @PostMapping("/staticList")
-    public ResponseEntity<AnimationResponse> staticListVertexCover(@RequestBody AnimationRequest request) {
+    public ResponseEntity<AnimationResponse> staticListVertexCover(@RequestBody VertexCoverRequest request) {
         return ResponseEntity.ok(staticListVertexCover.solve(request));
     }
 }

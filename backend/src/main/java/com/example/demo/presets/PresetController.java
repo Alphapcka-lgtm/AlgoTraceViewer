@@ -1,5 +1,6 @@
 package com.example.demo.presets;
 
+import com.example.demo.model.Preset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,6 @@ import java.util.List;
 )
 @RequestMapping("/api/presets")
 public class PresetController {
-    public record SavePresetRequest(String name, String exportString) {}
     private final PresetService service;
 
     @Autowired
@@ -24,13 +24,13 @@ public class PresetController {
 
     //um alle presets für den alg zu bekommen
     @GetMapping("/{algorithm}")
-    public List<PresetService.Preset> getPresets(@PathVariable String algorithm) throws IOException {
+    public List<Preset> getPresets(@PathVariable String algorithm) {
         return service.getPresets(algorithm);
     }
 
     //um presets zu speichern
     @PostMapping("/{algorithm}")
-    public List<PresetService.Preset> addPreset(@PathVariable String algorithm, @RequestBody SavePresetRequest request) throws IOException {
-        return service.add(algorithm, request.name(), request.exportString());
+    public List<Preset> addPreset(@PathVariable String algorithm, @RequestBody Preset preset) throws IOException {
+        return service.add(algorithm, preset);
     }
 }
