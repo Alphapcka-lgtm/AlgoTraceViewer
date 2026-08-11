@@ -1,7 +1,7 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
+import {getActiveLineIdsRandom, createStepLabels, getStepIndexFromTimeline, PSEUDOCODE_RANDOM} from "../../shared/Utils.tsx";
+import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {getActiveLineIdsRandom, NodeIcon, PSEUDOCODE_RANDOM, ArbitraryEdgeIcon, RemainingEdgeIcon} from "./PseudoCode.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import type {SVGOutputProps} from "../shared/Types.tsx";
@@ -11,7 +11,6 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
