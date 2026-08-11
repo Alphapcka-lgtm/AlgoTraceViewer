@@ -32,7 +32,10 @@ export function InputControls(props: InputControlProps) {
         props.setInteraction({type: "idle"});
     };
 
-    const setPreset = (request: AnimationRequest) => {props.setInput(request as VertexCoverRequest)}
+    const setPreset = (request: AnimationRequest) => {
+        const myInput = request as VertexCoverRequest;
+        props.setInput({...myInput, timestamp: Date.now()});
+    }
 
     return <>
         <div className="control-row">
