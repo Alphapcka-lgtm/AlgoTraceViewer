@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type {RingStyle} from "./closestPair/shared/Types.tsx";
+import {colors} from "./shared/Utils.tsx";
 
 type LegendEntryProps = {
     label: string;
@@ -84,5 +85,105 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
                 strokeLinecap="round"
             />
         </g>
+    );
+}
+
+export function NodeIcon() {
+    return (
+        <>
+            <circle cx={9} cy={9} r={9} fill="black"/>
+            <circle cx={9} cy={9} r={8} fill={colors.orange}/>
+            <circle cx={9} cy={9} r={7} fill="black"/>
+            <circle cx={9} cy={9} r={6} fill={colors.orange}/>
+        </>
+    );
+}
+
+export function RemainingEdgeIcon() {
+    return (
+        <>
+            <line
+                x1={0}
+                x2={20}
+                y1={0}
+                y2={20}
+                stroke={colors.blue}
+                strokeWidth={7}
+            />
+            <line
+                x1={0}
+                x2={20}
+                y1={0}
+                y2={20}
+                stroke="black"
+                strokeWidth={2}
+            />
+        </>
+    );
+}
+
+export function ArbitraryEdgeIcon() {
+    return (
+        <>
+            <line
+                x1={0}
+                x2={20}
+                y1={0}
+                y2={20}
+                stroke={colors.red}
+                strokeWidth={7}
+            />
+            <line
+                x1={0}
+                x2={20}
+                y1={0}
+                y2={20}
+                stroke="black"
+                strokeWidth={2}
+            />
+        </>
+    );
+}
+
+export function NodeDegreeMapIcon() {
+    return (
+        <>
+            <rect
+                x={0}
+                y={0}
+                width={10}
+                height={10}
+                stroke="black"
+                fill="none"
+                strokeWidth={2}
+            />
+            <rect
+                x={10}
+                y={0}
+                width={10}
+                height={10}
+                stroke="black"
+                fill="none"
+                strokeWidth={2}
+            />
+            <rect
+                x={0}
+                y={10}
+                width={10}
+                height={10}
+                stroke="black"
+                fill="none"
+                strokeWidth={2}
+            />
+            <rect
+                x={10}
+                y={10}
+                width={10}
+                height={10}
+                stroke="black"
+                fill="none"
+                strokeWidth={2}
+            />
+        </>
     );
 }

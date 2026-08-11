@@ -15,37 +15,54 @@
     height: auto;
 }
 
-.home-nav {
+.home-nav,
+.mode-tabs {
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 7px;
-    padding: 9px;
-    border: 3px solid var(--primary);
-    border-radius: 999px;
+    gap: var(--space-sm);
+    padding: 7px;
+    border-radius: var(--radius-pill);
     background: var(--card-background);
     box-shadow: var(--shadow);
 }
 
-.home-nav-link {
-    align-content: center;
+.home-nav {
+    border: none;
 }
 
-.home-nav-button {
+.mode-tabs {
+    border: 2px solid var(--primary);
+}
+
+.home-nav-link {
+    display: flex;
+    align-items: stretch;
+    text-decoration: none;
+}
+
+.home-nav-button,
+.mode-tab {
+    min-height: var(--control-height);
     border: none;
-    border-radius: 999px;
-    padding: 10px 20px;
-    background: white;
+    border-radius: var(--radius-pill);
+    padding: 8px 18px;
+    background: var(--card-background);
     color: var(--primary);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
+    line-height: 1.2;
     transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
-.home-nav-button:hover {
+.home-nav-button:hover,
+.mode-tab:not(.is-active):hover {
+    background: var(--soft-background);
     transform: translateY(-1px);
 }
 
-.home-nav-button.is-active {
+.home-nav-button.is-active,
+.mode-tab.is-active {
     background: var(--primary);
     color: white;
 }
@@ -66,14 +83,15 @@
 .algorithm-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+    gap: var(--space-lg);
 }
 
 .algorithm-card {
+    min-height: 150px;
     text-align: left;
     border: 2px solid var(--primary);
-    border-radius: 18px;
-    padding: 20px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
     background: var(--card-background);
     color: inherit;
     box-shadow: var(--shadow);
@@ -109,9 +127,10 @@
         max-width: 300px;
     }
 
-    .home-nav {
+    .home-nav,
+    .mode-tabs {
         flex-wrap: wrap;
-        border-radius: 18px;
+        border-radius: var(--radius-lg);
     }
 
     .home-nav-button {

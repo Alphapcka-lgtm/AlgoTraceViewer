@@ -1,13 +1,20 @@
 .preset-control-group {
     display: flex;
-    align-items: center;
-    gap: 4px;
+    align-items: stretch;
+    gap: var(--ui-gap);
+    flex: 1 1 240px;
+}
+
+.preset-control-group .control-select {
+    flex: 1 1 auto;
+    min-width: 150px;
 }
 
 .preset-add-button {
-    width: 28px;
-    height: 28px;
+    flex: 0 0 var(--control-height);
+    width: var(--control-height);
+    height: var(--control-height);
     padding: 0;
-    font-size: 20px;
-    line-height: 20px;
+    font-size: 22px;
+    line-height: 1;
 }

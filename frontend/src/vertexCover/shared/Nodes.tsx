@@ -3,7 +3,7 @@ import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {NodesProps} from "./Types.tsx";
 
 export function Nodes(props: NodesProps) {
-    const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
+    const colors = {red: "#be3d2a", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0000CD"}
     return props.nodes.map((n: Node, i: number) => (
         <g
             id={n.id.toString()}

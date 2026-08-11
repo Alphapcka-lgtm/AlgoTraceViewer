@@ -1,11 +1,5 @@
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
-import {
-    colors,
-    getActiveLineIdsMaxDegree, NodeDegreeMapIcon,
-    NodeIcon,
-    PSEUDOCODE_MAX_DEGREE,
-    RemainingEdgeIcon
-} from "./PseudoCode.tsx";
+import {createStepLabels, getStepIndexFromTimeline, colors, getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "../../shared/Utils.tsx";
+import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
@@ -18,7 +12,6 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {LegendEntry} from "../../LegendeEntry.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -184,7 +177,9 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             playbackSpeed={playbackSpeed}
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
-        <div className="step-info">
+        <div className="step-layout">
+            <div className="step-layout-side">
+                <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
                 <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
@@ -214,15 +209,19 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                     </div>);
                 })}
             </div>
+                </div>
+                <div className="step-layout-actions">
+                    <ImportExportDialog
+                        createExportString={props.createExportString}
+                        onImport={props.onImport}
+                    />
+                </div>
+            </div>
+            <PseudoCodePanel
+                lines={PSEUDOCODE_MAX_DEGREE}
+                activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
+                title={"Vertex Cover PseudoCode"}
+            />
         </div>
-        <PseudoCodePanel
-            lines={PSEUDOCODE_MAX_DEGREE}
-            activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
-            title={"Vertex Cover PseudoCode"}
-        />
-        <ImportExportDialog
-            createExportString={props.createExportString}
-            onImport={props.onImport}
-        />
     </div>;
 }
