@@ -103,6 +103,12 @@ function HomeContent(props: HomeContentProps) {
                     description="bup lup schup"
                     onClick={() => props.onTabChange("vertexCover")}
                 />
+
+                <AlgorithmCard
+                    title="Ehrlich Swaps"
+                    description="Generates all permutations of distinct elements."
+                    onClick={() => props.onTabChange("ehrlichSwaps")}
+                />
             </div>
         </section>
     );

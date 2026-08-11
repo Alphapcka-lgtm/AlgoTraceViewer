@@ -5,10 +5,10 @@ import {getRandomId} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {presets} from "./Presets.tsx";
+import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 
 export function Input(props: InputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
-
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const svg = e.currentTarget;
         const rect = svg.getBoundingClientRect();
@@ -76,6 +76,7 @@ export function Input(props: InputProps) {
             </svg>
 
             <div className="control-row">
+                <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
                 <select className="control-select" value={props.selectedPreset}
                         onChange={(e) => props.onPresetChange(e.target.value)}
