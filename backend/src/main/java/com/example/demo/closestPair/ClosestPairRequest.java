@@ -1,4 +1,4 @@
-package com.example.demo.ClosestPair;
+package com.example.demo.closestPair;
 
 import com.example.demo.model.AnimationRequest;
 import lombok.AllArgsConstructor;

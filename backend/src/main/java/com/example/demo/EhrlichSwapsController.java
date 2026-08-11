@@ -1,7 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.EhrlichSwapsAlgorithm.EhrlichSwapsRequest;
-import com.example.demo.EhrlichSwapsAlgorithm.EhrlichSwapsService;
+import com.example.demo.ehrlichSwaps.EhrlichSwapsService;
 import dto.EhrlichSwapStepDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,7 @@ public class EhrlichSwapsController {
     }
 
     @PostMapping("/swap_steps")
-    public List<EhrlichSwapStepDTO> calculateSwapSteps(@RequestBody EhrlichSwapsRequest ehrlichSwapsRequest) {
-        return ehrlichSwapsService.ehrlichSwaps(ehrlichSwapsRequest);
+    public List<EhrlichSwapStepDTO> calculateSwapSteps(@RequestBody List<String> inputValues) {
+        return ehrlichSwapsService.ehrlichSwaps(inputValues);
     }
 }

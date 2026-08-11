@@ -5,6 +5,7 @@ import {RandomOutput} from "./output/RandomOutput.tsx";
 import type {ExportState} from "../shared/Types.tsx";
 import {Input} from "./input/Input.tsx";
 import {useState} from "react";
+import "./VertexCover.css";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -110,13 +111,7 @@ export function VertexCover() {
 
     return (
         <>
-            <nav className="home-nav" style={{
-                padding: "0.25rem",
-                width: "fit-content",
-                marginLeft: "auto",
-                marginRight: "3rem",
-                marginBottom: "2rem"
-            }}>
+            <nav className="home-nav vertex-cover-variant-navigation">
                 <NavButton variant="random" label="Random" activeVariant={variant} onTabChange={onTabChange}/>
                 <NavButton variant="maxDegree" label="Max Degree" activeVariant={variant} onTabChange={onTabChange}/>
                 <NavButton variant="staticList" label="Static List" activeVariant={variant} onTabChange={onTabChange}/>
@@ -141,10 +136,9 @@ function NavButton(props: NavButtonProps) {
 
     return (
         <button
-            style={{padding: "0.5rem 1.5rem", fontSize: "1rem"}}
             type="button"
             onClick={() => props.onTabChange(props.variant)}
-            className={`home-nav-button ${isActive ? "is-active" : ""}`}
+            className={`home-nav-button vertex-cover-variant-button ${isActive ? "is-active" : ""}`}
         >
             {props.label}
         </button>

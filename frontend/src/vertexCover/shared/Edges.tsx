@@ -15,7 +15,7 @@ export function Edges(props: EdgesProps) {
                     id={"u0" + e.id}
                     key={"u0" + e.id + index}
                     d={p}
-                    style={{opacity: 0}}
+                    className="vertex-cover-hidden-edge"
                     stroke={colors.blue}
                     strokeWidth={6}
                 />
@@ -23,7 +23,7 @@ export function Edges(props: EdgesProps) {
                     id={"u1" + e.id}
                     key={"u1" + e.id + index}
                     d={p}
-                    style={{opacity: 0}}
+                    className="vertex-cover-hidden-edge"
                     stroke={colors.red}
                     strokeWidth={7}
                 />

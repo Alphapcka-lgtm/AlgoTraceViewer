@@ -146,11 +146,11 @@ export function RandomOutput(props: SVGOutputProps) {
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-info">
-            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)", marginBottom: 15}}>
+            <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
                 <div><strong>Vertex Cover Size:</strong> {Math.floor(props.stepIndex / 3) * 2}</div>
             </div>
-            <div className="step-info-grid" style={{gridTemplateColumns: "repeat(3, 1fr)"}}>
+            <div className="step-info-grid vertex-cover-legend-grid">
                 <LegendEntry
                     label="Arbitrary Edge e"
                     value={""}

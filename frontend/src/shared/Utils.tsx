@@ -1,4 +1,3 @@
-import React from "react";
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
 import type {Node, PointPair, ClosestPairStepType} from "../closestPair/shared/Types.tsx"
@@ -18,16 +17,7 @@ export function getRandomId(): string{
     return encodeUsingChars(Math.floor(Date.now() * Math.random()), chars + chars.toUpperCase());
 }
 
-export const btnStyle: React.CSSProperties = {
-    flex: 1,
-    border: "2px solid black",
-    borderRadius: "10px",
-    fontFamily: "monospace",
-    padding: "4px 10px",
-    cursor: "pointer",
-    backgroundColor: "rgba(240, 240, 240, 0.8)",
-    fontSize: 18
-};
+
 
 
 //0  -> A, 1  -> B, ..., 25 -> Z, 26 -> AA, 27 -> AB

@@ -9,8 +9,8 @@ type LegendEntryProps = {
 
 export function LegendEntry({ label, value, icon }: LegendEntryProps) {
     return (
-        <div style={{ display: "flex", alignItems: "center", gap:6}}>
-            <svg width={18} height={18} viewBox="0 0 20 20" style={{ overflow: "visible" }}>
+        <div className="legend-entry">
+            <svg className="legend-entry-icon" width={18} height={18} viewBox="0 0 20 20">
                 {icon}
             </svg>
             <span><strong>{label}</strong>{value}</span>

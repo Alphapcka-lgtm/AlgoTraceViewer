@@ -1,4 +1,4 @@
-package com.example.demo.ClosestPair;
+package com.example.demo.closestPair;
 import dto.AlgorithmStepDTO;
 import org.springframework.stereotype.Service;
 import java.util.*;

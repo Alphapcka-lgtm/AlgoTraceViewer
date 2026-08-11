@@ -1,8 +1,8 @@
 package com.example.demo;
 
-import com.example.demo.ClosestPair.Point;
-import com.example.demo.ClosestPair.PointPair;
-import com.example.demo.ClosestPair.ClosestPairService;
+import com.example.demo.closestPair.Point;
+import com.example.demo.closestPair.PointPair;
+import com.example.demo.closestPair.ClosestPairService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

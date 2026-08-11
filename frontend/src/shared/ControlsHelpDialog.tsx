@@ -11,7 +11,7 @@ import {
     SkipBack,
     X
 } from "lucide-react";
-import "../shared/SharedStyle.css"
+import "./styles/controls-help-dialog.css"
 import {useState} from "react";
 
 

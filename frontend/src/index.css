@@ -1,3 +1,12 @@
+@import "./styles/layout.css";
+@import "./styles/homepage.css";
+@import "./shared/styles/controls.css";
+@import "./shared/styles/step-info.css";
+@import "./shared/styles/pseudocode.css";
+@import "./shared/styles/dialog.css";
+@import "./shared/styles/preset.css";
+@import "./shared/styles/legend.css";
+@import "./shared/styles/algorithm-overview.css";
 :root {
   /*
    * Global design tokens.
