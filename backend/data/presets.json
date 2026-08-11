@@ -1,0 +1,1163 @@
+{
+  "vertexCover" : {
+    "abc" : {
+      "request" : {
+        "graph" : {
+          "nodes" : [ {
+            "x" : 102.0,
+            "y" : 50.0,
+            "id" : "A",
+            "label" : "A"
+          }, {
+            "x" : 204.0,
+            "y" : 50.0,
+            "id" : "B",
+            "label" : "B"
+          }, {
+            "x" : 306.0,
+            "y" : 50.0,
+            "id" : "C",
+            "label" : "C"
+          }, {
+            "x" : 408.0,
+            "y" : 50.0,
+            "id" : "D",
+            "label" : "D"
+          }, {
+            "x" : 510.0,
+            "y" : 50.0,
+            "id" : "E",
+            "label" : "E"
+          }, {
+            "x" : 612.0,
+            "y" : 50.0,
+            "id" : "F",
+            "label" : "F"
+          }, {
+            "x" : 714.0,
+            "y" : 50.0,
+            "id" : "G",
+            "label" : "G"
+          }, {
+            "x" : 816.0,
+            "y" : 50.0,
+            "id" : "H",
+            "label" : "H"
+          }, {
+            "x" : 918.0,
+            "y" : 50.0,
+            "id" : "I",
+            "label" : "I"
+          }, {
+            "x" : 1020.0,
+            "y" : 50.0,
+            "id" : "J",
+            "label" : "J"
+          }, {
+            "x" : 40.0,
+            "y" : 450.0,
+            "id" : "K",
+            "label" : "K"
+          }, {
+            "x" : 80.0,
+            "y" : 450.0,
+            "id" : "L",
+            "label" : "L"
+          }, {
+            "x" : 120.0,
+            "y" : 450.0,
+            "id" : "M",
+            "label" : "M"
+          }, {
+            "x" : 160.0,
+            "y" : 450.0,
+            "id" : "N",
+            "label" : "N"
+          }, {
+            "x" : 200.0,
+            "y" : 450.0,
+            "id" : "O",
+            "label" : "O"
+          }, {
+            "x" : 240.0,
+            "y" : 450.0,
+            "id" : "P",
+            "label" : "P"
+          }, {
+            "x" : 280.0,
+            "y" : 450.0,
+            "id" : "Q",
+            "label" : "Q"
+          }, {
+            "x" : 320.0,
+            "y" : 450.0,
+            "id" : "R",
+            "label" : "R"
+          }, {
+            "x" : 360.0,
+            "y" : 450.0,
+            "id" : "S",
+            "label" : "S"
+          }, {
+            "x" : 400.0,
+            "y" : 450.0,
+            "id" : "T",
+            "label" : "T"
+          }, {
+            "x" : 440.0,
+            "y" : 450.0,
+            "id" : "U",
+            "label" : "U"
+          }, {
+            "x" : 480.0,
+            "y" : 450.0,
+            "id" : "V",
+            "label" : "V"
+          }, {
+            "x" : 520.0,
+            "y" : 450.0,
+            "id" : "W",
+            "label" : "W"
+          }, {
+            "x" : 560.0,
+            "y" : 450.0,
+            "id" : "X",
+            "label" : "X"
+          }, {
+            "x" : 600.0,
+            "y" : 450.0,
+            "id" : "Y",
+            "label" : "Y"
+          }, {
+            "x" : 640.0,
+            "y" : 450.0,
+            "id" : "Z",
+            "label" : "Z"
+          }, {
+            "x" : 680.0,
+            "y" : 450.0,
+            "id" : "AA",
+            "label" : "AA"
+          }, {
+            "x" : 720.0,
+            "y" : 450.0,
+            "id" : "AB",
+            "label" : "AB"
+          }, {
+            "x" : 760.0,
+            "y" : 450.0,
+            "id" : "AC",
+            "label" : "AC"
+          }, {
+            "x" : 800.0,
+            "y" : 450.0,
+            "id" : "AD",
+            "label" : "AD"
+          }, {
+            "x" : 840.0,
+            "y" : 450.0,
+            "id" : "AE",
+            "label" : "AE"
+          }, {
+            "x" : 880.0,
+            "y" : 450.0,
+            "id" : "AF",
+            "label" : "AF"
+          }, {
+            "x" : 920.0,
+            "y" : 450.0,
+            "id" : "AG",
+            "label" : "AG"
+          }, {
+            "x" : 960.0,
+            "y" : 450.0,
+            "id" : "AH",
+            "label" : "AH"
+          }, {
+            "x" : 1000.0,
+            "y" : 450.0,
+            "id" : "AI",
+            "label" : "AI"
+          }, {
+            "x" : 1040.0,
+            "y" : 450.0,
+            "id" : "AJ",
+            "label" : "AJ"
+          }, {
+            "x" : 1080.0,
+            "y" : 450.0,
+            "id" : "AK",
+            "label" : "AK"
+          } ],
+          "edges" : [ {
+            "fromId" : "K",
+            "toId" : "A",
+            "id" : "K-A"
+          }, {
+            "fromId" : "L",
+            "toId" : "B",
+            "id" : "L-B"
+          }, {
+            "fromId" : "M",
+            "toId" : "C",
+            "id" : "M-C"
+          }, {
+            "fromId" : "N",
+            "toId" : "D",
+            "id" : "N-D"
+          }, {
+            "fromId" : "O",
+            "toId" : "E",
+            "id" : "O-E"
+          }, {
+            "fromId" : "P",
+            "toId" : "F",
+            "id" : "P-F"
+          }, {
+            "fromId" : "Q",
+            "toId" : "G",
+            "id" : "Q-G"
+          }, {
+            "fromId" : "R",
+            "toId" : "H",
+            "id" : "R-H"
+          }, {
+            "fromId" : "S",
+            "toId" : "I",
+            "id" : "S-I"
+          }, {
+            "fromId" : "T",
+            "toId" : "J",
+            "id" : "T-J"
+          }, {
+            "fromId" : "U",
+            "toId" : "A",
+            "id" : "U-A"
+          }, {
+            "fromId" : "U",
+            "toId" : "B",
+            "id" : "U-B"
+          }, {
+            "fromId" : "V",
+            "toId" : "C",
+            "id" : "V-C"
+          }, {
+            "fromId" : "V",
+            "toId" : "D",
+            "id" : "V-D"
+          }, {
+            "fromId" : "W",
+            "toId" : "E",
+            "id" : "W-E"
+          }, {
+            "fromId" : "W",
+            "toId" : "F",
+            "id" : "W-F"
+          }, {
+            "fromId" : "X",
+            "toId" : "G",
+            "id" : "X-G"
+          }, {
+            "fromId" : "X",
+            "toId" : "H",
+            "id" : "X-H"
+          }, {
+            "fromId" : "Y",
+            "toId" : "I",
+            "id" : "Y-I"
+          }, {
+            "fromId" : "Y",
+            "toId" : "J",
+            "id" : "Y-J"
+          }, {
+            "fromId" : "Z",
+            "toId" : "A",
+            "id" : "Z-A"
+          }, {
+            "fromId" : "Z",
+            "toId" : "B",
+            "id" : "Z-B"
+          }, {
+            "fromId" : "Z",
+            "toId" : "C",
+            "id" : "Z-C"
+          }, {
+            "fromId" : "AA",
+            "toId" : "D",
+            "id" : "AA-D"
+          }, {
+            "fromId" : "AA",
+            "toId" : "E",
+            "id" : "AA-E"
+          }, {
+            "fromId" : "AA",
+            "toId" : "F",
+            "id" : "AA-F"
+          }, {
+            "fromId" : "AB",
+            "toId" : "G",
+            "id" : "AB-G"
+          }, {
+            "fromId" : "AB",
+            "toId" : "H",
+            "id" : "AB-H"
+          }, {
+            "fromId" : "AB",
+            "toId" : "I",
+            "id" : "AB-I"
+          }, {
+            "fromId" : "AC",
+            "toId" : "A",
+            "id" : "AC-A"
+          }, {
+            "fromId" : "AC",
+            "toId" : "B",
+            "id" : "AC-B"
+          }, {
+            "fromId" : "AC",
+            "toId" : "C",
+            "id" : "AC-C"
+          }, {
+            "fromId" : "AC",
+            "toId" : "D",
+            "id" : "AC-D"
+          }, {
+            "fromId" : "AD",
+            "toId" : "E",
+            "id" : "AD-E"
+          }, {
+            "fromId" : "AD",
+            "toId" : "F",
+            "id" : "AD-F"
+          }, {
+            "fromId" : "AD",
+            "toId" : "G",
+            "id" : "AD-G"
+          }, {
+            "fromId" : "AD",
+            "toId" : "H",
+            "id" : "AD-H"
+          }, {
+            "fromId" : "AE",
+            "toId" : "A",
+            "id" : "AE-A"
+          }, {
+            "fromId" : "AE",
+            "toId" : "B",
+            "id" : "AE-B"
+          }, {
+            "fromId" : "C",
+            "toId" : "AE",
+            "id" : "C-AE"
+          }, {
+            "fromId" : "D",
+            "toId" : "AE",
+            "id" : "D-AE"
+          }, {
+            "fromId" : "E",
+            "toId" : "AE",
+            "id" : "E-AE"
+          }, {
+            "fromId" : "AF",
+            "toId" : "F",
+            "id" : "AF-F"
+          }, {
+            "fromId" : "AF",
+            "toId" : "G",
+            "id" : "AF-G"
+          }, {
+            "fromId" : "AF",
+            "toId" : "H",
+            "id" : "AF-H"
+          }, {
+            "fromId" : "AF",
+            "toId" : "I",
+            "id" : "AF-I"
+          }, {
+            "fromId" : "AF",
+            "toId" : "J",
+            "id" : "AF-J"
+          }, {
+            "fromId" : "AG",
+            "toId" : "A",
+            "id" : "AG-A"
+          }, {
+            "fromId" : "AG",
+            "toId" : "B",
+            "id" : "AG-B"
+          }, {
+            "fromId" : "AG",
+            "toId" : "C",
+            "id" : "AG-C"
+          }, {
+            "fromId" : "AG",
+            "toId" : "D",
+            "id" : "AG-D"
+          }, {
+            "fromId" : "AG",
+            "toId" : "E",
+            "id" : "AG-E"
+          }, {
+            "fromId" : "AG",
+            "toId" : "F",
+            "id" : "AG-F"
+          }, {
+            "fromId" : "AH",
+            "toId" : "A",
+            "id" : "AH-A"
+          }, {
+            "fromId" : "AH",
+            "toId" : "B",
+            "id" : "AH-B"
+          }, {
+            "fromId" : "AH",
+            "toId" : "C",
+            "id" : "AH-C"
+          }, {
+            "fromId" : "AH",
+            "toId" : "D",
+            "id" : "AH-D"
+          }, {
+            "fromId" : "AH",
+            "toId" : "E",
+            "id" : "AH-E"
+          }, {
+            "fromId" : "AH",
+            "toId" : "F",
+            "id" : "AH-F"
+          }, {
+            "fromId" : "AH",
+            "toId" : "G",
+            "id" : "AH-G"
+          }, {
+            "fromId" : "AI",
+            "toId" : "A",
+            "id" : "AI-A"
+          }, {
+            "fromId" : "B",
+            "toId" : "AI",
+            "id" : "B-AI"
+          }, {
+            "fromId" : "C",
+            "toId" : "AI",
+            "id" : "C-AI"
+          }, {
+            "fromId" : "D",
+            "toId" : "AI",
+            "id" : "D-AI"
+          }, {
+            "fromId" : "E",
+            "toId" : "AI",
+            "id" : "E-AI"
+          }, {
+            "fromId" : "F",
+            "toId" : "AI",
+            "id" : "F-AI"
+          }, {
+            "fromId" : "G",
+            "toId" : "AI",
+            "id" : "G-AI"
+          }, {
+            "fromId" : "H",
+            "toId" : "AI",
+            "id" : "H-AI"
+          }, {
+            "fromId" : "AJ",
+            "toId" : "A",
+            "id" : "AJ-A"
+          }, {
+            "fromId" : "B",
+            "toId" : "AJ",
+            "id" : "B-AJ"
+          }, {
+            "fromId" : "C",
+            "toId" : "AJ",
+            "id" : "C-AJ"
+          }, {
+            "fromId" : "D",
+            "toId" : "AJ",
+            "id" : "D-AJ"
+          }, {
+            "fromId" : "E",
+            "toId" : "AJ",
+            "id" : "E-AJ"
+          }, {
+            "fromId" : "F",
+            "toId" : "AJ",
+            "id" : "F-AJ"
+          }, {
+            "fromId" : "G",
+            "toId" : "AJ",
+            "id" : "G-AJ"
+          }, {
+            "fromId" : "H",
+            "toId" : "AJ",
+            "id" : "H-AJ"
+          }, {
+            "fromId" : "I",
+            "toId" : "AJ",
+            "id" : "I-AJ"
+          }, {
+            "fromId" : "AK",
+            "toId" : "A",
+            "id" : "AK-A"
+          }, {
+            "fromId" : "B",
+            "toId" : "AK",
+            "id" : "B-AK"
+          }, {
+            "fromId" : "C",
+            "toId" : "AK",
+            "id" : "C-AK"
+          }, {
+            "fromId" : "D",
+            "toId" : "AK",
+            "id" : "D-AK"
+          }, {
+            "fromId" : "E",
+            "toId" : "AK",
+            "id" : "E-AK"
+          }, {
+            "fromId" : "F",
+            "toId" : "AK",
+            "id" : "F-AK"
+          }, {
+            "fromId" : "G",
+            "toId" : "AK",
+            "id" : "G-AK"
+          }, {
+            "fromId" : "H",
+            "toId" : "AK",
+            "id" : "H-AK"
+          }, {
+            "fromId" : "I",
+            "toId" : "AK",
+            "id" : "I-AK"
+          }, {
+            "fromId" : "J",
+            "toId" : "AK",
+            "id" : "J-AK"
+          } ]
+        },
+        "nodeOrder" : [ "AK", "AJ", "AI", "AH", "AG", "AF", "AE", "AD", "AC", "AB", "AA", "Z", "Y", "X", "W", "V", "U", "T", "S", "R", "Q", "P", "O", "N", "M", "L", "K" ],
+        "edgeOrder" : [ "AJ-A", "G-AK", "C-AJ", "AD-G", "AF-F", "AE-A", "D-AE", "AC-B", "V-D", "F-AJ", "AF-G", "F-AI", "Z-B", "AC-D", "AB-I", "G-AI", "Y-I", "N-D", "U-B", "AB-H", "B-AK", "AD-E", "AG-F", "Z-A", "AK-A", "AC-A", "G-AJ", "AH-C", "AD-F", "AB-G", "AA-E", "T-J", "AI-A", "C-AE", "E-AK", "K-A", "W-F", "I-AK", "D-AI", "Q-G", "P-F", "X-G", "B-AJ", "C-AK", "AG-B", "AG-A", "F-AK", "C-AI", "AE-B", "Z-C", "H-AJ", "AH-G", "V-C", "L-B", "S-I", "B-AI", "E-AE", "H-AI", "J-AK", "O-E", "AF-H", "Y-J", "X-H", "U-A", "AD-H", "AC-C", "AF-J", "W-E", "AF-I", "D-AK", "R-H", "AH-D", "AA-D", "AA-F", "M-C", "H-AK", "AH-A", "AG-E", "E-AJ", "AH-E", "AH-F", "E-AI", "AG-C", "I-AJ", "AH-B", "AG-D", "D-AJ" ],
+        "timestamp" : 1786193953236
+      },
+      "algorithm" : "vertexCover",
+      "name" : "preset-1"
+    },
+    "2" : {
+      "request" : {
+        "graph" : {
+          "nodes" : [ {
+            "x" : 452.0,
+            "y" : 241.0,
+            "id" : "bfWiUyCG",
+            "label" : ""
+          }, {
+            "x" : 282.0,
+            "y" : 279.0,
+            "id" : "bDlihLix",
+            "label" : ""
+          }, {
+            "x" : 621.0,
+            "y" : 322.0,
+            "id" : "bJYJpjov",
+            "label" : ""
+          }, {
+            "x" : 829.0,
+            "y" : 248.0,
+            "id" : "lwPnrAy",
+            "label" : ""
+          }, {
+            "x" : 648.0,
+            "y" : 134.0,
+            "id" : "HYlfVBw",
+            "label" : ""
+          }, {
+            "x" : 695.0,
+            "y" : 243.0,
+            "id" : "KHjMLDX",
+            "label" : ""
+          }, {
+            "x" : 735.0,
+            "y" : 352.0,
+            "id" : "bDfNZCRL",
+            "label" : ""
+          }, {
+            "x" : 424.0,
+            "y" : 389.0,
+            "id" : "wFDOKGa",
+            "label" : ""
+          }, {
+            "x" : 346.0,
+            "y" : 50.0,
+            "id" : "zsoIbZF",
+            "label" : ""
+          } ],
+          "edges" : [ ]
+        },
+        "nodeOrder" : [ ],
+        "edgeOrder" : [ ],
+        "timestamp" : 1786472591565
+      },
+      "algorithm" : "vertexCover",
+      "name" : "2"
+    }
+  },
+  "closestPair" : {
+    "abcd" : {
+      "request" : {
+        "points" : [ {
+          "x" : 635,
+          "y" : 334,
+          "id" : "RcbZTCl",
+          "label" : "A"
+        }, {
+          "x" : 279,
+          "y" : 312,
+          "id" : "qWFtwiX",
+          "label" : "B"
+        }, {
+          "x" : 209,
+          "y" : 249,
+          "id" : "bqhifpIY",
+          "label" : "C"
+        }, {
+          "x" : 167,
+          "y" : 181,
+          "id" : "NpnOJgS",
+          "label" : "D"
+        }, {
+          "x" : 172,
+          "y" : 400,
+          "id" : "bxEPWzKi",
+          "label" : "E"
+        }, {
+          "x" : 581,
+          "y" : 396,
+          "id" : "bbcgAYsR",
+          "label" : "F"
+        }, {
+          "x" : 741,
+          "y" : 401,
+          "id" : "XhcRazj",
+          "label" : "G"
+        }, {
+          "x" : 329,
+          "y" : 407,
+          "id" : "fGeefLM",
+          "label" : "H"
+        }, {
+          "x" : 297,
+          "y" : 283,
+          "id" : "HtXDtHg",
+          "label" : "I"
+        } ],
+        "timestamp" : 1786468414712
+      },
+      "algorithm" : "closestPair",
+      "name" : "abcd"
+    },
+    "hope" : {
+      "request" : {
+        "points" : [ {
+          "x" : 290,
+          "y" : 157,
+          "id" : "CeXisDH",
+          "label" : "A"
+        }, {
+          "x" : 454,
+          "y" : 184,
+          "id" : "stZePHd",
+          "label" : "B"
+        }, {
+          "x" : 335,
+          "y" : 307,
+          "id" : "ArxmehF",
+          "label" : "C"
+        }, {
+          "x" : 590,
+          "y" : 307,
+          "id" : "nTbTmDj",
+          "label" : "D"
+        }, {
+          "x" : 779,
+          "y" : 232,
+          "id" : "bEKAdPIe",
+          "label" : "E"
+        }, {
+          "x" : 916,
+          "y" : 398,
+          "id" : "YdlGCSK",
+          "label" : "F"
+        }, {
+          "x" : 1032,
+          "y" : 372,
+          "id" : "bdniDJUb",
+          "label" : "G"
+        }, {
+          "x" : 1013,
+          "y" : 221,
+          "id" : "BorwOSS",
+          "label" : "H"
+        }, {
+          "x" : 1011,
+          "y" : 137,
+          "id" : "nKjJVeS",
+          "label" : "I"
+        }, {
+          "x" : 979,
+          "y" : 86,
+          "id" : "kkQOZdn",
+          "label" : "J"
+        }, {
+          "x" : 826,
+          "y" : 166,
+          "id" : "bydEZrRD",
+          "label" : "K"
+        }, {
+          "x" : 724,
+          "y" : 350,
+          "id" : "rxyvDXf",
+          "label" : "L"
+        }, {
+          "x" : 754,
+          "y" : 172,
+          "id" : "UrkOYVU",
+          "label" : "M"
+        }, {
+          "x" : 606,
+          "y" : 97,
+          "id" : "vkZsRY",
+          "label" : "N"
+        }, {
+          "x" : 352,
+          "y" : 118,
+          "id" : "bokOlBKY",
+          "label" : "O"
+        }, {
+          "x" : 190,
+          "y" : 166,
+          "id" : "fNDioTw",
+          "label" : "P"
+        }, {
+          "x" : 580,
+          "y" : 403,
+          "id" : "bsmntJFx",
+          "label" : "Q"
+        }, {
+          "x" : 825,
+          "y" : 304,
+          "id" : "IuOmREr",
+          "label" : "R"
+        }, {
+          "x" : 800,
+          "y" : 229,
+          "id" : "FWONYPn",
+          "label" : "S"
+        }, {
+          "x" : 437,
+          "y" : 110,
+          "id" : "bxYtRwUI",
+          "label" : "T"
+        }, {
+          "x" : 143,
+          "y" : 156,
+          "id" : "sYnViyZ",
+          "label" : "U"
+        }, {
+          "x" : 454,
+          "y" : 245,
+          "id" : "bmlJlDSG",
+          "label" : "V"
+        }, {
+          "x" : 158,
+          "y" : 409,
+          "id" : "wvRvFiD",
+          "label" : "W"
+        }, {
+          "x" : 159,
+          "y" : 339,
+          "id" : "hVuXOGP",
+          "label" : "X"
+        }, {
+          "x" : 768,
+          "y" : 312,
+          "id" : "qZmZeJY",
+          "label" : "Y"
+        } ],
+        "timestamp" : -1
+      },
+      "algorithm" : "closestPair",
+      "name" : "hope"
+    },
+    "asdfasdf" : {
+      "request" : {
+        "points" : [ {
+          "x" : 387,
+          "y" : 206,
+          "id" : "bHALOlBD",
+          "label" : "A"
+        }, {
+          "x" : 679,
+          "y" : 228,
+          "id" : "ychnaX",
+          "label" : "B"
+        }, {
+          "x" : 491,
+          "y" : 345,
+          "id" : "lVqFOoz",
+          "label" : "C"
+        }, {
+          "x" : 824,
+          "y" : 345,
+          "id" : "ZlssYml",
+          "label" : "D"
+        } ],
+        "timestamp" : 1786472477571
+      },
+      "algorithm" : "closestPair",
+      "name" : "asdfasdf"
+    },
+    "123" : {
+      "request" : {
+        "points" : [ {
+          "x" : 325,
+          "y" : 152,
+          "id" : "byjppKgz",
+          "label" : "A"
+        }, {
+          "x" : 488,
+          "y" : 192,
+          "id" : "SQvJYGk",
+          "label" : "B"
+        }, {
+          "x" : 362,
+          "y" : 386,
+          "id" : "bbVNgDcR",
+          "label" : "C"
+        }, {
+          "x" : 821,
+          "y" : 354,
+          "id" : "xRWwdyQ",
+          "label" : "D"
+        } ],
+        "timestamp" : -1
+      },
+      "algorithm" : "closestPair",
+      "name" : "123"
+    },
+    "2" : {
+      "request" : {
+        "points" : [ {
+          "x" : 325,
+          "y" : 152,
+          "id" : "byjppKgz",
+          "label" : "A"
+        }, {
+          "x" : 488,
+          "y" : 192,
+          "id" : "SQvJYGk",
+          "label" : "B"
+        }, {
+          "x" : 362,
+          "y" : 386,
+          "id" : "bbVNgDcR",
+          "label" : "C"
+        }, {
+          "x" : 821,
+          "y" : 354,
+          "id" : "xRWwdyQ",
+          "label" : "D"
+        }, {
+          "x" : 591,
+          "y" : 240,
+          "id" : "PWqhIgb",
+          "label" : "E"
+        }, {
+          "x" : 582,
+          "y" : 328,
+          "id" : "bykCmWLg",
+          "label" : "F"
+        } ],
+        "timestamp" : -1
+      },
+      "algorithm" : "closestPair",
+      "name" : "2"
+    },
+    "5" : {
+      "request" : {
+        "points" : [ {
+          "x" : 325,
+          "y" : 152,
+          "id" : "byjppKgz",
+          "label" : "A"
+        }, {
+          "x" : 488,
+          "y" : 192,
+          "id" : "SQvJYGk",
+          "label" : "B"
+        }, {
+          "x" : 362,
+          "y" : 386,
+          "id" : "bbVNgDcR",
+          "label" : "C"
+        }, {
+          "x" : 821,
+          "y" : 354,
+          "id" : "xRWwdyQ",
+          "label" : "D"
+        }, {
+          "x" : 591,
+          "y" : 240,
+          "id" : "PWqhIgb",
+          "label" : "E"
+        }, {
+          "x" : 582,
+          "y" : 328,
+          "id" : "bykCmWLg",
+          "label" : "F"
+        }, {
+          "x" : 792,
+          "y" : 49,
+          "id" : "ZalUQZL",
+          "label" : "G"
+        }, {
+          "x" : 687,
+          "y" : 128,
+          "id" : "HwJxGrr",
+          "label" : "H"
+        } ],
+        "timestamp" : -1
+      },
+      "algorithm" : "closestPair",
+      "name" : "5"
+    },
+    "jetzt" : {
+      "request" : {
+        "points" : [ {
+          "x" : 381,
+          "y" : 133,
+          "id" : "tSAnsva",
+          "label" : "A"
+        }, {
+          "x" : 669,
+          "y" : 193,
+          "id" : "bnJfXzdQ",
+          "label" : "B"
+        }, {
+          "x" : 479,
+          "y" : 287,
+          "id" : "IGjiYns",
+          "label" : "C"
+        }, {
+          "x" : 703,
+          "y" : 359,
+          "id" : "byFIyAQc",
+          "label" : "D"
+        }, {
+          "x" : 904,
+          "y" : 223,
+          "id" : "RxQSbzC",
+          "label" : "E"
+        }, {
+          "x" : 815,
+          "y" : 113,
+          "id" : "PUaEHmk",
+          "label" : "F"
+        }, {
+          "x" : 797,
+          "y" : 241,
+          "id" : "jZCoqNH",
+          "label" : "G"
+        }, {
+          "x" : 822,
+          "y" : 386,
+          "id" : "QlBfUeM",
+          "label" : "H"
+        }, {
+          "x" : 534,
+          "y" : 394,
+          "id" : "bzhFpwmL",
+          "label" : "I"
+        }, {
+          "x" : 316,
+          "y" : 394,
+          "id" : "ITqZmTe",
+          "label" : "J"
+        } ],
+        "timestamp" : 1786472526940
+      },
+      "algorithm" : "closestPair",
+      "name" : "jetzt"
+    },
+    "nnn" : {
+      "request" : {
+        "points" : [ {
+          "x" : 381,
+          "y" : 133,
+          "id" : "tSAnsva",
+          "label" : "A"
+        }, {
+          "x" : 669,
+          "y" : 193,
+          "id" : "bnJfXzdQ",
+          "label" : "B"
+        }, {
+          "x" : 479,
+          "y" : 287,
+          "id" : "IGjiYns",
+          "label" : "C"
+        }, {
+          "x" : 703,
+          "y" : 359,
+          "id" : "byFIyAQc",
+          "label" : "D"
+        }, {
+          "x" : 904,
+          "y" : 223,
+          "id" : "RxQSbzC",
+          "label" : "E"
+        }, {
+          "x" : 815,
+          "y" : 113,
+          "id" : "PUaEHmk",
+          "label" : "F"
+        }, {
+          "x" : 797,
+          "y" : 241,
+          "id" : "jZCoqNH",
+          "label" : "G"
+        }, {
+          "x" : 822,
+          "y" : 386,
+          "id" : "QlBfUeM",
+          "label" : "H"
+        }, {
+          "x" : 534,
+          "y" : 394,
+          "id" : "bzhFpwmL",
+          "label" : "I"
+        }, {
+          "x" : 316,
+          "y" : 394,
+          "id" : "ITqZmTe",
+          "label" : "J"
+        } ],
+        "timestamp" : 1786472526940
+      },
+      "algorithm" : "closestPair",
+      "name" : "nnn"
+    },
+    "gggg" : {
+      "request" : {
+        "points" : [ {
+          "x" : 286,
+          "y" : 177,
+          "id" : "gCGEmBv",
+          "label" : "A"
+        }, {
+          "x" : 553,
+          "y" : 227,
+          "id" : "blAdaBls",
+          "label" : "B"
+        }, {
+          "x" : 420,
+          "y" : 367,
+          "id" : "bCJwfuUo",
+          "label" : "C"
+        }, {
+          "x" : 775,
+          "y" : 367,
+          "id" : "BCHBCaO",
+          "label" : "D"
+        }, {
+          "x" : 916,
+          "y" : 217,
+          "id" : "tWHWmyG",
+          "label" : "E"
+        }, {
+          "x" : 778,
+          "y" : 154,
+          "id" : "AWmSPbF",
+          "label" : "F"
+        }, {
+          "x" : 714,
+          "y" : 212,
+          "id" : "bcFBArtg",
+          "label" : "G"
+        } ],
+        "timestamp" : 1786472664086
+      },
+      "algorithm" : "closestPair",
+      "name" : "gggg"
+    },
+    "bbb" : {
+      "request" : {
+        "points" : [ {
+          "x" : 422,
+          "y" : 249,
+          "id" : "YjMYdMR",
+          "label" : "A"
+        }, {
+          "x" : 618,
+          "y" : 252,
+          "id" : "blxMvTLt",
+          "label" : "B"
+        } ],
+        "timestamp" : 1786472687001
+      },
+      "algorithm" : "closestPair",
+      "name" : "bbb"
+    },
+    "qqq" : {
+      "request" : {
+        "points" : [ {
+          "x" : 389,
+          "y" : 42,
+          "id" : "AXghgdB",
+          "label" : "A"
+        }, {
+          "x" : 472,
+          "y" : 124,
+          "id" : "bhwjmvpI",
+          "label" : "B"
+        }, {
+          "x" : 713,
+          "y" : 340,
+          "id" : "tVZqrEU",
+          "label" : "C"
+        }, {
+          "x" : 997,
+          "y" : 268,
+          "id" : "bzkxuUwC",
+          "label" : "D"
+        }, {
+          "x" : 527,
+          "y" : 288,
+          "id" : "buPQrsBv",
+          "label" : "E"
+        }, {
+          "x" : 704,
+          "y" : 248,
+          "id" : "TGRbCeX",
+          "label" : "F"
+        }, {
+          "x" : 480,
+          "y" : 316,
+          "id" : "bEQsoMkH",
+          "label" : "G"
+        }, {
+          "x" : 248,
+          "y" : 430,
+          "id" : "byfTHkdN",
+          "label" : "H"
+        } ],
+        "timestamp" : 1786472714267
+      },
+      "algorithm" : "closestPair",
+      "name" : "qqq"
+    }
+  }
+}

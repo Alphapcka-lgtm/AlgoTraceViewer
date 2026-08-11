@@ -1,4 +1,4 @@
-import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {Dispatch, SetStateAction} from "react";
 
 export type Edge = {
@@ -27,9 +27,10 @@ export type EdgesProps = {
 
 export type AnimationResponse = {
     initialState: Graph,
+    nodeOrder: string[],
+    edgeOrder: string[],
     initialDegreeMap: NodeDegreePair[]
     intermediateStates: AnimationState[],
-    randomSeed: number,
     timestamp: number,
 };
 
@@ -45,11 +46,10 @@ type NodeDegreePair = {
     degree: number,
 }
 
-export type AnimationRequest = {
+export type VertexCoverRequest = {
     graph: Graph,
-    densityFactor: number,
-    preset: string,
-    randomSeed: number,
+    nodeOrder: string[],
+    edgeOrder: string[],
     timestamp: number,
 };
 
@@ -79,16 +79,16 @@ export type Interaction =
 };
 
 export type SVGInputProps = {
-    input: AnimationRequest,
-    setInput: Dispatch<SetStateAction<AnimationRequest>>,
-    onSubmit: (input: AnimationRequest) => void;
+    input: VertexCoverRequest,
+    setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
+    onSubmit: (input: VertexCoverRequest) => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
 };
 
 export type InputControlProps = {
-    input: AnimationRequest,
-    setInput: Dispatch<SetStateAction<AnimationRequest>>,
+    input: VertexCoverRequest,
+    setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
     createExportString: () => string;
     onImport: (encoded: string) => void;

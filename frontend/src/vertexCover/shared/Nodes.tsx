@@ -1,5 +1,5 @@
 import {getAlphabetLabel} from "../../shared/Utils.tsx";
-import type {Node} from "../../sweepLine/shared/Types.tsx"
+import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {NodesProps} from "./Types.tsx";
 
 export function Nodes(props: NodesProps) {

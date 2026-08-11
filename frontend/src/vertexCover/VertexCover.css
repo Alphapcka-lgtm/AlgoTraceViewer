@@ -288,6 +288,8 @@
 }
 
 .step-description {
+    min-height: 4.5em;
+    line-height: 1.5;
     margin-bottom: 8px;
     color: var(--muted-text);
 }

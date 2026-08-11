@@ -1,10 +1,13 @@
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
-import type {InputControlProps} from "../shared/Types.tsx";
+import type {InputControlProps, VertexCoverRequest} from "../shared/Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
-import {presets} from "./Presets.tsx";
+import {PresetSelect} from "../../shared/PresetSelect.tsx";
+import {useState} from "react";
+import type {AnimationRequest} from "../../shared/Types.tsx";
 
 export function InputControls(props: InputControlProps) {
+    const [densityFactor, setDensityFactor] = useState<number>(0);
 
     const setRandomGraph = () => {
         const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;
@@ -13,20 +16,26 @@ export function InputControls(props: InputControlProps) {
         props.setInput((input) => {
             return {
                 ...input,
-                densityFactor: density.valueAsNumber,
                 graph: graph,
-                preset: "random",
+                nodeOrder: [],
+                edgeOrder: [],
                 timestamp: Date.now()
             };
         });
+        setDensityFactor(density.valueAsNumber);
     };
 
     const resetInput = () => {
         props.setInput((input) => {
-            return {...input, graph: {nodes: [], edges: []}, preset: "custom", timestamp: Date.now()};
+            return {...input, graph: {nodes: [], edges: []}, timestamp: Date.now()};
         });
         props.setInteraction({type: "idle"});
     };
+
+    const setPreset = (request: AnimationRequest) => {
+        const myInput = request as VertexCoverRequest;
+        props.setInput({...myInput, timestamp: Date.now()});
+    }
 
     return <>
         <div className="control-row">
@@ -37,24 +46,7 @@ export function InputControls(props: InputControlProps) {
             <button onClick={resetInput} className="control-button" style={{flex: 13}}>Reset</button>
         </div>
         <div className="control-row">
-            <select
-                className="control-select"
-                style={{flex: 1}}
-                value={props.input.preset}
-                onChange={(e) => {
-                    const selected = e.target.value;
-                    if (selected === "random") {
-                        setRandomGraph();
-                    } else if (selected !== "custom") {
-                        const importString = presets.filter(preset => preset.name === selected)[0].importString;
-                        props.onImport(importString);
-                    }
-                }}
-            >
-                {presets.map((preset, index) => <option key={index} value={preset.name}>{preset.name}</option>)}
-                <option value="random">random</option>
-                <option value="custom">custom</option>
-            </select>
+            <PresetSelect input={props.input} setInput={setPreset} algorithm={"vertexCover"} />
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
                 <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}
@@ -62,9 +54,9 @@ export function InputControls(props: InputControlProps) {
             </div>
             <div className="control-button">
                 <label htmlFor={"graphDensityInputSlider"}>Density
-                    Factor: {props.input.densityFactor.toString().slice(0, 4)}</label>
+                    Factor: {densityFactor.toString().slice(0, 4)}</label>
                 <input id={"graphDensityInputSlider"} type={"range"} min={0} max={1} step={"any"}
-                       value={props.input.densityFactor} onInput={setRandomGraph} style={{width: "100%"}}/>
+                       value={densityFactor} onInput={setRandomGraph} style={{width: "100%"}}/>
             </div>
         </div>
     </>;

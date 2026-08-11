@@ -10,8 +10,8 @@ const router = createBrowserRouter([
         element: <Homepage activeTab={"homepage"}/>
     },
     {
-        path: "/sweepLine",
-        element: <Homepage activeTab={"sweepLine"}/>
+        path: "/closestPair",
+        element: <Homepage activeTab={"closestPair"}/>
     },
     {
         path: "/vertexCover",

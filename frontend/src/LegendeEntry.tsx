@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type {RingStyle} from "./sweepLine/shared/Types.tsx";
+import type {RingStyle} from "./closestPair/shared/Types.tsx";
 
 type LegendEntryProps = {
     label: string;
@@ -18,75 +18,70 @@ export function LegendEntry({ label, value, icon }: LegendEntryProps) {
     );
 }
 
-type CircleNodeIconProps = {
-    fill: string;
-    stroke?: string;
-};
-
-export function CircleNodeIcon({ fill, stroke = "black" }: CircleNodeIconProps) {
-    return (
-        <>
-            <circle cx={10} cy={10} r={10} fill={stroke} />
-            <circle cx={10} cy={10} r={8} fill={fill} />
-        </>
-    );
-}
-
-type EdgeIconProps = {
-    stroke: string;
-    strokeWidth?: number;
-};
-
-export function EdgeIcon({ stroke, strokeWidth = 2 }: EdgeIconProps) {
-    return (
-        <path
-            d="M 3 17 L 17 3"
-            stroke={stroke}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-        />
-    );
-}
-
-type XNodeIconProps = {
-    fill: string;
+type XPointIconProps = {
+    color: string;
     ringStyle?: RingStyle;
-}
+    variant?: "default" | "current";
+};
 
-export function XNodeIcon({fill, ringStyle = "none"}: XNodeIconProps) {
+export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPointIconProps) {
     const NODE_SIZE = 4;
     const RING_RADIUS = 9;
+    const CURRENT_MARKER_RADIUS = RING_RADIUS-1.25;
+
+    const DEFAULT_NODE_COLOR = "#222222";//"#555";
+    const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
+    const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
+    const CURRENT_MARKER_COLOR = "#ff0000"; //"#ff3333";//"#F25C54";
+
     return (
-        <g transform={`translate(${10}, ${10})`}>
-            {ringStyle !== "none" && (
+        <g transform={`translate(10, 10)`}>
+            {(ringStyle === "active" || ringStyle === "candidate") && (
                 <circle
                     cx={0}
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke={fill}
+                    stroke={ACTIVE_RING_COLOR}
                     strokeWidth={2.5}
-                    strokeDasharray={ringStyle === "candidate" ? "3 2" : undefined}
                 />
             )}
-
+            {ringStyle === "candidate" && (
+                <circle
+                    cx={0}
+                    cy={0}
+                    r={RING_RADIUS + 2}
+                    fill="none"
+                    stroke={CANDIDATE_RING_COLOR}
+                    strokeWidth={2.5}
+                    strokeDasharray="3 2"
+                />
+            )}
+            {variant === "current" && (
+                <circle
+                    cx={0}
+                    cy={0}
+                    r={CURRENT_MARKER_RADIUS}
+                    fill={CURRENT_MARKER_COLOR}
+                />
+            )}
             <line
                 x1={-NODE_SIZE}
                 y1={-NODE_SIZE}
                 x2={NODE_SIZE}
                 y2={NODE_SIZE}
-                stroke={fill}
+                stroke={color}
                 strokeWidth={3}
+                strokeLinecap="round"
             />
-
             <line
                 x1={NODE_SIZE}
                 y1={-NODE_SIZE}
                 x2={-NODE_SIZE}
                 y2={NODE_SIZE}
-                stroke={fill}
+                stroke={color}
                 strokeWidth={3}
+                strokeLinecap="round"
             />
         </g>
     );
