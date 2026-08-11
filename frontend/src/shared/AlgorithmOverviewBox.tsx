@@ -6,7 +6,7 @@ export function AlgorithmOverviewBox(prop:AlgorithmOverviewBoxProps) {
         return (
             <section className="algorithm-overview">
                 <div className="algorithm-overview__content">
-                    <h3>Closest Pair - Sweepline</h3>
+                    <h3>Closest Pair — Sweepline</h3>
                     <p>
                         The Sweepline algorithm finds the closest pair of points by moving a vertical sweep line from
                         left to right and processing one point at a time, called the current point. δ denotes the shortest

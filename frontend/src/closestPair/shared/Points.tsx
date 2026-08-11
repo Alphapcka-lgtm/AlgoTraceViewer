@@ -75,7 +75,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
     const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
     const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
-    const CURRENT_MARKER_COLOR = "#F25C54";
+    const CURRENT_MARKER_COLOR = "#ff0000";//"#F25C54";
 
     return (
         <g transform={`translate(${point.x}, ${point.y})`}>

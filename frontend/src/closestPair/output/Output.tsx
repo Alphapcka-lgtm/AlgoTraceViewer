@@ -37,6 +37,7 @@ export function Output(props: OutputProps) {
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
     const pointRefsMap = useRef(new Map<string, PointVisualRefs>());
+    const closestPairLineRef = useRef<SVGLineElement>(null);
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
@@ -76,7 +77,7 @@ export function Output(props: OutputProps) {
     };
 
     const getPointColor = (state: PointVisualState): string => {
-        if (state.isBest) return "#f5c45e";
+        if (state.isBest) return "#0000CD";//"#0000CD"; //"#f5c45e";00008B
         if (state.isProcessed) return "#cccccc";
         if (state.isFuture) return "#808080";
         return "#222222";//"#555";
@@ -265,6 +266,15 @@ export function Output(props: OutputProps) {
         animatePointColors(timeline, previousStep, targetStep, "<");
     };
 
+    const animateclosestPairLine = (timeline: gsap.core.Timeline, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
+        const line = closestPairLineRef.current;
+        const pair = targetStep.bestPair;
+        if (!line || !pair) return;
+        timeline.to(line, {attr: {x1: pair.p0.x, y1: pair.p0.y, x2: pair.p1.x, y2: pair.p1.y},
+            opacity: 1, duration: 0.3, ease: "power1.inOut"}, position
+        );
+    };
+
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
         const activeArea = activeSweepAreaRef.current;
@@ -334,6 +344,7 @@ export function Output(props: OutputProps) {
                 }
                 case "INITIALIZATION": {
                     animateInitialization(timeline, previousStep, targetStep);
+                    animateclosestPairLine(timeline, targetStep, "<");
                     break;
                 }
                 case "ADVANCE_AND_PRUNE": {
@@ -363,6 +374,7 @@ export function Output(props: OutputProps) {
 
                     animateDeltaUpdate(timeline, previousStep, targetStep);
                     animateClosestPairUpdate(timeline, previousStep, targetStep);
+                    animateclosestPairLine(timeline, targetStep, "<");
                     animateCurrentInsertion(timeline, targetStep);
                     break;
                 }
@@ -416,71 +428,44 @@ export function Output(props: OutputProps) {
 
     return (
         <div className="algorithm-panel">
-            <IOModeTabs
-                mode="output"
-                onChangeInput={props.onChangeInput}
-                onSubmit={() => {}}
-                canSubmit={false}
-            />
+            <IOModeTabs mode="output" onChangeInput={props.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
 
             <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
-
                 <defs>
                     <pattern id="active-window-shrink-schraffur"
                         width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                         <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(90, 90, 90, 0.99)" strokeWidth="1" strokeDasharray="4 2" strokeLinecap="round"/>
                     </pattern>
                 </defs>
-
                 <rect
                     ref={activeSweepAreaDifferenceRef}
-                    x={0}
-                    y={PADDING}
-                    width={0}
-                    height={props.height - 2 * PADDING}
+                    className="svg-activeSweepAreaDifference"
+                    x={0} y={PADDING}
+                    width={0} height={props.height - 2 * PADDING}
                     fill="url(#active-window-shrink-schraffur)"
-                    opacity={0}
-                    pointerEvents="none"
                 />
                 <rect
                     ref={activeSweepAreaRef}
-                    x={0}
-                    y={PADDING}
-                    width={0}
-                    height={props.height - 2 * PADDING}
-                    fill="rgba(90, 90, 90, 0.14)"
-                    stroke="none"
-                    opacity={0}
-                    pointerEvents="none"
-                    rx={2}
+                    className="svg-activeSweepArea"
+                    x={0} y={PADDING}
+                    width={0} height={props.height - 2 * PADDING}
                 />
                 <rect
                     ref={candidateSweepWindowRef}
-                    x={0}
-                    y={0}
-                    width={0}
-                    height={0}
-                    fill="rgba(255,220,245,0.75)"
-                    stroke="rgb(204,14,119)"
-                    strokeWidth={0.6}
-                    strokeDasharray="6 3"
-                    rx={2}
-                    opacity={0}
-                    pointerEvents="none"
+                    className="svg-candidateSweepWindow"
+                    x={0} y={0} width={0} height={0}
                 />
                 <line
                     ref={sweepLineRef}
-                    x1={0}
-                    x2={0}
-                    y1={PADDING}
-                    y2={props.height - PADDING}
-                    stroke="rgba(0, 0, 0, 0.9)"
-                    strokeWidth={2}
-                    opacity={0}
-                    pointerEvents="none"
-                    strokeLinecap="round"
+                    className="svg-sweepLine"
+                    x1={0} x2={0}
+                    y1={PADDING} y2={props.height - PADDING}
                 />
-
+                <line
+                    ref={closestPairLineRef}
+                    className="svg-closestPairLine"
+                    x1={0} y1={0} x2={0} y2={0}
+                />
                 {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
                     <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
                 ))}
@@ -505,7 +490,6 @@ export function Output(props: OutputProps) {
                     <div className="step-description"> {step.description} </div>
 
                     <div className="step-info-grid">
-                        {/*<div><strong>Step:</strong> {props.currentStep + 1} / {props.steps.length}</div>*/}
                         <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
 
                         <div>
@@ -515,14 +499,14 @@ export function Output(props: OutputProps) {
 
                         <LegendEntry
                             label="Current Point: "
-                            value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "-"}
+                            value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "—"}
                             icon={<XPointIcon color="#222222" variant="current"/>}
                         />
                         <div>
                             <LegendEntry
                                 label="Closest pair: "
                                 value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                                icon={<XPointIcon color="#f5c45e" ringStyle="none"/>}
+                                icon={<XPointIcon color="#0000CD" ringStyle="none"/>}
                             />
                         </div>
                         <div>
@@ -540,11 +524,10 @@ export function Output(props: OutputProps) {
                                 icon={<XPointIcon color="#222222" ringStyle="candidate"/>}
                             />
                         </div>
-
-                        <div>
-                            <strong>Distances to current:</strong>{" "}
-                            {candidateDistances}
-                        </div>
+                    </div>
+                    <div className="candidate-distances">
+                        <strong>Distances to current:</strong>{" "}
+                        {candidateDistances}
                     </div>
                 </div>
 

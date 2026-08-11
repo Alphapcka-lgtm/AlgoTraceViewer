@@ -80,10 +80,9 @@ type HomeContentProps = {
 function HomeContent(props: HomeContentProps) {
     return (
         <section>
-            <h1 className="home-headline">Willkommen im Algo Trace Viewer</h1>
-
+            <h1 className="home-headline">Welcome to the Algo Trace Viewer</h1>
             <p className="home-text">
-                Wähle einen Algorithmus aus, um seine Schritte visuell nachzuvollziehen.
+                <p>Select an algorithm to explore its execution step by step through an interactive visualization.</p>
             </p>
 
             <div className="algorithm-card-grid">
