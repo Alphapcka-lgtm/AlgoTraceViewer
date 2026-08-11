@@ -139,7 +139,7 @@ export default function ClosestPair() {
                     height={svgHeight}
                     width={svgWidth}
                     mode={modeState}
-                    points={inputState.points}
+                    inputState={inputState}
                     onAddPoint={handleAddPoint}
                     onMovePoint={handleMovePoint}
                     onDeletePoint={handleDeletePoint}
