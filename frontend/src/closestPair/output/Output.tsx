@@ -490,7 +490,8 @@ export function Output(props: OutputProps) {
             />
 
             <div className="step-layout">
-                <div className="step-info">
+                <div className="step-layout-side">
+                    <div className="step-info closest-pair-step-info">
 
                     <div className="step-info-grid">
                         <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
@@ -534,6 +535,14 @@ export function Output(props: OutputProps) {
                     </div>
 
                     <div className="closest-pair-step-description"> {step.description} </div>
+                    </div>
+
+                    <div className="step-layout-actions">
+                        <ImportExportDialog
+                            onImport={props.onImport}
+                            createExportString={props.createExportString}
+                        />
+                    </div>
                 </div>
 
                 <PseudoCodePanel
@@ -543,10 +552,6 @@ export function Output(props: OutputProps) {
                 />
             </div>
 
-            <ImportExportDialog
-                onImport={props.onImport}
-                createExportString={props.createExportString}
-            />
         </div>
     );
 }

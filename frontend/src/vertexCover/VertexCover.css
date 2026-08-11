@@ -3,14 +3,20 @@
 @import "./shared/Graph.css";
 
 .vertex-cover-variant-navigation {
-    padding: 0.25rem;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: 3rem;
-    margin-bottom: 2rem;
+    width: min(100%, 520px);
+    margin: 0 0 var(--section-gap) auto;
 }
 
 .vertex-cover-variant-button {
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
+    flex: 1 1 0;
+    min-width: 120px;
+    padding-inline: 16px;
+    font-size: 16px;
+}
+
+@media (max-width: 700px) {
+    .vertex-cover-variant-navigation {
+        width: 100%;
+        margin-left: 0;
+    }
 }

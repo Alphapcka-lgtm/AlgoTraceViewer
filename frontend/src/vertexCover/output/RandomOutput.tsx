@@ -145,37 +145,43 @@ export function RandomOutput(props: SVGOutputProps) {
             playbackSpeed={playbackSpeed}
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
-        <div className="step-info">
-            <div className="step-info-grid vertex-cover-step-summary">
-                <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.floor(props.stepIndex / 3) * 2}</div>
+        <div className="step-layout">
+            <div className="step-layout-side">
+                <div className="step-info">
+                    <div className="step-info-grid vertex-cover-step-summary">
+                        <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.stepIndex / 3) * 2}</div>
+                    </div>
+                    <div className="step-info-grid vertex-cover-legend-grid">
+                        <LegendEntry
+                            label="Arbitrary Edge e"
+                            value={""}
+                            icon={<ArbitraryEdgeIcon/>}
+                        />
+                        <LegendEntry
+                            label="Vertex Cover C"
+                            value={""}
+                            icon={<NodeIcon/>}
+                        />
+                        <LegendEntry
+                            label="Remaining Edges E'"
+                            value={""}
+                            icon={<RemainingEdgeIcon/>}
+                        />
+                    </div>
+                </div>
+                <div className="step-layout-actions">
+                    <ImportExportDialog
+                        createExportString={props.createExportString}
+                        onImport={props.onImport}
+                    />
+                </div>
             </div>
-            <div className="step-info-grid vertex-cover-legend-grid">
-                <LegendEntry
-                    label="Arbitrary Edge e"
-                    value={""}
-                    icon={<ArbitraryEdgeIcon/>}
-                />
-                <LegendEntry
-                    label="Vertex Cover C"
-                    value={""}
-                    icon={<NodeIcon/>}
-                />
-                <LegendEntry
-                    label="Remaining Edges E'"
-                    value={""}
-                    icon={<RemainingEdgeIcon/>}
-                />
-            </div>
+            <PseudoCodePanel
+                lines={PSEUDOCODE_RANDOM}
+                activeLineIds={getActiveLineIdsRandom(props.stepIndex, labels.length - 1)}
+                title={"Vertex Cover PseudoCode"}
+            />
         </div>
-        <PseudoCodePanel
-            lines={PSEUDOCODE_RANDOM}
-            activeLineIds={getActiveLineIdsRandom(props.stepIndex, labels.length - 1)}
-            title={"Vertex Cover PseudoCode"}
-        />
-        <ImportExportDialog
-            createExportString={props.createExportString}
-            onImport={props.onImport}
-        />
     </div>;
 }

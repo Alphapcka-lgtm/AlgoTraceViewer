@@ -1,3 +1,8 @@
 .vertex-cover-hidden-edge {
     opacity: 0;
 }
+
+/* Keep algorithm animation colors untouched; only static graph chrome follows the shared palette. */
+.algorithm-canvas text {
+    font-family: var(--mono-font);
+}

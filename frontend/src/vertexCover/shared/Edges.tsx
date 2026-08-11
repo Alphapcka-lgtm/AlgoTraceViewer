@@ -7,7 +7,7 @@ export function Edges(props: EdgesProps) {
         const to = getNodeById(props.nodes, e.toId);
 
         const p = "M " + (from.x) + " " + (from.y) + " L " + (to.x) + " " + (to.y);
-        const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
+        const colors = {red: "#be3d2a", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0000CD"}
 
         return (
             <g key={"a" + e.id + index}>

@@ -184,7 +184,9 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             playbackSpeed={playbackSpeed}
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
-        <div className="step-info">
+        <div className="step-layout">
+            <div className="step-layout-side">
+                <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
                 <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
@@ -214,15 +216,19 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                     </div>);
                 })}
             </div>
+                </div>
+                <div className="step-layout-actions">
+                    <ImportExportDialog
+                        createExportString={props.createExportString}
+                        onImport={props.onImport}
+                    />
+                </div>
+            </div>
+            <PseudoCodePanel
+                lines={PSEUDOCODE_MAX_DEGREE}
+                activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
+                title={"Vertex Cover PseudoCode"}
+            />
         </div>
-        <PseudoCodePanel
-            lines={PSEUDOCODE_MAX_DEGREE}
-            activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
-            title={"Vertex Cover PseudoCode"}
-        />
-        <ImportExportDialog
-            createExportString={props.createExportString}
-            onImport={props.onImport}
-        />
     </div>;
 }

@@ -570,18 +570,22 @@ export function SwapOutput(props: SwapOutputProps) {
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
-            <div className="step-info">
-                <div className="step-info-grid">
-                    <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
-                    <div><strong>k:</strong> {props.currentStep == 0 ? "" : step.k}</div>
-                    <div><strong>b[k]:</strong> {props.currentStep == 0 ? "" : step.swapIndex}</div>
+            <div className="step-layout">
+                <div className="step-layout-side">
+                    <div className="step-info">
+                        <div className="step-info-grid">
+                            <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
+                            <div><strong>k:</strong> {props.currentStep == 0 ? "" : step.k}</div>
+                            <div><strong>b[k]:</strong> {props.currentStep == 0 ? "" : step.swapIndex}</div>
+                        </div>
+                    </div>
                 </div>
+                <PseudoCodePanel
+                    lines={PSEUDOCODE_EHRLICH_SWAPS}
+                    activeLineIds={getActiveLineIdsEhrlich(props.currentStep, labels.length - 1)}
+                    title={"Ehrlich Swaps PseudoCode"}
+                />
             </div>
-            <PseudoCodePanel
-                lines={PSEUDOCODE_EHRLICH_SWAPS}
-                activeLineIds={getActiveLineIdsEhrlich(props.currentStep, labels.length - 1)}
-                title={"Ehrlich Swaps PseudoCode"}
-            />
         </div>
     );
 }
