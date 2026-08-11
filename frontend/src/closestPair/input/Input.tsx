@@ -56,7 +56,7 @@ export function Input(props: InputProps) {
                 mode="input"
                 onChangeInput={props.onChangeInput}
                 onSubmit={props.onSubmit}
-                canSubmit={props.points.length >= 2}
+                canSubmit={props.inputState.points.length >= 2}
             />
 
             <svg
@@ -68,7 +68,7 @@ export function Input(props: InputProps) {
                 preserveAspectRatio="xMidYMid meet"
             >
                 <DynamicPoints
-                    points={props.points}
+                    points={props.inputState.points}
                     onMouseDown={handlePointMouseDown}
                     onMouseUp={handlePointMouseUp}
                     onDoubleClick={handlePointDoubleClick}
@@ -78,7 +78,7 @@ export function Input(props: InputProps) {
             <div className="control-row">
                 <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={{points: props.points, timestamp: -1}}/>
+                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={props.inputState}/>
 
                 <button
                     className="control-button"
@@ -96,10 +96,10 @@ export function Input(props: InputProps) {
                 />
 
                 <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>
-                <span style={{ width: 70 }}>Points: {props.points.length}</span>
+                <span style={{ width: 70 }}>Points: {props.inputState.points.length}</span>
                     <input
                         className="timeline-slider"
-                        type="range" min={0} max={50} value={props.points.length}
+                        type="range" min={0} max={50} value={props.inputState.points.length}
                         onChange={(event) =>
                             props.onSetPointCount(Number(event.currentTarget.value))
                         }

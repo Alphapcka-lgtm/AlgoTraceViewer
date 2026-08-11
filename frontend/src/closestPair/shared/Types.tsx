@@ -25,7 +25,7 @@ export type InputProps = {
     height: number;
     width: number;
     mode: string;
-    points: Point[];
+    inputState: ClosestPairInputState;
     onAddPoint: (point: Point) => void;
     onMovePoint: (id: string, x: number, y: number) => void;
     onDeletePoint: (id: string) => void;
