@@ -56,7 +56,7 @@ function NavButton(props: NavButtonProps) {
     const isActive = props.activeTab === props.tab;
 
     return (
-        <Link to={props.linkTo} style={{alignContent: "center"}}>
+        <Link to={props.linkTo} className="home-nav-link">
             <button
                 type="button"
                 onClick={() => props.onTabChange(props.tab)}

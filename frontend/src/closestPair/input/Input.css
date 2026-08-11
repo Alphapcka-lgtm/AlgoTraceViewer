@@ -1,0 +1,10 @@
+.closest-pair-point-count-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: monospace;
+}
+
+.closest-pair-point-count-label {
+    width: 70px;
+}

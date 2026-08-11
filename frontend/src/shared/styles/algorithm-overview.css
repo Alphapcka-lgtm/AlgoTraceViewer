@@ -1,0 +1,24 @@
+.algorithm-overview {
+    width: 100%;
+}
+
+.algorithm-overview h2 {
+    margin: 0 0 0.75rem;
+}
+
+.algorithm-overview__content {
+    height: 220px;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--primary);
+    border-radius: 15px;
+    line-height: 1.55;
+}
+
+.algorithm-overview__content p {
+    margin: 0 0 1rem;
+}
+
+.algorithm-overview__content p:last-child {
+    margin-bottom: 0;
+}

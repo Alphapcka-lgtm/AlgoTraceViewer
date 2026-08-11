@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import type {AnimationRequest} from "./Types.tsx";
 
 export type Preset = {
@@ -75,7 +75,7 @@ export function PresetSelect(props: PresetSelectProps) {
 
     return (
         <>
-            <div style={presetRowStyle}>
+            <div className="preset-control-group">
                 <select
                     className="control-select"
                     value={presetName}
@@ -93,21 +93,20 @@ export function PresetSelect(props: PresetSelectProps) {
                 <button
                     type="button"
                     onClick={openDialog}
-                    className="control-button"
+                    className="control-button preset-add-button"
                     title="New preset"
-                    style={plusButtonStyle}
                 >
                     +
                 </button>
             </div>
 
             {dialogOpen && (
-                <div style={overlayStyle} onClick={closeDialog}>
+                <div className="simple-dialog-overlay" onClick={closeDialog}>
                     <div
-                        style={dialogStyle}
+                        className="simple-dialog-card"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <h3 style={{marginTop: 0}}>New Preset</h3>
+                        <h3 className="simple-dialog-title">New Preset</h3>
 
                         <input
                             type="text"
@@ -124,10 +123,10 @@ export function PresetSelect(props: PresetSelectProps) {
                             }}
                             placeholder="Preset name..."
                             autoFocus
-                            style={inputStyle}
+                            className="simple-dialog-input"
                         />
 
-                        <div style={buttonRowStyle}>
+                        <div className="simple-dialog-actions">
                             <button
                                 type="button"
                                 onClick={() => void savePreset()}
@@ -151,50 +150,3 @@ export function PresetSelect(props: PresetSelectProps) {
         </>
     );
 }
-
-const presetRowStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 4
-};
-
-const plusButtonStyle: React.CSSProperties = {
-    width: 28,
-    height: 28,
-    padding: 0,
-    fontSize: 20,
-    lineHeight: "20px"
-};
-
-const overlayStyle: React.CSSProperties = {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.25)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000
-};
-
-const dialogStyle: React.CSSProperties = {
-    width: 520,
-    maxWidth: "90vw",
-    background: "white",
-    border: "2px solid black",
-    borderRadius: 12,
-    padding: 16,
-    fontFamily: "monospace"
-};
-
-const inputStyle: React.CSSProperties = {
-    width: "100%",
-    boxSizing: "border-box",
-    fontFamily: "monospace",
-    padding: 6
-};
-
-const buttonRowStyle: React.CSSProperties = {
-    display: "flex",
-    gap: 8,
-    marginTop: 10
-};

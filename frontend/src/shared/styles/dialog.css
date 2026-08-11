@@ -1,0 +1,91 @@
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 46, 80, 0.25);
+}
+
+.dialog-card {
+    width: 520px;
+    max-width: 90vw;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    background: var(--card-background);
+    box-shadow: var(--shadow);
+    font-family: var(--mono-font);
+}
+
+.dialog-textarea {
+    width: 100%;
+    resize: vertical;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm);
+    font-family: var(--mono-font);
+}
+
+.dialog-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
+.simple-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+}
+
+.simple-dialog-card {
+    width: 520px;
+    max-width: 90vw;
+    background: white;
+    border: 2px solid black;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: monospace;
+}
+
+.simple-dialog-title {
+    margin-top: 0;
+}
+
+.simple-dialog-input,
+.simple-dialog-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+.simple-dialog-input {
+    padding: 6px;
+}
+
+.simple-dialog-textarea {
+    resize: vertical;
+}
+
+.simple-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.simple-dialog-button {
+    flex: 1;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-family: monospace;
+    padding: 4px 10px;
+    cursor: pointer;
+    background-color: rgba(240, 240, 240, 0.8);
+    font-size: 18px;
+}

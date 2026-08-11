@@ -1,5 +1,4 @@
-import React, {useState} from "react";
-import {btnStyle} from "./Utils.tsx";
+import {useState} from "react";
 
 type ImportExportDialogProps = {
     onImport: (encoded: string) => void;
@@ -73,11 +72,11 @@ export function ImportExportDialog(props: ImportExportDialogProps) {
             <button type="button" onClick={openImportDialog} className="control-button">Import</button>
             <button type="button" onClick={openExportDialog} className="control-button">Export</button>
             {dialogMode && (
-                <div style={overlayStyle} onClick={closeDialog}>
-                    <div style={dialogStyle}
+                <div className="simple-dialog-overlay" onClick={closeDialog}>
+                    <div className="simple-dialog-card"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <h3 style={{ marginTop: 0 }}>{dialogTitle}</h3>
+                        <h3 className="simple-dialog-title">{dialogTitle}</h3>
                         {dialogContent}
                     </div>
                 </div>
@@ -102,10 +101,10 @@ function ImportDialog(props: ImportDialogProps) {
               onChange={(event) => props.setImportValue(event.currentTarget.value)}
               placeholder="Paste export string here..."
               rows={3}
-              style={textareaStyle}
+              className="simple-dialog-textarea"
             />
 
-            <div style={buttonRowStyle}>
+            <div className="simple-dialog-actions">
                 <button type="button" onClick={props.importState} disabled={!props.canImport} className="control-button">
                     Import
                 </button>
@@ -123,42 +122,16 @@ type ExportDialogProps = { exportValue: string; copyExport: () => void; closeDia
 function ExportDialog(props: ExportDialogProps) {
     return (
         <>
-            <textarea value={props.exportValue} readOnly rows={5} style={textareaStyle}/>
-            <div style={buttonRowStyle}>
-                <button type="button" onClick={props.copyExport} disabled={!props.exportValue} style={btnStyle}>
+            <textarea value={props.exportValue} readOnly rows={5} className="simple-dialog-textarea"/>
+            <div className="simple-dialog-actions">
+                <button type="button" onClick={props.copyExport} disabled={!props.exportValue} className="simple-dialog-button">
                     {props.copied ? "Copied!" : "Copy"}
                 </button>
 
-                <button type="button" onClick={props.closeDialog} style={btnStyle}>
+                <button type="button" onClick={props.closeDialog} className="simple-dialog-button">
                     Close
                 </button>
             </div>
         </>
     );
 }
-
-const overlayStyle: React.CSSProperties = {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.25)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000
-};
-const dialogStyle: React.CSSProperties = {
-    width: 520,
-    maxWidth: "90vw",
-    background: "white",
-    border: "2px solid black",
-    borderRadius: 12,
-    padding: 16,
-    fontFamily: "monospace"
-};
-const textareaStyle: React.CSSProperties = {
-    width: "100%",
-    boxSizing: "border-box",
-    fontFamily: "monospace",
-    resize: "vertical"
-};
-const buttonRowStyle: React.CSSProperties = {display: "flex", gap: 8, marginTop: 10};

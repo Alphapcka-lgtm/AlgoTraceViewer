@@ -43,20 +43,20 @@ export function InputControls(props: InputControlProps) {
                 createExportString={props.createExportString}
                 onImport={props.onImport}
             />
-            <button onClick={resetInput} className="control-button" style={{flex: 13}}>Reset</button>
+            <button onClick={resetInput} className="control-button vertex-cover-reset-button">Reset</button>
         </div>
         <div className="control-row">
             <PresetSelect input={props.input} setInput={setPreset} algorithm={"vertexCover"} />
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
                 <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}
-                       value={props.input.graph.nodes.length} onInput={setRandomGraph} style={{width: "100%"}}/>
+                       value={props.input.graph.nodes.length} onInput={setRandomGraph} className="vertex-cover-range-input"/>
             </div>
             <div className="control-button">
                 <label htmlFor={"graphDensityInputSlider"}>Density
                     Factor: {densityFactor.toString().slice(0, 4)}</label>
                 <input id={"graphDensityInputSlider"} type={"range"} min={0} max={1} step={"any"}
-                       value={densityFactor} onInput={setRandomGraph} style={{width: "100%"}}/>
+                       value={densityFactor} onInput={setRandomGraph} className="vertex-cover-range-input"/>
             </div>
         </div>
     </>;

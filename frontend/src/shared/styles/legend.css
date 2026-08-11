@@ -1,0 +1,9 @@
+.legend-entry {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-entry-icon {
+    overflow: visible;
+}

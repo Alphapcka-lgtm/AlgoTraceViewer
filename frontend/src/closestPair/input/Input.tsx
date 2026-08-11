@@ -95,8 +95,8 @@ export function Input(props: InputProps) {
                     createExportString={props.createExportString}
                 />
 
-                <label style={{display: "flex", alignItems: "center", gap: 5, fontFamily: "monospace"}}>
-                <span style={{ width: 70 }}>Points: {props.inputState.points.length}</span>
+                <label className="closest-pair-point-count-control">
+                <span className="closest-pair-point-count-label">Points: {props.inputState.points.length}</span>
                     <input
                         className="timeline-slider"
                         type="range" min={0} max={50} value={props.inputState.points.length}

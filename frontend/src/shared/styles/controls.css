@@ -1,0 +1,84 @@
+.mode-tabs {
+    display: flex;
+    gap: 7px;
+    padding: 7px;
+    border: 2px solid var(--primary);
+    border-radius: 25px;
+    background: var(--card-background);
+    box-shadow: var(--shadow);
+    margin-bottom: 15px;
+}
+
+.mode-tab {
+    flex: 1;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    background: white;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.mode-tab.is-active {
+    background: var(--primary);
+    color: white;
+}
+
+.mode-tab.is-active:disabled {
+    opacity: 1;
+    cursor: default;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.control-button,
+.control-select {
+    min-height: 40px;
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 6px 14px;
+    background: white;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.control-button {
+    flex: 1 1 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-button.icon-only {
+    flex: 0 0 42px;
+    padding: 6px;
+}
+
+.control-select {
+    flex: 0 0 110px;
+}
+
+.timeline-slider {
+    flex: 3 1 240px;
+    min-width: 200px;
+    height: 40px;
+    accent-color: var(--secondary);
+}
+
+@media (max-width: 700px) {
+    .control-button {
+        flex-basis: 140px;
+    }
+
+    .timeline-slider {
+        flex-basis: 100%;
+    }
+}
