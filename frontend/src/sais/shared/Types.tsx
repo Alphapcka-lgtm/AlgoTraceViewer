@@ -15,6 +15,8 @@ export type SaisOutputProps = {
     setProgress: Dispatch<SetStateAction<number>>,
     stepIndex: number,
     setStepIndex: Dispatch<SetStateAction<number>>,
+    activeLineIds: string[],
+    setActiveLineIds: Dispatch<SetStateAction<string[]>>,
     onChangeInput: () => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
@@ -54,6 +56,8 @@ export type SortStepDto = {
     sourceIndex: number,
     bucketIndex: number,
     resultingArray: number[],
+    stepDescription: string,
+    induceSaIndex: number,
 }
 
 export type TypeMapDto = {
@@ -104,6 +108,7 @@ export type BucketRowProps = {
     xOffsetStart: number,
     yPos: number,
     nameColWidth: number,
+    strokeWidth: number,
 }
 
 export type TypesRowProps = {
@@ -114,6 +119,7 @@ export type TypesRowProps = {
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
+    strokeWidth: number,
 }
 
 export type TextRowProps = {
@@ -124,6 +130,7 @@ export type TextRowProps = {
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
+    strokeWidth: number,
 }
 
 export type IndexRowProps = {
@@ -133,4 +140,5 @@ export type IndexRowProps = {
     yPos: number
     source: string,
     nameColWidth: number,
+    strokeWidth: number,
 }

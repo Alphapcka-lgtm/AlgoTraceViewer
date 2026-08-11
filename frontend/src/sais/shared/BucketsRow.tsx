@@ -5,7 +5,7 @@ export function BucketsRow(props: BucketRowProps) {
     const y = props.yPos;
 
     return (
-        <g key="buckets_row" id="buckets_row" style={{opacity: 100}}>
+        <g key="buckets_row" id="buckets_row" style={{opacity: 0}}>
             <rect
                 key={"buckets_row_name_rect"}
                 x={props.xOffsetStart}

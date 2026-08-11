@@ -1,7 +1,8 @@
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
 import {
     colors,
-    getActiveLineIdsMaxDegree, NodeDegreeMapIcon,
+    getActiveLineIdsMaxDegree,
+    NodeDegreeMapIcon,
     NodeIcon,
     PSEUDOCODE_MAX_DEGREE,
     RemainingEdgeIcon
@@ -68,9 +69,9 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             if (index == 0) {
                 timeline.set("#u0" + edge.id, {opacity: 100});
             } else {
-                timeline.set("#u0" + edge.id, {opacity: 100}, "<");
+                timeline.set("#u0" + edge.id, {opacity: 100}, ">");
             }
-            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
+            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, ">");
         })
 
         timeline.addLabel(labels[1]);
@@ -203,11 +204,27 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                     icon={<RemainingEdgeIcon/>}
                 />
             </div>
-            <div style={{display: "flex", flexWrap: "nowrap", overflowX: "auto", overflowY: "hidden", paddingBottom: "12px"}}>
+            <div style={{
+                display: "flex",
+                flexWrap: "nowrap",
+                overflowX: "auto",
+                overflowY: "hidden",
+                paddingBottom: "12px"
+            }}>
                 {props.output.initialDegreeMap.map(ndp => {
                     return (<div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} style={{flex: 1, fontSize: 20}}>
-                        <div style={{minWidth: "27px", border: "solid 1px", textAlign: "center", textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"}}>{ndp.node.label}</div>
-                        <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} style={{minWidth: "27px", border: "solid 1px", textAlign: "center", textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"}}></div>
+                        <div style={{
+                            minWidth: "27px",
+                            border: "solid 1px",
+                            textAlign: "center",
+                            textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"
+                        }}>{ndp.node.label}</div>
+                        <div id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} style={{
+                            minWidth: "27px",
+                            border: "solid 1px",
+                            textAlign: "center",
+                            textShadow: "1px 1px 0px rgba(255, 255, 255, 1)"
+                        }}></div>
                     </div>);
                 })}
             </div>

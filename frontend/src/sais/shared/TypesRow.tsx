@@ -4,7 +4,7 @@ export function TypesRow(props: TypesRowProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
 
     return (
-        <g key="types_row" id="types_row" style={{opacity: 100}}>
+        <g key="types_row" id="types_row" style={{opacity: 0}}>
             <rect
                 x={props.xOffsetStart}
                 y={props.yPos}
@@ -31,6 +31,7 @@ export function TypesRow(props: TypesRowProps) {
                             // fill cell yellow when suffix is lms
                             fill={(props.typeMap.map[index].isLms) ? "yellow" : "white"}
                             stroke="black"
+                            strokeWidth={props.strokeWidth}
                         />
                         <text
                             x={xCellStart + index * props.cellWidth + props.cellWidth / 2}

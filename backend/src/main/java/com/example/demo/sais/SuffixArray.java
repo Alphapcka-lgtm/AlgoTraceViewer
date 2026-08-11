@@ -55,7 +55,8 @@ public class SuffixArray {
                 guessLmsSteps.add(new SortStepDto(i,
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
-                        "inducing lms suffixes: " + c + "(" + i + ") -> " + bucketTails[bucketIndex]));
+                        "inducing lms suffixes: " + c + "(" + i + ") -> " + bucketTails[bucketIndex],
+                        -1));
             }
             // ... and move the tail pointer down.
             bucketTails[bucketIndex]--;
@@ -165,7 +166,8 @@ public class SuffixArray {
                 induceLSteps.add(new SortStepDto(j,
                         bucketHeads[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
-                        "inducing L suffixes: " + c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]));
+                        "inducing L suffixes: " + c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex],
+                        i));
             }
 
             // ...and move the head pointer up.
@@ -232,7 +234,8 @@ public class SuffixArray {
                 induceSSteps.add(new SortStepDto(j,
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
-                        "inducing S suffixes: " + c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]));
+                        "inducing S suffixes: " + c + "(" + j + ")" + " -> " + bucketTails[bucketIndex],
+                        i));
             }
 
             // ...and move the tail pointer down.

@@ -25,6 +25,7 @@ export function TextRow(props: TextRowProps) {
                 [...props.source].map((char, index) => (
                     <g key={index}>
                         <rect
+                            id={`text_row_name_${index}`}
                             x={xCellStart + index * props.cellWidth}
                             y={props.yPos}
                             width={props.cellWidth}
@@ -32,6 +33,7 @@ export function TextRow(props: TextRowProps) {
                             // fill cell yellow when suffix is lms
                             fill={(props.typeMap.map[index].isLms) ? "yellow" : "white"}
                             stroke="black"
+                            strokeWidth={props.strokeWidth}
                         />
                         <text
                             x={xCellStart + index * props.cellWidth + props.cellWidth / 2}

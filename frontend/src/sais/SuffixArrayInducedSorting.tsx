@@ -7,6 +7,7 @@ export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState(0);
+    const [activeLineIds, setActiveLineIds] = useState(["word"]);
     const [input, setInput] = useState<SaisRequestDto>({
         source: "",
         timestamp: 0,
@@ -99,6 +100,8 @@ export default function SuffixArrayInducedSorting() {
                         setProgress={setProgress}
                         stepIndex={stepIndex}
                         setStepIndex={setStepIndex}
+                        activeLineIds={activeLineIds}
+                        setActiveLineIds={setActiveLineIds}
                         onChangeInput={handleChangeInput}
                         createExportString={() => "" /*TODO*/}
                         onImport={encoded => console.log("import: " + encoded) /*TODO*/}
