@@ -1,9 +1,9 @@
 package dto;
 
-import com.example.demo.ClosestPair.CandidateComparison;
-import com.example.demo.ClosestPair.Point;
-import com.example.demo.ClosestPair.PointPair;
-import com.example.demo.ClosestPair.SweepLineStepType;
+import com.example.demo.closestPair.CandidateComparison;
+import com.example.demo.closestPair.Point;
+import com.example.demo.closestPair.PointPair;
+import com.example.demo.closestPair.SweepLineStepType;
 
 import java.util.List;
 

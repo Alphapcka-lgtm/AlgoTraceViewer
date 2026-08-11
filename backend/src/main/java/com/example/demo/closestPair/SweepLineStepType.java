@@ -1,4 +1,4 @@
-package com.example.demo.ClosestPair;
+package com.example.demo.closestPair;
 
 public enum SweepLineStepType {
     START, //bevor der alg startet ... kein wirklicher alg step
