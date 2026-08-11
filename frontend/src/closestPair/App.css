@@ -295,9 +295,17 @@
     font-size: 15px;
 }
 
+
 .step-description {
-    margin-bottom: 8px;
-    color: var(--muted-text);
+    margin-top: 8px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+
+    height: 3lh;
+
+    overflow-y: auto;
+    /*color: var(--muted-text);*/
+
 }
 
 .candidate-distances {

@@ -17,11 +17,12 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {LegendEntry, XPointIcon} from "../../LegendeEntry.tsx";
 
-const STEP_DURATION = 0.9;
-const CANDIDATE_FADE_IN_DURATION = 0.7;
-const CANDIDATE_FADE_OUT_DURATION = 0.3;
-const CANDIDATE_AUTOPLAY_HOLD_DURATION = 0.9;
-const ACTIVE_WINDOW_SHRINK_DURATION = 0.75
+const STEP_DURATION = 0.8;
+const CANDIDATE_FADE_IN_DURATION = 0.45;
+const CANDIDATE_FADE_OUT_DURATION = 0.25;
+const CANDIDATE_AUTOPLAY_HOLD_DURATION = 0.8;
+const ACTIVE_WINDOW_SHRINK_DURATION = 0.7;
+
 const PADDING = 1;
 
 export function Output(props: OutputProps) {
@@ -104,6 +105,11 @@ export function Output(props: OutputProps) {
         return res;
     };
 
+    const addBreak = (timeline: gsap.core.Timeline, duration = 0.15) => {
+        const dummy = {value: 0};
+        timeline.to(dummy, {value: 1, duration, ease: "none"});
+    };
+
     const animateInitialization = (
         timeline: gsap.core.Timeline, startStep: AlgorithmStepDTO, targetStep: AlgorithmStepDTO
     ) => {
@@ -111,10 +117,7 @@ export function Output(props: OutputProps) {
         timeline.to(activeSweepAreaRef.current, {attr: getActiveAreaAttrs(targetStep), opacity: 1});
         timeline.to(sweepLineRef.current, {attr: getSweepLineAttrs(targetStep), opacity: 1}, "<");
         // Initiales Best Pair und Future points colors
-        animatePointColors(timeline, startStep, targetStep, "<");
-
-        // initial Current Marker animateCurrentChange(timeline, startStep, targetStep, "<");
-
+        animatePointColors(timeline, startStep, targetStep, "<")
         // Active Ring für initial aktive Punkte
         const activeRefs = getRefsForPoints(targetStep.activePoints);
         if (activeRefs.length > 0) {
@@ -245,7 +248,7 @@ export function Output(props: OutputProps) {
             duration: ACTIVE_WINDOW_SHRINK_DURATION, ease: "power2.inOut"
         }, "<");
         // kurz stehen lassen damit man den unterschied sehen kann
-        timeline.to({}, {duration: 0.7});
+        addBreak(timeline, 0.7);
         // Schraffur wieder entfernen
         timeline.to(activeAreaDifference, {opacity: 0, duration: 0.35, ease: "power1.out"});
     };
@@ -266,7 +269,7 @@ export function Output(props: OutputProps) {
         animatePointColors(timeline, previousStep, targetStep, "<");
     };
 
-    const animateclosestPairLine = (timeline: gsap.core.Timeline, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
+    const animateClosestPairLine = (timeline: gsap.core.Timeline, targetStep: AlgorithmStepDTO, position?: gsap.Position) => {
         const line = closestPairLineRef.current;
         const pair = targetStep.bestPair;
         if (!line || !pair) return;
@@ -344,7 +347,7 @@ export function Output(props: OutputProps) {
                 }
                 case "INITIALIZATION": {
                     animateInitialization(timeline, previousStep, targetStep);
-                    animateclosestPairLine(timeline, targetStep, "<");
+                    animateClosestPairLine(timeline, targetStep, "<");
                     break;
                 }
                 case "ADVANCE_AND_PRUNE": {
@@ -355,27 +358,28 @@ export function Output(props: OutputProps) {
                     animatePointColors(timeline, previousStep, targetStep, "<");
                     // damit die animation einblenden besser aussieht, fährt es unsichtbar mit und so muss es bei CHECK_CANDIDATES nicht mehr bewegt werden
                     timeline.set(candidateRect, {attr: getCandidateRectAttrs(targetStep), opacity: 0});
+                    addBreak(timeline, 0.15);
                     animateRemoveActiveRings(timeline, targetStep); //enfernen der außerhalb liegende active Rings animieren
                     break;
                 }
                 case "CHECK_CANDIDATES": {
                     //Candidate Window einblenden.
                     timeline.to(candidateRect, {opacity: 1, duration: CANDIDATE_FADE_IN_DURATION, ease: "power1.inOut"});
-
                     animateCandidateRingsIn(timeline, targetStep, "<");
                     // Damit man das candidaten window im Autoplay beim CHECK_CANDIDATES etwas länger sieht.
-                    timeline.to({}, {duration: CANDIDATE_AUTOPLAY_HOLD_DURATION});
+                    addBreak(timeline, CANDIDATE_AUTOPLAY_HOLD_DURATION);
                     break;
                 }
                 case "COMMIT_ITERATION": {
                     timeline.to(candidateRect, {opacity: 0, duration: CANDIDATE_FADE_OUT_DURATION}); // Candidate Window wieder ausblenden
                     animateCandidateRingsOut(timeline, previousStep, "<");
-                    timeline.to({}, {duration: 0.25}); //kleine pause, damit man beides besser wahrnehmen kann ...
-
+                    addBreak(timeline, 0.25);
                     animateDeltaUpdate(timeline, previousStep, targetStep);
                     animateClosestPairUpdate(timeline, previousStep, targetStep);
-                    animateclosestPairLine(timeline, targetStep, "<");
+                    animateClosestPairLine(timeline, targetStep, "<");
+                    addBreak(timeline, 0.15);
                     animateCurrentInsertion(timeline, targetStep);
+                    addBreak(timeline, 0.5);
                     break;
                 }
                 case "FINISHED": {
@@ -487,7 +491,6 @@ export function Output(props: OutputProps) {
 
             <div className="step-layout">
                 <div className="step-info">
-                    <div className="step-description"> {step.description} </div>
 
                     <div className="step-info-grid">
                         <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
@@ -529,6 +532,8 @@ export function Output(props: OutputProps) {
                         <strong>Distances to current:</strong>{" "}
                         {candidateDistances}
                     </div>
+
+                    <div className="step-description"> {step.description} </div>
                 </div>
 
                 <PseudoCodePanel
