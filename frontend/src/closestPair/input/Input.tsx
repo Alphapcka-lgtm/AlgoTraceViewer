@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 import {DynamicPoints} from "../shared/Points.tsx";
-import type {ClosestPairInputState, InputProps, Interaction} from "../shared/Types.tsx";
+import type {InputProps, Interaction} from "../shared/Types.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
-import type {AnimationRequest} from "../../shared/Types.tsx";
 
 export function Input(props: InputProps) {
     const [interaction, setInteraction] = useState<Interaction>({type: "idle"});
@@ -51,10 +50,6 @@ export function Input(props: InputProps) {
         setInteraction({type: "idle"});
     };
 
-    const setPreset = (input: AnimationRequest) => {
-        props.setInputState(input as ClosestPairInputState);
-    }
-
     return (
         <div className="algorithm-panel">
             <IOModeTabs
@@ -83,7 +78,7 @@ export function Input(props: InputProps) {
             <div className="control-row">
                 <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <PresetSelect algorithm={"closestPair"} setInput={setPreset} input={props.inputState}/>
+                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={{points: props.points, timestamp: -1}}/>
 
                 <button
                     className="control-button"

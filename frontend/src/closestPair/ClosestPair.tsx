@@ -5,8 +5,7 @@ import type {Point, ClosestPairInputState, ClosestPairOutputState} from "./share
 import {Output} from "./output/Output.tsx";
 import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomPoints} from "../shared/Utils.tsx";
 import "./App.css";
-import {presets} from "./input/Presets.tsx";
-import type {ExportState} from "../shared/Types.tsx";
+import type {AnimationRequest, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function ClosestPair() {
@@ -16,7 +15,6 @@ export default function ClosestPair() {
     const {loading, error, calculateSteps} = useClosestPairSteps();
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
-    const [selectedPreset, setSelectedPreset] = useState("");
     const svgHeight = 500;
     const svgWidth = 1123;
 
@@ -128,15 +126,9 @@ export default function ClosestPair() {
         });
     };
 
-    const handlePresetChange = async (selected: string) => {
-        setSelectedPreset(selected);
-        if (selected === "random") return;
-        if (selected === "-") return;
-        const preset = presets.find(p => p.name === selected);
-        if (!preset) return;
-
-        await handleImport(preset.importString);
-    };
+    const handlePresetChange = (input: AnimationRequest) => {
+        setInputState(input as ClosestPairInputState);
+    }
 
     if (modeState === "input") {
         return (
@@ -156,11 +148,8 @@ export default function ClosestPair() {
                     onChangeInput={handleChangeInput}
                     onImport={handleImport}
                     onSetPointCount={handleSetPointCount}
-                    selectedPreset={selectedPreset}
                     onPresetChange={handlePresetChange}
                     createExportString={createExportString}
-                    setInputState={setInputState}
-                    inputState={inputState}
                 />
             </div>
         );

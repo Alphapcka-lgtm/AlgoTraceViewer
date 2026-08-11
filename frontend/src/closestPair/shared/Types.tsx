@@ -1,4 +1,4 @@
-import React, {type Dispatch, type SetStateAction} from "react";
+import type {AnimationRequest} from "../../shared/Types.tsx";
 
 export type Point = {
     x: number;
@@ -34,11 +34,8 @@ export type InputProps = {
     onChangeInput: () => void;
     onImport: (encoded: string) => void;
     onSetPointCount: (count: number) => void;
-    selectedPreset: string;
-    onPresetChange: (selected: string) => void;
+    onPresetChange: (request: AnimationRequest) => void;
     createExportString: () => string;
-    setInputState: Dispatch<SetStateAction<ClosestPairInputState>>;
-    inputState: ClosestPairInputState;
 };
 
 export interface PointPair {
