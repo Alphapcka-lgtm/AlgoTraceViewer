@@ -123,7 +123,8 @@ export default function ClosestPair() {
     };
 
     const handlePresetChange = (input: AnimationRequest) => {
-        setInputState(input as ClosestPairInputState);
+        const myInput =  input as ClosestPairInputState;
+        setInputState({...myInput, timestamp: Date.now()});
     }
 
     if (modeState === "input") {
