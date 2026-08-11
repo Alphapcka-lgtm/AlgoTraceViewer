@@ -11,7 +11,7 @@ import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
     const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
-    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: -1,});
+    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: 0,});
     const {loading, error, calculateSteps} = useClosestPairSteps();
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
@@ -53,16 +53,14 @@ export default function ClosestPair() {
     //bevor die points ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
     // die durch löschen von points entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
-    const calculateOutput = async (submittedPoints: Point[], inputTimestamp: number) => {
+    const calculateOutput = async (submittedPoints: Point[]) => {
         try {
             const labeledPoints: Point[] = assignLabels(submittedPoints);
-            setInputState({points: labeledPoints, timestamp: inputTimestamp});
+            setInputState({...inputState, points: labeledPoints});
 
             const result = await calculateSteps(labeledPoints);
             //console.log("Algorithm steps:", result);
-            setOutputState({steps: result, timestamp: inputTimestamp});
-
-            //setModeState("output");
+            setOutputState({steps: result, timestamp: Date.now()});
         } catch (error) {
             console.error(error);
         }
@@ -70,16 +68,15 @@ export default function ClosestPair() {
 
     //bei normalen will man ganz normal am anfang starten...
     const handleNormalSubmit = async () => {
-        const outputIsStillValid = outputState.steps.length > 0 && inputState.timestamp <= outputState.timestamp;
-        if (outputIsStillValid) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
+        if (inputState.timestamp < outputState.timestamp) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
             setModeState("output");
             return;
         }
         //wenn input neu/verändert bei 0 starten
         setProgress(0);
         setCurrentStep(0);
-
-        await calculateOutput(inputState.points, inputState.timestamp);
+        await calculateOutput(inputState.points);
+        setModeState("output");
     };
 
     const handleChangeInput = () => {
@@ -96,10 +93,9 @@ export default function ClosestPair() {
             if (imported.algorithm !== "closestPair") {
                 return;
             }
-            const importTimestamp = Date.now();
             const importedPoints = imported.input; //assign labels wird dann in calculateOutput geamacht ...
             setProgress(imported.progress);
-            await calculateOutput(importedPoints, importTimestamp);
+            await calculateOutput(importedPoints);
         } catch (error) {
             console.error("Invalid import string", error);
         }
