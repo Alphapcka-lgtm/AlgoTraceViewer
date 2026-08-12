@@ -5,6 +5,7 @@ import type {Graph, Node} from "../shared/Types.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {useState} from "react";
 import type {AnimationRequest} from "../../shared/Types.tsx";
+import {getFormattedRequest} from "../shared/Utils.tsx";
 
 export function InputControls(props: InputControlProps) {
     const [densityFactor, setDensityFactor] = useState<number>(0);
@@ -60,7 +61,7 @@ export function InputControls(props: InputControlProps) {
             <button onClick={resetInput} className="control-button vertex-cover-reset-button">Reset</button>
         </div>
         <div className="control-row">
-            <PresetSelect input={props.input} setInput={setPreset} algorithm={"vertexCover"} />
+            <PresetSelect setInput={setPreset} algorithm={"vertexCover"} getInput={() => getFormattedRequest(props.input)} />
             <div className="control-button">
                 <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
                 <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}

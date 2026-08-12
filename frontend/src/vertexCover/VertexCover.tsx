@@ -43,6 +43,7 @@ export function VertexCover() {
             .then((json) => {
                 const output = json as AnimationResponse;
                 setOutput(output);
+                setInput(input);
             });
     };
 

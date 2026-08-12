@@ -78,7 +78,7 @@ export function Input(props: InputProps) {
             <div className="control-row">
                 <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={props.inputState}/>
+                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} getInput={() => props.inputState}/>
 
                 <button
                     className="control-button"

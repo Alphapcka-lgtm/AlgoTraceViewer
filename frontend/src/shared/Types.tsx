@@ -56,3 +56,15 @@ export type CommonOutputProps = {
     createExportString: () => string;
     onImport: (encoded: string) => void;
 }
+
+export type Preset = {
+    request: AnimationRequest;
+    algorithm: string;
+    name: string;
+};
+
+export type PresetSelectProps = {
+    algorithm: string;
+    setInput: (input: AnimationRequest) => void,
+    getInput: () => AnimationRequest;
+};
