@@ -46,14 +46,14 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             },
             onUpdate: () => {
                 const tl = timelineRef.current;
-                props.setProgress(tl.progress());
+                props.cProps.setProgress(tl.progress());
 
                 const stepIndex: number = getStepIndexFromTimeline(tl, labels);
 
-                props.setCurrentStepIndex(stepIndex);
+                props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
-                props.setProgress(1);
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
                 timelineRef.current.pause();
             },
@@ -151,7 +151,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             timeline.addLabel(labels[3 * index + 5]);
         });
 
-        timeline.progress(props.progress);
+        timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
@@ -163,7 +163,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
     return <div className="algorithm-panel">
         <IOModeTabs
             mode="output"
-            onChangeInput={props.onChangeInput}
+            onChangeInput={props.cProps.onChangeInput}
             onSubmit={() => {
             }}
             canSubmit={false}
@@ -175,12 +175,12 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
         <OutputControls
             timelineRef={timelineRef}
             labels={labels}
-            currentStep={props.currentStepIndex}
-            setCurrentStep={props.setCurrentStepIndex}
+            currentStep={props.cProps.currentStepIndex}
+            setCurrentStep={props.cProps.setCurrentStepIndex}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
-            progress={props.progress}
-            setProgress={props.setProgress}
+            progress={props.cProps.progress}
+            setProgress={props.cProps.setProgress}
             playbackSpeed={playbackSpeed}
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
@@ -188,8 +188,8 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
-                <div><strong>Step:</strong> {props.currentStepIndex} / {labels.length - 1}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.currentStepIndex - 1) / 3)}</div>
+                <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
+                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.cProps.currentStepIndex - 1) / 3)}</div>
             </div>
             <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
                 <LegendEntry
@@ -210,23 +210,25 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             </div>
             <div className="vertex-cover-degree-table">
                 {props.output.initialDegreeMap.map(ndp => {
-                    return (<div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-column">
-                        <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
-                        <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-cell"></div>
-                    </div>);
+                    return (
+                        <div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-column">
+                            <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
+                            <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-cell"></div>
+                        </div>
+                    );
                 })}
             </div>
                 </div>
                 <div className="step-layout-actions">
                     <ImportExportDialog
-                        onImport={props.onImport}
-                        createExportString={props.createExportString}
+                        onImport={props.cProps.onImport}
+                        createExportString={props.cProps.createExportString}
                     />
                 </div>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_MAX_DEGREE}
-                activeLineIds={getActiveLineIdsMaxDegree(props.currentStepIndex, labels.length - 1)}
+                activeLineIds={getActiveLineIdsMaxDegree(props.cProps.currentStepIndex, labels.length - 1)}
             />
         </div>
     </div>;

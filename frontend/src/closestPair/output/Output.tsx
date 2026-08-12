@@ -31,7 +31,7 @@ export function Output(props: OutputProps) {
     const activeSweepAreaRef = useRef<SVGRectElement>(null);
     const sweepLineRef = useRef<SVGLineElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
-    const step: AlgorithmStepDTO = props.steps[props.currentStepIndex];
+    const step: AlgorithmStepDTO = props.steps[props.cProps.currentStepIndex];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
@@ -289,7 +289,7 @@ export function Output(props: OutputProps) {
 
         // Startzustand der Timeline aus app.
         // Beim normalen Submit (nichts importered) ist props.progress = 0 und bei import ist es der importierte progress...
-        const initialProgress: number = props.progress;
+        const initialProgress: number = props.cProps.progress;
 
         const timeline = gsap.timeline({
             paused: true,
@@ -301,14 +301,14 @@ export function Output(props: OutputProps) {
                 const tl = timelineRef.current;
                 const now = performance.now();
                 if (now - lastProgressUpdateRef.current > 100) { // setProgress throttlen, sonst kann man playback speed nicht mehr während auotplay ändern
-                    props.setProgress(tl.progress());
+                    props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
                 const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
-                props.setCurrentStepIndex(stepIndex);
+                props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
-                props.setProgress(1);
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
                 timelineRef.current.pause();
             }
@@ -424,12 +424,12 @@ export function Output(props: OutputProps) {
     Transition i->i+1 = steps[i+1].stepType wird ausgeführt/passiert visuell
         Während der Transition i->i+1 wird weiterhin der Pseudocode von steps[i+1].stepType gehighlighted (was also gerade passiert)
      */
-    const pseudoCodeStepIndex = Math.min(props.currentStepIndex + 1, props.steps.length - 1);
+    const pseudoCodeStepIndex = Math.min(props.cProps.currentStepIndex + 1, props.steps.length - 1);
     const pseudoCodeStep = props.steps[pseudoCodeStepIndex];
 
     return (
         <div className="algorithm-panel">
-            <IOModeTabs mode="output" onChangeInput={props.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
+            <IOModeTabs mode="output" onChangeInput={props.cProps.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
 
             <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
                 <defs>
@@ -475,12 +475,12 @@ export function Output(props: OutputProps) {
             <OutputControls
                 timelineRef={timelineRef}
                 labels={myLabels}
-                currentStep={props.currentStepIndex}
-                setCurrentStep={props.setCurrentStepIndex}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={props.progress}
-                setProgress={props.setProgress}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
@@ -490,7 +490,7 @@ export function Output(props: OutputProps) {
                     <div className="step-info closest-pair-step-info">
 
                     <div className="step-info-grid">
-                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStepIndex} / ${props.steps.length - 1}`}</strong>
+                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.cProps.currentStepIndex} / ${props.steps.length - 1}`}</strong>
 
                         <div>
                             <strong>Closest distance δ:</strong>{" "}
@@ -535,8 +535,8 @@ export function Output(props: OutputProps) {
 
                     <div className="step-layout-actions">
                         <ImportExportDialog
-                            onImport={props.onImport}
-                            createExportString={props.createExportString}
+                            onImport={props.cProps.onImport}
+                            createExportString={props.cProps.createExportString}
                         />
                     </div>
                 </div>

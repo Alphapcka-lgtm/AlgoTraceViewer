@@ -1,10 +1,9 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {getRandomId} from "../../shared/Utils.tsx";
 import type {Interaction, SVGInputProps} from "../shared/Types.tsx";
-import type {Node} from "../../closestPair/shared/Types.tsx"
 import {Edges, PreviewEdge} from "../shared/Edges.tsx";
 import {InputControls} from "./InputControls.tsx";
-import type {Edge} from "../shared/Types.tsx";
+import type {Edge, Node} from "../shared/Types.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useRef, useState} from "react";
 import * as React from "react";
