@@ -57,8 +57,8 @@ export type SVGOutputProps = {
     output: AnimationResponse,
     progress: number,
     setProgress: Dispatch<SetStateAction<number>>,
-    stepIndex: number,
-    setStepIndex: Dispatch<SetStateAction<number>>,
+    currentStepIndex: number,
+    setCurrentStepIndex: Dispatch<SetStateAction<number>>,
     onChangeInput: () => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;

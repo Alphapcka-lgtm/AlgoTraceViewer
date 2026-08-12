@@ -3,8 +3,6 @@ import type {PseudoCodePanelProps} from "./Types.tsx";
 export function PseudoCodePanel(props: PseudoCodePanelProps) {
     return (
         <div className="pseudocode-panel">
-            <div className="pseudocode-title">{props.title}</div>
-
             {props.lines.map((line) => {
                 const active = props.activeLineIds.includes(line.id);
 

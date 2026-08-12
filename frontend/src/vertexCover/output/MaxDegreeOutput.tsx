@@ -1,4 +1,11 @@
-import {createStepLabels, getStepIndexFromTimeline, colors, getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "../../shared/Utils.tsx";
+import {
+    createStepLabels,
+    getStepIndexFromTimeline,
+    colors,
+    getActiveLineIdsMaxDegree,
+    PSEUDOCODE_MAX_DEGREE,
+    SVG_WIDTH, SVG_HEIGHT
+} from "../../shared/Utils.tsx";
 import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -17,13 +24,13 @@ const STEP_DURATION = 1.0;
 
 export function MaxDegreeOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 3);
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
-        tlRef.current.timeScale(speed);
+        timelineRef.current.timeScale(speed);
     };
 
     useGSAP(() => {
@@ -38,20 +45,21 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 ease: "power2.inOut",
             },
             onUpdate: () => {
-                const tl = tlRef.current;
+                const tl = timelineRef.current;
                 props.setProgress(tl.progress());
 
                 const stepIndex: number = getStepIndexFromTimeline(tl, labels);
 
-                props.setStepIndex(stepIndex);
+                props.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
+                props.setProgress(1);
                 setIsPlaying(false);
-                tlRef.current.pause();
+                timelineRef.current.pause();
             },
         });
 
-        tlRef.current = timeline;
+        timelineRef.current = timeline;
 
         timeline.addLabel(labels[0]);
 
@@ -148,7 +156,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
 
         return () => {
             timeline.kill();
-            tlRef.current = gsap.timeline({paused: true});
+            timelineRef.current = gsap.timeline({paused: true});
         };
     }, {dependencies: [props.output.timestamp]});
 
@@ -160,16 +168,15 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             }}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
+        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
         <OutputControls
-            timelineRef={tlRef}
+            timelineRef={timelineRef}
             labels={labels}
-            currentStep={props.stepIndex}
-            setCurrentStep={props.setStepIndex}
-            stepCount={props.output.intermediateStates.length + 2}
+            currentStep={props.currentStepIndex}
+            setCurrentStep={props.setCurrentStepIndex}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             progress={props.progress}
@@ -181,8 +188,8 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
-                <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.stepIndex - 1) / 3)}</div>
+                <div><strong>Step:</strong> {props.currentStepIndex} / {labels.length - 1}</div>
+                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.currentStepIndex - 1) / 3)}</div>
             </div>
             <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
                 <LegendEntry
@@ -212,15 +219,14 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 </div>
                 <div className="step-layout-actions">
                     <ImportExportDialog
-                        createExportString={props.createExportString}
                         onImport={props.onImport}
+                        createExportString={props.createExportString}
                     />
                 </div>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_MAX_DEGREE}
-                activeLineIds={getActiveLineIdsMaxDegree(props.stepIndex, labels.length - 1)}
-                title={"Vertex Cover PseudoCode"}
+                activeLineIds={getActiveLineIdsMaxDegree(props.currentStepIndex, labels.length - 1)}
             />
         </div>
     </div>;

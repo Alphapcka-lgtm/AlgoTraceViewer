@@ -3,7 +3,14 @@ import {Input} from "./input/Input.tsx";
 import useClosestPairSteps from "./Api.tsx";
 import type {Point, ClosestPairInputState, ClosestPairOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
-import {decodeExportState, encodeExportState, assignLabels, getAlphabetLabel, createRandomPoints} from "../shared/Utils.tsx";
+import {
+    decodeExportState,
+    encodeExportState,
+    assignLabels,
+    getAlphabetLabel,
+    createRandomPoints,
+    SVG_WIDTH, SVG_HEIGHT
+} from "../shared/Utils.tsx";
 import "./App.css";
 import type {AnimationRequest, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
@@ -13,10 +20,8 @@ export default function ClosestPair() {
     const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
     const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: 0,});
     const {loading, error, calculateSteps} = useClosestPairSteps();
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [progress, setProgress] = useState(0);
-    const svgHeight = 500;
-    const svgWidth = 1123;
 
 
     //Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
@@ -45,7 +50,7 @@ export default function ClosestPair() {
         setInputState({points: [], timestamp: Date.now()});
         setOutputState({steps: [], timestamp: -1});
 
-        setCurrentStep(0);
+        setCurrentStepIndex(0);
         setProgress(0);
     };
 
@@ -74,7 +79,7 @@ export default function ClosestPair() {
         }
         //wenn input neu/verändert bei 0 starten
         setProgress(0);
-        setCurrentStep(0);
+        setCurrentStepIndex(0);
         await calculateOutput(inputState.points);
         setModeState("output");
     };
@@ -117,7 +122,7 @@ export default function ClosestPair() {
             }
             //slider nach rechts
             const missingCount:number = targetCount - prev.points.length;
-            const newPoints = createRandomPoints(missingCount, PADDING, svgWidth, svgHeight);
+            const newPoints = createRandomPoints(missingCount, PADDING, SVG_WIDTH, SVG_HEIGHT);
             return {...prev, points: assignLabels([...prev.points, ...newPoints]), timestamp: Date.now()};
         });
     };
@@ -133,8 +138,6 @@ export default function ClosestPair() {
                 <AlgorithmOverviewBox algoTyp={"closestPair"}/>
 
                 <Input
-                    height={svgHeight}
-                    width={svgWidth}
                     mode={modeState}
                     inputState={inputState}
                     onAddPoint={handleAddPoint}
@@ -155,14 +158,12 @@ export default function ClosestPair() {
     return (
         <div className="algorithm-shell">
             <Output
-                height={svgHeight}
-                width={svgWidth}
                 steps={outputState.steps}
                 loading={loading}
                 error={error}
                 onChangeInput={handleChangeInput}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
+                currentStepIndex={currentStepIndex}
+                setCurrentStepIndex={setCurrentStepIndex}
                 progress={progress}
                 setProgress={setProgress}
                 createExportString={createExportString}
