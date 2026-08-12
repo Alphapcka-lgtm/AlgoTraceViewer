@@ -35,7 +35,7 @@
 
 .svg-sweepLine {
     stroke: rgba(0, 0, 0, 0.9);
-    stroke-width: 2;
+    stroke-width: 2.5;
     opacity: 0;
     pointer-events: none;
     stroke-linecap: round;

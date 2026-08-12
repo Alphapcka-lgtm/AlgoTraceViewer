@@ -408,7 +408,7 @@ export function Output(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
+    const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "Empty"
         : step.activePoints.map((p) => p.label).join(", ");
 
     const candidateDistances = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
