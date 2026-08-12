@@ -189,7 +189,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.floor((props.cProps.currentStepIndex - 1) / 3)}</div>
+                <div><strong>Vertex Cover Size:</strong> {Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3))}</div>
             </div>
             <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
                 <LegendEntry

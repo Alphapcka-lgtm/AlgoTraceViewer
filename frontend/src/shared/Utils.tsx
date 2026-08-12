@@ -209,7 +209,7 @@ export const PSEUDOCODE_MAX_DEGREE: PseudoCodeLine[] = [
 
     {
         id: "remove",
-        text: "remove all edges from E' that are incident to u and update N",
+        text: "remove all incident edges from E' and update N",
         indent: 1
     },
 

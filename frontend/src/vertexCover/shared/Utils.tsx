@@ -1,6 +1,36 @@
 import type {Edge, Graph, Node, VertexCoverRequest} from "./Types.tsx";
-import {getAlphabetLabel} from "../../shared/Utils.tsx";
+import {getAlphabetLabel, getRandomId} from "../../shared/Utils.tsx";
 
+
+export function getRandomGraph(n: number, density: number): Graph {
+    const nodes: Node[] = [];
+
+    for (let i = 0; i < n; i++) {
+        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
+        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
+        nodes.push({
+            x: Math.floor(xCoordinate * 1123),
+            y: Math.floor(yCoordinate * 500),
+            id: getRandomId(),
+            label: ""
+        })
+    }
+
+    return getRandomEdges(nodes, density);
+}
+
+export function getRandomEdges(nodes: Node[], d: number): Graph {
+    const graph: Graph = {nodes: nodes, edges: []};
+
+    for (let i = 0; i < graph.nodes.length; i++) {
+        for (let j = i + 1; j < graph.nodes.length; j++) {
+            if (Math.random() < d) {
+                graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId()});
+            }
+        }
+    }
+    return graph;
+}
 
 export function getFormattedRequest(request: VertexCoverRequest): VertexCoverRequest {
 

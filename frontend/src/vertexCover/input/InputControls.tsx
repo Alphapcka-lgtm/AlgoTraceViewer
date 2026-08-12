@@ -1,11 +1,10 @@
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import {getRandomId} from "../../shared/Utils.tsx";
 import type {InputControlProps, VertexCoverRequest} from "../shared/Types.tsx";
-import type {Graph, Node} from "../shared/Types.tsx";
+import type {Graph} from "../shared/Types.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {useState} from "react";
 import type {AnimationRequest} from "../../shared/Types.tsx";
-import {getFormattedRequest} from "../shared/Utils.tsx";
+import {getFormattedRequest, getRandomEdges, getRandomGraph} from "../shared/Utils.tsx";
 
 export function InputControls(props: InputControlProps) {
     const [densityFactor, setDensityFactor] = useState<number>(0);
@@ -41,9 +40,7 @@ export function InputControls(props: InputControlProps) {
     };
 
     const resetInput = () => {
-        props.setInput((input) => {
-            return {...input, graph: {nodes: [], edges: []}, timestamp: Date.now()};
-        });
+        props.setInput({graph: {nodes: [], edges: []}, nodeOrder: [], edgeOrder: [], timestamp: Date.now()});
         props.setInteraction({type: "idle"});
     };
 
@@ -75,34 +72,4 @@ export function InputControls(props: InputControlProps) {
             </div>
         </div>
     </>;
-}
-
-function getRandomGraph(n: number, density: number): Graph {
-    const nodes: Node[] = [];
-
-    for (let i = 0; i < n; i++) {
-        const xCoordinate = ((Math.cos((i * 2 * Math.PI) / n) + 1.1) * 0.45);
-        const yCoordinate = ((Math.sin((i * 2 * Math.PI) / n) + 1.1) * 0.45);
-        nodes.push({
-            x: Math.floor(xCoordinate * 1123),
-            y: Math.floor(yCoordinate * 500),
-            id: getRandomId(),
-            label: ""
-        })
-    }
-
-    return getRandomEdges(nodes, density);
-}
-
-function getRandomEdges(nodes: Node[], d: number): Graph {
-    const graph: Graph = {nodes: nodes, edges: []};
-
-    for (let i = 0; i < graph.nodes.length; i++) {
-        for (let j = i + 1; j < graph.nodes.length; j++) {
-            if (Math.random() < d) {
-                graph.edges.push({fromId: graph.nodes[i].id, toId: graph.nodes[j].id, id: getRandomId()});
-            }
-        }
-    }
-    return graph;
 }
