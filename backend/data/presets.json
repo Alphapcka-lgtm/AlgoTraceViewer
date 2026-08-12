@@ -545,619 +545,101 @@
       },
       "algorithm" : "vertexCover",
       "name" : "preset-1"
-    },
-    "2" : {
-      "request" : {
-        "graph" : {
-          "nodes" : [ {
-            "x" : 452.0,
-            "y" : 241.0,
-            "id" : "bfWiUyCG",
-            "label" : ""
-          }, {
-            "x" : 282.0,
-            "y" : 279.0,
-            "id" : "bDlihLix",
-            "label" : ""
-          }, {
-            "x" : 621.0,
-            "y" : 322.0,
-            "id" : "bJYJpjov",
-            "label" : ""
-          }, {
-            "x" : 829.0,
-            "y" : 248.0,
-            "id" : "lwPnrAy",
-            "label" : ""
-          }, {
-            "x" : 648.0,
-            "y" : 134.0,
-            "id" : "HYlfVBw",
-            "label" : ""
-          }, {
-            "x" : 695.0,
-            "y" : 243.0,
-            "id" : "KHjMLDX",
-            "label" : ""
-          }, {
-            "x" : 735.0,
-            "y" : 352.0,
-            "id" : "bDfNZCRL",
-            "label" : ""
-          }, {
-            "x" : 424.0,
-            "y" : 389.0,
-            "id" : "wFDOKGa",
-            "label" : ""
-          }, {
-            "x" : 346.0,
-            "y" : 50.0,
-            "id" : "zsoIbZF",
-            "label" : ""
-          } ],
-          "edges" : [ ]
-        },
-        "nodeOrder" : [ ],
-        "edgeOrder" : [ ],
-        "timestamp" : 1786472591565
-      },
-      "algorithm" : "vertexCover",
-      "name" : "2"
     }
   },
   "closestPair" : {
-    "abcd" : {
+    "Test" : {
       "request" : {
         "points" : [ {
-          "x" : 635,
-          "y" : 334,
-          "id" : "RcbZTCl",
+          "x" : 629,
+          "y" : 395,
+          "id" : "JsOoSSV",
           "label" : "A"
         }, {
-          "x" : 279,
-          "y" : 312,
-          "id" : "qWFtwiX",
+          "x" : 961,
+          "y" : 391,
+          "id" : "GujThpX",
           "label" : "B"
         }, {
-          "x" : 209,
-          "y" : 249,
-          "id" : "bqhifpIY",
+          "x" : 521,
+          "y" : 364,
+          "id" : "AFkFVws",
           "label" : "C"
         }, {
-          "x" : 167,
-          "y" : 181,
-          "id" : "NpnOJgS",
+          "x" : 508,
+          "y" : 117,
+          "id" : "bKbQHvbk",
           "label" : "D"
         }, {
-          "x" : 172,
-          "y" : 400,
-          "id" : "bxEPWzKi",
+          "x" : 654,
+          "y" : 147,
+          "id" : "bCGmTDMW",
           "label" : "E"
+        }, {
+          "x" : 959,
+          "y" : 151,
+          "id" : "byrYKyXF",
+          "label" : "F"
+        }, {
+          "x" : 311,
+          "y" : 162,
+          "id" : "GdZjRdi",
+          "label" : "G"
         }, {
           "x" : 581,
-          "y" : 396,
-          "id" : "bbcgAYsR",
-          "label" : "F"
-        }, {
-          "x" : 741,
-          "y" : 401,
-          "id" : "XhcRazj",
-          "label" : "G"
-        }, {
-          "x" : 329,
-          "y" : 407,
-          "id" : "fGeefLM",
+          "y" : 288,
+          "id" : "DyPdYtP",
           "label" : "H"
         }, {
-          "x" : 297,
-          "y" : 283,
-          "id" : "HtXDtHg",
-          "label" : "I"
-        } ],
-        "timestamp" : 1786468414712
-      },
-      "algorithm" : "closestPair",
-      "name" : "abcd"
-    },
-    "hope" : {
-      "request" : {
-        "points" : [ {
-          "x" : 290,
-          "y" : 157,
-          "id" : "CeXisDH",
-          "label" : "A"
-        }, {
-          "x" : 454,
-          "y" : 184,
-          "id" : "stZePHd",
-          "label" : "B"
-        }, {
-          "x" : 335,
-          "y" : 307,
-          "id" : "ArxmehF",
-          "label" : "C"
-        }, {
-          "x" : 590,
-          "y" : 307,
-          "id" : "nTbTmDj",
-          "label" : "D"
-        }, {
-          "x" : 779,
-          "y" : 232,
-          "id" : "bEKAdPIe",
-          "label" : "E"
-        }, {
-          "x" : 916,
-          "y" : 398,
-          "id" : "YdlGCSK",
-          "label" : "F"
-        }, {
-          "x" : 1032,
-          "y" : 372,
-          "id" : "bdniDJUb",
-          "label" : "G"
-        }, {
-          "x" : 1013,
-          "y" : 221,
-          "id" : "BorwOSS",
-          "label" : "H"
-        }, {
-          "x" : 1011,
-          "y" : 137,
-          "id" : "nKjJVeS",
+          "x" : 1004,
+          "y" : 257,
+          "id" : "bGuseJyN",
           "label" : "I"
         }, {
-          "x" : 979,
-          "y" : 86,
-          "id" : "kkQOZdn",
+          "x" : 233,
+          "y" : 268,
+          "id" : "hEssgXR",
           "label" : "J"
         }, {
-          "x" : 826,
-          "y" : 166,
-          "id" : "bydEZrRD",
+          "x" : 348,
+          "y" : 148,
+          "id" : "zfOVpOr",
           "label" : "K"
         }, {
-          "x" : 724,
-          "y" : 350,
-          "id" : "rxyvDXf",
+          "x" : 438,
+          "y" : 374,
+          "id" : "bwKZoFMV",
           "label" : "L"
         }, {
-          "x" : 754,
-          "y" : 172,
-          "id" : "UrkOYVU",
+          "x" : 644,
+          "y" : 220,
+          "id" : "buqkiuEE",
           "label" : "M"
         }, {
-          "x" : 606,
-          "y" : 97,
-          "id" : "vkZsRY",
+          "x" : 782,
+          "y" : 257,
+          "id" : "TNtozvv",
           "label" : "N"
         }, {
-          "x" : 352,
-          "y" : 118,
-          "id" : "bokOlBKY",
+          "x" : 1031,
+          "y" : 253,
+          "id" : "iUIBGQA",
           "label" : "O"
         }, {
-          "x" : 190,
-          "y" : 166,
-          "id" : "fNDioTw",
+          "x" : 963,
+          "y" : 141,
+          "id" : "blfHYJRL",
           "label" : "P"
         }, {
-          "x" : 580,
-          "y" : 403,
-          "id" : "bsmntJFx",
+          "x" : 424,
+          "y" : 292,
+          "id" : "hwhvpaj",
           "label" : "Q"
-        }, {
-          "x" : 825,
-          "y" : 304,
-          "id" : "IuOmREr",
-          "label" : "R"
-        }, {
-          "x" : 800,
-          "y" : 229,
-          "id" : "FWONYPn",
-          "label" : "S"
-        }, {
-          "x" : 437,
-          "y" : 110,
-          "id" : "bxYtRwUI",
-          "label" : "T"
-        }, {
-          "x" : 143,
-          "y" : 156,
-          "id" : "sYnViyZ",
-          "label" : "U"
-        }, {
-          "x" : 454,
-          "y" : 245,
-          "id" : "bmlJlDSG",
-          "label" : "V"
-        }, {
-          "x" : 158,
-          "y" : 409,
-          "id" : "wvRvFiD",
-          "label" : "W"
-        }, {
-          "x" : 159,
-          "y" : 339,
-          "id" : "hVuXOGP",
-          "label" : "X"
-        }, {
-          "x" : 768,
-          "y" : 312,
-          "id" : "qZmZeJY",
-          "label" : "Y"
         } ],
-        "timestamp" : -1
+        "timestamp" : 1786543957880
       },
       "algorithm" : "closestPair",
-      "name" : "hope"
-    },
-    "asdfasdf" : {
-      "request" : {
-        "points" : [ {
-          "x" : 387,
-          "y" : 206,
-          "id" : "bHALOlBD",
-          "label" : "A"
-        }, {
-          "x" : 679,
-          "y" : 228,
-          "id" : "ychnaX",
-          "label" : "B"
-        }, {
-          "x" : 491,
-          "y" : 345,
-          "id" : "lVqFOoz",
-          "label" : "C"
-        }, {
-          "x" : 824,
-          "y" : 345,
-          "id" : "ZlssYml",
-          "label" : "D"
-        } ],
-        "timestamp" : 1786472477571
-      },
-      "algorithm" : "closestPair",
-      "name" : "asdfasdf"
-    },
-    "123" : {
-      "request" : {
-        "points" : [ {
-          "x" : 325,
-          "y" : 152,
-          "id" : "byjppKgz",
-          "label" : "A"
-        }, {
-          "x" : 488,
-          "y" : 192,
-          "id" : "SQvJYGk",
-          "label" : "B"
-        }, {
-          "x" : 362,
-          "y" : 386,
-          "id" : "bbVNgDcR",
-          "label" : "C"
-        }, {
-          "x" : 821,
-          "y" : 354,
-          "id" : "xRWwdyQ",
-          "label" : "D"
-        } ],
-        "timestamp" : -1
-      },
-      "algorithm" : "closestPair",
-      "name" : "123"
-    },
-    "2" : {
-      "request" : {
-        "points" : [ {
-          "x" : 325,
-          "y" : 152,
-          "id" : "byjppKgz",
-          "label" : "A"
-        }, {
-          "x" : 488,
-          "y" : 192,
-          "id" : "SQvJYGk",
-          "label" : "B"
-        }, {
-          "x" : 362,
-          "y" : 386,
-          "id" : "bbVNgDcR",
-          "label" : "C"
-        }, {
-          "x" : 821,
-          "y" : 354,
-          "id" : "xRWwdyQ",
-          "label" : "D"
-        }, {
-          "x" : 591,
-          "y" : 240,
-          "id" : "PWqhIgb",
-          "label" : "E"
-        }, {
-          "x" : 582,
-          "y" : 328,
-          "id" : "bykCmWLg",
-          "label" : "F"
-        } ],
-        "timestamp" : -1
-      },
-      "algorithm" : "closestPair",
-      "name" : "2"
-    },
-    "5" : {
-      "request" : {
-        "points" : [ {
-          "x" : 325,
-          "y" : 152,
-          "id" : "byjppKgz",
-          "label" : "A"
-        }, {
-          "x" : 488,
-          "y" : 192,
-          "id" : "SQvJYGk",
-          "label" : "B"
-        }, {
-          "x" : 362,
-          "y" : 386,
-          "id" : "bbVNgDcR",
-          "label" : "C"
-        }, {
-          "x" : 821,
-          "y" : 354,
-          "id" : "xRWwdyQ",
-          "label" : "D"
-        }, {
-          "x" : 591,
-          "y" : 240,
-          "id" : "PWqhIgb",
-          "label" : "E"
-        }, {
-          "x" : 582,
-          "y" : 328,
-          "id" : "bykCmWLg",
-          "label" : "F"
-        }, {
-          "x" : 792,
-          "y" : 49,
-          "id" : "ZalUQZL",
-          "label" : "G"
-        }, {
-          "x" : 687,
-          "y" : 128,
-          "id" : "HwJxGrr",
-          "label" : "H"
-        } ],
-        "timestamp" : -1
-      },
-      "algorithm" : "closestPair",
-      "name" : "5"
-    },
-    "jetzt" : {
-      "request" : {
-        "points" : [ {
-          "x" : 381,
-          "y" : 133,
-          "id" : "tSAnsva",
-          "label" : "A"
-        }, {
-          "x" : 669,
-          "y" : 193,
-          "id" : "bnJfXzdQ",
-          "label" : "B"
-        }, {
-          "x" : 479,
-          "y" : 287,
-          "id" : "IGjiYns",
-          "label" : "C"
-        }, {
-          "x" : 703,
-          "y" : 359,
-          "id" : "byFIyAQc",
-          "label" : "D"
-        }, {
-          "x" : 904,
-          "y" : 223,
-          "id" : "RxQSbzC",
-          "label" : "E"
-        }, {
-          "x" : 815,
-          "y" : 113,
-          "id" : "PUaEHmk",
-          "label" : "F"
-        }, {
-          "x" : 797,
-          "y" : 241,
-          "id" : "jZCoqNH",
-          "label" : "G"
-        }, {
-          "x" : 822,
-          "y" : 386,
-          "id" : "QlBfUeM",
-          "label" : "H"
-        }, {
-          "x" : 534,
-          "y" : 394,
-          "id" : "bzhFpwmL",
-          "label" : "I"
-        }, {
-          "x" : 316,
-          "y" : 394,
-          "id" : "ITqZmTe",
-          "label" : "J"
-        } ],
-        "timestamp" : 1786472526940
-      },
-      "algorithm" : "closestPair",
-      "name" : "jetzt"
-    },
-    "nnn" : {
-      "request" : {
-        "points" : [ {
-          "x" : 381,
-          "y" : 133,
-          "id" : "tSAnsva",
-          "label" : "A"
-        }, {
-          "x" : 669,
-          "y" : 193,
-          "id" : "bnJfXzdQ",
-          "label" : "B"
-        }, {
-          "x" : 479,
-          "y" : 287,
-          "id" : "IGjiYns",
-          "label" : "C"
-        }, {
-          "x" : 703,
-          "y" : 359,
-          "id" : "byFIyAQc",
-          "label" : "D"
-        }, {
-          "x" : 904,
-          "y" : 223,
-          "id" : "RxQSbzC",
-          "label" : "E"
-        }, {
-          "x" : 815,
-          "y" : 113,
-          "id" : "PUaEHmk",
-          "label" : "F"
-        }, {
-          "x" : 797,
-          "y" : 241,
-          "id" : "jZCoqNH",
-          "label" : "G"
-        }, {
-          "x" : 822,
-          "y" : 386,
-          "id" : "QlBfUeM",
-          "label" : "H"
-        }, {
-          "x" : 534,
-          "y" : 394,
-          "id" : "bzhFpwmL",
-          "label" : "I"
-        }, {
-          "x" : 316,
-          "y" : 394,
-          "id" : "ITqZmTe",
-          "label" : "J"
-        } ],
-        "timestamp" : 1786472526940
-      },
-      "algorithm" : "closestPair",
-      "name" : "nnn"
-    },
-    "gggg" : {
-      "request" : {
-        "points" : [ {
-          "x" : 286,
-          "y" : 177,
-          "id" : "gCGEmBv",
-          "label" : "A"
-        }, {
-          "x" : 553,
-          "y" : 227,
-          "id" : "blAdaBls",
-          "label" : "B"
-        }, {
-          "x" : 420,
-          "y" : 367,
-          "id" : "bCJwfuUo",
-          "label" : "C"
-        }, {
-          "x" : 775,
-          "y" : 367,
-          "id" : "BCHBCaO",
-          "label" : "D"
-        }, {
-          "x" : 916,
-          "y" : 217,
-          "id" : "tWHWmyG",
-          "label" : "E"
-        }, {
-          "x" : 778,
-          "y" : 154,
-          "id" : "AWmSPbF",
-          "label" : "F"
-        }, {
-          "x" : 714,
-          "y" : 212,
-          "id" : "bcFBArtg",
-          "label" : "G"
-        } ],
-        "timestamp" : 1786472664086
-      },
-      "algorithm" : "closestPair",
-      "name" : "gggg"
-    },
-    "bbb" : {
-      "request" : {
-        "points" : [ {
-          "x" : 422,
-          "y" : 249,
-          "id" : "YjMYdMR",
-          "label" : "A"
-        }, {
-          "x" : 618,
-          "y" : 252,
-          "id" : "blxMvTLt",
-          "label" : "B"
-        } ],
-        "timestamp" : 1786472687001
-      },
-      "algorithm" : "closestPair",
-      "name" : "bbb"
-    },
-    "qqq" : {
-      "request" : {
-        "points" : [ {
-          "x" : 389,
-          "y" : 42,
-          "id" : "AXghgdB",
-          "label" : "A"
-        }, {
-          "x" : 472,
-          "y" : 124,
-          "id" : "bhwjmvpI",
-          "label" : "B"
-        }, {
-          "x" : 713,
-          "y" : 340,
-          "id" : "tVZqrEU",
-          "label" : "C"
-        }, {
-          "x" : 997,
-          "y" : 268,
-          "id" : "bzkxuUwC",
-          "label" : "D"
-        }, {
-          "x" : 527,
-          "y" : 288,
-          "id" : "buPQrsBv",
-          "label" : "E"
-        }, {
-          "x" : 704,
-          "y" : 248,
-          "id" : "TGRbCeX",
-          "label" : "F"
-        }, {
-          "x" : 480,
-          "y" : 316,
-          "id" : "bEQsoMkH",
-          "label" : "G"
-        }, {
-          "x" : 248,
-          "y" : 430,
-          "id" : "byfTHkdN",
-          "label" : "H"
-        } ],
-        "timestamp" : 1786472714267
-      },
-      "algorithm" : "closestPair",
-      "name" : "qqq"
+      "name" : "Test"
     }
   }
 }

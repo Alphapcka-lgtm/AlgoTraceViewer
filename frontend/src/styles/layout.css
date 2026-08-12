@@ -16,6 +16,11 @@
     width: 100%;
 }
 
+.algorithm-shell.is-loading,
+.algorithm-shell.is-loading * {
+    cursor: wait;
+}
+
 .algorithm-panel {
     display: flex;
     flex-direction: column;

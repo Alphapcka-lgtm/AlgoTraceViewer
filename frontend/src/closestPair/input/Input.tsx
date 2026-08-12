@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {DynamicPoints} from "../shared/Points.tsx";
 import type {InputProps, Interaction} from "../shared/Types.tsx";
-import {getRandomId} from "../../shared/Utils.tsx";
+import {getRandomId, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
@@ -19,8 +19,8 @@ export function Input(props: InputProps) {
          * convert them back into the SVG coordinate system used by the points.
          */
         return {
-            x: ((e.clientX - rect.left) / rect.width) * props.width,
-            y: ((e.clientY - rect.top) / rect.height) * props.height,
+            x: ((e.clientX - rect.left) / rect.width) * SVG_WIDTH,
+            y: ((e.clientY - rect.top) / rect.height) * SVG_HEIGHT,
         };
     };
 
@@ -64,7 +64,7 @@ export function Input(props: InputProps) {
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handlePointMouseUp}
-                viewBox={`0 0 ${props.width} ${props.height}`}
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 preserveAspectRatio="xMidYMid meet"
             >
                 <DynamicPoints

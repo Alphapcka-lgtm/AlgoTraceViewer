@@ -10,7 +10,7 @@ import "./VertexCover.css";
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
-    const [stepIndex, setStepIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [variant, setVariant] = useState<VertexCoverVariant>("random");
 
     const [input, setInput] = useState<VertexCoverRequest>({
@@ -49,7 +49,7 @@ export function VertexCover() {
             fetchAnimation(labeledInp)
                 .then(() => {
                     setProgress(0);
-                    setStepIndex(0);
+                    setCurrentStepIndex(0);
                     setMode("output");
                 });
         } else {
@@ -89,8 +89,8 @@ export function VertexCover() {
         <RandomOutput
             setProgress={setProgress}
             progress={progress}
-            setStepIndex={setStepIndex}
-            stepIndex={stepIndex}
+            setCurrentStepIndex={setCurrentStepIndex}
+            currentStepIndex={currentStepIndex}
             output={output}
             onChangeInput={() => setMode("input")}
             createExportString={createExportString}
@@ -100,8 +100,8 @@ export function VertexCover() {
         <MaxDegreeOutput
             setProgress={setProgress}
             progress={progress}
-            setStepIndex={setStepIndex}
-            stepIndex={stepIndex}
+            setCurrentStepIndex={setCurrentStepIndex}
+            currentStepIndex={currentStepIndex}
             output={output}
             onChangeInput={() => setMode("input")}
             createExportString={createExportString}

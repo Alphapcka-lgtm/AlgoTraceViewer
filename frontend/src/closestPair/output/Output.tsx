@@ -11,7 +11,7 @@ import {
     getStepIndexFromTimeline,
     createStepLabels,
     SWEEP_LINE_PSEUDOCODE,
-    getActivePseudoCodeLineIds, isSamePair
+    getActivePseudoCodeLineIds, isSamePair, SVG_WIDTH, SVG_HEIGHT
 } from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -31,7 +31,7 @@ export function Output(props: OutputProps) {
     const activeSweepAreaRef = useRef<SVGRectElement>(null);
     const sweepLineRef = useRef<SVGLineElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
-    const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
+    const step: AlgorithmStepDTO = props.steps[props.currentStepIndex];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
@@ -48,12 +48,12 @@ export function Output(props: OutputProps) {
     const getActiveAreaAttrs = (step: AlgorithmStepDTO ): RectAttrs => {
         const currentX = step.currentPoint?.x ?? 0;
         const delta = step.windowDelta;
-        return {x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING};
+        return {x: currentX - delta, y: PADDING, width: delta, height: SVG_HEIGHT - 2 * PADDING};
     };
 
     const getSweepLineAttrs = (step: AlgorithmStepDTO): LineAttrs=> {
         const currentX = step.currentPoint?.x ?? 0;
-        return {x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
+        return {x1: currentX, x2: currentX, y1: PADDING, y2: SVG_HEIGHT - PADDING};
     };
 
     const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
@@ -305,11 +305,12 @@ export function Output(props: OutputProps) {
                     lastProgressUpdateRef.current = now;
                 }
                 const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
-                props.setCurrentStep(stepIndex);
+                props.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
-                props.setProgress(1); //nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
+                props.setProgress(1);
                 setIsPlaying(false);
+                timelineRef.current.pause();
             }
         });
 
@@ -396,7 +397,7 @@ export function Output(props: OutputProps) {
         // Setzt die gerade gebaute Timeline auf den richtigen (0 oder den vom import) progress.
         //in onUpdate wird dann aus progress der richitge currentStep berechnet
         timeline.progress(initialProgress).pause();
-        timeline.timeScale(playbackSpeed); //hat keine auswirkung auf progress ... timeScale verändert nur wie schnell Timeline abgespielt wird
+        //timeline.timeScale(playbackSpeed); //hat keine auswirkung auf progress ... timeScale verändert nur wie schnell Timeline abgespielt wird
         setIsPlaying(false);
 
         return () => {
@@ -406,10 +407,6 @@ export function Output(props: OutputProps) {
     }, {
         dependencies: [props.steps]
     });
-
-    if (props.loading) return <p className="closest-pair-loading">Loading...</p>;
-    if (props.error) return <p className="closest-pair-error">Error: {props.error}</p>;
-    if (!step) return <></>;
 
     const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
@@ -427,14 +424,14 @@ export function Output(props: OutputProps) {
     Transition i->i+1 = steps[i+1].stepType wird ausgeführt/passiert visuell
         Während der Transition i->i+1 wird weiterhin der Pseudocode von steps[i+1].stepType gehighlighted (was also gerade passiert)
      */
-    const pseudoCodeStepIndex = Math.min(props.currentStep + 1, props.steps.length - 1);
+    const pseudoCodeStepIndex = Math.min(props.currentStepIndex + 1, props.steps.length - 1);
     const pseudoCodeStep = props.steps[pseudoCodeStepIndex];
 
     return (
         <div className="algorithm-panel">
             <IOModeTabs mode="output" onChangeInput={props.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
 
-            <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
+            <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
                 <defs>
                     <pattern id="active-window-shrink-schraffur"
                         width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -445,14 +442,14 @@ export function Output(props: OutputProps) {
                     ref={activeSweepAreaDifferenceRef}
                     className="svg-activeSweepAreaDifference"
                     x={0} y={PADDING}
-                    width={0} height={props.height - 2 * PADDING}
+                    width={0} height={SVG_HEIGHT - 2 * PADDING}
                     fill="url(#active-window-shrink-schraffur)"
                 />
                 <rect
                     ref={activeSweepAreaRef}
                     className="svg-activeSweepArea"
                     x={0} y={PADDING}
-                    width={0} height={props.height - 2 * PADDING}
+                    width={0} height={SVG_HEIGHT - 2 * PADDING}
                 />
                 <rect
                     ref={candidateSweepWindowRef}
@@ -463,7 +460,7 @@ export function Output(props: OutputProps) {
                     ref={sweepLineRef}
                     className="svg-sweepLine"
                     x1={0} x2={0}
-                    y1={PADDING} y2={props.height - PADDING}
+                    y1={PADDING} y2={SVG_HEIGHT - PADDING}
                 />
                 <line
                     ref={closestPairLineRef}
@@ -478,9 +475,8 @@ export function Output(props: OutputProps) {
             <OutputControls
                 timelineRef={timelineRef}
                 labels={myLabels}
-                currentStep={props.currentStep}
-                setCurrentStep={props.setCurrentStep}
-                stepCount={props.steps.length}
+                currentStep={props.currentStepIndex}
+                setCurrentStep={props.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
                 progress={props.progress}
@@ -494,7 +490,7 @@ export function Output(props: OutputProps) {
                     <div className="step-info closest-pair-step-info">
 
                     <div className="step-info-grid">
-                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
+                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStepIndex} / ${props.steps.length - 1}`}</strong>
 
                         <div>
                             <strong>Closest distance δ:</strong>{" "}
@@ -548,7 +544,6 @@ export function Output(props: OutputProps) {
                 <PseudoCodePanel
                     lines={SWEEP_LINE_PSEUDOCODE}
                     activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
-                    title={"Closest Pair Pseudocode"}
                 />
             </div>
 

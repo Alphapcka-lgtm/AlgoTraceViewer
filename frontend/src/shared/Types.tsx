@@ -8,7 +8,6 @@ export type OutputControlsProps = {
     labels: string[];
     currentStep: number;
     setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    stepCount: number;
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
     progress: number;
@@ -37,7 +36,6 @@ export type PseudoCodeLine = {
 export type PseudoCodePanelProps = {
     lines: PseudoCodeLine[];
     activeLineIds: string[];
-    title: string;
 };
 
 export type Tab = "homepage" | "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";

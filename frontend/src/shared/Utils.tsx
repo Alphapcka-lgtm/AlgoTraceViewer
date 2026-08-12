@@ -2,6 +2,9 @@ import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
 import type {Node, PointPair, ClosestPairStepType} from "../closestPair/shared/Types.tsx"
 
+export const SVG_WIDTH = 1123;
+export const SVG_HEIGHT = 500;
+
 function encodeUsingChars(i: number, chars: string): string {
     const base = chars.length;
     let result = "";

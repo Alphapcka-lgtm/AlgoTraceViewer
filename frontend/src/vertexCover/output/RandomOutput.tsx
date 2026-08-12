@@ -1,4 +1,10 @@
-import {getActiveLineIdsRandom, createStepLabels, getStepIndexFromTimeline, PSEUDOCODE_RANDOM} from "../../shared/Utils.tsx";
+import {
+    getActiveLineIdsRandom,
+    createStepLabels,
+    getStepIndexFromTimeline,
+    PSEUDOCODE_RANDOM,
+    SVG_HEIGHT, SVG_WIDTH
+} from "../../shared/Utils.tsx";
 import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -16,13 +22,13 @@ const STEP_DURATION = 1.0;
 
 export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const tlRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
-        tlRef.current.timeScale(speed);
+        timelineRef.current.timeScale(speed);
     };
 
     useGSAP(() => {
@@ -36,20 +42,19 @@ export function RandomOutput(props: SVGOutputProps) {
                 ease: "power2.inOut",
             },
             onUpdate: () => {
-                const tl = tlRef.current;
+                const tl = timelineRef.current;
                 props.setProgress(tl.progress()); //für scrubber
 
                 const stepIndex: number = getStepIndexFromTimeline(tl, labels);
 
-                props.setStepIndex(stepIndex);
+                props.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
+                props.setProgress(1);
                 setIsPlaying(false);
-                tlRef.current.pause();
+                timelineRef.current.pause();
             },
         });
-
-        tlRef.current = timeline;
 
         timeline.addLabel(labels[0]);
 
@@ -110,12 +115,13 @@ export function RandomOutput(props: SVGOutputProps) {
             timeline.addLabel(labels[3 * index + 4]);
         });
 
+        timelineRef.current = timeline;
         timeline.progress(props.progress);
         setIsPlaying(false);
 
         return () => {
             timeline.kill();
-            tlRef.current = gsap.timeline({paused: true});
+            timelineRef.current = gsap.timeline({paused: true});
         };
     }, {dependencies: [props.output.timestamp]});
 
@@ -127,16 +133,15 @@ export function RandomOutput(props: SVGOutputProps) {
             }}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox="0 0 1123 500" preserveAspectRatio="xMidYMid meet">
+        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
         <OutputControls
-            timelineRef={tlRef}
+            timelineRef={timelineRef}
             labels={labels}
-            currentStep={props.stepIndex}
-            setCurrentStep={props.setStepIndex}
-            stepCount={props.output.intermediateStates.length + 2}
+            currentStep={props.currentStepIndex}
+            setCurrentStep={props.setCurrentStepIndex}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             progress={props.progress}
@@ -148,8 +153,8 @@ export function RandomOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
                     <div className="step-info-grid vertex-cover-step-summary">
-                        <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
-                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.stepIndex / 3) * 2}</div>
+                        <div><strong>Step:</strong> {props.currentStepIndex} / {labels.length - 1}</div>
+                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.currentStepIndex / 3) * 2}</div>
                     </div>
                     <div className="step-info-grid vertex-cover-legend-grid">
                         <LegendEntry
@@ -171,15 +176,14 @@ export function RandomOutput(props: SVGOutputProps) {
                 </div>
                 <div className="step-layout-actions">
                     <ImportExportDialog
-                        createExportString={props.createExportString}
                         onImport={props.onImport}
+                        createExportString={props.createExportString}
                     />
                 </div>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={getActiveLineIdsRandom(props.stepIndex, labels.length - 1)}
-                title={"Vertex Cover PseudoCode"}
+                activeLineIds={getActiveLineIdsRandom(props.currentStepIndex, labels.length - 1)}
             />
         </div>
     </div>;
