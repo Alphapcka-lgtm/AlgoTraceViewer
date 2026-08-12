@@ -408,13 +408,6 @@ export function Output(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    /*
-    if (props.loading) return <p className="closest-pair-loading">Loading...</p>;
-    if (props.error) return <p className="closest-pair-error">Error: {props.error}</p>;
-    if (!step) return <></>;
-
-     */
-
     const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
         : step.activePoints.map((p) => p.label).join(", ");
 

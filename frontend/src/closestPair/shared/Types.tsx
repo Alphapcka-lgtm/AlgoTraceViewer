@@ -73,8 +73,6 @@ export interface AlgorithmStepDTO {
 //was Output von ClosestPair bekommt
 export type OutputProps = {
     steps: AlgorithmStepDTO[];
-    loading: boolean;
-    error: string | null;
     onChangeInput: () => void;
     currentStepIndex: number;
     setCurrentStepIndex: React.Dispatch<React.SetStateAction<number>>;

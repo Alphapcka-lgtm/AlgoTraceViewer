@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { SwapInput } from "./input/Input.tsx";
 import { SwapOutput } from "./output/Output.tsx";
-import {type EhrlichSwapStepDTO, sendSwapInput} from "./Api.ts";
+import {type EhrlichSwapStepDTO, getEhrlichSwapSteps} from "./Api.ts";
 import {extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
-import "./EhrlichStyle.css";
+import "./EhrlichSwaps.css";
 
 const MAX_CELL_COUNT = 6;
 
@@ -14,11 +14,11 @@ export type SwapInputField = {
 
 export default function EhrlichSwaps () {
     const nextFieldId = useRef(1);
+    const [loading, setLoading] = useState(false);
     const [modeState, setModeState] = useState<"input" | "output">("input");
     const [fields, setFields] = useState<SwapInputField[]>([{id: 0, value: ""}]);
     const [submittedValues, setSubmittedValues] = useState<string[]>([]);
     const [validationError, setValidationError] = useState<string | null>(null);
-
     const [ehrlichSwapsSteps, setEhrlichSwapsSteps] = useState<EhrlichSwapStepDTO[]>([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
@@ -76,17 +76,20 @@ export default function EhrlichSwaps () {
             return;
         }
         setEhrlichSwapsSteps([]);
-
+        setLoading(true);
         try {
-            const response = await sendSwapInput(enteredValues);
+            const steps = await getEhrlichSwapSteps(enteredValues);
+
             setSubmittedValues(enteredValues);
-            setEhrlichSwapsSteps(response);
+            setEhrlichSwapsSteps(steps);
             setModeState("output");
             setCurrentStep(0);
             setProgress(0);
         } catch (error) {
             console.error(error);
-            setValidationError("Input could be processed");
+            setValidationError("Input could not be processed");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,7 +98,7 @@ export default function EhrlichSwaps () {
 
     if (modeState === "input") {
         return (
-            <div className="algorithm-shell">
+            <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
                 <SwapInput
                     fields={fields}
                     canSubmit={canSubmit}
@@ -110,7 +113,7 @@ export default function EhrlichSwaps () {
     }
 
     return (
-        <div className="algorithm-shell">
+        <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
             <SwapOutput
                 values={submittedValues}
                 steps={ehrlichSwapsSteps}

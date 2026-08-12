@@ -1,6 +1,5 @@
 import {useState} from "react";
 import {Input} from "./input/Input.tsx";
-import useClosestPairSteps from "./Api.tsx";
 import type {Point, ClosestPairInputState, ClosestPairOutputState} from "./shared/Types.tsx";
 import {Output} from "./output/Output.tsx";
 import {
@@ -11,18 +10,18 @@ import {
     createRandomPoints,
     SVG_WIDTH, SVG_HEIGHT
 } from "../shared/Utils.tsx";
-import "./App.css";
+import "./ClosestPair.css";
 import type {AnimationRequest, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
+import {getClosestPairSteps} from "./Api.tsx";
 
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
     const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
-    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: 0,});
-    const {loading, error, calculateSteps} = useClosestPairSteps();
+    const [outputState, setOutputState] = useState<ClosestPairOutputState>({steps: [], timestamp: 0});
+    const [loading, setLoading] = useState(false);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [progress, setProgress] = useState(0);
-
 
     //Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
     const handleAddPoint = (point: Point) => {
@@ -48,8 +47,7 @@ export default function ClosestPair() {
 
     const handleReset = () => {
         setInputState({points: [], timestamp: Date.now()});
-        setOutputState({steps: [], timestamp: -1});
-
+        setOutputState({steps: [], timestamp: Date.now()});
         setCurrentStepIndex(0);
         setProgress(0);
     };
@@ -59,29 +57,27 @@ export default function ClosestPair() {
     // die durch löschen von points entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
     const calculateOutput = async (submittedPoints: Point[]) => {
+        const labeledPoints = assignLabels(submittedPoints);
+        setInputState(prev => ({...prev, points: labeledPoints}));
+        setLoading(true);
         try {
-            const labeledPoints: Point[] = assignLabels(submittedPoints);
-            setInputState({...inputState, points: labeledPoints});
-
-            const result = await calculateSteps(labeledPoints);
-            //console.log("Algorithm steps:", result);
-            setOutputState({steps: result, timestamp: Date.now()});
-        } catch (error) {
-            console.error(error);
+            const steps = await getClosestPairSteps(labeledPoints);
+            setOutputState({steps, timestamp: Date.now()});
+        } finally {
+            setLoading(false);
         }
     };
 
     //bei normalen will man ganz normal am anfang starten...
-    const handleNormalSubmit = async () => {
-        if (inputState.timestamp < outputState.timestamp) { //wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
+    const handleNormalSubmit = () => {
+        if (inputState.timestamp < outputState.timestamp) {//wenn input nicht neuer als output, nur zu output switchen und nicht neu berechenen und progress bleibt erhalten
             setModeState("output");
             return;
         }
         //wenn input neu/verändert bei 0 starten
         setProgress(0);
         setCurrentStepIndex(0);
-        await calculateOutput(inputState.points);
-        setModeState("output");
+        calculateOutput(inputState.points).then(() => setModeState("output"));
     };
 
     const handleChangeInput = () => {
@@ -95,12 +91,9 @@ export default function ClosestPair() {
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
-            if (imported.algorithm !== "closestPair") {
-                return;
-            }
-            const importedPoints = imported.input; //assign labels wird dann in calculateOutput geamacht ...
+            if (imported.algorithm !== "closestPair") return;
             setProgress(imported.progress);
-            await calculateOutput(importedPoints);
+            await calculateOutput(imported.input);//assign labels wird dann in calculateOutput geamacht ...
         } catch (error) {
             console.error("Invalid import string", error);
         }
@@ -134,7 +127,7 @@ export default function ClosestPair() {
 
     if (modeState === "input") {
         return (
-            <div className="algorithm-shell">
+            <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
                 <AlgorithmOverviewBox algoTyp={"closestPair"}/>
 
                 <Input
@@ -156,16 +149,14 @@ export default function ClosestPair() {
     }
 
     return (
-        <div className="algorithm-shell">
+        <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
             <Output
                 steps={outputState.steps}
-                loading={loading}
-                error={error}
-                onChangeInput={handleChangeInput}
-                currentStepIndex={currentStepIndex}
-                setCurrentStepIndex={setCurrentStepIndex}
                 progress={progress}
                 setProgress={setProgress}
+                currentStepIndex={currentStepIndex}
+                setCurrentStepIndex={setCurrentStepIndex}
+                onChangeInput={handleChangeInput}
                 createExportString={createExportString}
                 onImport={handleImport}
             />

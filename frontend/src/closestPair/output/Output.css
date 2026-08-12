@@ -10,15 +10,6 @@
     margin-top: 0.7rem;
 }
 
-.closest-pair-loading,
-.closest-pair-error {
-    font-family: monospace;
-}
-
-.closest-pair-error {
-    color: red;
-}
-
 .svg-activeSweepAreaDifference {
     pointer-events: none;
     opacity: 0;
