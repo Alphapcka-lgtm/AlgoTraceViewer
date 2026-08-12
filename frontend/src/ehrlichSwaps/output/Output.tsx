@@ -1,5 +1,4 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import type {EhrlichSwapStepDTO} from "../Api.ts";
 import React, {useMemo, useRef, useState} from "react";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
@@ -7,16 +6,7 @@ import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {getActiveLineIdsEhrlich, PSEUDOCODE_EHRLICH_SWAPS} from "./PseudoCode.tsx";
-
-type SwapOutputProps = {
-    values: string[];
-    steps: EhrlichSwapStepDTO[];
-    onChangeInput: () => void;
-    currentStep: number;
-    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    progress: number;
-    setProgress: React.Dispatch<React.SetStateAction<number>>;
-}
+import type {EhrlichSwapStepDTO, SVGOutputProps} from "../shared/Types.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -75,7 +65,7 @@ function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boo
     }, "<");
 }
 
-export function SwapOutput(props: SwapOutputProps) {
+export function Output(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline({paused: true}));
@@ -90,7 +80,7 @@ export function SwapOutput(props: SwapOutputProps) {
     };
 
     const kGraph = useMemo(() => {
-        const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.currentStep - 1) / 3)));
+        const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3)));
         const coordinates = props.steps
             .slice(0, kGraphStepIndex + 1)
             .map((step, index) => {
@@ -117,9 +107,9 @@ export function SwapOutput(props: SwapOutputProps) {
                 .map(point => `${point.x},${point.y}`)
                 .join(" ")
         };
-    }, [props.steps, props.currentStep, maxK]);
+    }, [props.steps, props.cProps.currentStepIndex, maxK]);
 
-    const stepIndex = Math.max(0, Math.floor((props.currentStep - 1) / 3));
+    const stepIndex = Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3));
 
     const step: EhrlichSwapStepDTO = props.steps[stepIndex];
 
@@ -167,13 +157,13 @@ export function SwapOutput(props: SwapOutputProps) {
                 const tl = timelineRef.current;
                 const now = performance.now();
                 if (now - lastProgressUpdateRef.current > 100) {
-                    props.setProgress(tl.progress());
+                    props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
-                props.setCurrentStep(getStepIndexFromTimeline(tl, labels));
+                props.cProps.setCurrentStepIndex(getStepIndexFromTimeline(tl, labels));
             },
             onComplete: () => {
-                props.setProgress(1);
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
                 timelineRef.current.pause();
             },
@@ -290,7 +280,7 @@ export function SwapOutput(props: SwapOutputProps) {
         });
 
         timelineRef.current = timeline;
-        timeline.progress(props.progress).pause();
+        timeline.progress(props.cProps.progress).pause();
         timeline.timeScale(playbackSpeed);
         setIsPlaying(false);
 
@@ -306,7 +296,7 @@ export function SwapOutput(props: SwapOutputProps) {
         <div className="algorithm-panel">
             <IOModeTabs
                 mode="output"
-                onChangeInput={props.onChangeInput}
+                onChangeInput={props.cProps.onChangeInput}
                 onSubmit={() => {
                 }}
                 canSubmit={false}
@@ -517,12 +507,12 @@ export function SwapOutput(props: SwapOutputProps) {
             <OutputControls
                 timelineRef={timelineRef}
                 labels={labels}
-                currentStep={props.currentStep}
-                setCurrentStep={props.setCurrentStep}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={props.progress}
-                setProgress={props.setProgress}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
@@ -531,15 +521,15 @@ export function SwapOutput(props: SwapOutputProps) {
                 <div className="step-layout-side">
                     <div className="step-info">
                         <div className="step-info-grid">
-                            <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
-                            <div><strong>k:</strong> {props.currentStep == 0 ? "" : step.k}</div>
-                            <div><strong>b[k]:</strong> {props.currentStep == 0 ? "" : step.swapIndex}</div>
+                            <div><strong>Step:</strong> {props.cProps.currentStepIndex + 1} / {labels.length}</div>
+                            <div><strong>k:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.k}</div>
+                            <div><strong>b[k]:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.swapIndex}</div>
                         </div>
                     </div>
                 </div>
                 <PseudoCodePanel
                     lines={PSEUDOCODE_EHRLICH_SWAPS}
-                    activeLineIds={getActiveLineIdsEhrlich(props.currentStep, labels.length - 1)}
+                    activeLineIds={getActiveLineIdsEhrlich(props.cProps.currentStepIndex, labels.length - 1)}
                 />
             </div>
         </div>

@@ -13,26 +13,9 @@ public class RandomVertexCover {
     public AnimationResponse solve(VertexCoverRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
-        List<String> nodeOrder = new ArrayList<>();
-        List<String> edgeOrder = new ArrayList<>();
-        Graph graph = Graph.getShortenedIdGraph(request.getGraph());
 
-        if (Objects.isNull(request.getNodeOrder()) || request.getNodeOrder().isEmpty()) {
-            nodeOrder.addAll(graph.getNodes().stream().map(Node::id).toList());
-            Collections.shuffle(nodeOrder);
-        } else {
-            nodeOrder.addAll(request.getNodeOrder());
-        }
-
-        if (Objects.isNull(request.getEdgeOrder()) || request.getEdgeOrder().isEmpty()) {
-            edgeOrder.addAll(graph.getEdges().stream().map(Edge::id).toList());
-            Collections.shuffle(edgeOrder);
-        } else {
-            edgeOrder.addAll(request.getEdgeOrder());
-        }
-
-        OrderComparator comparator = new OrderComparator(edgeOrder);
-        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
+        OrderComparator comparator = new OrderComparator(request.getEdgeOrder());
+        List<Edge> remainingEdges = new ArrayList<>(request.getGraph().getEdges());
 
         while (!remainingEdges.isEmpty()) {
             Edge chosenEdge = remainingEdges.stream().min(comparator::compare).orElseThrow();
@@ -49,14 +32,12 @@ public class RandomVertexCover {
             intermediateStates.add(AnimationState.builder()
                     .chosenEdge(chosenEdge)
                     .incidentEdges(incidentEdges)
-                    .chosenNodes(List.of(graph.getNodeById(chosenEdge.fromId()), graph.getNodeById(chosenEdge.toId())))
+                    .chosenNodes(List.of(request.getGraph().getNodeById(chosenEdge.fromId()), request.getGraph().getNodeById(chosenEdge.toId())))
                     .build()
             );
         }
         return AnimationResponse.builder()
-                .initialState(graph)
-                .nodeOrder(nodeOrder)
-                .edgeOrder(edgeOrder)
+                .initialState(request.getGraph())
                 .intermediateStates(intermediateStates)
                 .timestamp(System.currentTimeMillis())
                 .build();

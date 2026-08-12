@@ -1,6 +1,6 @@
 import LZString from "lz-string";
 import type {ExportState, PseudoCodeLine} from "./Types.tsx";
-import type {Node, PointPair, ClosestPairStepType} from "../closestPair/shared/Types.tsx"
+import type {PointPair, ClosestPairStepType, Point} from "../closestPair/shared/Types.tsx"
 
 export const SVG_WIDTH = 1123;
 export const SVG_HEIGHT = 500;
@@ -41,8 +41,8 @@ alle vorhandenen lables werden überschrieben, sodass wenn nodes gelöscht wurde
 gibt. Das wird gemacht before die nodes ans backend geschicket werden...
 label werden nur für anzeige und explanations benutzt... deshalb gibt es noch node id
  */
-export function assignLabels(nodes: Node[]): Node[] {
-    return nodes.map((node, index) => ({...node, label: getAlphabetLabel(index)}));
+export function assignLabels(points: Point[]): Point[] {
+    return points.map((point, index) => ({...point, label: getAlphabetLabel(index)}));
 }
 
 
@@ -79,7 +79,7 @@ export function createStepLabels(stepCount: number): string[] {
     return Array.from({length: stepCount}, (_, i) => String(i));
 }
 
-const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): Node => {
+const createRandomPoint = (padding: number, svgWidth:number, svgHeight:number): Point => {
     const minX = padding;
     const maxX = svgWidth - padding;
     const minY = padding;
@@ -91,12 +91,13 @@ const createRandomNode = (padding: number, svgWidth:number, svgHeight:number): N
         label: "",
     };
 };
-export const createRandomPoints = (count: number, padding: number, svgWidth:number, svgHeight:number): Node[] => {
-    const nodes: Node[] = [];
+
+export const createRandomPoints = (count: number, padding: number, svgWidth:number, svgHeight:number): Point[] => {
+    const points: Point[] = [];
     for (let i = 0; i < count; i++) {
-        nodes.push(createRandomNode(padding, svgWidth, svgHeight));
+        points.push(createRandomPoint(padding, svgWidth, svgHeight));
     }
-    return nodes;
+    return points;
 };
 
 export function getActivePseudoCodeLineIds(stepType: ClosestPairStepType): string[] {
@@ -208,7 +209,7 @@ export const PSEUDOCODE_MAX_DEGREE: PseudoCodeLine[] = [
 
     {
         id: "remove",
-        text: "remove all edges from E' that are incident to u and update N",
+        text: "remove all incident edges from E' and update N",
         indent: 1
     },
 

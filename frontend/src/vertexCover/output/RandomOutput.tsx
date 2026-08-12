@@ -43,14 +43,14 @@ export function RandomOutput(props: SVGOutputProps) {
             },
             onUpdate: () => {
                 const tl = timelineRef.current;
-                props.setProgress(tl.progress()); //für scrubber
+                props.cProps.setProgress(tl.progress()); //für scrubber
 
                 const stepIndex: number = getStepIndexFromTimeline(tl, labels);
 
-                props.setCurrentStepIndex(stepIndex);
+                props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
-                props.setProgress(1);
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
                 timelineRef.current.pause();
             },
@@ -116,7 +116,7 @@ export function RandomOutput(props: SVGOutputProps) {
         });
 
         timelineRef.current = timeline;
-        timeline.progress(props.progress);
+        timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
@@ -128,7 +128,7 @@ export function RandomOutput(props: SVGOutputProps) {
     return <div className="algorithm-panel">
         <IOModeTabs
             mode="output"
-            onChangeInput={props.onChangeInput}
+            onChangeInput={props.cProps.onChangeInput}
             onSubmit={() => {
             }}
             canSubmit={false}
@@ -140,12 +140,12 @@ export function RandomOutput(props: SVGOutputProps) {
         <OutputControls
             timelineRef={timelineRef}
             labels={labels}
-            currentStep={props.currentStepIndex}
-            setCurrentStep={props.setCurrentStepIndex}
+            currentStep={props.cProps.currentStepIndex}
+            setCurrentStep={props.cProps.setCurrentStepIndex}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
-            progress={props.progress}
-            setProgress={props.setProgress}
+            progress={props.cProps.progress}
+            setProgress={props.cProps.setProgress}
             playbackSpeed={playbackSpeed}
             onPlaybackSpeedChange={changePlaybackSpeed}
         />
@@ -153,8 +153,8 @@ export function RandomOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
                     <div className="step-info-grid vertex-cover-step-summary">
-                        <div><strong>Step:</strong> {props.currentStepIndex} / {labels.length - 1}</div>
-                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.currentStepIndex / 3) * 2}</div>
+                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
+                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}</div>
                     </div>
                     <div className="step-info-grid vertex-cover-legend-grid">
                         <LegendEntry
@@ -176,14 +176,14 @@ export function RandomOutput(props: SVGOutputProps) {
                 </div>
                 <div className="step-layout-actions">
                     <ImportExportDialog
-                        onImport={props.onImport}
-                        createExportString={props.createExportString}
+                        onImport={props.cProps.onImport}
+                        createExportString={props.cProps.createExportString}
                     />
                 </div>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={getActiveLineIdsRandom(props.currentStepIndex, labels.length - 1)}
+                activeLineIds={getActiveLineIdsRandom(props.cProps.currentStepIndex, labels.length - 1)}
             />
         </div>
     </div>;

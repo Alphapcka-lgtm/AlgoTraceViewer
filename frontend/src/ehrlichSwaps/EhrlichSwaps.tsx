@@ -1,16 +1,14 @@
 import { useRef, useState } from "react";
 import { SwapInput } from "./input/Input.tsx";
-import { SwapOutput } from "./output/Output.tsx";
-import {type EhrlichSwapStepDTO, getEhrlichSwapSteps} from "./Api.ts";
-import {extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
+import { Output } from "./output/Output.tsx";
+import { getEhrlichSwapSteps} from "./Api.ts";
+import { extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
 import "./EhrlichSwaps.css";
+import type {EhrlichSwapStepDTO, SwapInputField} from "./shared/Types.tsx";
+import type {CommonOutputProps} from "../shared/Types.tsx";
+import { encodeExportState} from "../shared/Utils.tsx";
 
 const MAX_CELL_COUNT = 6;
-
-export type SwapInputField = {
-    id: number;
-    value: string;
-};
 
 export default function EhrlichSwaps () {
     const nextFieldId = useRef(1);
@@ -20,7 +18,7 @@ export default function EhrlichSwaps () {
     const [submittedValues, setSubmittedValues] = useState<string[]>([]);
     const [validationError, setValidationError] = useState<string | null>(null);
     const [ehrlichSwapsSteps, setEhrlichSwapsSteps] = useState<EhrlichSwapStepDTO[]>([]);
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [progress, setProgress] = useState(0);
 
     const createEmptyField = (): SwapInputField => {
@@ -83,7 +81,7 @@ export default function EhrlichSwaps () {
             setSubmittedValues(enteredValues);
             setEhrlichSwapsSteps(steps);
             setModeState("output");
-            setCurrentStep(0);
+            setCurrentStepIndex(0);
             setProgress(0);
         } catch (error) {
             console.error(error);
@@ -91,6 +89,10 @@ export default function EhrlichSwaps () {
         } finally {
             setLoading(false);
         }
+    };
+
+    const createExportString = () => {
+        return encodeExportState({algorithm: "ehrlichSwaps", input: fields, progress});
     };
 
     const handleChangeInput = (): void => {setModeState("input");};
@@ -111,17 +113,23 @@ export default function EhrlichSwaps () {
             </div>
         );
     }
+    
+    const cProps: CommonOutputProps = {
+        progress: progress,
+        setProgress: setProgress,
+        currentStepIndex: currentStepIndex,
+        setCurrentStepIndex: setCurrentStepIndex,
+        onChangeInput: handleChangeInput,
+        createExportString: createExportString,
+        onImport: () => {}
+    }
 
     return (
         <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
-            <SwapOutput
+            <Output
                 values={submittedValues}
                 steps={ehrlichSwapsSteps}
-                onChangeInput={handleChangeInput}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                progress={progress}
-                setProgress={setProgress}
+                cProps={cProps}
             />
         </div>
     );
