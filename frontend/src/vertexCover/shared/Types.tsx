@@ -97,24 +97,14 @@ export type PreviewEdgeProps = {
 export type TimelineStep = {
     label: string;
     backendStepIndex: number,
-    stepType: RandomStepType | MaxDegreeStepType
+    stepType: StepType
 }
 
-export type RandomStepType =
-    | "INIT"
+export type StepType =
+    | "INIT_CE"
+    | "INIT_N"
     | "WHILE"
     | "CHOOSE"
     | "ADD"
     | "REMOVE"
     | "RETURN";
-
-
-export type MaxDegreeStepType =
-    | "initC"
-    | "initE"
-    | "initN"
-    | "while"
-    | "choose"
-    | "add"
-    | "remove"
-    | "return";
