@@ -1,48 +1,49 @@
-import type {TypesRowProps} from "./Types.tsx";
+import type {LmsPositionsProps} from "./Types.tsx";
 
-export function TypesRow(props: TypesRowProps) {
+export function LmsPositions(props: LmsPositionsProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
-
     return (
-        <g key="types_row" id="types_row" style={{opacity: 0}}>
+        <g id={`lms_positions`} style={{opacity: 0}}>
             <rect
+                id={`lms_positions_name_rect`}
                 x={props.xOffsetStart}
                 y={props.yPos}
                 width={props.nameColWidth}
-                height={props.cellWidth}
+                height={props.cellHeight}
                 fill="lightgray"
                 stroke="black"
             />
             <text
+                id={`lms_positions_name_text`}
                 x={props.xOffsetStart + props.nameColWidth / 2}
                 y={props.yPos + props.cellHeight * 0.7}
                 textAnchor="middle"
             >
-                Type
+                LMS Positions
             </text>
             {
-                [...props.source].map((_, index) => {
-                    return (<g key={index}>
+                props.lmsPositions.map((pos, index) => (
+                    <g id={`lms_positions_elem_${index}`} key={index}>
                         <rect
+                            id={`lms_positions_rect_${index}`}
                             x={xCellStart + index * props.cellWidth}
                             y={props.yPos}
                             width={props.cellWidth}
                             height={props.cellHeight}
-                            // fill cell yellow when suffix is lms
-                            fill={(props.typeMap.map[index].isLms) ? "yellow" : "white"}
+                            fill="white"
                             stroke="black"
-                            strokeWidth={props.strokeWidth}
                         />
                         <text
+                            id={`lms_positions_text_${index}`}
                             x={xCellStart + index * props.cellWidth + props.cellWidth / 2}
                             y={props.yPos + props.cellHeight * 0.7}
                             textAnchor="middle"
                         >
-                            {props.typeMap.map[index].type}
+                            {pos}
                         </text>
-                    </g>)
-                })
+                    </g>
+                ))
             }
         </g>
-    )
+    );
 }

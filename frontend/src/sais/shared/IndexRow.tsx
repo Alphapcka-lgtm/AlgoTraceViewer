@@ -9,7 +9,7 @@ export function IndexRow(props: IndexRowProps) {
                 y={props.yPos}
                 width={props.nameColWidth}
                 height={props.cellWidth}
-                fill="white"
+                fill="lightgray"
                 stroke="black"
             />
             <text
@@ -24,6 +24,7 @@ export function IndexRow(props: IndexRowProps) {
                 [...props.source].map((_, index) => (
                     <g key={index}>
                         <rect
+                            id={`index_row_rect_${index}`}
                             x={xCellStart + index * props.cellWidth}
                             y={props.yPos}
                             width={props.cellWidth}

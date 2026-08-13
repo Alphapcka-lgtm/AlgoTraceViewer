@@ -18,6 +18,7 @@ public record SaisResponseDto(
         int[] lmsPositions,
         int[] reduced,
         int[] reducedSorted,
+        List<LmsSortStepDto> lmsSortSteps,
         int[] saLmsAdded,
         List<SortStepDto> saInduceL,
         List<SortStepDto> saInduceS,

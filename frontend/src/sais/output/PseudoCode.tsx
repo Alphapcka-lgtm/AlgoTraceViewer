@@ -28,7 +28,7 @@ export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
     },
     {
         id: "forEachInduceLGuess",
-        text: "for each offset in sa from left to right where neighbour n = offset - 1 is L-Type:",
+        text: "for each offset o in sa from left to right where neighbour n = o - 1 is L-Type:",
         indent: 0
     },
     {
@@ -38,7 +38,7 @@ export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
     },
     {
         id: "forEachInduceSGuess",
-        text: "for each offset in sa from right to left where neighbour n = offset - 1 is S-Type:",
+        text: "for each offset o in sa from right to left where neighbour n = o - 1 is S-Type:",
         indent: 0
     },
     {
@@ -87,6 +87,11 @@ export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
         indent: 1
     },
     {
+        id: "clearSa",
+        text: "clear the suffix array",
+        indent: 0
+    },
+    {
         id: "forEachFinalLms",
         text: "for each element e in r_sa from right to left where e < #pos:",
         indent: 0
@@ -103,7 +108,7 @@ export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
     },
     {
         id: "forEachInduceLFinal",
-        text: "for each offset in sa from left to right where neighbour n = offset - 1 is L-Type:",
+        text: "for each offset o in sa from left to right where neighbour n = o - 1 is L-Type:",
         indent: 0
     },
     {
@@ -113,7 +118,7 @@ export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
     },
     {
         id: "forEachInduceSFinal",
-        text: "for each offset in sa from right to left where neighbour n = offset - 1 is S-Type:",
+        text: "for each offset o in sa from right to left where neighbour n = o - 1 is S-Type:",
         indent: 0
     },
     {

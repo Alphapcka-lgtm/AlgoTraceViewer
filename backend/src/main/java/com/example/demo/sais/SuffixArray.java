@@ -1,9 +1,6 @@
 package com.example.demo.sais;
 
-import com.example.demo.sais.dto.BucketSizeDto;
-import com.example.demo.sais.dto.SaisResponseDto;
-import com.example.demo.sais.dto.SortStepDto;
-import com.example.demo.sais.dto.TypeMapDto;
+import com.example.demo.sais.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -420,6 +417,7 @@ public class SuffixArray {
 
         final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
+        final List<LmsSortStepDto> lmsSortSteps = new ArrayList<>();
         if (trackSteps) IO.println("final lms placement");
         for (int i = reducedSa.length - 1; i >= 0; i--) {
             int lmsIndex = reducedSa[i];
@@ -435,11 +433,21 @@ public class SuffixArray {
                 char c = (pos < source.length()) ? source.charAt(pos) : '$';
                 IO.println(c + "(" + pos + ")" + " -> " + bucketTails[bucketIndex]);
                 showSuffixArray(result, bucketTails[pos]);
+                lmsSortSteps.add(new LmsSortStepDto(
+                        i,
+                        lmsIndex,
+                        pos,
+                        bucketTails[bucketIndex],
+                        Arrays.copyOf(result, result.length)
+                ));
             }
             bucketTails[text[pos]]--;
         }
 
-        if (trackSteps) responseBuilder.saLmsAdded(Arrays.copyOf(result, result.length));
+        if (trackSteps) {
+            responseBuilder.lmsSortSteps(lmsSortSteps);
+            responseBuilder.saLmsAdded(Arrays.copyOf(result, result.length));
+        }
 
         // * ...and once again, slot all the other suffixes into place with induced sorting.
         induceSortL(text, result, bucketSizes, typeMap, alphabetSize, trackSteps, false);

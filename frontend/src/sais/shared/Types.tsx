@@ -17,6 +17,8 @@ export type SaisOutputProps = {
     setStepIndex: Dispatch<SetStateAction<number>>,
     activeLineIds: string[],
     setActiveLineIds: Dispatch<SetStateAction<string[]>>,
+    stepDescription: string,
+    setStepDescription: Dispatch<SetStateAction<string>>,
     onChangeInput: () => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
@@ -40,6 +42,7 @@ export type SaisResponseDto = {
     lmsPositions: number[],
     reduced: number[],
     reducedSorted: number[],
+    lmsSortSteps: LmsSortStepDto[],
     saLmsAdded: number[],
     saInduceL: SortStepDto[],
     saInduceS: SortStepDto[],
@@ -58,6 +61,14 @@ export type SortStepDto = {
     resultingArray: number[],
     stepDescription: string,
     induceSaIndex: number,
+}
+
+export type LmsSortStepDto = {
+    sortedReducedIndex: number,
+    lmsIndex: number,
+    sourceIndex: number,
+    bucketIndex: number,
+    resultingSa: number[],
 }
 
 export type TypeMapDto = {
@@ -115,7 +126,7 @@ export type TypesRowProps = {
     cellWidth: number,
     cellHeight: number,
     xOffsetStart: number,
-    yPos: number
+    yPos: number,
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
@@ -126,7 +137,7 @@ export type TextRowProps = {
     cellWidth: number,
     cellHeight: number,
     xOffsetStart: number,
-    yPos: number
+    yPos: number,
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
@@ -137,8 +148,47 @@ export type IndexRowProps = {
     cellWidth: number,
     cellHeight: number,
     xOffsetStart: number,
-    yPos: number
+    yPos: number,
     source: string,
     nameColWidth: number,
     strokeWidth: number,
+}
+
+export type ReducedStringProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number,
+    lmsPositions: number[],
+    reduced: number[],
+    nameColWidth: number,
+}
+
+export type ReducedSortedStringProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number,
+    lmsPositions: number[],
+    reducedSorted: number[],
+    nameColWidth: number,
+}
+
+export type EmptySuffixArrayProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number,
+    boxCount: number,
+    nameColWidth: number,
+    counter: number,
+}
+
+export type LmsPositionsProps = {
+    cellWidth: number,
+    cellHeight: number,
+    xOffsetStart: number,
+    yPos: number,
+    lmsPositions: number[],
+    nameColWidth: number,
 }
