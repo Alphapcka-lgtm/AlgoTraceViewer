@@ -89,7 +89,7 @@ export function OutputControls(props: OutputControlsProps) {
     return (
         <>
             <div className="control-row">
-                <ControlsHelp tab={"output"} algorithm={"closestPair"}/>
+                <ControlsHelp tab={"output"}/>
                 <select
                     value={props.playbackSpeed}
                     onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}

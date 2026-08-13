@@ -12,12 +12,6 @@ export function Input(props: InputProps) {
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const svg = e.currentTarget;
         const rect = svg.getBoundingClientRect();
-
-        /*
-         * The SVG is responsive: its visual size can differ from the internal viewBox size.
-         * Mouse coordinates are measured in screen pixels, so they are
-         * convert them back into the SVG coordinate system used by the points.
-         */
         return {
             x: ((e.clientX - rect.left) / rect.width) * SVG_WIDTH,
             y: ((e.clientY - rect.top) / rect.height) * SVG_HEIGHT,
@@ -99,7 +93,7 @@ export function Input(props: InputProps) {
                 <span className="closest-pair-point-count-label">Points: {props.inputState.points.length}</span>
                     <input
                         className="timeline-slider"
-                        type="range" min={0} max={50} value={props.inputState.points.length}
+                        type="range" min={0} max={40} value={props.inputState.points.length}
                         onChange={(event) =>
                             props.onSetPointCount(Number(event.currentTarget.value))
                         }

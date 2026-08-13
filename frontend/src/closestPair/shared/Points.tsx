@@ -68,8 +68,8 @@ export function XPointWithCords({point, registerPointRefsInMap}: XPointWithCords
 }
 
 export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef, activeRingRef, candidateRingRef}: XPointProps) {
-    const NODE_SIZE = 5;
-    const HITBOX_RADIUS = 4;
+    const NODE_SIZE = 5.5;
+    const HITBOX_RADIUS = 5;
     const RING_RADIUS = 9;
 
     const DEFAULT_NODE_COLOR = "#222222";//"#555";
@@ -77,7 +77,8 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
     const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
     const CURRENT_MARKER_COLOR = "#ff0000";//"#F25C54";
 
-    const RING_AND_X_STROKE_WIDTH = 2.7;
+    const X_STROKE_WIDTH = 3.3;
+    const RING_STROKE_WIDTH = 2.7;
 
     return (
         <g transform={`translate(${point.x}, ${point.y})`}>
@@ -86,7 +87,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     ref={currentMarkerRef}
                     cx={0}
                     cy={0}
-                    r={RING_RADIUS}
+                    r={RING_RADIUS+1}
                     fill={CURRENT_MARKER_COLOR}
                     opacity={0}
                     pointerEvents="none"
@@ -99,7 +100,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                         x2={NODE_SIZE}
                         y2={NODE_SIZE}
                         stroke="currentColor"
-                        strokeWidth={RING_AND_X_STROKE_WIDTH}
+                        strokeWidth={X_STROKE_WIDTH}
                         strokeLinecap="round"
                         pointerEvents="none"
                     />
@@ -109,14 +110,14 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                         x2={-NODE_SIZE}
                         y2={NODE_SIZE}
                         stroke="currentColor"
-                        strokeWidth={RING_AND_X_STROKE_WIDTH}
+                        strokeWidth={X_STROKE_WIDTH}
                         strokeLinecap="round"
                         pointerEvents="none"
                     />
                     <text
                         x={10}
                         y={-10}
-                        fontSize="13"
+                        fontSize="14"
                         fontFamily="monospace"
                         fill="currentColor"
                         pointerEvents="none"
@@ -131,7 +132,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     r={RING_RADIUS}
                     fill="none"
                     stroke={ACTIVE_RING_COLOR}
-                    strokeWidth={RING_AND_X_STROKE_WIDTH}
+                    strokeWidth={RING_STROKE_WIDTH}
                     opacity={0}
                     pointerEvents="none"
                 />
@@ -142,8 +143,8 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     r={RING_RADIUS+2}
                     fill="none"
                     stroke={CANDIDATE_RING_COLOR}
-                    strokeWidth={RING_AND_X_STROKE_WIDTH}
-                    strokeDasharray="3 2"
+                    strokeWidth={RING_STROKE_WIDTH}
+                    strokeDasharray="3 1"
                     opacity={0}
                     pointerEvents="none"
                 />

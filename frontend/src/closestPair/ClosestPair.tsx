@@ -5,16 +5,14 @@ import {Output} from "./output/Output.tsx";
 import {
     decodeExportState,
     encodeExportState,
-    assignLabels,
     getAlphabetLabel,
-    createRandomPoints,
     SVG_WIDTH, SVG_HEIGHT
 } from "../shared/Utils.tsx";
 import "./ClosestPair.css";
 import type {AnimationRequest, CommonOutputProps, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 import {getClosestPairSteps} from "./Api.tsx";
-
+import {assignLabels, createRandomPoints} from "./shared/Utils.ts";
 export default function ClosestPair() {
     const [modeState, setModeState] = useState("input");
     const [inputState, setInputState] = useState<ClosestPairInputState>({points: [], timestamp: 0});  //welche points es gerade gibt
@@ -26,6 +24,7 @@ export default function ClosestPair() {
     //Die Lables werden sofort vergeben, sodass man die auch schon während input sieht.
     const handleAddPoint = (point: Point) => {
         setInputState(prev => {
+            if (prev.points.length >= 100) return prev;
             const labeledPoint: Point = {...point, label: getAlphabetLabel(prev.points.length)};
             return {points: [...prev.points, labeledPoint], timestamp: Date.now()};
         });

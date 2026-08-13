@@ -1,12 +1,6 @@
-import {
-    createStepLabels,
-    getStepIndexFromTimeline,
-    colors,
-    getActiveLineIdsMaxDegree,
-    PSEUDOCODE_MAX_DEGREE,
-    SVG_WIDTH, SVG_HEIGHT
-} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex, SVG_WIDTH, SVG_HEIGHT} from "../../shared/Utils.tsx";
 import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
+import {colors, getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
@@ -48,7 +42,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress());
 
-                const stepIndex: number = getStepIndexFromTimeline(tl, labels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, labels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },

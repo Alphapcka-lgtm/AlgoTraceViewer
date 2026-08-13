@@ -1,11 +1,6 @@
-import {
-    getActiveLineIdsRandom,
-    createStepLabels,
-    getStepIndexFromTimeline,
-    PSEUDOCODE_RANDOM,
-    SVG_HEIGHT, SVG_WIDTH
-} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
+import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.ts";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
@@ -45,7 +40,7 @@ export function RandomOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress()); //für scrubber
 
-                const stepIndex: number = getStepIndexFromTimeline(tl, labels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, labels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },

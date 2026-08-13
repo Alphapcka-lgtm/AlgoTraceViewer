@@ -12,6 +12,7 @@ public class ClosestPairService {
     //https://pages.di.unipi.it/rossano/blog/2023/sweepline/
     //https://www.geeksforgeeks.org/dsa/closest-pair-of-points-using-sweep-line-algorithm/
     //https://www.jn.ethz.ch/education/script/P6_C26.pdf
+    //https://wuecampus.uni-wuerzburg.de/moodle/pluginfile.php/3627503/mod_resource/content/4/advalg-ws22-vl12-comp-geom-short.pdf
     public List<AlgorithmStepDTO> nearestPoints(List<Point> points) {
         List<AlgorithmStepDTO> steps = new ArrayList<>();
 
