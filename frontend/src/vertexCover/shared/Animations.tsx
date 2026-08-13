@@ -1,5 +1,5 @@
 import type {AnimationResponse, AnimationState, TimelineStep} from "./Types.tsx";
-import {colors} from "../../shared/Utils.tsx";
+import {colors} from "../output/PseudoCode.ts";
 
 export function animateInit(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
     void timeline.addLabel(step.label)

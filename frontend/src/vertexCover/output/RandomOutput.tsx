@@ -1,7 +1,5 @@
 import {
-    createStepLabels,
-    getStepIndexFromTimeline,
-    PSEUDOCODE_RANDOM,
+    createStepLabels, getCurrentTimelineStepIndex,
     SVG_HEIGHT, SVG_WIDTH
 } from "../../shared/Utils.tsx";
 import {
@@ -23,6 +21,7 @@ import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {PSEUDOCODE_RANDOM} from "./PseudoCode.ts";
 
 const STEP_DURATION = 1.0;
 
@@ -60,7 +59,7 @@ export function RandomOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress()); //für scrubber
 
-                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, myLabels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },
