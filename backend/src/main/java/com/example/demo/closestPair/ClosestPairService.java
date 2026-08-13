@@ -245,6 +245,7 @@ public class ClosestPairService {
      * this method is called, so only the vertical distance must be checked.
      * Points exactly on the candidate window boundary are excluded.
      */
+    /*
     private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
             Point current, TreeSet<Point> activePoints, double candidateSearchDelta, double currentBestDistance, PointPair currentBestPair
     ) {
@@ -266,6 +267,35 @@ public class ClosestPairService {
         }
 
         return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
+    }
+     */
+
+    private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
+            Point current, TreeSet<Point> activePoints, double candidateSearchDelta, double currentBestDistance, PointPair currentBestPair
+    ) {
+        List<CandidateComparison> candidateComparisons = new ArrayList<>();
+        boolean foundNewBest = false;
+
+        NavigableSet<Point> candidates = getPointsInYRange(
+                activePoints, current.y() - candidateSearchDelta, current.y() + candidateSearchDelta);
+
+        for (Point candidate : candidates) {
+            if (Math.abs(current.y() - candidate.y()) >= candidateSearchDelta) continue;
+            double distance = euclideanDistance(current, candidate);
+            candidateComparisons.add(new CandidateComparison(candidate, distance));
+            if (distance < currentBestDistance) {
+                currentBestDistance = distance;
+                currentBestPair = new PointPair(candidate, current, distance);
+                foundNewBest = true;
+            }
+        }
+        return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
+    }
+
+    private NavigableSet<Point> getPointsInYRange(TreeSet<Point> points, double minY, double maxY) {
+        Point lowerBound = new Point(Integer.MIN_VALUE, (int) Math.floor(minY), "", "");
+        Point upperBound = new Point(Integer.MAX_VALUE, (int) Math.ceil(maxY), "", "");
+        return points.subSet(lowerBound, true, upperBound, true);
     }
 
     private List<Point> getFuturePoints(List<Point> xSorted, int currentIndex) {
