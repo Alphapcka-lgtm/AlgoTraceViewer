@@ -54,6 +54,7 @@
 .algorithm-overview__toggle {
     margin-top: var(--space-sm);
     cursor: pointer;
+    margin-top: -6px;
 }
 
 .algorithm-overview__header {
