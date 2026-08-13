@@ -1,17 +1,27 @@
-import {createStepLabels, getCurrentTimelineStepIndex, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
+import {
+    createStepLabels, getCurrentTimelineStepIndex,
+    SVG_HEIGHT, SVG_WIDTH
+} from "../../shared/Utils.tsx";
+import {
+    animateAdd,
+    animateChooseRandomEdge,
+    animateInit,
+    animateRemoveRandom,
+    animateReturn
+} from "../shared/Animations.tsx";
 import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
-import {getActiveLineIdsRandom, PSEUDOCODE_RANDOM} from "./PseudoCode.ts";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import type {SVGOutputProps} from "../shared/Types.tsx";
+import {useMemo, useRef, useState} from "react";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
-import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {PSEUDOCODE_RANDOM} from "./PseudoCode.ts";
 
 const STEP_DURATION = 1.0;
 
@@ -19,11 +29,20 @@ export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
+
+    const {timelineSteps, myLabels} = useMemo(
+        () => {
+            return {
+                timelineSteps: createRandomVertexCoverOutputSteps(props.output.intermediateStates.length),
+                myLabels: createStepLabels(3 * props.output.intermediateStates.length + 2)
+            }
+        },
+        [props.output.intermediateStates.length]
+    );
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
+        void timelineRef.current.timeScale(speed);
     };
 
     useGSAP(() => {
@@ -40,82 +59,48 @@ export function RandomOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress()); //für scrubber
 
-                const stepIndex: number = getCurrentTimelineStepIndex(tl, labels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, myLabels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
                 props.cProps.setProgress(1);
                 setIsPlaying(false);
-                timelineRef.current.pause();
+                void timelineRef.current.pause();
             },
         });
 
-        timeline.addLabel(labels[0]);
-
-        props.output.initialState.edges.forEach((edge, index) => {
-            if (index == 0) {
-                timeline.set("#u0" + edge.id, {opacity: 100});
-            } else {
-                timeline.set("#u0" + edge.id, {opacity: 100}, "<");
+        timelineSteps.forEach((targetStep) => {
+            switch (targetStep.stepType) {
+                case "INIT_CE": {
+                    animateInit(timeline, targetStep, props.output);
+                    break;
+                }
+                case "CHOOSE": {
+                    animateChooseRandomEdge(timeline, targetStep, props.output);
+                    break;
+                }
+                case "ADD": {
+                    animateAdd(timeline, targetStep, props.output);
+                    break;
+                }
+                case "REMOVE": {
+                    animateRemoveRandom(timeline, targetStep, props.output);
+                    break;
+                }
+                case "RETURN": {
+                    animateReturn(timeline, targetStep);
+                    break;
+                }
             }
-            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
         })
 
-        timeline.addLabel(labels[1]);
-
-        props.output.intermediateStates.forEach((intermediateState, index) => {
-
-            timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
-            timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
-
-            timeline.addLabel(labels[3 * index + 2]);
-
-            intermediateState.chosenNodes.forEach((node, index) => {
-                if (index === 0) {
-                    timeline.to("#u1" + node.id, {r: 20});
-                    timeline.to("#u2" + node.id, {r: 18}, "<");
-                    timeline.to("#u3" + node.id, {r: 15}, "<");
-                } else {
-                    timeline.to("#u1" + node.id, {r: 20}, "<");
-                    timeline.to("#u2" + node.id, {r: 18}, "<");
-                    timeline.to("#u3" + node.id, {r: 15}, "<");
-                }
-            })
-
-            timeline.addLabel(labels[3 * index + 3]);
-
-            intermediateState.incidentEdges.forEach((incidentEdge, index) => {
-                if (index == 0) {
-                    if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"});
-                        timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                    } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"});
-                    } else {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"});
-                    }
-                } else {
-                    if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                        timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                    } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
-                    } else {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
-                    }
-                }
-            });
-
-            timeline.addLabel(labels[3 * index + 4]);
-        });
-
         timelineRef.current = timeline;
-        timeline.progress(props.cProps.progress);
+        void timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
-            timeline.kill();
+            void timeline.kill();
             timelineRef.current = gsap.timeline({paused: true});
         };
     }, {dependencies: [props.output.timestamp]});
@@ -128,13 +113,14 @@ export function RandomOutput(props: SVGOutputProps) {
             }}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
+        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+             preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
         <OutputControls
             timelineRef={timelineRef}
-            labels={labels}
+            labels={myLabels}
             currentStep={props.cProps.currentStepIndex}
             setCurrentStep={props.cProps.setCurrentStepIndex}
             isPlaying={isPlaying}
@@ -148,8 +134,9 @@ export function RandomOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
                     <div className="step-info-grid vertex-cover-step-summary">
-                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
-                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}</div>
+                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
+                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}
+                        </div>
                     </div>
                     <div className="step-info-grid vertex-cover-legend-grid">
                         <LegendEntry
@@ -178,8 +165,25 @@ export function RandomOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={getActiveLineIdsRandom(props.cProps.currentStepIndex, labels.length - 1)}
+                activeLineIds={[timelineSteps[props.cProps.currentStepIndex].stepType]}
             />
         </div>
     </div>;
+}
+
+function createRandomVertexCoverOutputSteps(n: number): TimelineStep[] {
+    if (n > 0) {
+        const steps: TimelineStep[] = [
+            {label: "0", backendStepIndex: -1, stepType: "INIT_CE"},
+        ];
+        Array.from({length: n}, (_, i) => i).forEach((i) => {
+            steps.push({label: String(3 * i + 1), backendStepIndex: i, stepType: "CHOOSE"})
+            steps.push({label: String(3 * i + 2), backendStepIndex: i, stepType: "ADD"})
+            steps.push({label: String(3 * i + 3), backendStepIndex: i, stepType: "REMOVE"})
+        })
+        steps.push({label: String(3 * n + 1), backendStepIndex: -1, stepType: "RETURN"})
+        return steps;
+    } else {
+        return [];
+    }
 }

@@ -93,3 +93,18 @@ export type PreviewEdgeProps = {
     interaction: Interaction,
     nodes: Node[],
 };
+
+export type TimelineStep = {
+    label: string;
+    backendStepIndex: number,
+    stepType: StepType
+}
+
+export type StepType =
+    | "INIT_CE"
+    | "INIT_N"
+    | "WHILE"
+    | "CHOOSE"
+    | "ADD"
+    | "REMOVE"
+    | "RETURN";

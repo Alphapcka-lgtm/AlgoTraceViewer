@@ -1,18 +1,29 @@
-import {createStepLabels, getCurrentTimelineStepIndex, SVG_WIDTH, SVG_HEIGHT} from "../../shared/Utils.tsx";
+import {
+    createStepLabels, getCurrentTimelineStepIndex,
+    SVG_HEIGHT, SVG_WIDTH
+} from "../../shared/Utils.tsx";
+import {
+    animateAdd,
+    animateChooseMaxDegreeNode,
+    animateInit,
+    animateInitN,
+    animateRemoveAndUpdate,
+    animateReturn
+} from "../shared/Animations.tsx";
 import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
-import {colors, getActiveLineIdsMaxDegree, PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
-import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
-import type {SVGOutputProps} from "../shared/Types.tsx";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {useMemo, useRef, useState} from "react";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
-import {useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import {PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
 
 const STEP_DURATION = 1.0;
 
@@ -20,11 +31,20 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const labels = createStepLabels(3 * props.output.intermediateStates.length + 3);
+
+    const {timelineSteps, myLabels} = useMemo(
+        () => {
+            return {
+                timelineSteps: createMaxDegreeVertexCoverOutputSteps(props.output.intermediateStates.length),
+                myLabels: createStepLabels(3 * props.output.intermediateStates.length + 3)
+            }
+        },
+        [props.output.intermediateStates.length]
+    );
 
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
+        void timelineRef.current.timeScale(speed);
     };
 
     useGSAP(() => {
@@ -42,114 +62,52 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress());
 
-                const stepIndex: number = getCurrentTimelineStepIndex(tl, labels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, myLabels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
                 props.cProps.setProgress(1);
                 setIsPlaying(false);
-                timelineRef.current.pause();
+                void timelineRef.current.pause();
             },
         });
 
+        timelineSteps.forEach((targetStep) => {
+            switch (targetStep.stepType) {
+                case "INIT_CE": {
+                    animateInit(timeline, targetStep, props.output);
+                    break;
+                }
+                case "INIT_N": {
+                    animateInitN(timeline, targetStep, props.output);
+                    break;
+                }
+                case "CHOOSE": {
+                    animateChooseMaxDegreeNode(timeline, targetStep, props.output);
+                    break;
+                }
+                case "ADD": {
+                    animateAdd(timeline, targetStep, props.output);
+                    break;
+                }
+                case "REMOVE": {
+                    animateRemoveAndUpdate(timeline, targetStep, props.output);
+                    break;
+                }
+                case "RETURN": {
+                    animateReturn(timeline, targetStep);
+                    break;
+                }
+            }
+        })
+
         timelineRef.current = timeline;
-
-        timeline.addLabel(labels[0]);
-
-        props.output.initialState.edges.forEach((edge, index) => {
-            if (index == 0) {
-                timeline.set("#u0" + edge.id, {opacity: 100});
-            } else {
-                timeline.set("#u0" + edge.id, {opacity: 100}, "<");
-            }
-            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
-        })
-
-        timeline.addLabel(labels[1]);
-
-        props.output.initialDegreeMap.forEach((ndp, index) => {
-
-            if (index === 0) {
-                timeline.to("#t2" + ndp.node.id, {
-                    scrambleText: {text: String(ndp.degree), chars: "-|"},
-                });
-            } else {
-                timeline.to("#t2" + ndp.node.id, {
-                    scrambleText: {text: String(ndp.degree), chars: "-|"},
-                }, "<");
-            }
-        })
-
-        timeline.addLabel(labels[2]);
-
-        props.output.intermediateStates.forEach((intermediateState, index) => {
-
-            intermediateState.chosenNodes.forEach((node) => {
-                const tableElement = document.getElementById("t1" + node.id)! as HTMLDivElement;
-
-                timeline.to(tableElement, {
-                    background: colors.red,
-                    onStart: () => tableElement.scrollIntoView({
-                        behavior: "smooth",
-                        inline: "center",
-                        block: "nearest"
-                    })
-                });
-
-                timeline.addLabel(labels[3 * index + 3]);
-
-                timeline.to("#u1" + node.id, {r: 20});
-                timeline.to("#u2" + node.id, {r: 18}, "<");
-                timeline.to("#u3" + node.id, {r: 15}, "<");
-
-                timeline.addLabel(labels[3 * index + 4]);
-
-                intermediateState.incidentEdges.forEach((incidentEdge, index) => {
-                    if (index == 0) {
-                        if (incidentEdge.fromId === node.id || incidentEdge.fromId === node.id) {
-                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"});
-                        } else {
-                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"});
-                        }
-                    } else {
-                        if (incidentEdge.fromId === node.id || incidentEdge.fromId === node.id) {
-                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
-                        } else {
-                            timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
-                        }
-                    }
-                });
-
-                const previous = index == 0 ? props.output.initialDegreeMap : props.output.intermediateStates[index-1].degreeMap;
-                let first = true;
-
-                intermediateState.degreeMap.forEach((ndp, index) => {
-                    if(previous[index].degree != ndp.degree) {
-                        if (first) {
-                            timeline.to("#t2" + ndp.node.id, {
-                                scrambleText: {text: String(ndp.degree), chars: "-|"},
-                            });
-                            first = false;
-                        } else {
-                            timeline.to("#t2" + ndp.node.id, {
-                                scrambleText: {text: String(ndp.degree), chars: "-|"},
-                            }, "<");
-                        }
-                    }
-                })
-
-                timeline.to(tableElement, {background: "none"});
-            })
-
-            timeline.addLabel(labels[3 * index + 5]);
-        });
-
-        timeline.progress(props.cProps.progress);
+        void timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
-            timeline.kill();
+            void timeline.kill();
             timelineRef.current = gsap.timeline({paused: true});
         };
     }, {dependencies: [props.output.timestamp]});
@@ -162,13 +120,14 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             }}
             canSubmit={false}
         />
-        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
+        <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+             preserveAspectRatio="xMidYMid meet">
             <Edges edges={props.output.initialState.edges} nodes={props.output.initialState.nodes}/>
             <Nodes nodes={props.output.initialState.nodes}/>
         </svg>
         <OutputControls
             timelineRef={timelineRef}
-            labels={labels}
+            labels={myLabels}
             currentStep={props.cProps.currentStepIndex}
             setCurrentStep={props.cProps.setCurrentStepIndex}
             isPlaying={isPlaying}
@@ -181,37 +140,40 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
         <div className="step-layout">
             <div className="step-layout-side">
                 <div className="step-info">
-            <div className="step-info-grid vertex-cover-step-summary">
-                <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3))}</div>
-            </div>
-            <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
-                <LegendEntry
-                    label="Node-Degree Map N"
-                    value={""}
-                    icon={<NodeDegreeMapIcon/>}
-                />
-                <LegendEntry
-                    label="Vertex Cover C"
-                    value={""}
-                    icon={<NodeIcon/>}
-                />
-                <LegendEntry
-                    label="Remaining Edges E'"
-                    value={""}
-                    icon={<RemainingEdgeIcon/>}
-                />
-            </div>
-            <div className="vertex-cover-degree-table">
-                {props.output.initialDegreeMap.map(ndp => {
-                    return (
-                        <div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-column">
-                            <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
-                            <div  id={"t2" + ndp.node.id} key={"t1" + ndp.node.id} className="vertex-cover-degree-cell"></div>
-                        </div>
-                    );
-                })}
-            </div>
+                    <div className="step-info-grid vertex-cover-step-summary">
+                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
+                        <div><strong>Vertex Cover
+                            Size:</strong> {Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3))}</div>
+                    </div>
+                    <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
+                        <LegendEntry
+                            label="Node-Degree Map N"
+                            value={""}
+                            icon={<NodeDegreeMapIcon/>}
+                        />
+                        <LegendEntry
+                            label="Vertex Cover C"
+                            value={""}
+                            icon={<NodeIcon/>}
+                        />
+                        <LegendEntry
+                            label="Remaining Edges E'"
+                            value={""}
+                            icon={<RemainingEdgeIcon/>}
+                        />
+                    </div>
+                    <div className="vertex-cover-degree-table">
+                        {props.output.initialDegreeMap.map(ndp => {
+                            return (
+                                <div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id}
+                                     className="vertex-cover-degree-column">
+                                    <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
+                                    <div id={"t2" + ndp.node.id} key={"t1" + ndp.node.id}
+                                         className="vertex-cover-degree-cell"></div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
                 <div className="step-layout-actions">
                     <ImportExportDialog
@@ -222,8 +184,26 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_MAX_DEGREE}
-                activeLineIds={getActiveLineIdsMaxDegree(props.cProps.currentStepIndex, labels.length - 1)}
+                activeLineIds={[timelineSteps[props.cProps.currentStepIndex].stepType]}
             />
         </div>
     </div>;
+}
+
+function createMaxDegreeVertexCoverOutputSteps(n: number): TimelineStep[] {
+    if (n > 0) {
+        const steps: TimelineStep[] = [
+            {label: "0", backendStepIndex: -1, stepType: "INIT_CE"},
+            {label: "1", backendStepIndex: -1, stepType: "INIT_N"},
+        ];
+        Array.from({length: n}, (_, i) => i).forEach((i) => {
+            steps.push({label: String(3 * i + 2), backendStepIndex: i, stepType: "CHOOSE"})
+            steps.push({label: String(3 * i + 3), backendStepIndex: i, stepType: "ADD"})
+            steps.push({label: String(3 * i + 4), backendStepIndex: i, stepType: "REMOVE"})
+        })
+        steps.push({label: String(3 * n + 2), backendStepIndex: -1, stepType: "RETURN"})
+        return steps;
+    } else {
+        return [];
+    }
 }
