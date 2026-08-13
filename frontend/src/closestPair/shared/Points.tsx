@@ -1,5 +1,6 @@
 import type {Point, DynamicPointsProps, XPointProps, XPointWithCordsProps} from "./Types.tsx";
 import {useLayoutEffect, useRef, useState} from "react";
+import {POINT_COLORS} from "./Utils.ts";
 
 export function DynamicPoints(props: DynamicPointsProps) {
     return props.points.map((point: Point) => (
@@ -71,12 +72,6 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
     const NODE_SIZE = 5.5;
     const HITBOX_RADIUS = 5;
     const RING_RADIUS = 9;
-
-    const DEFAULT_NODE_COLOR = "#222222";//"#555";
-    const ACTIVE_RING_COLOR = DEFAULT_NODE_COLOR;
-    const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
-    const CURRENT_MARKER_COLOR = "#ff0000";//"#F25C54";
-
     const X_STROKE_WIDTH = 3.3;
     const RING_STROKE_WIDTH = 2.7;
 
@@ -88,12 +83,12 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     cx={0}
                     cy={0}
                     r={RING_RADIUS+1}
-                    fill={CURRENT_MARKER_COLOR}
+                    fill={POINT_COLORS.currentMarker}
                     opacity={0}
                     pointerEvents="none"
                 />
                 {/* farbe wird von gsap kontrolliert */}
-                <g ref={pointVisualRef} color={DEFAULT_NODE_COLOR}>
+                <g ref={pointVisualRef} color={POINT_COLORS.default}>
                     <line
                         x1={-NODE_SIZE}
                         y1={-NODE_SIZE}
@@ -131,7 +126,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke={ACTIVE_RING_COLOR}
+                    stroke={POINT_COLORS.default}
                     strokeWidth={RING_STROKE_WIDTH}
                     opacity={0}
                     pointerEvents="none"
@@ -142,7 +137,7 @@ export function XPoint({point, visualGroupRef, pointVisualRef, currentMarkerRef,
                     cy={0}
                     r={RING_RADIUS+2}
                     fill="none"
-                    stroke={CANDIDATE_RING_COLOR}
+                    stroke={POINT_COLORS.candidateRing}
                     strokeWidth={RING_STROKE_WIDTH}
                     strokeDasharray="3 1"
                     opacity={0}

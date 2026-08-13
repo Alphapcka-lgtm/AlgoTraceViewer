@@ -41,3 +41,12 @@ label werden nur für anzeige und explanations benutzt... deshalb gibt es noch n
 export function assignLabels(points: Point[]): Point[] {
     return points.map((point, index) => ({...point, label: getAlphabetLabel(index)}));
 }
+
+export const POINT_COLORS = {
+    default: "#222222",
+    closest: "#0000CD",
+    processed: "#cccccc",
+    future: "#808080",
+    candidateRing: "rgb(204,14,119)",
+    currentMarker: "#ff0000",
+} as const;

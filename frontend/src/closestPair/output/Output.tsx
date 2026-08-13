@@ -1,29 +1,30 @@
+import type {AlgorithmStepDTO, Point, OutputProps, PointVisualRefs} from "../shared/Types.tsx";
+import {getCurrentTimelineStepIndex, createStepLabels, SVG_WIDTH, SVG_HEIGHT} from "../../shared/Utils.tsx";
+import {getActivePseudoCodeLineIds, SWEEP_LINE_PSEUDOCODE} from "./PseudoCode.ts";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {isSamePair} from "../shared/Utils.ts";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
 import {useCallback, useMemo, useRef, useState} from "react";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {XPointWithCords} from "../shared/Points.tsx";
+import {Legend} from "./Legend.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {
-    AlgorithmStepDTO, Point, OutputProps, RectAttrs, LineAttrs, PointVisualRefs, PointVisualState
-} from "../shared/Types.tsx";
-import {OutputControls} from "../../shared/OutputControls.tsx";
-import {XPointWithCords} from "../shared/Points.tsx";
-import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {
-    getCurrentTimelineStepIndex,
-    createStepLabels, SVG_WIDTH, SVG_HEIGHT
-} from "../../shared/Utils.tsx";
-import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {getActivePseudoCodeLineIds, SWEEP_LINE_PSEUDOCODE} from "./PseudoCode.ts";
-import {Legend} from "./Legend.tsx";
-import {hasCurrentDisplayed, isSamePair} from "../shared/Utils.ts";
+    getActiveAreaAttrs,
+    getCandidateRectAttrs,
+    getPointColor,
+    getPointVisualState,
+    getSweepLineAttrs
+} from "./OutputUtils.ts";
 
 const STEP_DURATION = 0.8;
 const CANDIDATE_FADE_IN_DURATION = 0.45;
 const CANDIDATE_FADE_OUT_DURATION = 0.25;
 const CANDIDATE_AUTOPLAY_HOLD_DURATION = 0.8;
 const ACTIVE_WINDOW_SHRINK_DURATION = 0.7;
-
-const PADDING = 1;
+export const PADDING = 1;
 
 export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -45,42 +46,6 @@ export function Output(props: OutputProps) {
         timelineRef.current.timeScale(speed);
     };
 
-    const getActiveAreaAttrs = (step: AlgorithmStepDTO ): RectAttrs => {
-        const currentX = step.currentPoint?.x ?? 0;
-        const delta = step.windowDelta;
-        return {x: currentX - delta, y: PADDING, width: delta, height: SVG_HEIGHT - 2 * PADDING};
-    };
-
-    const getSweepLineAttrs = (step: AlgorithmStepDTO): LineAttrs=> {
-        const currentX = step.currentPoint?.x ?? 0;
-        return {x1: currentX, x2: currentX, y1: PADDING, y2: SVG_HEIGHT - PADDING};
-    };
-
-    const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const currentX = step.currentPoint?.x ?? 0;
-        const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
-
-        return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
-    };
-
-    const getPointVisualState = (step: AlgorithmStepDTO, pointId: string): PointVisualState => {
-        const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === pointId;
-        const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
-            step.candidateComparisons.some(({candidate}) => candidate.id === pointId);
-        const isActive = step.activePoints.some(point => point.id === pointId);
-        const isBest = step.bestPair?.p0.id === pointId ||step.bestPair?.p1.id === pointId;
-        const isProcessed = step.processedPoints.some(point => point.id === pointId);
-        const isFuture = step.futurePoints.some(point => point.id === pointId);
-        return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
-    };
-
-    const getPointColor = (state: PointVisualState): string => {
-        if (state.isBest) return "#0000CD";//"#0000CD"; //"#f5c45e";00008B
-        if (state.isProcessed) return "#cccccc";
-        if (state.isFuture) return "#808080";
-        return "#222222";//"#555";
-    };
-
     const registerPointRefsInMap = useCallback((pointId: string, refs: PointVisualRefs | null) => {
             if (refs) {
                 pointRefsMap.current.set(pointId, refs);
@@ -100,6 +65,25 @@ export function Output(props: OutputProps) {
             if (refs) res.push(refs);
         });
         return res;
+    };
+
+    const initializeVisualState = (firstStep: AlgorithmStepDTO) => {
+        //init state setzen
+        //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
+        gsap.set(activeSweepAreaRef.current, {opacity: 0});
+        gsap.set(activeSweepAreaDifferenceRef.current, {opacity: 0});
+        gsap.set(sweepLineRef.current, {opacity: 0});
+        gsap.set(candidateSweepWindowRef.current, {opacity: 0});
+
+        firstStep.allPoints.forEach(point => {
+            const refs = getPointRefs(point.id);
+            if (!refs) return;
+            const state = getPointVisualState(firstStep, point.id);
+            gsap.set(refs.pointVisual, {color: getPointColor(state)});
+            gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
+            gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
+            gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
+        });
     };
 
     const addBreak = (timeline: gsap.core.Timeline, duration = 0.15) => {
@@ -278,7 +262,6 @@ export function Output(props: OutputProps) {
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
         const activeArea = activeSweepAreaRef.current;
-        const activeAreaDifference = activeSweepAreaDifferenceRef.current;
         const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
@@ -311,26 +294,7 @@ export function Output(props: OutputProps) {
             }
         });
 
-        const setPointVisualsToStep = (step: AlgorithmStepDTO) => {
-            step.allPoints.forEach(point => {
-                const refs = getPointRefs(point.id);
-                if (!refs) return;
-                const state = getPointVisualState(step, point.id);
-                gsap.set(refs.pointVisual, {color: getPointColor(state)});
-                gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
-                gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
-                gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
-            });
-        };
-
-        //init state setzen
-        //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
-        const firstStep = props.steps[0];
-        gsap.set(activeArea, {opacity: 0});
-        gsap.set(activeAreaDifference, {opacity: 0});
-        gsap.set(sweepLine, {opacity: 0});
-        gsap.set(candidateRect, {opacity: 0});
-        setPointVisualsToStep(firstStep);
+        initializeVisualState(props.steps[0]);
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
@@ -385,7 +349,6 @@ export function Output(props: OutputProps) {
                     break;
                 }
             }
-
             timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
         });
 

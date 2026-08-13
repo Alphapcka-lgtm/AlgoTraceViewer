@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type {RingStyle} from "./closestPair/shared/Types.tsx";
 import {colors} from "./vertexCover/output/PseudoCode.ts";
+import {POINT_COLORS} from "./closestPair/shared/Utils.ts";
 
 type LegendEntryProps = {
     label: string;
@@ -29,9 +30,6 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
     const NODE_SIZE = 4.5;
     const RING_RADIUS = 8;
     const CURRENT_MARKER_RADIUS = RING_RADIUS + 0.5;
-    const ACTIVE_RING_COLOR = "#222222";
-    const CANDIDATE_RING_COLOR = "rgb(204,14,119)";
-    const CURRENT_MARKER_COLOR = "#ff0000";
     const X_STROKE_WIDTH = 3;
     const RING_STROKE_WIDTH = 2.4;
     return (
@@ -41,7 +39,7 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
                     cx={0}
                     cy={0}
                     r={CURRENT_MARKER_RADIUS}
-                    fill={CURRENT_MARKER_COLOR}
+                    fill={POINT_COLORS.currentMarker}
                 />
             )}
             <line
@@ -68,7 +66,7 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
                     cy={0}
                     r={RING_RADIUS}
                     fill="none"
-                    stroke={ACTIVE_RING_COLOR}
+                    stroke={POINT_COLORS.default}
                     strokeWidth={RING_STROKE_WIDTH}
                 />
             )}
@@ -78,7 +76,7 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
                     cy={0}
                     r={RING_RADIUS + 1.8}
                     fill="none"
-                    stroke={CANDIDATE_RING_COLOR}
+                    stroke={POINT_COLORS.candidateRing}
                     strokeWidth={RING_STROKE_WIDTH}
                     strokeDasharray="3 1"
                 />
