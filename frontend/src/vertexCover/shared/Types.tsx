@@ -93,3 +93,28 @@ export type PreviewEdgeProps = {
     interaction: Interaction,
     nodes: Node[],
 };
+
+export type TimelineStep = {
+    label: string;
+    backendStepIndex: number,
+    stepType: RandomStepType | MaxDegreeStepType
+}
+
+export type RandomStepType =
+    | "INIT"
+    | "WHILE"
+    | "CHOOSE"
+    | "ADD"
+    | "REMOVE"
+    | "RETURN";
+
+
+export type MaxDegreeStepType =
+    | "initC"
+    | "initE"
+    | "initN"
+    | "while"
+    | "choose"
+    | "add"
+    | "remove"
+    | "return";

@@ -10,11 +10,11 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import type {SVGOutputProps} from "../shared/Types.tsx";
+import type {AnimationResponse, AnimationState, SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
-import {useRef, useState} from "react";
+import {useMemo, useRef, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 
@@ -26,9 +26,14 @@ export function RandomOutput(props: SVGOutputProps) {
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
 
+    const timelineSteps = useMemo(
+        ()=> createRandomVertexCoverOutputSteps(props.output.intermediateStates.length),
+        [props.output.intermediateStates.length]
+    );
+
     const changePlaybackSpeed = (speed: number) => {
         setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
+        void timelineRef.current.timeScale(speed);
     };
 
     useGSAP(() => {
@@ -56,64 +61,30 @@ export function RandomOutput(props: SVGOutputProps) {
             },
         });
 
-        timeline.addLabel(labels[0]);
-
-        props.output.initialState.edges.forEach((edge, index) => {
-            if (index == 0) {
-                timeline.set("#u0" + edge.id, {opacity: 100});
-            } else {
-                timeline.set("#u0" + edge.id, {opacity: 100}, "<");
+        timelineSteps.forEach((targetStep) => {
+            switch (targetStep.stepType) {
+                case "INIT": {
+                    animateInit(timeline, targetStep, props.output);
+                    break;
+                }
+                case "CHOOSE": {
+                    animateChoose(timeline, targetStep, props.output);
+                    break;
+                }
+                case "ADD": {
+                    animateAdd(timeline, targetStep, props.output);
+                    break;
+                }
+                case "REMOVE": {
+                    animateRemove(timeline, targetStep, props.output);
+                    break;
+                }
+                case "RETURN": {
+                    animateReturn(timeline, targetStep);
+                    break;
+                }
             }
-            timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
         })
-
-        timeline.addLabel(labels[1]);
-
-        props.output.intermediateStates.forEach((intermediateState, index) => {
-
-            timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
-            timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
-
-            timeline.addLabel(labels[3 * index + 2]);
-
-            intermediateState.chosenNodes.forEach((node, index) => {
-                if (index === 0) {
-                    timeline.to("#u1" + node.id, {r: 20});
-                    timeline.to("#u2" + node.id, {r: 18}, "<");
-                    timeline.to("#u3" + node.id, {r: 15}, "<");
-                } else {
-                    timeline.to("#u1" + node.id, {r: 20}, "<");
-                    timeline.to("#u2" + node.id, {r: 18}, "<");
-                    timeline.to("#u3" + node.id, {r: 15}, "<");
-                }
-            })
-
-            timeline.addLabel(labels[3 * index + 3]);
-
-            intermediateState.incidentEdges.forEach((incidentEdge, index) => {
-                if (index == 0) {
-                    if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"});
-                        timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                    } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"});
-                    } else {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"});
-                    }
-                } else {
-                    if (incidentEdge.id === intermediateState.chosenEdge.id) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                        timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
-                    } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
-                    } else {
-                        timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
-                    }
-                }
-            });
-
-            timeline.addLabel(labels[3 * index + 4]);
-        });
 
         timelineRef.current = timeline;
         timeline.progress(props.cProps.progress);
@@ -187,4 +158,93 @@ export function RandomOutput(props: SVGOutputProps) {
             />
         </div>
     </div>;
+}
+
+function createRandomVertexCoverOutputSteps(n: number): TimelineStep[] {
+    if (n > 0) {
+        const steps: TimelineStep[] = [
+            {label: "0", backendStepIndex: -1, stepType: "INIT"},
+        ];
+        Array.from({length: n}, (_, i) => i).forEach((i) => {
+            steps.push({label: String(3*i+1), backendStepIndex: i, stepType: "CHOOSE"})
+            steps.push({label: String(3*i+2), backendStepIndex: i, stepType: "ADD"})
+            steps.push({label: String(3*i+3), backendStepIndex: i, stepType: "REMOVE"})
+        })
+        steps.push({label: String(3*n+1), backendStepIndex: -1, stepType: "RETURN"})
+        return steps;
+    } else {
+        return [];
+    }
+}
+
+function animateInit(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
+    void timeline.addLabel(step.label)
+
+    output.initialState.edges.forEach((edge, index) => {
+        if (index == 0) {
+            void timeline.set("#u0" + edge.id, {opacity: 100});
+        } else {
+            void timeline.set("#u0" + edge.id, {opacity: 100}, "<");
+        }
+        void timeline.from("#u0" + edge.id, {drawSVG: "50% 50%"}, "<");
+    })
+}
+
+function animateChoose(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
+    void timeline.addLabel(step.label);
+
+    const intermediateState: AnimationState = output.intermediateStates[step.backendStepIndex]
+
+    void timeline.set("#u1" + intermediateState.chosenEdge.id, {opacity: 100});
+    void timeline.from("#u1" + intermediateState.chosenEdge.id, {drawSVG: "50% 50%"}, "<");
+}
+
+function animateAdd(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
+    void timeline.addLabel(step.label);
+
+    const intermediateState: AnimationState = output.intermediateStates[step.backendStepIndex]
+
+    intermediateState.chosenNodes.forEach((node, index) => {
+        if (index === 0) {
+            void timeline.to("#u1" + node.id, {r: 20});
+            void timeline.to("#u2" + node.id, {r: 18}, "<");
+            void timeline.to("#u3" + node.id, {r: 15}, "<");
+        } else {
+            void timeline.to("#u1" + node.id, {r: 20}, "<");
+            void timeline.to("#u2" + node.id, {r: 18}, "<");
+            void timeline.to("#u3" + node.id, {r: 15}, "<");
+        }
+    })
+}
+
+function animateRemove(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
+    void timeline.addLabel(step.label);
+
+    const intermediateState: AnimationState = output.intermediateStates[step.backendStepIndex]
+
+    intermediateState.incidentEdges.forEach((incidentEdge, index) => {
+        if (index == 0) {
+            if (incidentEdge.id === intermediateState.chosenEdge.id) {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"});
+                void timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
+            } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"});
+            } else {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"});
+            }
+        } else {
+            if (incidentEdge.id === intermediateState.chosenEdge.id) {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
+                void timeline.to("#u1" + incidentEdge.id, {drawSVG: "50% 50%"}, "<");
+            } else if (incidentEdge.fromId === intermediateState.chosenEdge.fromId || incidentEdge.fromId === intermediateState.chosenEdge.toId) {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+            } else {
+                void timeline.to("#u0" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+            }
+        }
+    });
+}
+
+function animateReturn(timeline: gsap.core.Timeline, step: TimelineStep){
+    void timeline.add(step.label);
 }
