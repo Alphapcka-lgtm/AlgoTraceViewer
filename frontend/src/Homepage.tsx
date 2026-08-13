@@ -90,7 +90,7 @@ function HomeContent(props: HomeContentProps) {
             <div className="algorithm-card-grid">
                 <AlgorithmCard
                     title="Closest Pair"
-                    description="Finds the closest pair of points in 2D using a left-to-right sweep-line algorithm."
+                    description="Finds the closest pair of points in 2D using a sweep-line algorithm."
                     onClick={() => props.onTabChange("closestPair")}
                 />
 

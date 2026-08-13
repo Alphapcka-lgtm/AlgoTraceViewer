@@ -10,15 +10,6 @@
     margin-top: 0.7rem;
 }
 
-.closest-pair-loading,
-.closest-pair-error {
-    font-family: monospace;
-}
-
-.closest-pair-error {
-    color: red;
-}
-
 .svg-activeSweepAreaDifference {
     pointer-events: none;
     opacity: 0;
@@ -44,7 +35,7 @@
 
 .svg-sweepLine {
     stroke: rgba(0, 0, 0, 0.9);
-    stroke-width: 2;
+    stroke-width: 2.5;
     opacity: 0;
     pointer-events: none;
     stroke-linecap: round;
@@ -53,7 +44,7 @@
 .svg-closestPairLine {
     stroke: #0000CD;
     stroke-width: 2;
-    stroke-dasharray: 1 3;
+    stroke-dasharray: 2 3;
     stroke-linecap: round;
     pointer-events: none;
     opacity: 0;

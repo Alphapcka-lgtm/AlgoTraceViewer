@@ -1,4 +1,4 @@
-import type {AnimationRequest} from "../../shared/Types.tsx";
+import type {AnimationRequest, CommonOutputProps} from "../../shared/Types.tsx";
 
 export type Point = {
     x: number;
@@ -6,8 +6,6 @@ export type Point = {
     id: string;
     label: string;
 };
-
-export type Node = Point;
 
 export type Interaction =
     | { type: "idle" }
@@ -22,8 +20,6 @@ export type DynamicPointsProps = {
 
 //was Input alles von ClosestPair bekommt
 export type InputProps = {
-    height: number;
-    width: number;
     mode: string;
     inputState: ClosestPairInputState;
     onAddPoint: (point: Point) => void;
@@ -74,18 +70,8 @@ export interface AlgorithmStepDTO {
 
 //was Output von ClosestPair bekommt
 export type OutputProps = {
-    height: number;
-    width: number;
     steps: AlgorithmStepDTO[];
-    loading: boolean;
-    error: string | null;
-    onChangeInput: () => void;
-    currentStep: number;
-    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    progress: number;
-    setProgress: React.Dispatch<React.SetStateAction<number>>;
-    createExportString: () => string;
-    onImport: (encoded: string) => void;
+    cProps: CommonOutputProps;
 };
 
 export type ClosestPairInputState = {

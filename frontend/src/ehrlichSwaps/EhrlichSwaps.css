@@ -1,0 +1,55 @@
+.swap-input-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: var(--ui-gap);
+    width: 100%;
+}
+
+.swap-input-cell {
+    min-width: 92px;
+    max-width: none;
+    min-height: 54px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+    box-shadow: 0 2px 8px rgba(16, 46, 80, 0.08);
+}
+
+.swap-input-cell-empty {
+    border-style: dashed;
+    border-color: var(--muted-text);
+    background: var(--soft-background);
+}
+
+.swap-input-cell input {
+    min-width: 3ch;
+    max-width: 20ch;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--primary);
+    text-align: center;
+    font-family: var(--mono-font);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.swap-input-error {
+    margin: 0;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+/* Closest-Pair palette reused as a restrained semantic accent. */
+#current_k circle {
+    fill: var(--secondary);
+}
+
+#current_k text {
+    fill: var(--secondary);
+    font-weight: 700;
+}

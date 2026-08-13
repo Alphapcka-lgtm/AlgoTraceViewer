@@ -1,16 +1,22 @@
-import type {AnimationResponse, VertexCoverRequest, VertexCoverVariant, NavButtonProps} from "./shared/Types.tsx";
-import {assignLabels, decodeExportState, encodeExportState} from "../shared/Utils.tsx";
+import type {
+    AnimationResponse,
+    VertexCoverRequest,
+    VertexCoverVariant,
+    NavButtonProps
+} from "./shared/Types.tsx";
+import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 import {MaxDegreeOutput} from "./output/MaxDegreeOutput.tsx";
 import {RandomOutput} from "./output/RandomOutput.tsx";
-import type {ExportState} from "../shared/Types.tsx";
+import type {CommonOutputProps, ExportState} from "../shared/Types.tsx";
 import {Input} from "./input/Input.tsx";
 import {useState} from "react";
 import "./VertexCover.css";
+import {getFormattedRequest} from "./shared/Utils.tsx";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
-    const [stepIndex, setStepIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [variant, setVariant] = useState<VertexCoverVariant>("random");
 
     const [input, setInput] = useState<VertexCoverRequest>({
@@ -22,8 +28,6 @@ export function VertexCover() {
 
     const [output, setOutput] = useState<AnimationResponse>({
         initialState: {nodes: [], edges: []},
-        nodeOrder: [],
-        edgeOrder: [],
         intermediateStates: [],
         initialDegreeMap: [],
         timestamp: 0
@@ -38,18 +42,18 @@ export function VertexCover() {
             .then((response) => response.json())
             .then((json) => {
                 const output = json as AnimationResponse;
-                setInput({...input, graph: output.initialState, nodeOrder: output.nodeOrder, edgeOrder: output.edgeOrder, timestamp: output.timestamp});
                 setOutput(output);
+                setInput(input);
             });
     };
 
     const submitInput = (inp: VertexCoverRequest) => {
         if (inp.timestamp > output.timestamp) {
-            const labeledInp = {...inp, graph: {nodes: assignLabels(inp.graph.nodes), edges: inp.graph.edges}};
-            fetchAnimation(labeledInp)
+            const formattedRequest = getFormattedRequest(inp);
+            fetchAnimation(formattedRequest)
                 .then(() => {
                     setProgress(0);
-                    setStepIndex(0);
+                    setCurrentStepIndex(0);
                     setMode("output");
                 });
         } else {
@@ -61,7 +65,7 @@ export function VertexCover() {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm === "vertexCover") {
-                fetchAnimation(imported.input)
+                fetchAnimation({...imported.input, timestamp: Date.now()})
                     .then(() => {
                         setProgress(imported.progress);
                     });
@@ -72,8 +76,8 @@ export function VertexCover() {
     };
 
     const createExportString = () => {
-        const labeledInp = {...input, graph: {nodes: assignLabels(input.graph.nodes), edges: input.graph.edges}};
-        return encodeExportState({algorithm: "vertexCover", input: labeledInp, progress});
+        const formattedRequest = getFormattedRequest(input);
+        return encodeExportState({algorithm: "vertexCover", input: formattedRequest, progress});
     };
 
     const onTabChange = (v: VertexCoverVariant) => {
@@ -85,27 +89,25 @@ export function VertexCover() {
         }
     }
 
+    const cProps: CommonOutputProps = {
+        progress: progress,
+        setProgress: setProgress,
+        currentStepIndex: currentStepIndex,
+        setCurrentStepIndex: setCurrentStepIndex,
+        onChangeInput: () => setMode("input"),
+        createExportString: createExportString,
+        onImport: handleImport
+    }
+
     const svgOutput = variant === "random" ? (
         <RandomOutput
-            setProgress={setProgress}
-            progress={progress}
-            setStepIndex={setStepIndex}
-            stepIndex={stepIndex}
             output={output}
-            onChangeInput={() => setMode("input")}
-            createExportString={createExportString}
-            onImport={handleImport}
+            cProps={cProps}
         />
     ) : variant === "maxDegree" || variant === "staticList" ? (
         <MaxDegreeOutput
-            setProgress={setProgress}
-            progress={progress}
-            setStepIndex={setStepIndex}
-            stepIndex={stepIndex}
             output={output}
-            onChangeInput={() => setMode("input")}
-            createExportString={createExportString}
-            onImport={handleImport}
+            cProps={cProps}
         />
     ) : <></>;
 

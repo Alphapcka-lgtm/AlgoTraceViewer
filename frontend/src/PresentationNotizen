@@ -1,0 +1,132 @@
+const STEP_DURATION = 0.8;
+
+export function Output(props: OutputProps) {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    const step: AlgorithmStepDTO = props.steps[props.currentStep];
+    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        timelineRef.current.timeScale(speed);
+    };
+
+    useGSAP(() => {
+        if (!props.steps.length === 0) return;
+
+        timelineRef.current?.kill();
+
+        // Startzustand der Timeline aus app.
+        // Beim normalen Submit (nichts importered) ist props.progress = 0 und bei import ist es der importierte progress...
+        const initialProgress: number = props.progress;
+
+        const timeline = gsap.timeline({
+            paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut",
+            },
+            onUpdate: () => {
+                const tl = timelineRef.current;
+                props.setProgress(tl.progress());
+                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
+                props.setCurrentStep(stepIndex);
+            },
+            onComplete: () => {
+                props.setProgress(1); //nur nur sicherheit ...
+                setIsPlaying(false);
+            }
+        });
+
+
+        //tweens hinzufügen:
+        props.steps.slice(1).forEach((targetStep, index) => {
+
+        }
+
+            timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
+        });
+
+        timelineRef.current = timeline; //store timeline in ref
+
+        // Setzt die gerade gebaute Timeline auf den richtigen (0 oder den vom import) progress.
+        //in onUpdate wird dann aus progress der richitge currentStep berechnet
+        timeline.progress(initialProgress).pause();
+        setIsPlaying(false);
+
+        return () => {
+            timeline.kill();
+            timelineRef.current = gsap.timeline({paused: true}); //damit eine pausierte leere timeline erzeugt wird... aber eigentlich egal finde es nur schöner so
+        };
+    }, {
+        dependencies: [props.steps]
+    });
+
+    const pseudoCodeStepIndex = Math.min(props.currentStep + 1, props.steps.length - 1);
+    const pseudoCodeStep = props.steps[pseudoCodeStepIndex];
+
+    return (
+        <div className="algorithm-panel">
+            <IOModeTabs mode="output" onChangeInput={props.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
+
+            <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
+
+            </svg>
+
+            <OutputControls
+                timelineRef={timelineRef}
+                labels={myLabels}
+                currentStep={props.currentStep}
+                setCurrentStep={props.setCurrentStep}
+                stepCount={props.steps.length}
+                isPlaying={isPlaying}
+                setIsPlaying={setIsPlaying}
+                progress={props.progress}
+                setProgress={props.setProgress}
+                playbackSpeed={playbackSpeed}
+                onPlaybackSpeedChange={changePlaybackSpeed}
+            />
+
+            <div className="step-layout">
+                <div className="step-layout-side">
+                    <div className="step-info exampleAlg-step-info">
+
+                    <div className="step-info-grid">
+                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
+
+                        <LegendEntry          />
+
+                    </div>
+
+
+                    <div className="step-layout-actions">
+                        <ImportExportDialog
+                            onImport={props.onImport}
+                            createExportString={props.createExportString}
+                        />
+                    </div>
+                </div>
+
+                <PseudoCodePanel
+                    lines={SWEEP_LINE_PSEUDOCODE}
+                    activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
+
+                />
+            </div>
+
+        </div>
+    );
+}
+-	Grobe Struktur des Systems
+o	Frontend: Nimmt User-Input, schickt es an das backend und aus den steps generiert er die Animation.
+o	Schickt Requests im JSON Format.
+	Es wird GSAP genutzt, um eine Timeline zu bauen. Ein Snapshot kann zu einer oder mehreren Animationen führen. Die komplette Animationslogik jedes Algorithmus befindet sich in Output.tsx.
+	Die Timeline ist die Schnittstelle für die gemeinsamen Output Controls.
+o	Backend: Es stellt REST-Entpoints zu Verfügung. Generierung der Steps aus dem input vom user aus dem frontend. Anschließend wird ein Array aus Alg-Snapshots dem frontend zurückgeschickt.
+o	Backend ist in der lage presets zu speichern
+
+
+-	GSAP:
+o	Die Timeline ist das zentrale Element
+

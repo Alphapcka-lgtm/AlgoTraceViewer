@@ -6,9 +6,9 @@ export function AlgorithmOverviewBox(prop:AlgorithmOverviewBoxProps) {
         return (
             <section className="algorithm-overview">
                 <div className="algorithm-overview__content">
-                    <h3>Closest Pair — Sweepline</h3>
+                    <h3>Closest Pair — Sweep Line</h3>
                     <p>
-                        The Sweepline algorithm finds the closest pair of points by moving a vertical sweep line from
+                        The sweep-line algorithm finds the closest pair of points by moving a vertical sweep line from
                         left to right and processing one point at a time, called the current point. δ denotes the shortest
                         Euclidean distance found so far.
                     </p>
@@ -29,7 +29,7 @@ export function AlgorithmOverviewBox(prop:AlgorithmOverviewBoxProps) {
                         inserting or removing a point takes O(log n), and each of the n points is inserted and removed at most once.
                         It can also be shown that at most 10 points can lie within the candidate window for each current point,
                         bounding the number of distance calculations per point by a constant and therefore all distance calculations by O(n).
-                        Since O(n log n) dominates O(n), the algorithm has a worst-case time complexity of O(n log n) and uses O(n) space.
+                        Since O(n log n) dominates O(n), the algorithm has a time complexity of O(n log n) and uses O(n) space.
                     </p>
                 </div>
             </section>

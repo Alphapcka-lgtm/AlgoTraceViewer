@@ -9,10 +9,17 @@ import {
     SkipBack,
 } from "lucide-react";
 import {ControlsHelp} from "./ControlsHelpDialog.tsx";
+import {useState} from "react";
 
 export function OutputControls(props: OutputControlsProps) {
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const isAtStart = props.currentStep === 0;
     const isAtEnd = props.currentStep >= props.labels.length - 1;
+
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        void props.timelineRef.current.timeScale(speed);
+    };
 
     const tweenToStep = (targetStep: number) => {
         const tl = props.timelineRef.current;
@@ -89,15 +96,16 @@ export function OutputControls(props: OutputControlsProps) {
     return (
         <>
             <div className="control-row">
-                <ControlsHelp tab={"output"} algorithm={"closestPair"}/>
+                <ControlsHelp tab={"output"}/>
                 <select
-                    value={props.playbackSpeed}
-                    onChange={(e) => props.onPlaybackSpeedChange(Number(e.currentTarget.value))}
+                    value={playbackSpeed}
+                    onChange={(e) => changePlaybackSpeed(Number(e.currentTarget.value))}
                     className="control-select"
                 >
                     <option value={0.5}>0.5x</option>
                     <option value={1}>1x</option>
                     <option value={2}>2x</option>
+                    <option value={5}>5x</option>
                 </select>
 
                 <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">

@@ -1,7 +1,6 @@
 package com.example.demo.vertexCover;
 
 import com.example.demo.model.Edge;
-import com.example.demo.model.Graph;
 import com.example.demo.model.Node;
 import com.example.demo.model.NodeDegreePair;
 import org.springframework.stereotype.Service;
@@ -22,32 +21,15 @@ public class StaticListVertexCover {
     public AnimationResponse solve(VertexCoverRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
-        List<String> nodeOrder = new ArrayList<>();
-        List<String> edgeOrder = new ArrayList<>();
-        Graph graph = Graph.getShortenedIdGraph(request.getGraph());
 
-        if (Objects.isNull(request.getNodeOrder()) || request.getNodeOrder().isEmpty()) {
-            nodeOrder.addAll(graph.getNodes().stream().map(Node::id).toList());
-            Collections.shuffle(nodeOrder);
-        } else {
-            nodeOrder.addAll(request.getNodeOrder());
-        }
-
-        if (Objects.isNull(request.getEdgeOrder()) || request.getEdgeOrder().isEmpty()) {
-            edgeOrder.addAll(graph.getEdges().stream().map(Edge::id).toList());
-            Collections.shuffle(edgeOrder);
-        } else {
-            edgeOrder.addAll(request.getEdgeOrder());
-        }
-
-        OrderComparator comparator = new OrderComparator(nodeOrder);
-        List<Edge> remainingEdges = new ArrayList<>(graph.getEdges());
+        OrderComparator comparator = new OrderComparator(request.getNodeOrder());
+        List<Edge> remainingEdges = new ArrayList<>(request.getGraph().getEdges());
 
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
-        graph.getEdges().forEach(edge -> {
-            neighbourCount.put(graph.getNodeById(edge.fromId()), neighbourCount.getOrDefault(graph.getNodeById(edge.fromId()), 0) + 1);
-            neighbourCount.put(graph.getNodeById(edge.toId()), neighbourCount.getOrDefault(graph.getNodeById(edge.toId()), 0) + 1);
+        request.getGraph().getEdges().forEach(edge -> {
+            neighbourCount.put(request.getGraph().getNodeById(edge.fromId()), neighbourCount.getOrDefault(request.getGraph().getNodeById(edge.fromId()), 0) + 1);
+            neighbourCount.put(request.getGraph().getNodeById(edge.toId()), neighbourCount.getOrDefault(request.getGraph().getNodeById(edge.toId()), 0) + 1);
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
@@ -64,7 +46,7 @@ public class StaticListVertexCover {
             Node maxDegreeNode = maxDegreeNodes.stream().min(comparator::compare).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())).toList();
-            neighbourCount.put(graph.getNodeById(maxDegreeNode.id()), 0);
+            neighbourCount.put(request.getGraph().getNodeById(maxDegreeNode.id()), 0);
 
             remainingEdges.removeAll(incidentEdges);
 
@@ -81,9 +63,7 @@ public class StaticListVertexCover {
             );
         }
         return AnimationResponse.builder()
-                .initialState(graph)
-                .nodeOrder(nodeOrder)
-                .edgeOrder(edgeOrder)
+                .initialState(request.getGraph())
                 .initialDegreeMap(initialDegreePairs)
                 .intermediateStates(intermediateStates)
                 .timestamp(System.currentTimeMillis())

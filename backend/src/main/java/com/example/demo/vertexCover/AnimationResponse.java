@@ -11,8 +11,6 @@ import java.util.List;
 @Builder
 public class AnimationResponse {
     public final Graph initialState;
-    public final List<String> nodeOrder;
-    public final List<String> edgeOrder;
     public final List<NodeDegreePair> initialDegreeMap;
     public final List<AnimationState> intermediateStates;
     public final Long timestamp;

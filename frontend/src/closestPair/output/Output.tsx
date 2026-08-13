@@ -1,29 +1,30 @@
+import type {AlgorithmStepDTO, Point, OutputProps, PointVisualRefs} from "../shared/Types.tsx";
+import {getCurrentTimelineStepIndex, createStepLabels, SVG_WIDTH, SVG_HEIGHT} from "../../shared/Utils.tsx";
+import {getActivePseudoCodeLineIds, SWEEP_LINE_PSEUDOCODE} from "./PseudoCode.ts";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {isSamePair} from "../shared/Utils.ts";
+import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
+import {OutputControls} from "../../shared/OutputControls.tsx";
 import {useCallback, useMemo, useRef, useState} from "react";
+import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {XPointWithCords} from "../shared/Points.tsx";
+import {Legend} from "./Legend.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import type {
-    AlgorithmStepDTO, Point, OutputProps, RectAttrs, LineAttrs, PointVisualRefs, PointVisualState
-} from "../shared/Types.tsx";
-import {OutputControls} from "../../shared/OutputControls.tsx";
-import {XPointWithCords} from "../shared/Points.tsx";
-import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {
-    getStepIndexFromTimeline,
-    createStepLabels,
-    SWEEP_LINE_PSEUDOCODE,
-    getActivePseudoCodeLineIds, isSamePair
-} from "../../shared/Utils.tsx";
-import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {LegendEntry, XPointIcon} from "../../LegendeEntry.tsx";
+    getActiveAreaAttrs,
+    getCandidateRectAttrs,
+    getPointColor,
+    getPointVisualState,
+    getSweepLineAttrs
+} from "./OutputUtils.ts";
 
 const STEP_DURATION = 0.8;
 const CANDIDATE_FADE_IN_DURATION = 0.45;
 const CANDIDATE_FADE_OUT_DURATION = 0.25;
 const CANDIDATE_AUTOPLAY_HOLD_DURATION = 0.8;
 const ACTIVE_WINDOW_SHRINK_DURATION = 0.7;
-
-const PADDING = 1;
+export const PADDING = 1;
 
 export function Output(props: OutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -31,58 +32,13 @@ export function Output(props: OutputProps) {
     const activeSweepAreaRef = useRef<SVGRectElement>(null);
     const sweepLineRef = useRef<SVGLineElement>(null);
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
-    const step: AlgorithmStepDTO | undefined = props.steps[props.currentStep];
+    const step: AlgorithmStepDTO = props.steps[props.cProps.currentStepIndex];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
     const pointRefsMap = useRef(new Map<string, PointVisualRefs>());
     const closestPairLineRef = useRef<SVGLineElement>(null);
-
-    const changePlaybackSpeed = (speed: number) => {
-        setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
-    };
-
-    const getActiveAreaAttrs = (step: AlgorithmStepDTO ): RectAttrs => {
-        const currentX = step.currentPoint?.x ?? 0;
-        const delta = step.windowDelta;
-        return {x: currentX - delta, y: PADDING, width: delta, height: props.height - 2 * PADDING};
-    };
-
-    const getSweepLineAttrs = (step: AlgorithmStepDTO): LineAttrs=> {
-        const currentX = step.currentPoint?.x ?? 0;
-        return {x1: currentX, x2: currentX, y1: PADDING, y2: props.height - PADDING};
-    };
-
-    const getCandidateRectAttrs = (step: AlgorithmStepDTO) => {
-        const currentX = step.currentPoint?.x ?? 0;
-        const currentY = step.currentPoint?.y ?? 0; // const currentY = step.currentPoint?.y ?? props.height / 2;
-
-        return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
-    };
-
-    const hasCurrentDisplayed = (step: AlgorithmStepDTO): boolean =>
-        step.currentPoint !== null && step.stepType !== "START" && step.stepType !== "INITIALIZATION" && step.stepType !== "FINISHED";
-
-    const getPointVisualState = (step: AlgorithmStepDTO, pointId: string): PointVisualState => {
-        const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === pointId;
-        const isCandidate = step.stepType === "CHECK_CANDIDATES" &&
-            step.candidateComparisons.some(({candidate}) => candidate.id === pointId);
-        const isActive = step.activePoints.some(point => point.id === pointId);
-        const isBest = step.bestPair?.p0.id === pointId ||step.bestPair?.p1.id === pointId;
-        const isProcessed = step.processedPoints.some(point => point.id === pointId);
-        const isFuture = step.futurePoints.some(point => point.id === pointId);
-        return {isCurrent, isCandidate, isActive, isBest, isProcessed, isFuture};
-    };
-
-    const getPointColor = (state: PointVisualState): string => {
-        if (state.isBest) return "#0000CD";//"#0000CD"; //"#f5c45e";00008B
-        if (state.isProcessed) return "#cccccc";
-        if (state.isFuture) return "#808080";
-        return "#222222";//"#555";
-    };
 
     const registerPointRefsInMap = useCallback((pointId: string, refs: PointVisualRefs | null) => {
             if (refs) {
@@ -103,6 +59,25 @@ export function Output(props: OutputProps) {
             if (refs) res.push(refs);
         });
         return res;
+    };
+
+    const initializeVisualState = (firstStep: AlgorithmStepDTO) => {
+        //init state setzen
+        //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
+        gsap.set(activeSweepAreaRef.current, {opacity: 0});
+        gsap.set(activeSweepAreaDifferenceRef.current, {opacity: 0});
+        gsap.set(sweepLineRef.current, {opacity: 0});
+        gsap.set(candidateSweepWindowRef.current, {opacity: 0});
+
+        firstStep.allPoints.forEach(point => {
+            const refs = getPointRefs(point.id);
+            if (!refs) return;
+            const state = getPointVisualState(firstStep, point.id);
+            gsap.set(refs.pointVisual, {color: getPointColor(state)});
+            gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
+            gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
+            gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
+        });
     };
 
     const addBreak = (timeline: gsap.core.Timeline, duration = 0.15) => {
@@ -281,7 +256,6 @@ export function Output(props: OutputProps) {
     useGSAP(() => {
         if (!activeSweepAreaRef.current || !activeSweepAreaDifferenceRef.current || !sweepLineRef.current || !candidateSweepWindowRef.current || props.steps.length === 0) return;
         const activeArea = activeSweepAreaRef.current;
-        const activeAreaDifference = activeSweepAreaDifferenceRef.current;
         const sweepLine = sweepLineRef.current;
         const candidateRect = candidateSweepWindowRef.current;
 
@@ -289,7 +263,7 @@ export function Output(props: OutputProps) {
 
         // Startzustand der Timeline aus app.
         // Beim normalen Submit (nichts importered) ist props.progress = 0 und bei import ist es der importierte progress...
-        const initialProgress: number = props.progress;
+        const initialProgress: number = props.cProps.progress;
 
         const timeline = gsap.timeline({
             paused: true,
@@ -301,38 +275,20 @@ export function Output(props: OutputProps) {
                 const tl = timelineRef.current;
                 const now = performance.now();
                 if (now - lastProgressUpdateRef.current > 100) { // setProgress throttlen, sonst kann man playback speed nicht mehr während auotplay ändern
-                    props.setProgress(tl.progress());
+                    props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
-                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
-                props.setCurrentStep(stepIndex);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, myLabels);
+                props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
-                props.setProgress(1); //nur nur sicherheit ... eigentlich sollte tl.progress() in onUpdate am ende schon 1 liefern
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
+                timelineRef.current.pause();
             }
         });
 
-        const setPointVisualsToStep = (step: AlgorithmStepDTO) => {
-            step.allPoints.forEach(point => {
-                const refs = getPointRefs(point.id);
-                if (!refs) return;
-                const state = getPointVisualState(step, point.id);
-                gsap.set(refs.pointVisual, {color: getPointColor(state)});
-                gsap.set(refs.currentMarker, {opacity: state.isCurrent ? 1 : 0});
-                gsap.set(refs.activeRing, {opacity: state.isActive ? 1 : 0});
-                gsap.set(refs.candidateRing, {opacity: state.isCandidate ? 1 : 0});
-            });
-        };
-
-        //init state setzen
-        //"Neutraler" visueller Startzustand ... erste "echte" Algdarstellung ist bei Transition START -> INITIALIZATION.
-        const firstStep = props.steps[0];
-        gsap.set(activeArea, {opacity: 0});
-        gsap.set(activeAreaDifference, {opacity: 0});
-        gsap.set(sweepLine, {opacity: 0});
-        gsap.set(candidateRect, {opacity: 0});
-        setPointVisualsToStep(firstStep);
+        initializeVisualState(props.steps[0]);
         //startzustand label setzen
         timeline.addLabel(myLabels[0]);
 
@@ -387,7 +343,6 @@ export function Output(props: OutputProps) {
                     break;
                 }
             }
-
             timeline.addLabel(myLabels[stepIndex]); //Hier ist "Zielzustand" des Snapshots  erreicht.
         });
 
@@ -396,7 +351,7 @@ export function Output(props: OutputProps) {
         // Setzt die gerade gebaute Timeline auf den richtigen (0 oder den vom import) progress.
         //in onUpdate wird dann aus progress der richitge currentStep berechnet
         timeline.progress(initialProgress).pause();
-        timeline.timeScale(playbackSpeed); //hat keine auswirkung auf progress ... timeScale verändert nur wie schnell Timeline abgespielt wird
+        //timeline.timeScale(playbackSpeed); //hat keine auswirkung auf progress ... timeScale verändert nur wie schnell Timeline abgespielt wird
         setIsPlaying(false);
 
         return () => {
@@ -407,34 +362,20 @@ export function Output(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    if (props.loading) return <p className="closest-pair-loading">Loading...</p>;
-    if (props.error) return <p className="closest-pair-error">Error: {props.error}</p>;
-    if (!step) return <></>;
-
-    const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
-        : step.activePoints.map((p) => p.label).join(", ");
-
-    const candidateDistances = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
-        ? "No comparisons" : step.candidateComparisons.map(({candidate, distance}) =>
-                `d(${step.currentPoint!.label}, ${candidate.label}) = ${distance.toFixed(2)}`).join(", ");
-
-    const candidateLabels = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
-        ? "None" : step.candidateComparisons.map(({candidate}) => candidate.label) .join(", ");
-
     /*
     steps[i] bzw. bei Label i = "stabiler Zustand", der bereits erreicht wurde
         Bei Label i wird der Pseudocode von steps[i+1].stepType gehighlighted (was passiert wenn man auf next klickt)
     Transition i->i+1 = steps[i+1].stepType wird ausgeführt/passiert visuell
         Während der Transition i->i+1 wird weiterhin der Pseudocode von steps[i+1].stepType gehighlighted (was also gerade passiert)
      */
-    const pseudoCodeStepIndex = Math.min(props.currentStep + 1, props.steps.length - 1);
+    const pseudoCodeStepIndex = Math.min(props.cProps.currentStepIndex + 1, props.steps.length - 1);
     const pseudoCodeStep = props.steps[pseudoCodeStepIndex];
 
     return (
         <div className="algorithm-panel">
-            <IOModeTabs mode="output" onChangeInput={props.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
+            <IOModeTabs mode="output" onChangeInput={props.cProps.onChangeInput} onSubmit={() => {}} canSubmit={false}/>
 
-            <svg className="algorithm-canvas" viewBox={`0 0 ${props.width} ${props.height}`} preserveAspectRatio="xMidYMid meet">
+            <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
                 <defs>
                     <pattern id="active-window-shrink-schraffur"
                         width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -445,14 +386,14 @@ export function Output(props: OutputProps) {
                     ref={activeSweepAreaDifferenceRef}
                     className="svg-activeSweepAreaDifference"
                     x={0} y={PADDING}
-                    width={0} height={props.height - 2 * PADDING}
+                    width={0} height={SVG_HEIGHT - 2 * PADDING}
                     fill="url(#active-window-shrink-schraffur)"
                 />
                 <rect
                     ref={activeSweepAreaRef}
                     className="svg-activeSweepArea"
                     x={0} y={PADDING}
-                    width={0} height={props.height - 2 * PADDING}
+                    width={0} height={SVG_HEIGHT - 2 * PADDING}
                 />
                 <rect
                     ref={candidateSweepWindowRef}
@@ -463,90 +404,52 @@ export function Output(props: OutputProps) {
                     ref={sweepLineRef}
                     className="svg-sweepLine"
                     x1={0} x2={0}
-                    y1={PADDING} y2={props.height - PADDING}
+                    y1={PADDING} y2={SVG_HEIGHT - PADDING}
                 />
+                {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
+                    <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
+                ))}
                 <line
                     ref={closestPairLineRef}
                     className="svg-closestPairLine"
                     x1={0} y1={0} x2={0} y2={0}
                 />
-                {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
-                    <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
-                ))}
             </svg>
 
             <OutputControls
                 timelineRef={timelineRef}
                 labels={myLabels}
-                currentStep={props.currentStep}
-                setCurrentStep={props.setCurrentStep}
-                stepCount={props.steps.length}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={props.progress}
-                setProgress={props.setProgress}
-                playbackSpeed={playbackSpeed}
-                onPlaybackSpeedChange={changePlaybackSpeed}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
             />
 
             <div className="step-layout">
-                <div className="step-info">
+                <div className="step-layout-side">
 
-                    <div className="step-info-grid">
-                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.currentStep} / ${props.steps.length - 1}`}</strong>
+                    <Legend
+                        step={step}
+                        currentStepIndex={props.cProps.currentStepIndex}
+                        totalSteps={props.steps.length-1}
+                    />
 
-                        <div>
-                            <strong>Closest distance δ:</strong>{" "}
-                            {step.bestPair?.distance.toFixed(2) ?? "—"}
-                        </div>
-
-                        <LegendEntry
-                            label="Current Point: "
-                            value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "—"}
-                            icon={<XPointIcon color="#222222" variant="current"/>}
+                    <div className="step-layout-actions">
+                        <ImportExportDialog
+                            onImport={props.cProps.onImport}
+                            createExportString={props.cProps.createExportString}
                         />
-                        <div>
-                            <LegendEntry
-                                label="Closest pair: "
-                                value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                                icon={<XPointIcon color="#0000CD" ringStyle="none"/>}
-                            />
-                        </div>
-                        <div>
-                            <LegendEntry
-                                label="Active Set: "
-                                value={activePointsLegendValue}
-                                icon={<XPointIcon color="#222222" ringStyle="active"/>}
-                            />
-                        </div>
-
-                        <div>
-                            <LegendEntry
-                                label="Candidates: "
-                                value={candidateLabels}
-                                icon={<XPointIcon color="#222222" ringStyle="candidate"/>}
-                            />
-                        </div>
                     </div>
-                    <div className="closest-pair-candidate-distances">
-                        <strong>Distances to current:</strong>{" "}
-                        {candidateDistances}
-                    </div>
-
-                    <div className="closest-pair-step-description"> {step.description} </div>
                 </div>
 
                 <PseudoCodePanel
                     lines={SWEEP_LINE_PSEUDOCODE}
                     activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
-                    title={"Closest Pair Pseudocode"}
                 />
             </div>
 
-            <ImportExportDialog
-                onImport={props.onImport}
-                createExportString={props.createExportString}
-            />
         </div>
     );
 }

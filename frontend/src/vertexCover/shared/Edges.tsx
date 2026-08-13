@@ -1,49 +1,85 @@
-import type {Node} from "../../closestPair/shared/Types.tsx"
-import type {Edge, EdgesProps, PreviewEdgeProps} from "./Types.tsx";
+import type {Edge, Node, EdgesProps, PreviewEdgeProps} from "./Types.tsx";
+
+const COLORS = {
+    red: "#be3d2a",
+    orange: "#f4a582",
+    white: "#f7f7f7",
+    lightblue: "#92c5de",
+    blue: "#0000CD",
+} as const;
+
+const EDGE_CLASS = "vertex-cover-hidden-edge";
 
 export function Edges(props: EdgesProps) {
-    return props.edges.map((e: Edge, index) => {
-        const from = getNodeById(props.nodes, e.fromId);
-        const to = getNodeById(props.nodes, e.toId);
+    return (
+        <>
+            {props.edges.map((e: Edge) => {
+                const from = getNodeById(props.nodes, e.fromId);
+                const to = getNodeById(props.nodes, e.toId);
 
-        const p = "M " + (from.x) + " " + (from.y) + " L " + (to.x) + " " + (to.y);
-        const colors = {red: "#ca0020", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0571b0"}
+                const lineProps = {
+                    x1: from.x,
+                    y1: from.y,
+                    x2: to.x,
+                    y2: to.y,
+                };
 
-        return (
-            <g key={"a" + e.id + index}>
-                <path
-                    id={"u0" + e.id}
-                    key={"u0" + e.id + index}
-                    d={p}
-                    className="vertex-cover-hidden-edge"
-                    stroke={colors.blue}
-                    strokeWidth={6}
-                />
-                <path
-                    id={"u1" + e.id}
-                    key={"u1" + e.id + index}
-                    d={p}
-                    className="vertex-cover-hidden-edge"
-                    stroke={colors.red}
-                    strokeWidth={7}
-                />
-                <path
-                    id={e.id}
-                    key={e.id + index}
-                    d={p}
-                    stroke="black"
-                    strokeWidth={2}
-                />
-            </g>
-        );
-    });
+                return (
+                    <g key={e.id}>
+                        <line
+                            {...lineProps}
+                            id={"u0" + e.id}
+                            className={EDGE_CLASS}
+                            stroke={COLORS.blue}
+                            strokeWidth={5}
+                        />
+
+                        <line
+                            {...lineProps}
+                            id={e.id}
+                            stroke="black"
+                            strokeWidth={2}
+                        />
+                    </g>
+                );
+            })}
+
+            {props.edges.map((e: Edge) => {
+                const from = getNodeById(props.nodes, e.fromId);
+                const to = getNodeById(props.nodes, e.toId);
+
+                const lineProps = {
+                    x1: from.x,
+                    y1: from.y,
+                    x2: to.x,
+                    y2: to.y,
+                };
+
+                return (
+                    <g key={e.id}>
+                        <line
+                            {...lineProps}
+                            id={"u1" + e.id}
+                            className={EDGE_CLASS}
+                            stroke={COLORS.red}
+                            strokeWidth={7}
+                        />
+                    </g>
+                );
+            })}
+        </>
+    );
 }
 
 export function PreviewEdge(props: PreviewEdgeProps) {
-    if (props.interaction.type === "drawing-edge" && props.interaction.to) {
-        const node = getNodeById(props.nodes, props.interaction.fromId);
-        return <line
-            key={-1}
+    if (props.interaction.type !== "drawing-edge" || !props.interaction.to) {
+        return null;
+    }
+
+    const node = getNodeById(props.nodes, props.interaction.fromId);
+
+    return (
+        <line
             x1={node.x}
             y1={node.y}
             x2={props.interaction.to.x}
@@ -51,8 +87,8 @@ export function PreviewEdge(props: PreviewEdgeProps) {
             stroke="black"
             strokeWidth={1}
             strokeDasharray="4"
-        />;
-    }
+        />
+    );
 }
 
 function getNodeById(nodes: Node[], id: string): Node {
