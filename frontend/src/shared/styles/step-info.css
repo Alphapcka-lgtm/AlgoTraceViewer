@@ -9,25 +9,6 @@
     box-shadow: var(--shadow);
 }
 
-.algorithm-overview__definition {
-    background-color: #f2f2f2;
-    padding: 1rem 1.25rem;
-    border-radius: 6px;
-}
-
-.algorithm-overview__definition p:first-child {
-    margin-top: 0;
-}
-
-.algorithm-overview__definition p:last-child {
-    margin-bottom: 0;
-}
-
-.algorithm-overview__source {
-    font-size: 0.9em;
-    font-style: italic;
-}
-
 .step-info {
     font-family: var(--mono-font);
     font-size: 17px;
