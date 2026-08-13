@@ -1,7 +1,7 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import React, {useMemo, useRef, useState} from "react";
 import {OutputControls} from "../../shared/OutputControls.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex} from "../../shared/Utils.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -160,7 +160,7 @@ export function Output(props: SVGOutputProps) {
                     props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
-                props.cProps.setCurrentStepIndex(getStepIndexFromTimeline(tl, labels));
+                props.cProps.setCurrentStepIndex(getCurrentTimelineStepIndex(tl, labels));
             },
             onComplete: () => {
                 props.cProps.setProgress(1);

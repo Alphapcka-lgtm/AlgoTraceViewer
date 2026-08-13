@@ -11,7 +11,7 @@
 
 .step-info {
     font-family: var(--mono-font);
-    font-size: 15px;
+    font-size: 17px;
 }
 
 .step-info-grid {
@@ -58,10 +58,30 @@
     flex: 1;
 }
 
-.closest-pair-step-info .step-info-grid {
-    grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
-    gap: var(--space-md) 28px;
+
+/* Closest Pair */
+
+.closest-pair-step-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
 }
+
+.closest-pair-step-info .step-info-grid {
+    grid-template-columns: 42% 58%;
+    column-gap: clamp(36px, 5vw, 64px);
+    row-gap: var(--space-md);
+}
+
+.closest-pair-candidate-distances {
+    line-height: 1;
+}
+
+.closest-pair-step-description {
+    min-height: 5lh;
+    line-height: 1.2;
+}
+
 
 @media (max-width: 850px) {
     .step-layout {
@@ -71,6 +91,10 @@
 
 @media (max-width: 700px) {
     .step-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .closest-pair-step-info .step-info-grid {
         grid-template-columns: 1fr;
     }
 }

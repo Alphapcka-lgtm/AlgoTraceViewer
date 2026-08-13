@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import type {Preset, PresetSelectProps} from "./Types.tsx";
-
+import {Plus} from "lucide-react";
 export function PresetSelect(props: PresetSelectProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [presetName, setPresetName] = useState("");
@@ -84,7 +84,7 @@ export function PresetSelect(props: PresetSelectProps) {
                     className="control-button preset-add-button"
                     title="New preset"
                 >
-                    +
+                    <Plus/>
                 </button>
             </div>
 
@@ -94,7 +94,7 @@ export function PresetSelect(props: PresetSelectProps) {
                         className="simple-dialog-card"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <h3 className="simple-dialog-title">New Preset</h3>
+                        <h3 className="simple-dialog-title">Add a new preset</h3>
 
                         <input
                             type="text"

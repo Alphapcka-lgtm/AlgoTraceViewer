@@ -545,6 +545,530 @@
       },
       "algorithm" : "vertexCover",
       "name" : "preset-1"
+    },
+    "aaa" : {
+      "request" : {
+        "graph" : {
+          "nodes" : [ {
+            "x" : 1061.0,
+            "y" : 247.0,
+            "id" : "A",
+            "label" : "A"
+          }, {
+            "x" : 1047.0,
+            "y" : 299.0,
+            "id" : "B",
+            "label" : "B"
+          }, {
+            "x" : 1007.0,
+            "y" : 348.0,
+            "id" : "C",
+            "label" : "C"
+          }, {
+            "x" : 943.0,
+            "y" : 392.0,
+            "id" : "D",
+            "label" : "D"
+          }, {
+            "x" : 857.0,
+            "y" : 427.0,
+            "id" : "E",
+            "label" : "E"
+          }, {
+            "x" : 756.0,
+            "y" : 454.0,
+            "id" : "F",
+            "label" : "F"
+          }, {
+            "x" : 643.0,
+            "y" : 469.0,
+            "id" : "G",
+            "label" : "G"
+          }, {
+            "x" : 526.0,
+            "y" : 472.0,
+            "id" : "H",
+            "label" : "H"
+          }, {
+            "x" : 410.0,
+            "y" : 463.0,
+            "id" : "I",
+            "label" : "I"
+          }, {
+            "x" : 303.0,
+            "y" : 442.0,
+            "id" : "J",
+            "label" : "J"
+          }, {
+            "x" : 209.0,
+            "y" : 411.0,
+            "id" : "K",
+            "label" : "K"
+          }, {
+            "x" : 133.0,
+            "y" : 371.0,
+            "id" : "L",
+            "label" : "L"
+          }, {
+            "x" : 81.0,
+            "y" : 324.0,
+            "id" : "M",
+            "label" : "M"
+          }, {
+            "x" : 53.0,
+            "y" : 273.0,
+            "id" : "N",
+            "label" : "N"
+          }, {
+            "x" : 53.0,
+            "y" : 221.0,
+            "id" : "O",
+            "label" : "O"
+          }, {
+            "x" : 81.0,
+            "y" : 170.0,
+            "id" : "P",
+            "label" : "P"
+          }, {
+            "x" : 133.0,
+            "y" : 123.0,
+            "id" : "Q",
+            "label" : "Q"
+          }, {
+            "x" : 209.0,
+            "y" : 83.0,
+            "id" : "R",
+            "label" : "R"
+          }, {
+            "x" : 303.0,
+            "y" : 52.0,
+            "id" : "S",
+            "label" : "S"
+          }, {
+            "x" : 410.0,
+            "y" : 31.0,
+            "id" : "T",
+            "label" : "T"
+          }, {
+            "x" : 526.0,
+            "y" : 22.0,
+            "id" : "U",
+            "label" : "U"
+          }, {
+            "x" : 643.0,
+            "y" : 25.0,
+            "id" : "V",
+            "label" : "V"
+          }, {
+            "x" : 756.0,
+            "y" : 40.0,
+            "id" : "W",
+            "label" : "W"
+          }, {
+            "x" : 857.0,
+            "y" : 67.0,
+            "id" : "X",
+            "label" : "X"
+          }, {
+            "x" : 943.0,
+            "y" : 102.0,
+            "id" : "Y",
+            "label" : "Y"
+          }, {
+            "x" : 1007.0,
+            "y" : 146.0,
+            "id" : "Z",
+            "label" : "Z"
+          }, {
+            "x" : 1047.0,
+            "y" : 195.0,
+            "id" : "AA",
+            "label" : "AA"
+          } ],
+          "edges" : [ {
+            "fromId" : "A",
+            "toId" : "B",
+            "id" : "A-B"
+          }, {
+            "fromId" : "A",
+            "toId" : "L",
+            "id" : "A-L"
+          }, {
+            "fromId" : "A",
+            "toId" : "P",
+            "id" : "A-P"
+          }, {
+            "fromId" : "A",
+            "toId" : "S",
+            "id" : "A-S"
+          }, {
+            "fromId" : "A",
+            "toId" : "W",
+            "id" : "A-W"
+          }, {
+            "fromId" : "A",
+            "toId" : "Y",
+            "id" : "A-Y"
+          }, {
+            "fromId" : "B",
+            "toId" : "G",
+            "id" : "B-G"
+          }, {
+            "fromId" : "B",
+            "toId" : "I",
+            "id" : "B-I"
+          }, {
+            "fromId" : "B",
+            "toId" : "J",
+            "id" : "B-J"
+          }, {
+            "fromId" : "B",
+            "toId" : "Q",
+            "id" : "B-Q"
+          }, {
+            "fromId" : "B",
+            "toId" : "V",
+            "id" : "B-V"
+          }, {
+            "fromId" : "B",
+            "toId" : "W",
+            "id" : "B-W"
+          }, {
+            "fromId" : "B",
+            "toId" : "Y",
+            "id" : "B-Y"
+          }, {
+            "fromId" : "B",
+            "toId" : "Z",
+            "id" : "B-Z"
+          }, {
+            "fromId" : "C",
+            "toId" : "E",
+            "id" : "C-E"
+          }, {
+            "fromId" : "C",
+            "toId" : "I",
+            "id" : "C-I"
+          }, {
+            "fromId" : "C",
+            "toId" : "K",
+            "id" : "C-K"
+          }, {
+            "fromId" : "C",
+            "toId" : "T",
+            "id" : "C-T"
+          }, {
+            "fromId" : "D",
+            "toId" : "E",
+            "id" : "D-E"
+          }, {
+            "fromId" : "D",
+            "toId" : "F",
+            "id" : "D-F"
+          }, {
+            "fromId" : "D",
+            "toId" : "G",
+            "id" : "D-G"
+          }, {
+            "fromId" : "D",
+            "toId" : "Q",
+            "id" : "D-Q"
+          }, {
+            "fromId" : "D",
+            "toId" : "S",
+            "id" : "D-S"
+          }, {
+            "fromId" : "D",
+            "toId" : "X",
+            "id" : "D-X"
+          }, {
+            "fromId" : "D",
+            "toId" : "Z",
+            "id" : "D-Z"
+          }, {
+            "fromId" : "E",
+            "toId" : "S",
+            "id" : "E-S"
+          }, {
+            "fromId" : "E",
+            "toId" : "X",
+            "id" : "E-X"
+          }, {
+            "fromId" : "F",
+            "toId" : "G",
+            "id" : "F-G"
+          }, {
+            "fromId" : "F",
+            "toId" : "T",
+            "id" : "F-T"
+          }, {
+            "fromId" : "F",
+            "toId" : "X",
+            "id" : "F-X"
+          }, {
+            "fromId" : "F",
+            "toId" : "Y",
+            "id" : "F-Y"
+          }, {
+            "fromId" : "F",
+            "toId" : "Z",
+            "id" : "F-Z"
+          }, {
+            "fromId" : "G",
+            "toId" : "I",
+            "id" : "G-I"
+          }, {
+            "fromId" : "G",
+            "toId" : "L",
+            "id" : "G-L"
+          }, {
+            "fromId" : "G",
+            "toId" : "Q",
+            "id" : "G-Q"
+          }, {
+            "fromId" : "G",
+            "toId" : "S",
+            "id" : "G-S"
+          }, {
+            "fromId" : "G",
+            "toId" : "U",
+            "id" : "G-U"
+          }, {
+            "fromId" : "G",
+            "toId" : "Z",
+            "id" : "G-Z"
+          }, {
+            "fromId" : "H",
+            "toId" : "J",
+            "id" : "H-J"
+          }, {
+            "fromId" : "H",
+            "toId" : "K",
+            "id" : "H-K"
+          }, {
+            "fromId" : "H",
+            "toId" : "M",
+            "id" : "H-M"
+          }, {
+            "fromId" : "H",
+            "toId" : "R",
+            "id" : "H-R"
+          }, {
+            "fromId" : "H",
+            "toId" : "S",
+            "id" : "H-S"
+          }, {
+            "fromId" : "H",
+            "toId" : "T",
+            "id" : "H-T"
+          }, {
+            "fromId" : "H",
+            "toId" : "U",
+            "id" : "H-U"
+          }, {
+            "fromId" : "H",
+            "toId" : "W",
+            "id" : "H-W"
+          }, {
+            "fromId" : "H",
+            "toId" : "X",
+            "id" : "H-X"
+          }, {
+            "fromId" : "H",
+            "toId" : "Y",
+            "id" : "H-Y"
+          }, {
+            "fromId" : "I",
+            "toId" : "M",
+            "id" : "I-M"
+          }, {
+            "fromId" : "I",
+            "toId" : "O",
+            "id" : "I-O"
+          }, {
+            "fromId" : "J",
+            "toId" : "K",
+            "id" : "J-K"
+          }, {
+            "fromId" : "J",
+            "toId" : "N",
+            "id" : "J-N"
+          }, {
+            "fromId" : "J",
+            "toId" : "O",
+            "id" : "J-O"
+          }, {
+            "fromId" : "J",
+            "toId" : "S",
+            "id" : "J-S"
+          }, {
+            "fromId" : "J",
+            "toId" : "T",
+            "id" : "J-T"
+          }, {
+            "fromId" : "J",
+            "toId" : "U",
+            "id" : "J-U"
+          }, {
+            "fromId" : "K",
+            "toId" : "M",
+            "id" : "K-M"
+          }, {
+            "fromId" : "K",
+            "toId" : "U",
+            "id" : "K-U"
+          }, {
+            "fromId" : "K",
+            "toId" : "V",
+            "id" : "K-V"
+          }, {
+            "fromId" : "K",
+            "toId" : "W",
+            "id" : "K-W"
+          }, {
+            "fromId" : "L",
+            "toId" : "X",
+            "id" : "L-X"
+          }, {
+            "fromId" : "L",
+            "toId" : "Y",
+            "id" : "L-Y"
+          }, {
+            "fromId" : "L",
+            "toId" : "Z",
+            "id" : "L-Z"
+          }, {
+            "fromId" : "L",
+            "toId" : "AA",
+            "id" : "L-AA"
+          }, {
+            "fromId" : "M",
+            "toId" : "N",
+            "id" : "M-N"
+          }, {
+            "fromId" : "M",
+            "toId" : "O",
+            "id" : "M-O"
+          }, {
+            "fromId" : "M",
+            "toId" : "Q",
+            "id" : "M-Q"
+          }, {
+            "fromId" : "M",
+            "toId" : "S",
+            "id" : "M-S"
+          }, {
+            "fromId" : "M",
+            "toId" : "W",
+            "id" : "M-W"
+          }, {
+            "fromId" : "M",
+            "toId" : "Y",
+            "id" : "M-Y"
+          }, {
+            "fromId" : "M",
+            "toId" : "Z",
+            "id" : "M-Z"
+          }, {
+            "fromId" : "N",
+            "toId" : "V",
+            "id" : "N-V"
+          }, {
+            "fromId" : "N",
+            "toId" : "W",
+            "id" : "N-W"
+          }, {
+            "fromId" : "N",
+            "toId" : "X",
+            "id" : "N-X"
+          }, {
+            "fromId" : "N",
+            "toId" : "Y",
+            "id" : "N-Y"
+          }, {
+            "fromId" : "O",
+            "toId" : "P",
+            "id" : "O-P"
+          }, {
+            "fromId" : "O",
+            "toId" : "T",
+            "id" : "O-T"
+          }, {
+            "fromId" : "O",
+            "toId" : "W",
+            "id" : "O-W"
+          }, {
+            "fromId" : "P",
+            "toId" : "S",
+            "id" : "P-S"
+          }, {
+            "fromId" : "P",
+            "toId" : "V",
+            "id" : "P-V"
+          }, {
+            "fromId" : "P",
+            "toId" : "Y",
+            "id" : "P-Y"
+          }, {
+            "fromId" : "Q",
+            "toId" : "R",
+            "id" : "Q-R"
+          }, {
+            "fromId" : "Q",
+            "toId" : "S",
+            "id" : "Q-S"
+          }, {
+            "fromId" : "Q",
+            "toId" : "T",
+            "id" : "Q-T"
+          }, {
+            "fromId" : "R",
+            "toId" : "V",
+            "id" : "R-V"
+          }, {
+            "fromId" : "S",
+            "toId" : "V",
+            "id" : "S-V"
+          }, {
+            "fromId" : "T",
+            "toId" : "U",
+            "id" : "T-U"
+          }, {
+            "fromId" : "T",
+            "toId" : "X",
+            "id" : "T-X"
+          }, {
+            "fromId" : "T",
+            "toId" : "Y",
+            "id" : "T-Y"
+          }, {
+            "fromId" : "T",
+            "toId" : "AA",
+            "id" : "T-AA"
+          }, {
+            "fromId" : "U",
+            "toId" : "X",
+            "id" : "U-X"
+          }, {
+            "fromId" : "U",
+            "toId" : "Y",
+            "id" : "U-Y"
+          }, {
+            "fromId" : "W",
+            "toId" : "Z",
+            "id" : "W-Z"
+          }, {
+            "fromId" : "X",
+            "toId" : "Z",
+            "id" : "X-Z"
+          } ]
+        },
+        "nodeOrder" : [ "A", "C", "W", "Q", "Z", "U", "Y", "H", "P", "I", "J", "X", "N", "T", "D", "L", "AA", "R", "V", "B", "O", "S", "E", "M", "F", "K", "G" ],
+        "edgeOrder" : [ "H-T", "X-Z", "E-X", "M-O", "H-U", "J-T", "F-Z", "T-U", "D-S", "N-X", "G-I", "U-Y", "D-F", "K-U", "O-W", "H-S", "B-J", "B-Y", "P-V", "T-Y", "D-E", "A-Y", "G-S", "W-Z", "H-M", "J-N", "D-X", "H-R", "N-W", "H-Y", "I-O", "H-K", "J-S", "M-Z", "B-V", "P-S", "D-G", "Q-S", "F-T", "H-W", "A-W", "M-Y", "J-K", "B-Q", "M-Q", "Q-T", "U-X", "B-G", "D-Q", "K-V", "M-W", "H-X", "M-S", "K-W", "A-L", "F-Y", "F-G", "L-Y", "N-Y", "A-B", "B-W", "Q-R", "G-Z", "G-L", "B-Z", "C-E", "A-P", "N-V", "R-V", "T-X", "J-U", "A-S", "C-I", "S-V", "O-T", "M-N", "I-M", "C-K", "P-Y", "H-J", "G-U", "O-P", "D-Z", "B-I", "L-AA", "J-O", "E-S", "K-M", "F-X", "T-AA", "G-Q", "L-X", "C-T", "L-Z" ],
+        "timestamp" : 1786559054125
+      },
+      "algorithm" : "vertexCover",
+      "name" : "aaa"
     }
   },
   "closestPair" : {

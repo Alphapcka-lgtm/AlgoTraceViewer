@@ -8,14 +8,14 @@ import {OutputControls} from "../../shared/OutputControls.tsx";
 import {XPointWithCords} from "../shared/Points.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {
-    getStepIndexFromTimeline,
-    createStepLabels,
-    SWEEP_LINE_PSEUDOCODE,
-    getActivePseudoCodeLineIds, isSamePair, SVG_WIDTH, SVG_HEIGHT
+    getCurrentTimelineStepIndex,
+    createStepLabels, SVG_WIDTH, SVG_HEIGHT
 } from "../../shared/Utils.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {LegendEntry, XPointIcon} from "../../LegendeEntry.tsx";
+import {getActivePseudoCodeLineIds, SWEEP_LINE_PSEUDOCODE} from "./PseudoCode.ts";
+import {Legend} from "./Legend.tsx";
+import {hasCurrentDisplayed, isSamePair} from "../shared/Utils.ts";
 
 const STEP_DURATION = 0.8;
 const CANDIDATE_FADE_IN_DURATION = 0.45;
@@ -62,9 +62,6 @@ export function Output(props: OutputProps) {
 
         return {x: currentX - step.windowDelta, y: currentY - step.windowDelta, width: step.windowDelta, height: step.windowDelta * 2};
     };
-
-    const hasCurrentDisplayed = (step: AlgorithmStepDTO): boolean =>
-        step.currentPoint !== null && step.stepType !== "START" && step.stepType !== "INITIALIZATION" && step.stepType !== "FINISHED";
 
     const getPointVisualState = (step: AlgorithmStepDTO, pointId: string): PointVisualState => {
         const isCurrent = hasCurrentDisplayed(step) && step.currentPoint?.id === pointId;
@@ -304,7 +301,7 @@ export function Output(props: OutputProps) {
                     props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
-                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
+                const stepIndex: number = getCurrentTimelineStepIndex(tl, myLabels);
                 props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
@@ -408,16 +405,6 @@ export function Output(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    const activePointsLegendValue:string = step.currentPoint === null ? "—" : step.activePoints.length === 0 ? "No active points"
-        : step.activePoints.map((p) => p.label).join(", ");
-
-    const candidateDistances = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
-        ? "No comparisons" : step.candidateComparisons.map(({candidate, distance}) =>
-                `d(${step.currentPoint!.label}, ${candidate.label}) = ${distance.toFixed(2)}`).join(", ");
-
-    const candidateLabels = step.stepType !== "CHECK_CANDIDATES" ? "—" : step.candidateComparisons.length === 0
-        ? "None" : step.candidateComparisons.map(({candidate}) => candidate.label) .join(", ");
-
     /*
     steps[i] bzw. bei Label i = "stabiler Zustand", der bereits erreicht wurde
         Bei Label i wird der Pseudocode von steps[i+1].stepType gehighlighted (was passiert wenn man auf next klickt)
@@ -462,14 +449,14 @@ export function Output(props: OutputProps) {
                     x1={0} x2={0}
                     y1={PADDING} y2={SVG_HEIGHT - PADDING}
                 />
+                {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
+                    <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
+                ))}
                 <line
                     ref={closestPairLineRef}
                     className="svg-closestPairLine"
                     x1={0} y1={0} x2={0} y2={0}
                 />
-                {props.steps[0].allPoints.map((point: Point) => ( //step.allPoints.map()
-                    <XPointWithCords key={point.id} point={point} registerPointRefsInMap={registerPointRefsInMap} />
-                ))}
             </svg>
 
             <OutputControls
@@ -487,51 +474,12 @@ export function Output(props: OutputProps) {
 
             <div className="step-layout">
                 <div className="step-layout-side">
-                    <div className="step-info closest-pair-step-info">
 
-                    <div className="step-info-grid">
-                        <strong>Step: {step.stepType === "START" ? "Start" : `${props.cProps.currentStepIndex} / ${props.steps.length - 1}`}</strong>
-
-                        <div>
-                            <strong>Closest distance δ:</strong>{" "}
-                            {step.bestPair?.distance.toFixed(2) ?? "—"}
-                        </div>
-
-                        <LegendEntry
-                            label="Current Point: "
-                            value={hasCurrentDisplayed(step) ? step.currentPoint!.label : "—"}
-                            icon={<XPointIcon color="#222222" variant="current"/>}
-                        />
-                        <div>
-                            <LegendEntry
-                                label="Closest pair: "
-                                value={step.bestPair ? `${step.bestPair.p0.label} ↔ ${step.bestPair.p1.label}` : "—"}
-                                icon={<XPointIcon color="#0000CD" ringStyle="none"/>}
-                            />
-                        </div>
-                        <div>
-                            <LegendEntry
-                                label="Active Set: "
-                                value={activePointsLegendValue}
-                                icon={<XPointIcon color="#222222" ringStyle="active"/>}
-                            />
-                        </div>
-
-                        <div>
-                            <LegendEntry
-                                label="Candidates: "
-                                value={candidateLabels}
-                                icon={<XPointIcon color="#222222" ringStyle="candidate"/>}
-                            />
-                        </div>
-                    </div>
-                    <div className="closest-pair-candidate-distances">
-                        <strong>Distances to current:</strong>{" "}
-                        {candidateDistances}
-                    </div>
-
-                    <div className="closest-pair-step-description"> {step.description} </div>
-                    </div>
+                    <Legend
+                        step={step}
+                        currentStepIndex={props.cProps.currentStepIndex}
+                        totalSteps={props.steps.length-1}
+                    />
 
                     <div className="step-layout-actions">
                         <ImportExportDialog
