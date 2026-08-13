@@ -1,10 +1,4 @@
-import {
-    getActiveLineIdsRandom,
-    createStepLabels,
-    getStepIndexFromTimeline,
-    PSEUDOCODE_RANDOM,
-    SVG_HEIGHT, SVG_WIDTH
-} from "../../shared/Utils.tsx";
+import {getActiveLineIdsRandom, createStepLabels, getStepIndexFromTimeline, PSEUDOCODE_RANDOM, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -24,10 +18,14 @@ export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const labels = createStepLabels(3 * props.output.intermediateStates.length + 2);
 
-    const timelineSteps = useMemo(
-        ()=> createRandomVertexCoverOutputSteps(props.output.intermediateStates.length),
+    const {timelineSteps, myLabels} = useMemo(
+        ()=> {
+            return {
+                timelineSteps: createRandomVertexCoverOutputSteps(props.output.intermediateStates.length),
+                myLabels: createStepLabels(3 * props.output.intermediateStates.length + 2)
+            }
+        },
         [props.output.intermediateStates.length]
     );
 
@@ -50,14 +48,14 @@ export function RandomOutput(props: SVGOutputProps) {
                 const tl = timelineRef.current;
                 props.cProps.setProgress(tl.progress()); //für scrubber
 
-                const stepIndex: number = getStepIndexFromTimeline(tl, labels);
+                const stepIndex: number = getStepIndexFromTimeline(tl, myLabels);
 
                 props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
                 props.cProps.setProgress(1);
                 setIsPlaying(false);
-                timelineRef.current.pause();
+                void timelineRef.current.pause();
             },
         });
 
@@ -87,11 +85,11 @@ export function RandomOutput(props: SVGOutputProps) {
         })
 
         timelineRef.current = timeline;
-        timeline.progress(props.cProps.progress);
+        void timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
-            timeline.kill();
+            void timeline.kill();
             timelineRef.current = gsap.timeline({paused: true});
         };
     }, {dependencies: [props.output.timestamp]});
@@ -110,7 +108,7 @@ export function RandomOutput(props: SVGOutputProps) {
         </svg>
         <OutputControls
             timelineRef={timelineRef}
-            labels={labels}
+            labels={myLabels}
             currentStep={props.cProps.currentStepIndex}
             setCurrentStep={props.cProps.setCurrentStepIndex}
             isPlaying={isPlaying}
@@ -124,7 +122,7 @@ export function RandomOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <div className="step-info">
                     <div className="step-info-grid vertex-cover-step-summary">
-                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
+                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
                         <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}</div>
                     </div>
                     <div className="step-info-grid vertex-cover-legend-grid">
@@ -154,7 +152,7 @@ export function RandomOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={getActiveLineIdsRandom(props.cProps.currentStepIndex, labels.length - 1)}
+                activeLineIds={getActiveLineIdsRandom(props.cProps.currentStepIndex, myLabels.length - 1)}
             />
         </div>
     </div>;
