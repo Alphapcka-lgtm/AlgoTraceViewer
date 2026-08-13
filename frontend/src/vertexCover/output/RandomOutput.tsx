@@ -11,7 +11,7 @@ import {
 } from "../shared/Animations.tsx";
 import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
+import type {StepType, SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
@@ -99,6 +99,8 @@ export function RandomOutput(props: SVGOutputProps) {
         };
     }, {dependencies: [props.output.timestamp]});
 
+    const stepType: StepType = timelineSteps[props.cProps.currentStepIndex].stepType
+
     return <div className="algorithm-panel">
         <IOModeTabs
             mode="output"
@@ -157,7 +159,7 @@ export function RandomOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={[timelineSteps[props.cProps.currentStepIndex].stepType]}
+                activeLineIds={stepType === "INIT_CE" ? ["INIT_C", "INIT_E"] : [stepType]}
             />
         </div>
     </div>;

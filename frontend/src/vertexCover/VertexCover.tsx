@@ -12,6 +12,7 @@ import {Input} from "./input/Input.tsx";
 import {useState} from "react";
 import "./VertexCover.css";
 import {getFormattedRequest} from "./shared/Utils.tsx";
+import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
@@ -119,15 +120,18 @@ export function VertexCover() {
                 <NavButton variant="staticList" label="Static List" activeVariant={variant} onTabChange={onTabChange}/>
             </nav>
             <div className="algorithm-shell">
-                {mode == "input" ?
-                    <Input
-                        setInput={setInput}
-                        input={input}
-                        onSubmit={submitInput}
-                        createExportString={createExportString}
-                        onImport={handleImport}
-                    /> : svgOutput
-                }
+                {mode == "input" ? (
+                    <>
+                        <AlgorithmOverviewBox algoTyp={"vertexCover"}/>
+                        <Input
+                            setInput={setInput}
+                            input={input}
+                            onSubmit={submitInput}
+                            createExportString={createExportString}
+                            onImport={handleImport}
+                        />
+                    </>
+                ) : svgOutput}
             </div>
         </>
     )

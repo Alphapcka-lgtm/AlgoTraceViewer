@@ -3,13 +3,13 @@ import type {PseudoCodeLine} from "../../shared/Types.tsx";
 export const PSEUDOCODE_MAX_DEGREE: PseudoCodeLine[] = [
 
     {
-        id: "INIT_CE",
+        id: "INIT_C",
         text: "C = ∅",
         indent: 0
     },
 
     {
-        id: "INIT_CE",
+        id: "INIT_E",
         text: "E' = G.E",
         indent: 0
     },
@@ -54,13 +54,13 @@ export const PSEUDOCODE_MAX_DEGREE: PseudoCodeLine[] = [
 export const PSEUDOCODE_RANDOM: PseudoCodeLine[] = [
 
     {
-        id: "INIT_CE",
+        id: "INIT_C",
         text: "C = ∅",
         indent: 0
     },
 
     {
-        id: "INIT_CE",
+        id: "INIT_E",
         text: "E' = G.E",
         indent: 0
     },

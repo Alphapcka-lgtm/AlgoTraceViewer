@@ -1,8 +1,8 @@
 export type AlgorithmOverviewBoxProps = {
     algoTyp: "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
 };
-export function AlgorithmOverviewBox(prop:AlgorithmOverviewBoxProps) {
-    if(prop.algoTyp === "closestPair") {
+export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
+    if(props.algoTyp === "closestPair") {
         return (
             <section className="algorithm-overview">
                 <div className="algorithm-overview__content">
@@ -30,6 +30,64 @@ export function AlgorithmOverviewBox(prop:AlgorithmOverviewBoxProps) {
                         It can also be shown that at most 10 points can lie within the candidate window for each current point,
                         bounding the number of distance calculations per point by a constant and therefore all distance calculations by O(n).
                         Since O(n log n) dominates O(n), the algorithm has a time complexity of O(n log n) and uses O(n) space.
+                    </p>
+                </div>
+            </section>
+        );
+    } else if (props.algoTyp === "vertexCover") {
+
+        return (
+            <section className="algorithm-overview">
+                <div className="algorithm-overview__content">
+                    <h3>Vertex Cover</h3><p>
+                    In <em>Introduction to Algorithms</em>, a vertex cover and the associated problem are defined as follows.
+                </p>
+                    <div className="algorithm-overview__definition">
+                        <p>
+                            A <strong>vertex cover</strong> of an undirected graph G = (V, E) is a subset V′ ⊆ V
+                            such that if (u, v) is an edge of G, then either u ∈ V′ or v ∈ V′ (or both).
+                            The size of a vertex cover is the number of vertices in it.
+                        </p>
+                        <p>
+                            The <strong>vertex-cover problem</strong> is to find a vertex cover of minimum size
+                            in a given undirected graph. We call such a vertex cover an <strong>optimal vertex cover</strong>.
+                            This problem is the optimization version of an NP-complete decision problem.
+                        </p>
+                        <p>
+                            Even though we don't know how to find an optimal vertex cover in a graph G in polynomial
+                            time, we can efficiently find a vertex cover that is near-optimal.
+                        </p>
+                        <p className="algorithm-overview__source">
+                            Source: Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2009).
+                            <em> Introduction to Algorithms</em> (3rd ed.), p. 1108. MIT Press.
+                        </p>
+                    </div>
+                    <p>
+                        The book then presents the random heuristic, which produces a vertex cover at most twice the size
+                        of an optimal vertex cover. On this page, this heuristic can be explored along with two additional approaches.
+                    </p><h3>Random Heuristic</h3>
+                    <p>
+                        The random heuristic chooses a random edge from the set of remaining edges and adds both
+                        of its nodes to the vertex cover. All edges incident to either of the added nodes are then
+                        removed from the set of remaining edges. These steps are repeated until no edges remain.
+                    </p>
+
+                    <h3>Max Degree Heuristic</h3>
+                    <p>
+                        The max degree heuristic maintains an updated map of nodes and their degrees with respect
+                        to the set of remaining edges. In each iteration, the node with the highest degree is added
+                        to the vertex cover. All edges incident to the added node are then removed from the set of
+                        remaining edges, and the map is updated accordingly. These steps are repeated until no
+                        edges remain.
+                    </p>
+
+                    <h3>Static List Heuristic</h3>
+                    <p>
+                        The static list heuristic also determines the degree of each node. These degrees are used
+                        to create a static list in which the nodes are sorted by degree in descending order.
+                        The nodes are processed one after another in this fixed order. When a node is added to the
+                        vertex cover, all of its incident edges are removed from the set of remaining edges.
+                        The algorithm terminates when no edges remain.
                     </p>
                 </div>
             </section>
