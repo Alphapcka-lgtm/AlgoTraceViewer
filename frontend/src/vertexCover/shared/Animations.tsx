@@ -15,7 +15,7 @@ export function animateInit(timeline: gsap.core.Timeline, step: TimelineStep, ou
 }
 
 export function animateInitN(timeline: gsap.core.Timeline, step: TimelineStep, output: AnimationResponse){
-    timeline.addLabel(step.label);
+    void timeline.addLabel(step.label);
 
     output.initialDegreeMap.forEach((ndp, index) => {
 
