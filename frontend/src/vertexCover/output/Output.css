@@ -1,11 +1,20 @@
 .vertex-cover-step-summary,
 .vertex-cover-legend-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.vertex-cover-step-summary,
+.vertex-cover-step-summary {
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.vertex-cover-legend-grid {
+    padding: var(--space-sm) 0;
+}
+
 .vertex-cover-legend-grid--spaced {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-sm);
 }
 
 .vertex-cover-degree-table {
@@ -24,6 +33,14 @@
 .vertex-cover-degree-cell {
     min-width: 27px;
     border: solid 1px;
+    border-radius: var(--radius-sm);
     text-align: center;
     text-shadow: 1px 1px 0px rgba(255, 255, 255, 1);
+}
+
+@media (max-width: 700px) {
+    .vertex-cover-step-summary,
+    .vertex-cover-legend-grid {
+        grid-template-columns: 1fr;
+    }
 }

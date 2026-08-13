@@ -1,18 +1,6 @@
 import {useEffect, useState} from "react";
-import type {AnimationRequest} from "./Types.tsx";
-
-export type Preset = {
-    request: AnimationRequest;
-    algorithm: string;
-    name: string;
-};
-
-type PresetSelectProps = {
-    algorithm: string;
-    setInput: (input: AnimationRequest) => void,
-    input: AnimationRequest;
-};
-
+import type {Preset, PresetSelectProps} from "./Types.tsx";
+import {Plus} from "lucide-react";
 export function PresetSelect(props: PresetSelectProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [presetName, setPresetName] = useState("");
@@ -46,14 +34,14 @@ export function PresetSelect(props: PresetSelectProps) {
             const preset = presets.find(preset => preset.name === selected);
             if (!preset) return;
             setPresetName(preset.name);
-            props.setInput(preset.request);
+            props.setInput({...preset.request, timestamp: Date.now()});
         }
     };
 
     const savePreset = async () => {
         const name = presetName.trim();
         if (!name) return;
-        const preset = {name, algorithm: props.algorithm, request: props.input};
+        const preset = {name, algorithm: props.algorithm, request: props.getInput()};
         const response = await fetch(
             `http://localhost:8080/api/presets/${props.algorithm}`,
             {
@@ -96,7 +84,7 @@ export function PresetSelect(props: PresetSelectProps) {
                     className="control-button preset-add-button"
                     title="New preset"
                 >
-                    +
+                    <Plus/>
                 </button>
             </div>
 
@@ -106,7 +94,7 @@ export function PresetSelect(props: PresetSelectProps) {
                         className="simple-dialog-card"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <h3 className="simple-dialog-title">New Preset</h3>
+                        <h3 className="simple-dialog-title">Add a new preset</h3>
 
                         <input
                             type="text"

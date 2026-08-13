@@ -1,32 +1,28 @@
 .pseudocode-panel {
-    width: 100%;
-    border: 2px solid var(--primary);
-    border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    background: var(--card-background);
-    box-shadow: var(--shadow);
     font-family: var(--mono-font);
     font-size: 14px;
     overflow-x: auto;
 }
 
-.pseudocode-title {
-    margin-bottom: 8px;
-    font-weight: 700;
-    color: var(--primary);
-}
-
 .pseudocode-line {
-    padding: 3px 6px;
-    border-radius: 6px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
     white-space: nowrap;
 }
 
+.pseudocode-line + .pseudocode-line {
+    margin-top: 2px;
+}
+
 .pseudocode-line--indent-1 {
-    padding-left: 30px;
+    padding-left: 29px;
 }
 
 .pseudocode-line.is-active {
     background: var(--accent);
+    color: var(--primary);
     font-weight: 700;
 }

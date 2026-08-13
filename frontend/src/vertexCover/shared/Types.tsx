@@ -1,11 +1,14 @@
-import type {Node} from "../../closestPair/shared/Types.tsx"
 import type {Dispatch, SetStateAction} from "react";
+import type {Point} from "../../closestPair/shared/Types.tsx";
+import type {CommonOutputProps} from "../../shared/Types.tsx";
 
 export type Edge = {
     fromId: string,
     toId: string,
     id: string,
 };
+
+export type Node = Point;
 
 export type Graph = {
     nodes: Node[],
@@ -27,8 +30,6 @@ export type EdgesProps = {
 
 export type AnimationResponse = {
     initialState: Graph,
-    nodeOrder: string[],
-    edgeOrder: string[],
     initialDegreeMap: NodeDegreePair[]
     intermediateStates: AnimationState[],
     timestamp: number,
@@ -55,13 +56,7 @@ export type VertexCoverRequest = {
 
 export type SVGOutputProps = {
     output: AnimationResponse,
-    progress: number,
-    setProgress: Dispatch<SetStateAction<number>>,
-    stepIndex: number,
-    setStepIndex: Dispatch<SetStateAction<number>>,
-    onChangeInput: () => void;
-    createExportString: () => string;
-    onImport: (encoded: string) => void;
+    cProps: CommonOutputProps
 };
 
 export type VertexCoverVariant = "random" | "maxDegree" | "staticList";

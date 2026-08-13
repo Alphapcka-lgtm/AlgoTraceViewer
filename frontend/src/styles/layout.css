@@ -12,11 +12,19 @@
 .algorithm-shell {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--section-gap);
     width: 100%;
 }
 
+.algorithm-shell.is-loading,
+.algorithm-shell.is-loading * {
+    cursor: wait;
+}
+
 .algorithm-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
     width: 100%;
 }
 
@@ -24,8 +32,8 @@
     width: 100%;
     height: auto;
     border: 2px solid var(--primary);
-    border-radius: 15px;
-    background: white;
+    border-radius: var(--radius-lg);
+    background: var(--card-background);
     box-shadow: var(--shadow);
 }
 

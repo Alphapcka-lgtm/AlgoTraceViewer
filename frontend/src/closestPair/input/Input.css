@@ -1,10 +1,20 @@
 .closest-pair-point-count-control {
+    flex: 1 1 220px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-family: monospace;
+    gap: var(--ui-gap);
+    min-height: var(--control-height);
+    padding: 0 var(--space-sm);
+    color: var(--primary);
+    font-family: var(--mono-font);
+    font-weight: 700;
 }
 
 .closest-pair-point-count-label {
-    width: 70px;
+    flex: 0 0 auto;
+    min-width: 86px;
+}
+
+.closest-pair-point-count-control .timeline-slider {
+    min-width: 140px;
 }

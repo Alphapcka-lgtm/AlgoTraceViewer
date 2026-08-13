@@ -1,29 +1,12 @@
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import type {EhrlichSwapStepDTO} from "../Api.ts";
 import React, {useMemo, useRef, useState} from "react";
 import {OutputControls} from "../../shared/OutputControls.tsx";
-import {createStepLabels, getStepIndexFromTimeline} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex} from "../../shared/Utils.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {getActiveLineIdsEhrlich, PSEUDOCODE_EHRLICH_SWAPS} from "./PseudoCode.tsx";
-
-// Kein MotionPathPlugin mehr – wir bauen den Bogen selbst über zwei parallele
-// Tweens (x und y), das ist einfacher und hat keine Koordinaten-Fallstricke.
-
-// ─── Typen ────────────────────────────────────────────────────────────────────
-
-type SwapOutputProps = {
-    values: string[];
-    steps: EhrlichSwapStepDTO[];
-    onChangeInput: () => void;
-    currentStep: number;
-    setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-    progress: number;
-    setProgress: React.Dispatch<React.SetStateAction<number>>;
-}
-
-// ─── Layout-Konstanten ────────────────────────────────────────────────────────
+import type {EhrlichSwapStepDTO, SVGOutputProps} from "../shared/Types.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -52,7 +35,6 @@ const K_GRAPH_HEIGHT = 220;
 const ARC_LIFT_BASE = 100;
 const ARC_LIFT_PER_SLOT = 25;
 
-// ─── Hilfsfunktionen ─────────────────────────────────────────────────────────
 
 /**
  * Gibt den X-Wert des linken Rands einer Box an einem bestimmten Slot zurück.
@@ -62,29 +44,11 @@ function slotX(slot: number): number {
     return ARRAY_START_X + slot * (BOX_WIDTH + GAP);
 }
 
-/**
- * Animiert den Tausch zweier Boxen in Array a mit einem Bogen.
- * Den Bogen bauen wir so:
- *   - x: linearer Tween mit `+=delta` (direkt von links nach rechts / rechts nach links)
- *   - y: separater Tween, der nach oben geht und wieder zurück kommt
- *        → gsap.to mit yoyo:true & repeat:1, halbe Duration pro Hälfte
- *
- * Box die nach oben geht (goUp=true):  y += -lift → zurück
- * Box die nach unten geht (goUp=false): y += +lift → zurück
- * Dadurch kreuzen sich die Wege der beiden tauschenden Boxen nicht.
- *
- * @param el        Das SVGGElement der Box
- * @param deltaX    Wie weit die Box horizontal bewegt werden soll (positiv oder negativ)
- * @param lift      Wie weit der Bogen ausschlagen soll (immer positiv)
- * @param goUp      Ob der Bogen nach oben (true) oder nach unten (false) geht
- * @param timeline  Die GSAP-Timeline, in die die Tweens eingefügt werden
- * @param newPosition  GSAP-Zeitposition in der Timeline (z.B. Label-String)
- */
 function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boolean, timeline: gsap.core.Timeline, newPosition: boolean): void {
     const yDirection = goUp ? -1 : 1;
 
     // x-Tween: bewegt die Box horizontal zum Ziel-Slot
-    if(newPosition) {
+    if (newPosition) {
         timeline.to(el, {x: `+=${deltaX}`, duration: STEP_DURATION, ease: "power2.inOut"});
     } else {
         timeline.to(el, {x: `+=${deltaX}`, duration: STEP_DURATION, ease: "power2.inOut"}, "<");
@@ -92,28 +56,31 @@ function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boo
 
     // y-Tween: erzeugt den Bogen – geht zur Mitte hoch/runter, dann zurück
     // repeat:1 + yoyo:true bedeutet: hin und zurück, also insgesamt STEP_DURATION
-    timeline.to(el, {y: `+=${yDirection * lift}`, duration: STEP_DURATION / 2, ease: "power1.in", repeat: 1, yoyo: true}, "<");
+    timeline.to(el, {
+        y: `+=${yDirection * lift}`,
+        duration: STEP_DURATION / 2,
+        ease: "power1.in",
+        repeat: 1,
+        yoyo: true
+    }, "<");
 }
 
-// ─── Komponente ───────────────────────────────────────────────────────────────
-
-export function SwapOutput(props: SwapOutputProps) {
+export function Output(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline({paused: true}));
     const lastProgressUpdateRef = useRef(0);
-
     const labels = useMemo(() => createStepLabels(3 * (props.steps.length - 1) + 2), [props.steps.length]);
+    const maxK = props.values.length
+    const kLabelDistance = Array.from({length: maxK - 1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
 
-    const maxK =  props.values.length
-
-    const kLabelDistance = Array.from({length: maxK-1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
+    const changePlaybackSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        timelineRef.current.timeScale(speed);
+    };
 
     const kGraph = useMemo(() => {
-
-        const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.currentStep - 1) / 3)));
-
+        const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3)));
         const coordinates = props.steps
             .slice(0, kGraphStepIndex + 1)
             .map((step, index) => {
@@ -129,17 +96,9 @@ export function SwapOutput(props: SwapOutputProps) {
 
                 const normalizedK = step.k / (maxK + 1);
 
-                const y =
-                    K_GRAPH_Y +
-                    K_GRAPH_HEIGHT -
-                    normalizedK * K_GRAPH_HEIGHT;
+                const y = K_GRAPH_Y + K_GRAPH_HEIGHT - normalizedK * K_GRAPH_HEIGHT;
 
-                return {
-                    x,
-                    y,
-                    k: step.k,
-                    i: index
-                };
+                return {x, y, k: step.k, i: index};
             });
 
         return {
@@ -148,48 +107,31 @@ export function SwapOutput(props: SwapOutputProps) {
                 .map(point => `${point.x},${point.y}`)
                 .join(" ")
         };
-    }, [props.steps, props.currentStep, maxK]);
+    }, [props.steps, props.cProps.currentStepIndex, maxK]);
 
-    const stepIndex = Math.max(0, Math.floor((props.currentStep-1)/3));
+    const stepIndex = Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3));
 
     const step: EhrlichSwapStepDTO = props.steps[stepIndex];
 
     // Initiale Werte aus Schritt 0. React rendert die Boxen genau einmal damit.
-    // Danach ist GSAP alleiniger Eigentümer der Box-Positionen im DOM.
+    // Danach ist GSAP alleine für die Box-Positionen im DOM zuständig.
     const initialA = props.steps[0]?.valuesBefore ?? [];
     const initialB = props.steps[0]?.bBefore ?? [];
     const count = Math.min(initialA.length, MAX_ELEMENTS);
 
-    // ── Refs ──────────────────────────────────────────────────────────────────
-    //
     // aRefs.current[i] → DOM-Element der Box, die ursprünglich an Index i stand.
     // Die Box behält diese ID für immer, egal wie oft sie verschoben wird.
-
     const aRefs = useRef<(SVGGElement | null)[]>([]);
     const bRefs = useRef<(SVGGElement | null)[]>([]);
 
-    // ── Slot-Tracking ─────────────────────────────────────────────────────────
-    //
     // aCurrentSlot.current[i] = aktueller Slot von Box i
-    //
     // Beispiel nach einem Swap von Slot 0 und Slot 2:
     //   vorher: [0, 1, 2, 3]   (Box i steht auf Slot i)
     //   nachher: [2, 1, 0, 3]  (Box 0 steht jetzt auf Slot 2, Box 2 auf Slot 0)
-    //
     // Mit indexOf(slot) findet man die Box, die aktuell auf einem bestimmten Slot steht.
     // Das wird beim Timeline-Aufbau gebraucht, um zu wissen welche Box wohin animiert wird.
-
     const aCurrentSlot = useRef<number[]>([]);
     const bCurrentSlot = useRef<number[]>([]);
-
-    // ── Playback-Geschwindigkeit ──────────────────────────────────────────────
-
-    const changePlaybackSpeed = (speed: number) => {
-        setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
-    };
-
-    // ── Timeline-Aufbau ───────────────────────────────────────────────────────
 
     useGSAP(() => {
         if (props.steps.length === 0) return;
@@ -215,24 +157,25 @@ export function SwapOutput(props: SwapOutputProps) {
                 const tl = timelineRef.current;
                 const now = performance.now();
                 if (now - lastProgressUpdateRef.current > 100) {
-                    props.setProgress(tl.progress());
+                    props.cProps.setProgress(tl.progress());
                     lastProgressUpdateRef.current = now;
                 }
-                props.setCurrentStep(getStepIndexFromTimeline(tl, labels));
+                props.cProps.setCurrentStepIndex(getCurrentTimelineStepIndex(tl, labels));
             },
             onComplete: () => {
-                props.setProgress(1);
+                props.cProps.setProgress(1);
                 setIsPlaying(false);
+                timelineRef.current.pause();
             },
         });
 
         timeline.addLabel(labels[0])
 
         Array.from({length: props.values.length}, (_, index) => {
-            if(index === 0){
+            if (index === 0) {
                 timeline.from("#swapTable" + index, {opacity: 0});
             } else {
-                timeline.from("#swapTable" + index, {opacity: 0} , "<");
+                timeline.from("#swapTable" + index, {opacity: 0}, "<");
             }
         });
 
@@ -252,40 +195,40 @@ export function SwapOutput(props: SwapOutputProps) {
             // Welche Box steht aktuell auf Slot 0? Welche auf Slot swapIndex?
             // "aktuell" = nach allen bisherigen Animationsschritten.
 
-            const aBoxAtSlot0     = aCurrentSlot.current.indexOf(0);
-            const aBoxAtSwapSlot  = aCurrentSlot.current.indexOf(s.swapIndex);
+            const aBoxAtSlot0 = aCurrentSlot.current.indexOf(0);
+            const aBoxAtSwapSlot = aCurrentSlot.current.indexOf(s.swapIndex);
 
             // Aktuelle Slots (nur zur Lesbarkeit – indexOf gibt uns diese bereits)
-            const aSlotOf0        = aCurrentSlot.current[aBoxAtSlot0];    // immer 0
-            const aSlotOfSwap     = aCurrentSlot.current[aBoxAtSwapSlot]; // immer s.swapIndex
+            const aSlotOf0 = aCurrentSlot.current[aBoxAtSlot0];    // immer 0
+            const aSlotOfSwap = aCurrentSlot.current[aBoxAtSwapSlot]; // immer s.swapIndex
 
             // Wie weit muss sich jede Box horizontal bewegen?
             // slotX(ziel) - slotX(start) = pixel-Abstand zwischen den beiden Slots.
             // Da jede Box ihre X-Position als akkumulierten Transform speichert,
             // ist "+= delta" die korrekte GSAP-Schreibweise.
-            const aDeltaFor0     = slotX(aSlotOfSwap) - slotX(aSlotOf0);   // > 0 (nach rechts)
-            const aDeltaForSwap  = slotX(aSlotOf0)    - slotX(aSlotOfSwap); // < 0 (nach links)
+            const aDeltaFor0 = slotX(aSlotOfSwap) - slotX(aSlotOf0);   // > 0 (nach rechts)
+            const aDeltaForSwap = slotX(aSlotOf0) - slotX(aSlotOfSwap); // < 0 (nach links)
 
             // Bogenhöhe skaliert mit dem Abstand der Slots
             const slotDistance = Math.abs(s.swapIndex);
             const lift = ARC_LIFT_BASE + slotDistance * ARC_LIFT_PER_SLOT;
 
-            const elA0    = aRefs.current[aBoxAtSlot0];
+            const elA0 = aRefs.current[aBoxAtSlot0];
             const elASwap = aRefs.current[aBoxAtSwapSlot];
 
             if (elA0 && elASwap) {
                 // Box auf Slot 0 → fährt nach oben über die anderen Boxen
-                animateSwapArc(elA0,    aDeltaFor0,    lift, true,  timeline, true);
+                animateSwapArc(elA0, aDeltaFor0, lift, true, timeline, true);
                 // Box auf swapIndex → fährt nach unten (die Bögen kreuzen sich nicht)
                 animateSwapArc(elASwap, aDeltaForSwap, lift, false, timeline, false);
             }
 
-            timeline.addLabel(labels[3*stepIdx + 2])
+            timeline.addLabel(labels[3 * stepIdx + 2])
 
             // Slot-Tracking SOFORT aktualisieren (nicht via .call),
             // weil der Wert beim Aufbau der nächsten Schritte schon korrekt sein muss.
             // .call würde erst zur Laufzeit der Animation feuern – zu spät für den Aufbau.
-            aCurrentSlot.current[aBoxAtSlot0]    = aSlotOfSwap;
+            aCurrentSlot.current[aBoxAtSlot0] = aSlotOfSwap;
             aCurrentSlot.current[aBoxAtSwapSlot] = aSlotOf0;
 
             // ── Reverse von b[1..k-1] ──────────────────────────────────────
@@ -294,50 +237,50 @@ export function SwapOutput(props: SwapOutputProps) {
             // wandern aufeinander zu und tauschen jeweils die Positionen.
             // Kein Bogen hier
 
-            let leftIdx  = 1;
+            let leftIdx = 1;
             let rightIdx = s.k - 1;
 
-            if(rightIdx <= leftIdx) {
-                timeline.to({}, {duration: STEP_DURATION/5});
+            if (rightIdx <= leftIdx) {
+                timeline.to({}, {duration: STEP_DURATION / 5});
             } else {
                 timeline.to({}, {duration: 0});
             }
 
             while (leftIdx < rightIdx) {
-                const bBoxAtLeft  = bCurrentSlot.current.indexOf(leftIdx);
+                const bBoxAtLeft = bCurrentSlot.current.indexOf(leftIdx);
                 const bBoxAtRight = bCurrentSlot.current.indexOf(rightIdx);
 
-                const bSlotOfLeft  = bCurrentSlot.current[bBoxAtLeft];   // = leftIdx
+                const bSlotOfLeft = bCurrentSlot.current[bBoxAtLeft];   // = leftIdx
                 const bSlotOfRight = bCurrentSlot.current[bBoxAtRight];  // = rightIdx
 
-                const bDeltaForLeft  = slotX(bSlotOfRight) - slotX(bSlotOfLeft);  // nach rechts
-                const bDeltaForRight = slotX(bSlotOfLeft)  - slotX(bSlotOfRight); // nach links
+                const bDeltaForLeft = slotX(bSlotOfRight) - slotX(bSlotOfLeft);  // nach rechts
+                const bDeltaForRight = slotX(bSlotOfLeft) - slotX(bSlotOfRight); // nach links
 
-                const elBLeft  = bRefs.current[bBoxAtLeft];
+                const elBLeft = bRefs.current[bBoxAtLeft];
                 const elBRight = bRefs.current[bBoxAtRight];
 
                 if (elBLeft && elBRight) {
-                    timeline.to(elBLeft,  {x: `+=${bDeltaForLeft}`}, "<");
+                    timeline.to(elBLeft, {x: `+=${bDeltaForLeft}`}, "<");
                     timeline.to(elBRight, {x: `+=${bDeltaForRight}`}, "<");
                 }
 
                 // Slot-Tracking sofort aktualisieren (gleiche Begründung wie bei a)
-                bCurrentSlot.current[bBoxAtLeft]  = bSlotOfRight;
+                bCurrentSlot.current[bBoxAtLeft] = bSlotOfRight;
                 bCurrentSlot.current[bBoxAtRight] = bSlotOfLeft;
 
                 leftIdx++;
                 rightIdx--;
             }
 
-            timeline.addLabel(labels[3*stepIdx + 3])
+            timeline.addLabel(labels[3 * stepIdx + 3])
 
-            timeline.to({}, {duration: STEP_DURATION/5});
+            timeline.to({}, {duration: STEP_DURATION / 5});
 
-            timeline.addLabel(labels[3*stepIdx + 4])
+            timeline.addLabel(labels[3 * stepIdx + 4])
         });
 
         timelineRef.current = timeline;
-        timeline.progress(props.progress).pause();
+        timeline.progress(props.cProps.progress).pause();
         timeline.timeScale(playbackSpeed);
         setIsPlaying(false);
 
@@ -353,8 +296,9 @@ export function SwapOutput(props: SwapOutputProps) {
         <div className="algorithm-panel">
             <IOModeTabs
                 mode="output"
-                onChangeInput={props.onChangeInput}
-                onSubmit={() => {}}
+                onChangeInput={props.cProps.onChangeInput}
+                onSubmit={() => {
+                }}
                 canSubmit={false}
             />
 
@@ -393,7 +337,9 @@ export function SwapOutput(props: SwapOutputProps) {
                 ))}
 
                 {initialA.slice(0, count).map((value, i) => (
-                    <g key={`a-${i}`} ref={el => { aRefs.current[i] = el; }}>
+                    <g key={`a-${i}`} ref={el => {
+                        aRefs.current[i] = el;
+                    }}>
                         <rect
                             x={slotX(i)} y={A_Y}
                             width={BOX_WIDTH} height={BOX_HEIGHT}
@@ -410,7 +356,9 @@ export function SwapOutput(props: SwapOutputProps) {
                 ))}
 
                 {initialB.slice(0, count).map((value, i) => (
-                    <g key={`b-${i}`} ref={el => { bRefs.current[i] = el; }}>
+                    <g key={`b-${i}`} ref={el => {
+                        bRefs.current[i] = el;
+                    }}>
                         <rect
                             x={slotX(i)} y={B_Y}
                             width={BOX_WIDTH} height={BOX_HEIGHT}
@@ -445,7 +393,7 @@ export function SwapOutput(props: SwapOutputProps) {
                         y2={K_GRAPH_Y + K_GRAPH_HEIGHT}
 
                         stroke="#aaa"
-                          strokeWidth="2"/>
+                        strokeWidth="2"/>
 
                     {Array.from({length: maxK}, (_, index) => {
                         const k = index + 1;
@@ -453,7 +401,7 @@ export function SwapOutput(props: SwapOutputProps) {
                         const y =
                             K_GRAPH_Y +
                             K_GRAPH_HEIGHT -
-                            (k / (maxK+1)) * K_GRAPH_HEIGHT;
+                            (k / (maxK + 1)) * K_GRAPH_HEIGHT;
 
                         return (
                             <g key={`k-line-${k}`}>
@@ -559,29 +507,31 @@ export function SwapOutput(props: SwapOutputProps) {
             <OutputControls
                 timelineRef={timelineRef}
                 labels={labels}
-                currentStep={props.currentStep}
-                setCurrentStep={props.setCurrentStep}
-                stepCount={labels.length}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={props.progress}
-                setProgress={props.setProgress}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
                 playbackSpeed={playbackSpeed}
                 onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
-            <div className="step-info">
-                <div className="step-info-grid">
-                    <div><strong>Step:</strong> {props.currentStep + 1} / {labels.length}</div>
-                    <div><strong>k:</strong> {props.currentStep == 0 ? "" : step.k}</div>
-                    <div><strong>b[k]:</strong> {props.currentStep == 0 ? "" : step.swapIndex}</div>
+            <div className="step-layout">
+                <div className="step-layout-side">
+                    <div className="step-info">
+                        <div className="step-info-grid">
+                            <div><strong>Step:</strong> {props.cProps.currentStepIndex + 1} / {labels.length}</div>
+                            <div><strong>k:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.k}</div>
+                            <div><strong>b[k]:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.swapIndex}</div>
+                        </div>
+                    </div>
                 </div>
+                <PseudoCodePanel
+                    lines={PSEUDOCODE_EHRLICH_SWAPS}
+                    activeLineIds={getActiveLineIdsEhrlich(props.cProps.currentStepIndex, labels.length - 1)}
+                />
             </div>
-            <PseudoCodePanel
-                lines={PSEUDOCODE_EHRLICH_SWAPS}
-                activeLineIds={getActiveLineIdsEhrlich(props.currentStep, labels.length - 1)}
-                title={"Ehrlich Swaps PseudoCode"}
-            />
         </div>
     );
 }

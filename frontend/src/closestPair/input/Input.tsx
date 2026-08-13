@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {DynamicPoints} from "../shared/Points.tsx";
 import type {InputProps, Interaction} from "../shared/Types.tsx";
-import {getRandomId} from "../../shared/Utils.tsx";
+import {getRandomId, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
@@ -12,15 +12,9 @@ export function Input(props: InputProps) {
     const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
         const svg = e.currentTarget;
         const rect = svg.getBoundingClientRect();
-
-        /*
-         * The SVG is responsive: its visual size can differ from the internal viewBox size.
-         * Mouse coordinates are measured in screen pixels, so they are
-         * convert them back into the SVG coordinate system used by the points.
-         */
         return {
-            x: ((e.clientX - rect.left) / rect.width) * props.width,
-            y: ((e.clientY - rect.top) / rect.height) * props.height,
+            x: ((e.clientX - rect.left) / rect.width) * SVG_WIDTH,
+            y: ((e.clientY - rect.top) / rect.height) * SVG_HEIGHT,
         };
     };
 
@@ -64,7 +58,7 @@ export function Input(props: InputProps) {
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handlePointMouseUp}
-                viewBox={`0 0 ${props.width} ${props.height}`}
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 preserveAspectRatio="xMidYMid meet"
             >
                 <DynamicPoints
@@ -78,7 +72,7 @@ export function Input(props: InputProps) {
             <div className="control-row">
                 <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
 
-                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} input={props.inputState}/>
+                <PresetSelect algorithm={"closestPair"} setInput={props.onPresetChange} getInput={() => props.inputState}/>
 
                 <button
                     className="control-button"
@@ -99,7 +93,7 @@ export function Input(props: InputProps) {
                 <span className="closest-pair-point-count-label">Points: {props.inputState.points.length}</span>
                     <input
                         className="timeline-slider"
-                        type="range" min={0} max={50} value={props.inputState.points.length}
+                        type="range" min={0} max={40} value={props.inputState.points.length}
                         onChange={(event) =>
                             props.onSetPointCount(Number(event.currentTarget.value))
                         }

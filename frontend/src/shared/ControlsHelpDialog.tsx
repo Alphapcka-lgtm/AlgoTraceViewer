@@ -6,23 +6,27 @@ import {
     Move,
     MoveHorizontal,
     Pause,
-    Play,
+    Play, Plus,
     RotateCcw,
     SkipBack,
     X
 } from "lucide-react";
 import "./styles/controls-help-dialog.css"
 import {useState} from "react";
+import type {AlgorithmType} from "./Types.tsx";
 
 
-type ControlsHelpProps = {
-    tab: "input" | "output";
-    algorithm: alg;
+type ControlsHelpProps =
+    | {
+    tab: "output";
+}
+    | {
+    tab: "input";
+    algorithm: AlgorithmType;
 };
 
-export function ControlsHelp({tab, algorithm}: ControlsHelpProps) {
+export function ControlsHelp(props: ControlsHelpProps) {
     const [isOpen, setIsOpen] = useState(false);
-
     return (
         <>
             <button
@@ -36,21 +40,23 @@ export function ControlsHelp({tab, algorithm}: ControlsHelpProps) {
 
             {isOpen && (
                 <ControlsHelpDialog
+                    {...props}
                     onClose={() => setIsOpen(false)}
-                    tab={tab}
-                    algorithm={algorithm}
                 />
             )}
         </>
     );
 }
 
-
-type alg = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
-type ControlsHelpDialogProps = {
+type ControlsHelpDialogProps =
+    | {
+    tab: "output";
     onClose: () => void;
-    tab: "input" | "output"
-    algorithm:alg
+}
+    | {
+    tab: "input";
+    algorithm: AlgorithmType;
+    onClose: () => void;
 };
 
 export function ControlsHelpDialog(props: ControlsHelpDialogProps) {
@@ -68,24 +74,25 @@ export function ControlsHelpDialog(props: ControlsHelpDialogProps) {
             >
                 <button
                     type="button"
-                    className="controls-help-close" //control-button
+                    className="controls-help-close"
                     onClick={props.onClose}
                 >
                     <X size={14}/>
                 </button>
 
                 <div className="controls-help-list">
-
-                    {props.tab === "output" && (
+                    {props.tab === "output" ? (
                         <>
-                            <h2 id="controls-help-title">Controls explained </h2>
+                            <h2 id="controls-help-title">
+                                Controls explained
+                            </h2>
                             <OutputHelpGeneral/>
                         </>
-                    )}
-
-                    {props.tab === "input" && (
+                    ) : (
                         <>
-                            <h2 id="controls-help-title">Input explained </h2>
+                            <h2 id="controls-help-title">
+                                Input explained
+                            </h2>
                             <InputHelp algorithm={props.algorithm}/>
                         </>
                     )}
@@ -95,11 +102,15 @@ export function ControlsHelpDialog(props: ControlsHelpDialogProps) {
     );
 }
 
-function InputHelp({algorithm}: {algorithm: alg}) {
+function InputHelp({algorithm}: {algorithm: AlgorithmType}) {
     switch (algorithm) {
         case "closestPair":
             return (
                 <>
+                    <div>
+                        <Plus size={20}/>
+                        <span>Add a new preset.</span>
+                    </div>
                     <div>
                         <MousePointerClick size={20}/>
                         <span>Click on the canvas to add a point.</span>
