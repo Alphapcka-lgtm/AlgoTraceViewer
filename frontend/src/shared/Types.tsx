@@ -12,8 +12,6 @@ export type OutputControlsProps = {
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
     progress: number;
     setProgress: React.Dispatch<React.SetStateAction<number>>;
-    playbackSpeed: number;
-    onPlaybackSpeedChange: (speed: number) => void;
 };
 
 export type ModeTabsProps = {

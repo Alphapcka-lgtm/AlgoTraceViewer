@@ -28,7 +28,6 @@ const STEP_DURATION = 1.0;
 export function RandomOutput(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
     const {timelineSteps, myLabels} = useMemo(
         () => {
@@ -39,11 +38,6 @@ export function RandomOutput(props: SVGOutputProps) {
         },
         [props.output.intermediateStates.length]
     );
-
-    const changePlaybackSpeed = (speed: number) => {
-        setPlaybackSpeed(speed);
-        void timelineRef.current.timeScale(speed);
-    };
 
     useGSAP(() => {
 
@@ -127,8 +121,6 @@ export function RandomOutput(props: SVGOutputProps) {
             setIsPlaying={setIsPlaying}
             progress={props.cProps.progress}
             setProgress={props.cProps.setProgress}
-            playbackSpeed={playbackSpeed}
-            onPlaybackSpeedChange={changePlaybackSpeed}
         />
         <div className="step-layout">
             <div className="step-layout-side">

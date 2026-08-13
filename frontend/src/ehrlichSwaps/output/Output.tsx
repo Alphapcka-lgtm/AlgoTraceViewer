@@ -67,17 +67,11 @@ function animateSwapArc(el: SVGGElement, deltaX: number, lift: number, goUp: boo
 
 export function Output(props: SVGOutputProps) {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline({paused: true}));
     const lastProgressUpdateRef = useRef(0);
     const labels = useMemo(() => createStepLabels(3 * (props.steps.length - 1) + 2), [props.steps.length]);
     const maxK = props.values.length
     const kLabelDistance = Array.from({length: maxK - 1}, (_, i) => i + 1).reduce((a, b) => a * b, 1)
-
-    const changePlaybackSpeed = (speed: number) => {
-        setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
-    };
 
     const kGraph = useMemo(() => {
         const kGraphStepIndex = Math.min(props.steps.length - 1, Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3)));
@@ -281,7 +275,6 @@ export function Output(props: SVGOutputProps) {
 
         timelineRef.current = timeline;
         timeline.progress(props.cProps.progress).pause();
-        timeline.timeScale(playbackSpeed);
         setIsPlaying(false);
 
         return () => {
@@ -513,8 +506,6 @@ export function Output(props: SVGOutputProps) {
                 setIsPlaying={setIsPlaying}
                 progress={props.cProps.progress}
                 setProgress={props.cProps.setProgress}
-                playbackSpeed={playbackSpeed}
-                onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
             <div className="step-layout">

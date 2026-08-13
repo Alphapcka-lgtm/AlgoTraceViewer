@@ -34,17 +34,11 @@ export function Output(props: OutputProps) {
     const candidateSweepWindowRef = useRef<SVGRectElement>(null);
     const step: AlgorithmStepDTO = props.steps[props.cProps.currentStepIndex];
     const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);  //labels nur neu erzeugen, wenn sich die Anzahl der Steps ändert
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const lastProgressUpdateRef = useRef(0); //um setProgress zu throttlen
 
     const activeSweepAreaDifferenceRef = useRef<SVGRectElement>(null);
     const pointRefsMap = useRef(new Map<string, PointVisualRefs>());
     const closestPairLineRef = useRef<SVGLineElement>(null);
-
-    const changePlaybackSpeed = (speed: number) => {
-        setPlaybackSpeed(speed);
-        timelineRef.current.timeScale(speed);
-    };
 
     const registerPointRefsInMap = useCallback((pointId: string, refs: PointVisualRefs | null) => {
             if (refs) {
@@ -431,8 +425,6 @@ export function Output(props: OutputProps) {
                 setIsPlaying={setIsPlaying}
                 progress={props.cProps.progress}
                 setProgress={props.cProps.setProgress}
-                playbackSpeed={playbackSpeed}
-                onPlaybackSpeedChange={changePlaybackSpeed}
             />
 
             <div className="step-layout">
