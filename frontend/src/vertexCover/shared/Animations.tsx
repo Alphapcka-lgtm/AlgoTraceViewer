@@ -115,15 +115,15 @@ export function animateRemoveMaxDegree(timeline: gsap.core.Timeline, step: Timel
     intermediateState.incidentEdges.forEach((incidentEdge, index) => {
         if (index == 0) {
             if (incidentEdge.fromId === maxDegreeNode.id || incidentEdge.fromId === maxDegreeNode.id) {
-                timeline.to("#blue" + incidentEdge.id, {drawSVG: "0% 0%"});
+                void timeline.to("#blue" + incidentEdge.id, {drawSVG: "0% 0%"});
             } else {
-                timeline.to("#blue" + incidentEdge.id, {drawSVG: "100% 100%"});
+                void timeline.to("#blue" + incidentEdge.id, {drawSVG: "100% 100%"});
             }
         } else {
             if (incidentEdge.fromId === maxDegreeNode.id || incidentEdge.fromId === maxDegreeNode.id) {
-                timeline.to("#blue" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
+                void timeline.to("#blue" + incidentEdge.id, {drawSVG: "0% 0%"}, "<");
             } else {
-                timeline.to("#blue" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
+                void timeline.to("#blue" + incidentEdge.id, {drawSVG: "100% 100%"}, "<");
             }
         }
     });

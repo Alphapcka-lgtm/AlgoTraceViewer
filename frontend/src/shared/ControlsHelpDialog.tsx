@@ -8,7 +8,7 @@ import {
     Pause,
     Play, Plus,
     RotateCcw,
-    SkipBack,
+    SkipBack, Spline,
     X
 } from "lucide-react";
 import "./styles/controls-help-dialog.css"
@@ -108,10 +108,6 @@ function InputHelp({algorithm}: {algorithm: AlgorithmType}) {
             return (
                 <>
                     <div>
-                        <Plus size={20}/>
-                        <span>Add a new preset.</span>
-                    </div>
-                    <div>
                         <MousePointerClick size={20}/>
                         <span>Click on the canvas to add a point.</span>
                     </div>
@@ -125,6 +121,10 @@ function InputHelp({algorithm}: {algorithm: AlgorithmType}) {
                         <Move size={20}/>
                         <span>Drag a point to change its position.</span>
                     </div>
+                    <div>
+                        <Plus size={20}/>
+                        <span>Save your input as a preset.</span>
+                    </div>
                 </>
             );
         case "suffixArray":
@@ -136,8 +136,26 @@ function InputHelp({algorithm}: {algorithm: AlgorithmType}) {
         case "vertexCover":
             return (
                 <>
-                    <h3>Graph editing</h3>
-
+                    <div>
+                        <MousePointerClick size={20}/>
+                        <span>Click on the canvas to add a Node.</span>
+                    </div>
+                    <div>
+                        <Spline />
+                        <span>Click two nodes to connect them with an Edge.</span>
+                    </div>
+                    <div>
+                        <MousePointerClick size={20}/>
+                        <span>Double-click a Node to remove it.</span>
+                    </div>
+                    <div>
+                        <Move size={20}/>
+                        <span>Drag a Node to change its position.</span>
+                    </div>
+                    <div>
+                        <Plus size={20}/>
+                        <span>Save your input as a preset.</span>
+                    </div>
                 </>
             );
         case "ehrlichSwaps":

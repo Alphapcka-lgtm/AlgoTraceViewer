@@ -16,7 +16,7 @@ import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
-import {PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
+import {PSEUDOCODE_MAX_DEGREE, PSEUDOCODE_STATIC_LIST} from "./PseudoCode.ts";
 import {useMemo, useRef, useState} from "react";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import {MaxDegreeLegend} from "./Legend.tsx";
@@ -69,7 +69,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
 
         timelineSteps.forEach((targetStep) => {
             switch (targetStep.stepType) {
-                case "INIT_CE": {
+                case "INIT": {
                     animateInit(timeline, targetStep, props.output);
                     break;
                 }
@@ -135,6 +135,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <MaxDegreeLegend
                     currentStepIndex={props.cProps.currentStepIndex}
+                    variant={props.variant}
                     maxStepIndex={myLabels.length - 1}
                     initialDegreeMap={props.output.initialDegreeMap}
                 />
@@ -146,8 +147,8 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
                 </div>
             </div>
             <PseudoCodePanel
-                lines={PSEUDOCODE_MAX_DEGREE}
-                activeLineIds={stepType === "INIT_CE" ? ["INIT_C", "INIT_E"] : [stepType]}
+                lines={props.variant === "maxDegree" ? PSEUDOCODE_MAX_DEGREE : PSEUDOCODE_STATIC_LIST}
+                activeLineIds={stepType === "INIT" ? ["INIT_C", "INIT_E", "INIT_K"] : [stepType]}
             />
         </div>
     </div>;
@@ -156,7 +157,7 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
 function createMaxDegreeVertexCoverOutputSteps(n: number): TimelineStep[] {
     if (n > 0) {
         const steps: TimelineStep[] = [
-            {label: "0", backendStepIndex: -1, stepType: "INIT_CE"},
+            {label: "0", backendStepIndex: -1, stepType: "INIT"},
             {label: "1", backendStepIndex: -1, stepType: "INIT_N"},
         ];
         Array.from({length: n}, (_, i) => i).forEach((i) => {

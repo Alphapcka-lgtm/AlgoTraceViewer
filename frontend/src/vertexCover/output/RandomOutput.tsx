@@ -128,6 +128,7 @@ export function RandomOutput(props: SVGOutputProps) {
             <div className="step-layout-side">
                 <RandomLegend
                     currentStepIndex={props.cProps.currentStepIndex}
+                    variant={props.variant}
                     maxStepIndex={myLabels.length - 1}
                 />
                 <div className="step-layout-actions">

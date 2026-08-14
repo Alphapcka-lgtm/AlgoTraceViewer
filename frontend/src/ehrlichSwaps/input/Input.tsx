@@ -1,5 +1,5 @@
 import { IOModeTabs } from "../../shared/IOModeTabs.tsx";
-import type { SwapInputField } from "../EhrlichSwaps.tsx";
+import type {SwapInputField} from "../shared/Types.tsx";
 
 type SwapInputProps = {
     fields: SwapInputField[];

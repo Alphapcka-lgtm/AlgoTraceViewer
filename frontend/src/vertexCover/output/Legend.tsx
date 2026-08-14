@@ -6,8 +6,8 @@ export function MaxDegreeLegend(props: LegendProps) {
         <div className="step-info">
             <div className="step-info-grid vertex-cover-step-summary">
                 <div><strong>Step:</strong> {props.currentStepIndex} / {props.maxStepIndex}</div>
-                <div><strong>Vertex Cover Size:</strong> {Math.max(0, Math.floor((props.currentStepIndex - 1) / 3))}
-                </div>
+                <div><strong>Vertex Cover Size:</strong> {Math.max(0, Math.floor((props.currentStepIndex - 1) / 3))}</div>
+                {props.variant === "maxDegree" ? <></> : <div><strong>k:</strong> {Math.max(0, Math.floor((props.currentStepIndex - 2) / 3))}</div>}
             </div>
             <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
                 <LegendEntry
@@ -22,7 +22,7 @@ export function MaxDegreeLegend(props: LegendProps) {
                 />
             </div>
             <div className="vertex-cover-degree-table">
-                <div><strong>Node-Degree Map N</strong></div>
+                <div><strong>{props.variant === "maxDegree" ? "Node-Degree Map N" : "Descending Degree List L"}</strong></div>
                 <div className="vertex-cover-degree-table__columns">
                     {props.initialDegreeMap!.map((ndp: NodeDegreePair) => (
                         <div id={"column" + ndp.node.id} key={"column" + ndp.node.id}

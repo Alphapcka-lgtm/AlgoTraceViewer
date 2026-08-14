@@ -56,6 +56,7 @@ export type VertexCoverRequest = {
 
 export type SVGOutputProps = {
     output: AnimationResponse,
+    variant: VertexCoverVariant,
     cProps: CommonOutputProps
 };
 
@@ -76,6 +77,8 @@ export type Interaction =
 export type SVGInputProps = {
     input: VertexCoverRequest,
     setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
+    densityFactor: number,
+    setDensityFactor: Dispatch<SetStateAction<number>>,
     onSubmit: (input: VertexCoverRequest) => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
@@ -84,6 +87,8 @@ export type SVGInputProps = {
 export type InputControlProps = {
     input: VertexCoverRequest,
     setInput: Dispatch<SetStateAction<VertexCoverRequest>>,
+    densityFactor: number,
+    setDensityFactor: Dispatch<SetStateAction<number>>,
     setInteraction: Dispatch<SetStateAction<Interaction>>,
     createExportString: () => string;
     onImport: (encoded: string) => void;
@@ -101,7 +106,7 @@ export type TimelineStep = {
 }
 
 export type StepType =
-    | "INIT_CE"
+    | "INIT"
     | "INIT_N"
     | "WHILE"
     | "CHOOSE"
@@ -111,6 +116,14 @@ export type StepType =
 
 export type LegendProps = {
     initialDegreeMap?: NodeDegreePair[];
+    variant: VertexCoverVariant;
     currentStepIndex: number,
     maxStepIndex: number,
+}
+
+export type VariantNavigationProps = {
+    variant: VertexCoverVariant,
+    disabled: boolean,
+    onTabChange: (variant: VertexCoverVariant) => void,
+
 }
