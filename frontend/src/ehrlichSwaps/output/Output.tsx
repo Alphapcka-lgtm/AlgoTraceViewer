@@ -7,6 +7,7 @@ import gsap from "gsap";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {getActiveLineIdsEhrlich, PSEUDOCODE_EHRLICH_SWAPS} from "./PseudoCode.tsx";
 import type {EhrlichSwapStepDTO, SVGOutputProps} from "../shared/Types.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -516,6 +517,12 @@ export function Output(props: SVGOutputProps) {
                             <div><strong>k:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.k}</div>
                             <div><strong>b[k]:</strong> {props.cProps.currentStepIndex == 0 ? "" : step.swapIndex}</div>
                         </div>
+                    </div>
+                    <div className="step-layout-actions">
+                        <ImportExportDialog
+                            onImport={props.cProps.onImport}
+                            createExportString={props.cProps.createExportString}
+                        />
                     </div>
                 </div>
                 <PseudoCodePanel

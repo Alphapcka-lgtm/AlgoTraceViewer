@@ -90,7 +90,7 @@ function HomeContent(props: HomeContentProps) {
 
                 <AlgorithmCard
                     title="Suffix Array"
-                    description="bla bla blup"
+                    description="Creates the Suffix Array of a word with the Suffix-Array-Induced-Sorting (sais) algorithm."
                     onClick={() => props.onTabChange("suffixArray")}
                 />
 
@@ -176,87 +176,3 @@ function AlgoTraceLogo() {
         </svg>
     );
 }
-/*
-const pageStyle: React.CSSProperties = {
-    padding: 24,
-    //fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    fontFamily: "Arial",
-};
-
-const headerStyle: React.CSSProperties = {
-    //marginBottom: 16,
-    display: "flex",
-    alignItems: "center", //vertikal gleiche Höhe
-    justifyContent: "space-between", //maximal auseinander
-    gap: 40,
-    padding: 20,
-};
-
-const navStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    gap: 7,
-    padding: 9,
-    margin: "0 auto 32px auto",
-    maxWidth: 700,
-    border: "3px solid #102E50",
-    borderRadius: 999,
-    background: "white",
-};
-
-const navButtonStyle: React.CSSProperties = {
-    border: "none",
-    borderRadius: 999,
-    padding: "10px 20px",
-    fontSize: 20,
-    fontWeight: 700,
-    cursor: "pointer",
-};
-
-const mainStyle: React.CSSProperties = {
-    maxWidth: 1000,
-    margin: "0 auto",
-};
-
-const headlineStyle: React.CSSProperties = {
-    color: "#102E50",
-    fontSize: 36,
-    marginBottom: 8,
-    fontWeight: 500
-};
-
-const textStyle: React.CSSProperties = {
-    color: "#333",
-    fontSize: 18,
-    marginBottom: 28,
-};
-
-const cardGridStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: 20,
-};
-
-const cardStyle: React.CSSProperties = {
-    textAlign: "left",
-    border: "2px solid #102E50",
-    borderRadius: 18,
-    padding: 20,
-    background: "white",
-    cursor: "pointer",
-};
-
-const cardTitleStyle: React.CSSProperties = {
-    color: "#BE3D2A", // frabe vom logo wieder aufgenommen
-    marginTop: 0,
-    marginBottom: 10,
-    fontWeight: 700,
-};
-
-const cardTextStyle: React.CSSProperties = {
-    color: "#333",
-    fontSize: 15,
-    lineHeight: 1.5,
-};
-
- */

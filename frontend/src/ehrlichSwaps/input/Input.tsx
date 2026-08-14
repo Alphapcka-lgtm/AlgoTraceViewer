@@ -3,6 +3,7 @@ import type {SwapInputProps} from "../shared/Types.tsx";
 import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
+import {AlgorithmOverviewBox} from "../../shared/AlgorithmOverviewBox.tsx";
 
 
 const MIN_INPUT_LENGTH = 1;
@@ -11,6 +12,8 @@ const MAX_INPUT_LENGTH = 6;
 export const SwapInput = (props: SwapInputProps) => {
     return (
         <div className="algorithm-panel">
+            <AlgorithmOverviewBox algoTyp={"ehrlichSwaps"}/>
+
             <IOModeTabs
                 mode="input"
                 onChangeInput={props.onChangeInput}

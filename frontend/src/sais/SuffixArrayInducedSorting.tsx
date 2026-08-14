@@ -5,6 +5,7 @@ import {SaisOutput} from "./output/SaisOutput.tsx";
 import "./SuffixArrayInducedSorting.css"
 import type {ExportState} from "../shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
+import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
@@ -42,18 +43,20 @@ export default function SuffixArrayInducedSorting() {
 
     const handleSubmit = async () => {
         if (input.timestamp > output.timestamp) {
-            fetchSais(input).then(() => {
-                setProgress(0);
-                setStepIndex(0);
-                setModeState("output");
-            });
+            fetchSais(input)
+                .then(() => {
+                    setProgress(0);
+                    setStepIndex(0);
+                    setModeState("output");
+                })
+                .catch((error) => alert(error));
         } else {
             setModeState("output");
         }
     }
 
     const fetchSais = async (input: SaisRequestDto) => {
-        fetch("http://localhost:8080/sais", {
+        return fetch("http://localhost:8080/sais", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(input),
@@ -97,20 +100,26 @@ export default function SuffixArrayInducedSorting() {
         }
     }
 
+    const canSubmit = () => input.source.trim() !== "";
+
     if (mode === "input") {
         return (
-            <div className="algorithm-shell">
-                <SaisInput height={svgHeight}
-                           width={svgWidth}
-                           onSubmit={handleSubmit}
-                           onChangeInput={handleChangeInput}
-                           value={input.source}
-                           onUpdateValue={updateValue}
-                           onImport={handleImport}
-                           createExportString={createExportString}
-                           setInput={setInput}
-                />
-            </div>
+            <>
+                <AlgorithmOverviewBox algoTyp={"suffixArray"}/>
+                <div className="algorithm-shell">
+                    <SaisInput height={svgHeight}
+                               width={svgWidth}
+                               onSubmit={handleSubmit}
+                               onChangeInput={handleChangeInput}
+                               value={input.source}
+                               onUpdateValue={updateValue}
+                               onImport={handleImport}
+                               createExportString={createExportString}
+                               setInput={setInput}
+                               canSubmit={canSubmit()}
+                    />
+                </div>
+            </>
         );
     }
 

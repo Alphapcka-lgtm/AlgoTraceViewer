@@ -10,6 +10,7 @@ export type SaisInputProps = {
     createExportString: () => string;
     onImport: (encoded: string) => void;
     setInput: Dispatch<SetStateAction<SaisRequestDto>>,
+    canSubmit: boolean,
 }
 
 export type SaisInputFieldProps = {
