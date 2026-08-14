@@ -148,7 +148,7 @@ export default function EhrlichSwaps () {
         setCurrentStepIndex: setCurrentStepIndex,
         onChangeInput: handleChangeInput,
         createExportString: createExportString,
-        onImport: () => {}
+        onImport: handleImport
     }
 
     return (
