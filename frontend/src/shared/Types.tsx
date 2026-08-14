@@ -2,6 +2,7 @@ import React from "react";
 import type {VertexCoverRequest} from "../vertexCover/shared/Types.tsx";
 import type {ClosestPairRequest, Point} from "../closestPair/shared/Types.tsx"
 import type {EhrlichSwapsRequest, SwapInputField} from "../ehrlichSwaps/shared/Types.tsx";
+import type {SaisRequestDto} from "../sais/shared/Types.tsx";
 
 export type OutputControlsProps = {
     timelineRef: React.RefObject<gsap.core.Timeline>
@@ -22,9 +23,10 @@ export type ModeTabsProps = {
 };
 
 export type ExportState =
-    | { algorithm: "closestPair",  progress: number, input: Point[] }
-    | { algorithm: "vertexCover",  progress: number, input: VertexCoverRequest }
-    | { algorithm: "ehrlichSwaps", progress: number, input: SwapInputField[]};
+    | { algorithm: "closestPair", progress: number, input: Point[] }
+    | { algorithm: "vertexCover", progress: number, input: VertexCoverRequest }
+    | { algorithm: "ehrlichSwaps", progress: number, input: SwapInputField[] }
+    | { algorithm: "sais", progress: number, input: SaisRequestDto };
 
 export type PseudoCodeLine = {
     id: string;
@@ -44,7 +46,7 @@ export type HomepageProps = {
     activeTab: Tab;
 }
 
-export type AnimationRequest = EhrlichSwapsRequest | VertexCoverRequest | ClosestPairRequest
+export type AnimationRequest = EhrlichSwapsRequest | VertexCoverRequest | ClosestPairRequest | SaisRequestDto;
 
 export type CommonOutputProps = {
     onChangeInput: () => void;

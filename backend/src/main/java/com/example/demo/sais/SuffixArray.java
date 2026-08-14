@@ -33,7 +33,7 @@ public class SuffixArray {
         final List<SortStepDto> guessLmsSteps = new ArrayList<>();
 
         // Bucket-sort all the LMS suffixes into their appropriate bucket.
-        IO.println("Sort all lms suffixes into appropriate bucket");
+//        IO.println("Sort all lms suffixes into appropriate bucket");
         for (int i = 0; i < text.length; i++) {
             if (!typeMap.isLmsChar(i)) {
                 // Not the start of an LMS suffix
@@ -47,8 +47,8 @@ public class SuffixArray {
             guessedSuffixArray[bucketTails[bucketIndex]] = i;
             if (trackSteps) {
                 char c = (i < source.length()) ? source.charAt(i) : '$';
-                IO.println(c + "(" + i + ")" + " -> " + bucketTails[bucketIndex]);
-                showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+//                IO.println(c + "(" + i + ")" + " -> " + bucketTails[bucketIndex]);
+//                showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
                 guessLmsSteps.add(new SortStepDto(i,
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
@@ -124,7 +124,7 @@ public class SuffixArray {
 
         final List<SortStepDto> induceLSteps = new ArrayList<>();
 
-        IO.println("Inducing L-suffixes");
+//        IO.println("Inducing L-suffixes");
         for (int i = 0; i < guessedSuffixArray.length; i++) {
             if (guessedSuffixArray[i] == -1) {
                 // No offset is recorded here.
@@ -158,8 +158,8 @@ public class SuffixArray {
 
             if (trackSteps) {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
-                IO.println(c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]);
-                showSuffixArray(guessedSuffixArray, bucketHeads[bucketIndex]);
+//                IO.println(c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex]);
+//                showSuffixArray(guessedSuffixArray, bucketHeads[bucketIndex]);
                 induceLSteps.add(new SortStepDto(j,
                         bucketHeads[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
@@ -203,7 +203,7 @@ public class SuffixArray {
 
         final List<SortStepDto> induceSSteps = new ArrayList<>();
 
-        IO.println("Inducing S-suffixes");
+//        IO.println("Inducing S-suffixes");
         for (int i = guessedSuffixArray.length - 1; i > -1; i--) {
             int j = guessedSuffixArray[i] - 1;
             if (j < 0) {
@@ -227,8 +227,8 @@ public class SuffixArray {
 
             if (trackSteps) {
                 char c = (j < source.length()) ? source.charAt(j) : '$';
-                IO.println(c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]);
-                showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
+//                IO.println(c + "(" + j + ")" + " -> " + bucketTails[bucketIndex]);
+//                showSuffixArray(guessedSuffixArray, bucketTails[bucketIndex]);
                 induceSSteps.add(new SortStepDto(j,
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
@@ -380,19 +380,19 @@ public class SuffixArray {
             }
         }
 
-        if (trackSteps) {
-            IO.println("LMS Order\tName");
-            for (int i = 0; i < lmsOrder.length; i++) {
-                IO.println(lmsOrder[i] + " -> " + lmsNames[lmsOrder[i]]);
-            }
-
-            IO.println("names in text order");
-            for (int i = 0; i < lmsPositions.length; i++) {
-                IO.println(lmsPositions[i] + " -> " + lmsNames[lmsPositions[i]]);
-            }
-
-            IO.println("reduced text: " + Arrays.toString(reduced));
-        }
+//        if (trackSteps) {
+//            IO.println("LMS Order\tName");
+//            for (int i = 0; i < lmsOrder.length; i++) {
+//                IO.println(lmsOrder[i] + " -> " + lmsNames[lmsOrder[i]]);
+//            }
+//
+//            IO.println("names in text order");
+//            for (int i = 0; i < lmsPositions.length; i++) {
+//                IO.println(lmsPositions[i] + " -> " + lmsNames[lmsPositions[i]]);
+//            }
+//
+//            IO.println("reduced text: " + Arrays.toString(reduced));
+//        }
 
         final int[] reducedSa;
         if (currentName + 1 == lmsCount) {
@@ -401,12 +401,12 @@ public class SuffixArray {
                 reducedSa[reduced[i]] = i;
             }
         } else {
-            if (trackSteps) IO.println("Reduced sa with recursion");
+//            if (trackSteps) IO.println("Reduced sa with recursion");
             reducedSa = sais(reduced, currentName, false);
         }
 
         if (trackSteps) {
-            IO.println("reduced suffix array: " + Arrays.toString(reducedSa));
+//            IO.println("reduced suffix array: " + Arrays.toString(reducedSa));
             responseBuilder.lmsOrder(lmsOrder)
                     .lmsNames(lmsNames)
                     .lmsPositions(lmsPositions)
@@ -420,7 +420,7 @@ public class SuffixArray {
         final int[] bucketTails = findBucketTails(bucketSizes, alphabetSize);
 
         final List<LmsSortStepDto> lmsSortSteps = new ArrayList<>();
-        if (trackSteps) IO.println("final lms placement");
+//        if (trackSteps) IO.println("final lms placement");
         for (int i = reducedSa.length - 1; i >= 0; i--) {
             int lmsIndex = reducedSa[i];
 
@@ -433,8 +433,8 @@ public class SuffixArray {
             result[bucketTails[bucketIndex]] = pos;
             if (trackSteps) {
                 char c = (pos < source.length()) ? source.charAt(pos) : '$';
-                IO.println(c + "(" + pos + ")" + " -> " + bucketTails[bucketIndex]);
-                showSuffixArray(result, bucketTails[pos]);
+//                IO.println(c + "(" + pos + ")" + " -> " + bucketTails[bucketIndex]);
+//                showSuffixArray(result, bucketTails[pos]);
                 lmsSortSteps.add(new LmsSortStepDto(
                         i,
                         lmsIndex,

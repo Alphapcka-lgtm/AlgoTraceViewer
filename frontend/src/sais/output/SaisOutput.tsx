@@ -18,6 +18,7 @@ import {ReducedSortedString} from "../shared/ReducedSortedString.tsx";
 import {EmptySuffixArray} from "../shared/EmptySuffixArray.tsx";
 import {LmsPositions} from "../shared/LmsPositions.tsx";
 import {CurrentInduceSeedIcon, LastPlacedSuffixIcon, LegendEntry, LmsIcon} from "../../LegendeEntry.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 
 // TODO: export
 const STEP_DURATION = 1.0;
@@ -512,7 +513,7 @@ export function SaisOutput(props: SaisOutputProps) {
             currentCounter++;
         }
 
-        timeline.progress(props.progress);
+        void timeline.progress(props.progress);
         setIsPlaying(false);
 
         return () => {
@@ -525,14 +526,19 @@ export function SaisOutput(props: SaisOutputProps) {
     let counter = 0
     return (
         <div className="algorithm-panel">
-            <IOModeTabs mode={"output"}
-                        onChangeInput={props.onChangeInput}
-                        onSubmit={() => {
-                        }}
-                        canSubmit={false}/>
+            <IOModeTabs
+                mode={"output"}
+                onChangeInput={props.onChangeInput}
+                onSubmit={() => {
+                }}
+                canSubmit={false}
+            />
 
-            <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-                 preserveAspectRatio="xMidYMid meet">
+            <svg
+                className="algorithm-canvas"
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+                preserveAspectRatio="xMidYMid meet"
+            >
                 {/* initial state with indexes and buckets */}
                 <IndexRow
                     cellWidth={cellWidth}
@@ -1033,6 +1039,9 @@ export function SaisOutput(props: SaisOutputProps) {
                     <div><strong>{props.stepDescription.title}</strong></div>
                     <div>{props.stepDescription.description}</div>
                 </div>
+            </div>
+            <div className="step-layout-actions">
+                <ImportExportDialog onImport={props.onImport} createExportString={props.createExportString}/>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_SAIS}

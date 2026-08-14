@@ -3,6 +3,8 @@ import {SaisInput} from "./input/SaisInput.tsx";
 import type {SaisRequestDto, SaisResponseDto, StepInfo} from "./shared/Types.tsx";
 import {SaisOutput} from "./output/SaisOutput.tsx";
 import "./SuffixArrayInducedSorting.css"
+import type {ExportState} from "../shared/Types.tsx";
+import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
@@ -39,17 +41,14 @@ export default function SuffixArrayInducedSorting() {
     const svgWidth = 1123;
 
     const handleSubmit = async () => {
-        console.log("SuffixArrayInducedSorting.handleSubmit");
-        console.log("input: ", input);
         if (input.timestamp > output.timestamp) {
-            console.log("fetching")
             fetchSais(input).then(() => {
                 setProgress(0);
                 setStepIndex(0);
                 setModeState("output");
-            })
+            });
         } else {
-            setModeState("output")
+            setModeState("output");
         }
     }
 
@@ -67,6 +66,24 @@ export default function SuffixArrayInducedSorting() {
                 setInput({...input, timestamp: ts})
                 setOutput(output);
             });
+    }
+
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported: ExportState = decodeExportState(encoded);
+            if (imported.algorithm === "sais") {
+                fetchSais(({...imported.input, timestamp: Date.now()}))
+                    .then(() => {
+                        setProgress(imported.progress);
+                    });
+            }
+        } catch (error) {
+            console.error("Invalid import string", error);
+        }
+    }
+
+    const createExportString = () => {
+        return encodeExportState({algorithm: "sais", input: input, progress: progress});
     }
 
     const handleChangeInput = () => {
@@ -89,9 +106,10 @@ export default function SuffixArrayInducedSorting() {
                            onChangeInput={handleChangeInput}
                            value={input.source}
                            onUpdateValue={updateValue}
+                           onImport={handleImport}
+                           createExportString={createExportString}
+                           setInput={setInput}
                 />
-                <p>immissiissippi</p>
-                <p>banana</p>
             </div>
         );
     }
@@ -108,8 +126,8 @@ export default function SuffixArrayInducedSorting() {
                         stepDescription={stepDescription}
                         setStepDescription={setStepDescription}
                         onChangeInput={handleChangeInput}
-                        createExportString={() => "" /*TODO*/}
-                        onImport={encoded => console.log("import: " + encoded) /*TODO*/}
+                        createExportString={createExportString}
+                        onImport={handleImport}
             />
         </div>
     );

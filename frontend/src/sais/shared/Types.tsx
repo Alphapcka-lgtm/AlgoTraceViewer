@@ -7,6 +7,14 @@ export type SaisInputProps = {
     onChangeInput: () => void;
     value: string,
     onUpdateValue: (newValue: string) => void;
+    createExportString: () => string;
+    onImport: (encoded: string) => void;
+    setInput: Dispatch<SetStateAction<SaisRequestDto>>,
+}
+
+export type SaisInputFieldProps = {
+    value: string,
+    onUpdateValue: (newValue: string) => void;
 }
 
 export type SaisOutputProps = {
