@@ -75,3 +75,14 @@
     height: 36px;
     padding: 0;
 }
+
+.algorithm-overview__sources a {
+    color: inherit;
+}
+.algorithm-overview__section {
+    margin-bottom: 16px;
+}
+
+.algorithm-overview__section h4 {
+    margin: 0 0 8px;
+}

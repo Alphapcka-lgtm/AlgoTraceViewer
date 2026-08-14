@@ -42,8 +42,7 @@ public class ClosestPairService {
         PointPair currBestPair = new PointPair(p0, p1, delta);
 
         /*
-         * Points currently inside the active x-range [current.x - delta, current.x).
-         * The current point is inserted only after its candidates were checked.
+         * During the sweep, Points currently inside the active x-range [current.x - delta, current.x).
          * The set is ordered by y-coordinate for selection of candidate points by their y-distance.
          * The id comparator keeps points with identical coordinates distinct.
         */
@@ -60,12 +59,11 @@ public class ClosestPairService {
         String description = "The points were sorted by x-coordinate, and the closest pair, δ and the active set "
                         + "were initialized with " + p0.label() + " and " + p1.label()
                         + ". Their distance is the initial δ, the shortest distance found so far.";
-        //therefore determines the initial width of search windows.";
 
         steps.add(new AlgorithmStepDTO(
                 SweepLineStepType.INITIALIZATION,
                 description,
-                p1,
+                p1, // Only used to position the sweep line ... INITIALIZATION does not show/have a current point...
                 delta,
                 new ArrayList<>(activePoints),
                 xSorted,
@@ -84,6 +82,7 @@ public class ClosestPairService {
             Point current = xSorted.get(i);
 
              //used to remove points outside the active x-range and select points inside the candidate y-range.
+            // Keep the delta of this iteration fixed for pruning/removing and candidate selection.
             double candidateSearchDelta = delta;
 
             // Points that have not yet become the current point. Used only for visualization.
@@ -134,7 +133,7 @@ public class ClosestPairService {
             } else {
                 candidateDescription = "Active points with a vertical distance from " + current.label()
                                 + " smaller than δ, and therefore inside the δ × 2δ candidate window, were selected as candidates. "
-                                + "Their distances to the " + current.label() + " were checked for a closer pair.";
+                                + "Their distances to " + current.label() + " were checked for a closer pair.";
             }
 
             steps.add(new AlgorithmStepDTO(
@@ -152,10 +151,8 @@ public class ClosestPairService {
                     futurePoints
             ));
 
-            delta = deltaAfterCandidateCheck; //The smaller delta now becomes the new "search radius" for later points
+            delta = deltaAfterCandidateCheck; // // updating delta for the following iterations
             currBestPair = bestPairAfterCandidateCheck;
-
-            //current point only becomes part of the activePoints after all snapshots for this iteration were taken.
             activePoints.add(current);
 
             String commitDescription;
@@ -238,49 +235,21 @@ public class ClosestPairService {
         return new RemovalResult(tail, removed);
     }
 
-    /**
-     * Compares current with every active point whose vertical distance from
-     * current is strictly smaller than candidateSearchDelta.
-     * activePoints already contains only points inside the active-window x-range before
-     * this method is called, so only the vertical distance must be checked.
-     * Points exactly on the candidate window boundary are excluded.
-     */
-    /*
+    //Finds candidates in the relevant y-range and checks them for a new closest pair.
+    //activePoints already contains only points inside the active-window x-range before this method is called,
+    //so only the vertical restriction remains to be checked here.
     private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
             Point current, TreeSet<Point> activePoints, double candidateSearchDelta, double currentBestDistance, PointPair currentBestPair
     ) {
         List<CandidateComparison> candidateComparisons = new ArrayList<>();
         boolean foundNewBest = false;
-
-        for (Point candidate : activePoints) {
-            double verticalDistance = Math.abs(current.y() - candidate.y());
-            if (verticalDistance < candidateSearchDelta) {
-                double distance = euclideanDistance(current, candidate);
-                candidateComparisons.add(new CandidateComparison(candidate, distance));
-
-                if (distance < currentBestDistance) {
-                    currentBestDistance = distance;
-                    currentBestPair = new PointPair(candidate, current, distance);
-                    foundNewBest = true;
-                }
-            }
-        }
-
-        return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
-    }
-     */
-
-    private CandidateResult findAndCheckCandidatesInCandidateSweepWindow(
-            Point current, TreeSet<Point> activePoints, double candidateSearchDelta, double currentBestDistance, PointPair currentBestPair
-    ) {
-        List<CandidateComparison> candidateComparisons = new ArrayList<>();
-        boolean foundNewBest = false;
-
         NavigableSet<Point> candidates = getPointsInYRange(
                 activePoints, current.y() - candidateSearchDelta, current.y() + candidateSearchDelta);
-
         for (Point candidate : candidates) {
-            if (Math.abs(current.y() - candidate.y()) >= candidateSearchDelta) continue;
+            // Removes possible extra boundary points ... enforces |current.y - candidate.y| < delta.
+            double verticalDistance = Math.abs(current.y() - candidate.y());
+            if (verticalDistance >= candidateSearchDelta) continue;
+
             double distance = euclideanDistance(current, candidate);
             candidateComparisons.add(new CandidateComparison(candidate, distance));
             if (distance < currentBestDistance) {
@@ -292,9 +261,16 @@ public class ClosestPairService {
         return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
     }
 
+    // Returns a conservative y-range view from the y-ordered active set.
     private NavigableSet<Point> getPointsInYRange(TreeSet<Point> points, double minY, double maxY) {
-        Point lowerBound = new Point(Integer.MIN_VALUE, (int) Math.floor(minY), "", "");
-        Point upperBound = new Point(Integer.MAX_VALUE, (int) Math.ceil(maxY), "", "");
+        // Point coordinates are integers, but the y-bounds minY and maxY are doubles.
+        // floor/ceil create wider boundaries, so some extra points at the boundaries may be included.
+        int lowerY = (int) Math.floor(minY);
+        int upperY = (int) Math.ceil(maxY);
+        // MIN_VALUE and MAX_VALUE make sure that all points between the lower and upper y-bounds are included.
+        // "Real" x-coordinates are restricted by the input area and cannot reach these values.
+        Point lowerBound = new Point(Integer.MIN_VALUE, lowerY, "", "");
+        Point upperBound = new Point(Integer.MAX_VALUE, upperY, "", "");
         return points.subSet(lowerBound, true, upperBound, true);
     }
 
