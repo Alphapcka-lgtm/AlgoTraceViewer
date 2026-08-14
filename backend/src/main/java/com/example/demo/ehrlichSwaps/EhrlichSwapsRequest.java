@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class EhrlichSwapsRequest implements AnimationRequest {
-    List<String> inputValues;
+    List<SwapInputField> inputFields;
     Long timestamp;
 }
