@@ -162,7 +162,7 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                     <div className="algorithm-overview__section">
                         <h4>Problem</h4>
                         <p>
-                            Given n distinct elements a₀, ..., aₙ₋₁, the goal is to generate all n! possible permutations of these elements.
+                            Given n distinct elements a<sub>0</sub>, ..., a<sub>n-1</sub>, the goal is to generate all n! possible permutations of these elements.
                         </p>
                     </div>
 
@@ -170,19 +170,23 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                         <h4>Solution</h4>
                         <p>
                             The <strong>Ehrlich Swaps Algorithm</strong> generates each permutation from its
-                            predecessor using a single swap. The Algorithm always swaps the first element a₀ with another element.
-                            These swaps are also called <strong>star transpositions</strong>.
+                            predecessor using a single swap. The algorithm always swaps the first element
+                            a<sub>0</sub> with another element. These swaps are also called{" "}
+                            <strong>star transpositions</strong>.
                         </p>
+
                         <p>
                             The method uses two auxiliary arrays, <strong>b</strong> and <strong>c</strong>.
-                            Initially, bⱼ = j. For each new permutation, a value <strong>k</strong> is
-                            determined and the first element is swapped with the element at position bₖ:
-                            a₀ ↔ a<sub>bₖ</sub>.
+                            Initially, b<sub>j</sub> = j. For each new permutation, a value <strong>k</strong> is
+                            determined and the first element is swapped with the element at position
+                            b<sub>k</sub>: a<sub>0</sub> ↔ a<sub>b<sub>k</sub></sub>.
                         </p>
+
                         <p>
-                            After the swap, the entries b₁, ..., b<sub>k-1</sub> are reversed. The resulting
-                            b-array determines the positions used by subsequent swaps.
+                            After the swap, the entries b<sub>1</sub>, ..., b<sub>k-1</sub> are reversed.
+                            The resulting b-array determines the positions used by subsequent swaps.
                         </p>
+
                         <p>
                             The values of k follow a regular pattern. If the swaps are numbered starting
                             with i = 1, then k is the largest value for which k! divides i.
@@ -198,12 +202,15 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                             to determine the next value of k. Since c is only needed to generate the
                             sequence of k-values and is not unique to Ehrlich's method, it is not visualized here.
                         </p>
+
                         <p>
                             Instead, the visualization assumes a <strong>k-generator</strong> that
                             directly provides the same k-values. This allows the visualization to focus
-                            on the operations that change the visible state: selecting bₖ, swapping
-                            a₀ ↔ a<sub>bₖ</sub>, and reversing b₁, ..., bₖ₋₁.
+                            on the operations that change the visible state: selecting b<sub>k</sub>, swapping
+                            a<sub>0</sub> ↔ a<sub>b<sub>k</sub></sub>, and reversing
+                            b<sub>1</sub>, ..., b<sub>k-1</sub>.
                         </p>
+
                         <p>
                             This abstraction does not change the generated permutations or the swaps
                             performed by Ehrlich's method. It only replaces the internal calculation of
@@ -213,7 +220,10 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
 
                     <div className="algorithm-overview__sources">
                         <span><strong>Source: </strong></span>
-                        <span>Donald E. Knuth — <em>The Art of Computer Programming</em>, Algorithm E (Ehrlich swaps)</span>
+                        <span>
+                        Donald E. Knuth — <em>The Art of Computer Programming</em>,
+                        Algorithm E (Ehrlich swaps)
+                    </span>
                     </div>
                 </div>
             </section>
