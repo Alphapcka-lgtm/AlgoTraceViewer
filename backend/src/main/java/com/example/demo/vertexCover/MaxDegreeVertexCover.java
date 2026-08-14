@@ -10,21 +10,11 @@ import java.util.*;
 @Service
 public class MaxDegreeVertexCover {
 
-    public static Comparator<NodeDegreePair> NDPComp = (n1, n2) -> {
-        if(n1.node().label().length() == n2.node().label().length()){
-            return n1.node().label().compareTo(n2.node().label());
-        } else {
-            return n1.node().label().length() -  n2.node().label().length();
-        }
-    };
-
     public AnimationResponse solve(VertexCoverRequest request) {
 
-        List<AnimationState> intermediateStates = new ArrayList<>();
-
-        OrderComparator comparator = new OrderComparator(request.getNodeOrder());
         List<Edge> remainingEdges = new ArrayList<>(request.getGraph().getEdges());
-
+        OrderComparator comparator = new OrderComparator(request.getNodeOrder());
+        List<AnimationState> intermediateStates = new ArrayList<>();
         Map<Node, Integer> neighbourCount = new HashMap<>();
 
         request.getGraph().getEdges().forEach(edge -> {
@@ -33,9 +23,8 @@ public class MaxDegreeVertexCover {
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
-                .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
-                .sorted(NDPComp)
-                .toList();
+                .map(entry -> NodeDegreePair.builder().node(entry.getKey()).degree(entry.getValue()).build())
+                .sorted().toList();
 
         while (!remainingEdges.isEmpty()) {
 
@@ -43,7 +32,7 @@ public class MaxDegreeVertexCover {
 
             List<Node> maxDegreeNodes = neighbourCount.entrySet().stream().filter(e -> e.getValue() == maxDegree).map(Map.Entry::getKey).toList();
 
-            Node maxDegreeNode = maxDegreeNodes.stream().min(comparator::compare).orElseThrow();
+            Node maxDegreeNode = maxDegreeNodes.stream().min(comparator).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> {
                 if (edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())) {
@@ -57,9 +46,8 @@ public class MaxDegreeVertexCover {
             remainingEdges.removeAll(incidentEdges);
 
             List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
-                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
-                    .sorted(NDPComp)
-                    .toList();
+                    .map(entry -> NodeDegreePair.builder().node(entry.getKey()).degree(entry.getValue()).build())
+                    .sorted().toList();
 
             intermediateStates.add(AnimationState.builder()
                     .incidentEdges(incidentEdges)

@@ -23,9 +23,8 @@ export function Legend({step, currentStepIndex, totalSteps}: LegendProps) {
         <div className="step-info closest-pair-step-info">
             <div className="step-info-grid">
                 <strong>Step: {step.stepType === "START" ? "Start" : `${currentStepIndex} / ${totalSteps - 1}`}</strong>
-
                 <div>
-                    <strong>Closest distance δ:</strong>{" "}
+                    <strong>Minimum distance δ:</strong>{" "}
                     {step.bestPair?.distance.toFixed(2) ?? "—"}
                 </div>
 

@@ -4,6 +4,7 @@ import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
 import type {HomepageProps, Tab} from "./shared/Types.tsx";
 import {Link} from "react-router-dom";
+import SuffixArrayInducedSorting from "./sais/SuffixArrayInducedSorting.tsx";
 
 export function Homepage(props: HomepageProps) {
     const [activeTab, setActiveTab] = useState<Tab>(props.activeTab);
@@ -15,14 +16,15 @@ export function Homepage(props: HomepageProps) {
                 {activeTab === "homepage" && <HomeContent onTabChange={setActiveTab}/>}
                 {activeTab === "closestPair" && <ClosestPair/>}
                 {activeTab === "vertexCover" && <VertexCover/>}
-                {activeTab === "suffixArray" && <SuffixArray/>}
-                {activeTab === "ehrlichSwaps" && <EhrlichSwaps />}
+                {activeTab === "suffixArray" && <SuffixArrayInducedSorting/>}
+                {activeTab === "ehrlichSwaps" && <EhrlichSwaps/>}
             </main>
         </div>
     );
 }
 
 type HeaderProps = { activeTab: Tab; setActiveTab: React.Dispatch<React.SetStateAction<Tab>>; };
+
 function Header(props: HeaderProps) {
     return (
         <header className="home-header">
@@ -68,11 +70,6 @@ function NavButton(props: NavButtonProps) {
     );
 }
 
-function SuffixArray() {
-    return <h1>suffixarray</h1>;
-}
-
-
 type HomeContentProps = {
     onTabChange: (tab: Tab) => void;
 };
@@ -82,9 +79,8 @@ function HomeContent(props: HomeContentProps) {
         <section>
             <h1 className="home-headline">Welcome to the Algo Trace Viewer</h1>
             <p className="home-text">
-                <p>Select an algorithm to explore its execution step by step through an interactive visualization.</p>
+                Select an algorithm to explore its execution step by step through an interactive visualization.
             </p>
-
             <div className="algorithm-card-grid">
                 <AlgorithmCard
                     title="Closest Pair"
@@ -94,13 +90,13 @@ function HomeContent(props: HomeContentProps) {
 
                 <AlgorithmCard
                     title="Suffix Array"
-                    description="bla bla blup"
+                    description="Creates the Suffix Array of a word with the Suffix-Array-Induced-Sorting (sais) algorithm."
                     onClick={() => props.onTabChange("suffixArray")}
                 />
 
                 <AlgorithmCard
                     title="Vertex Cover"
-                    description="bup lup schup"
+                    description="Finds a set of vertices that has each edge of an undirected graph covered"
                     onClick={() => props.onTabChange("vertexCover")}
                 />
 
@@ -180,87 +176,3 @@ function AlgoTraceLogo() {
         </svg>
     );
 }
-/*
-const pageStyle: React.CSSProperties = {
-    padding: 24,
-    //fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    fontFamily: "Arial",
-};
-
-const headerStyle: React.CSSProperties = {
-    //marginBottom: 16,
-    display: "flex",
-    alignItems: "center", //vertikal gleiche Höhe
-    justifyContent: "space-between", //maximal auseinander
-    gap: 40,
-    padding: 20,
-};
-
-const navStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    gap: 7,
-    padding: 9,
-    margin: "0 auto 32px auto",
-    maxWidth: 700,
-    border: "3px solid #102E50",
-    borderRadius: 999,
-    background: "white",
-};
-
-const navButtonStyle: React.CSSProperties = {
-    border: "none",
-    borderRadius: 999,
-    padding: "10px 20px",
-    fontSize: 20,
-    fontWeight: 700,
-    cursor: "pointer",
-};
-
-const mainStyle: React.CSSProperties = {
-    maxWidth: 1000,
-    margin: "0 auto",
-};
-
-const headlineStyle: React.CSSProperties = {
-    color: "#102E50",
-    fontSize: 36,
-    marginBottom: 8,
-    fontWeight: 500
-};
-
-const textStyle: React.CSSProperties = {
-    color: "#333",
-    fontSize: 18,
-    marginBottom: 28,
-};
-
-const cardGridStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: 20,
-};
-
-const cardStyle: React.CSSProperties = {
-    textAlign: "left",
-    border: "2px solid #102E50",
-    borderRadius: 18,
-    padding: 20,
-    background: "white",
-    cursor: "pointer",
-};
-
-const cardTitleStyle: React.CSSProperties = {
-    color: "#BE3D2A", // frabe vom logo wieder aufgenommen
-    marginTop: 0,
-    marginBottom: 10,
-    fontWeight: 700,
-};
-
-const cardTextStyle: React.CSSProperties = {
-    color: "#333",
-    fontSize: 15,
-    lineHeight: 1.5,
-};
-
- */

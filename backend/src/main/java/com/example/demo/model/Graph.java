@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Graph {
 
     private final List<Node> nodes;

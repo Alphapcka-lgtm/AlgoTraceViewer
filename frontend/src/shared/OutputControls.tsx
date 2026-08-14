@@ -106,6 +106,7 @@ export function OutputControls(props: OutputControlsProps) {
                     <option value={1}>1x</option>
                     <option value={2}>2x</option>
                     <option value={5}>5x</option>
+                    <option value={10}>10x</option>
                 </select>
 
                 <button title="Back" onClick={goBack} disabled={isAtStart} className="control-button">

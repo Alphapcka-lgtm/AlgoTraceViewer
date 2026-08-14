@@ -1,7 +1,7 @@
-import type {CommonOutputProps} from "../../shared/Types.tsx";
+import type {AnimationRequest, CommonOutputProps} from "../../shared/Types.tsx";
 
 export type EhrlichSwapsRequest = {
-    inputValues: string[];
+    inputFields: SwapInputField[];
     timestamp: number;
 }
 
@@ -26,4 +26,17 @@ export type EhrlichSwapStepDTO = {
 export type SwapInputField = {
     id: number;
     value: string;
+};
+export type SwapInputProps = {
+    fields: SwapInputField[];
+    canSubmit: boolean;
+    validationError: string | null;
+    onUpdateValue: (fieldId: number, newValue: string) => void;
+    onDeleteField: (fieldId: number,) => void;
+    onSubmit: () => void;
+    onChangeInput: () => void;
+    onPresetChange: (request: AnimationRequest) => void;
+    createExportString: () => string;
+    onImport: (encoded: string) => void;
+    onReset: () => void;
 };

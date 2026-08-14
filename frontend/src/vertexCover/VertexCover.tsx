@@ -2,7 +2,6 @@ import type {
     AnimationResponse,
     VertexCoverRequest,
     VertexCoverVariant,
-    NavButtonProps
 } from "./shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 import {MaxDegreeOutput} from "./output/MaxDegreeOutput.tsx";
@@ -12,12 +11,15 @@ import {Input} from "./input/Input.tsx";
 import {useState} from "react";
 import "./VertexCover.css";
 import {getFormattedRequest} from "./shared/Utils.tsx";
+import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
+import {VariantNavigation} from "./shared/VariantNavigation.tsx";
 
 export function VertexCover() {
     const [mode, setMode] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [variant, setVariant] = useState<VertexCoverVariant>("random");
+    const [densityFactor, setDensityFactor] = useState<number>(0);
 
     const [input, setInput] = useState<VertexCoverRequest>({
         graph: {nodes: [], edges: []},
@@ -102,47 +104,51 @@ export function VertexCover() {
     const svgOutput = variant === "random" ? (
         <RandomOutput
             output={output}
+            variant={variant}
             cProps={cProps}
         />
     ) : variant === "maxDegree" || variant === "staticList" ? (
         <MaxDegreeOutput
             output={output}
+            variant={variant}
             cProps={cProps}
         />
     ) : <></>;
 
     return (
         <>
-            <nav className="home-nav vertex-cover-variant-navigation">
-                <NavButton variant="random" label="Random" activeVariant={variant} onTabChange={onTabChange}/>
-                <NavButton variant="maxDegree" label="Max Degree" activeVariant={variant} onTabChange={onTabChange}/>
-                <NavButton variant="staticList" label="Static List" activeVariant={variant} onTabChange={onTabChange}/>
-            </nav>
             <div className="algorithm-shell">
-                {mode == "input" ?
-                    <Input
-                        setInput={setInput}
-                        input={input}
-                        onSubmit={submitInput}
-                        createExportString={createExportString}
-                        onImport={handleImport}
-                    /> : svgOutput
-                }
+                {mode == "input" ? (
+                    <>
+                        <AlgorithmOverviewBox
+                            algoTyp={"vertexCover"}
+                        />
+                        <VariantNavigation
+                            variant={variant}
+                            disabled={false}
+                            onTabChange={onTabChange}
+                        />
+                        <Input
+                            setInput={setInput}
+                            input={input}
+                            setDensityFactor={setDensityFactor}
+                            densityFactor={densityFactor}
+                            onSubmit={submitInput}
+                            createExportString={createExportString}
+                            onImport={handleImport}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <VariantNavigation
+                            variant={variant}
+                            disabled={true}
+                            onTabChange={onTabChange}
+                        />
+                        {svgOutput}
+                    </>
+                )}
             </div>
         </>
     )
-}
-
-function NavButton(props: NavButtonProps) {
-    const isActive = props.activeVariant === props.variant;
-
-    return (
-        <button
-            type="button"
-            onClick={() => props.onTabChange(props.variant)}
-            className={`home-nav-button vertex-cover-variant-button ${isActive ? "is-active" : ""}`}
-        >
-            {props.label}
-        </button>
-    );
 }

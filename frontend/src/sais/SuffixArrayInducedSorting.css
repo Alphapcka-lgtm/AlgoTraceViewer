@@ -1,0 +1,41 @@
+@import "./output/SaisOutput.css";
+
+.sais-input-field {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: var(--ui-gap);
+    width: 100%;
+}
+
+.sais-input-cell {
+    min-width: 92px;
+    max-width: none;
+    min-height: 54px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+    box-shadow: 0 2px 8px rgba(16, 46, 80, 0.08);
+}
+
+.sais-input-cell-empty {
+    border-style: dashed;
+    border-color: var(--muted-text);
+    background: var(--soft-background);
+}
+
+.sais-input-cell input {
+    min-width: 3ch;
+    max-width: 20ch;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--primary);
+    text-align: center;
+    font-family: var(--mono-font);
+    font-size: 20px;
+    font-weight: 700;
+}

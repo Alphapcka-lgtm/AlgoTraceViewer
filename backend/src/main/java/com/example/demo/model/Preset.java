@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import com.example.demo.closestPair.ClosestPairRequest;
 import com.example.demo.ehrlichSwaps.EhrlichSwapsRequest;
+import com.example.demo.sais.dto.SaisRequestDto;
 import com.example.demo.vertexCover.VertexCoverRequest;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -31,6 +32,10 @@ public class Preset {
             @JsonSubTypes.Type(
                     value = EhrlichSwapsRequest.class,
                     name = "ehrlichSwaps"
+            ),
+            @JsonSubTypes.Type(
+                    value = SaisRequestDto.class,
+                    name = "sais"
             )
     })
     AnimationRequest request;

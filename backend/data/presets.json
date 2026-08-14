@@ -1165,5 +1165,72 @@
       "algorithm" : "closestPair",
       "name" : "Test"
     }
+  },
+  "ehrlichSwaps" : {
+    "test" : {
+      "request" : {
+        "inputFields" : null,
+        "timestamp" : 1786729012658
+      },
+      "algorithm" : "ehrlichSwaps",
+      "name" : "test"
+    },
+    "test2" : {
+      "request" : {
+        "inputFields" : null,
+        "timestamp" : 1786729181346
+      },
+      "algorithm" : "ehrlichSwaps",
+      "name" : "test2"
+    },
+    "test3" : {
+      "request" : {
+        "inputFields" : [ {
+          "id" : 0,
+          "value" : "a"
+        }, {
+          "id" : 1,
+          "value" : "b"
+        }, {
+          "id" : 4,
+          "value" : "c"
+        }, {
+          "id" : 6,
+          "value" : "d"
+        }, {
+          "id" : 8,
+          "value" : ""
+        } ],
+        "timestamp" : 1786729532029
+      },
+      "algorithm" : "ehrlichSwaps",
+      "name" : "test3"
+    }
+  },
+  "sais" : {
+    "immissiissippi" : {
+      "request" : {
+        "source" : "immissiissippi",
+        "timestamp" : 1786729553744
+      },
+      "algorithm" : "sais",
+      "name" : "immissiissippi"
+    },
+    "banana" : {
+      "request" : {
+        "source" : "banana",
+        "timestamp" : 1786729577720
+      },
+      "algorithm" : "sais",
+      "name" : "banana"
+    },
+    "bananaz" : {
+      "request" : {
+        "source" : "bananaz",
+        "timestamp" : 1786729607968
+      },
+      "algorithm" : "sais",
+      "name" : "bananaz"
+    }
   }
 }
