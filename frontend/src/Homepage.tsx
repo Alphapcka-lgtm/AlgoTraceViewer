@@ -70,11 +70,6 @@ function NavButton(props: NavButtonProps) {
     );
 }
 
-function SuffixArray() {
-    return <h1>suffixarray</h1>;
-}
-
-
 type HomeContentProps = {
     onTabChange: (tab: Tab) => void;
 };
@@ -101,13 +96,13 @@ function HomeContent(props: HomeContentProps) {
 
                 <AlgorithmCard
                     title="Vertex Cover"
-                    description="bup lup schup"
+                    description="Finds a set of vertices that has each edge of an undirected graph covered"
                     onClick={() => props.onTabChange("vertexCover")}
                 />
 
                 <AlgorithmCard
                     title="Ehrlich Swaps"
-                    description="Generates all permutations of distinct elements."
+                    description="Generates all permutations of a set of distinct elements."
                     onClick={() => props.onTabChange("ehrlichSwaps")}
                 />
             </div>
