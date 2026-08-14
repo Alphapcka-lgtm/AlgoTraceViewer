@@ -2,7 +2,6 @@ import type {ReducedStringProps} from "./Types.tsx";
 
 export function ReducedString(props: ReducedStringProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
-    const yPositions = props.yPos + props.cellHeight;
     return (
         <g id={"reduced_string"} style={{opacity: 0}}>
             // upper row the reduced word
@@ -46,47 +45,6 @@ export function ReducedString(props: ReducedStringProps) {
                     </g>
                 ))
             }
-            // sub row the positions in the actual word
-            {/*<rect*/}
-            {/*    id={`reduced_positions_name_rect`}*/}
-            {/*    x={props.xOffsetStart}*/}
-            {/*    y={yPositions}*/}
-            {/*    width={props.nameColWidth}*/}
-            {/*    height={props.cellHeight}*/}
-            {/*    fill="lightgray"*/}
-            {/*    stroke="black"*/}
-            {/*/>*/}
-            {/*<text*/}
-            {/*    id={`reduced_positions_name_text`}*/}
-            {/*    x={props.xOffsetStart + props.nameColWidth / 2}*/}
-            {/*    y={yPositions + props.cellHeight * 0.7}*/}
-            {/*    textAnchor="middle"*/}
-            {/*>*/}
-            {/*    Position*/}
-            {/*</text>*/}
-            {/*{*/}
-            {/*    props.lmsPositions.map((p, index) => (*/}
-            {/*        <g id={`reduced_position_elem_${index}`}>*/}
-            {/*            <rect*/}
-            {/*                id={`reduced_position_elem_rect_${index}`}*/}
-            {/*                x={xCellStart + index * props.cellWidth}*/}
-            {/*                y={yPositions}*/}
-            {/*                width={props.cellWidth}*/}
-            {/*                height={props.cellHeight}*/}
-            {/*                fill="lightgray"*/}
-            {/*                stroke="black"*/}
-            {/*            />*/}
-            {/*            <text*/}
-            {/*                id={`reduced_position_elem_text_${index}`}*/}
-            {/*                x={xCellStart + index * props.cellWidth + props.cellWidth / 2}*/}
-            {/*                y={yPositions + props.cellHeight * 0.7}*/}
-            {/*                textAnchor="middle"*/}
-            {/*            >*/}
-            {/*                {p}*/}
-            {/*            </text>*/}
-            {/*        </g>*/}
-            {/*    ))*/}
-            {/*}*/}
         </g>
     )
 }

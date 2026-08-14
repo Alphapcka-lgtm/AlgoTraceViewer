@@ -7,5 +7,6 @@ public record SortStepDto(int sourceIndex,
                           int bucketIndex,
                           int[] resultingArray,
                           String stepDescription,
-                          int induceSaIndex) {
+                          int induceSaIndex,
+                          int seedSourceIndex) {
 }

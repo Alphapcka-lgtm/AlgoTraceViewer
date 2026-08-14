@@ -1,7 +1,4 @@
-import {
-    createStepLabels, getCurrentTimelineStepIndex,
-    SVG_HEIGHT, SVG_WIDTH
-} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {
     animateAdd,
     animateChooseRandomEdge,
@@ -9,7 +6,7 @@ import {
     animateRemoveRandom,
     animateReturn
 } from "../shared/Animations.tsx";
-import {NodeIcon, ArbitraryEdgeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
+import {ArbitraryEdgeIcon, LegendEntry, NodeIcon, RemainingEdgeIcon} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
@@ -125,7 +122,7 @@ export function RandomOutput(props: SVGOutputProps) {
         <div className="step-layout">
             <div className="step-layout-side">
                 <div className="step-info">
-                    <div className="step-info-grid vertex-cover-step-summary">
+                    <div className="step-info-grid sais-step-summary">
                         <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
                         <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}
                         </div>

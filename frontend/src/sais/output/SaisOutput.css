@@ -1,0 +1,35 @@
+.sais-step-summary,
+.sais-legend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sais-step-summary {
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.sais-legend-grid {
+    padding: var(--space-sm) 0;
+}
+
+.sais-legend-grid--spaced {
+    margin-bottom: var(--space-sm);
+}
+
+@media (max-width: 700px) {
+    .sais-step-summary,
+    .sais-legend-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sais-step-text {
+    padding-top: var(--space-sm);
+    margin-top: var(--space-sm);
+    border-top: 1px solid var(--border);
+}
+
+.sais-step-info-height {
+    height: 219px;
+}

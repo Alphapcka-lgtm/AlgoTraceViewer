@@ -17,8 +17,8 @@ export type SaisOutputProps = {
     setStepIndex: Dispatch<SetStateAction<number>>,
     activeLineIds: string[],
     setActiveLineIds: Dispatch<SetStateAction<string[]>>,
-    stepDescription: string,
-    setStepDescription: Dispatch<SetStateAction<string>>,
+    stepDescription: StepInfo,
+    setStepDescription: Dispatch<SetStateAction<StepInfo>>,
     onChangeInput: () => void;
     createExportString: () => string;
     onImport: (encoded: string) => void;
@@ -61,6 +61,7 @@ export type SortStepDto = {
     resultingArray: number[],
     stepDescription: string,
     induceSaIndex: number,
+    seedSourceIndex: number,
 }
 
 export type LmsSortStepDto = {
@@ -191,4 +192,9 @@ export type LmsPositionsProps = {
     yPos: number,
     lmsPositions: number[],
     nameColWidth: number,
+}
+
+export type StepInfo = {
+    title: string,
+    description: string,
 }

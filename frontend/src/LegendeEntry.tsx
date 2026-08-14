@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import type {ReactNode} from "react";
 import type {RingStyle} from "./closestPair/shared/Types.tsx";
 import {colors} from "./vertexCover/output/PseudoCode.ts";
 import {POINT_COLORS} from "./closestPair/shared/Utils.ts";
+import {SAIS_COLORS} from "./sais/output/SaisOutput.tsx";
 
 type LegendEntryProps = {
     label: string;
@@ -9,7 +10,7 @@ type LegendEntryProps = {
     icon: ReactNode;
 };
 
-export function LegendEntry({ label, value, icon }: LegendEntryProps) {
+export function LegendEntry({label, value, icon}: LegendEntryProps) {
     return (
         <div className="legend-entry">
             <svg className="legend-entry-icon" width={18} height={18} viewBox="0 0 20 20">
@@ -179,6 +180,54 @@ export function NodeDegreeMapIcon() {
                 height={10}
                 stroke="black"
                 fill="none"
+                strokeWidth={2}
+            />
+        </>
+    );
+}
+
+export function LmsIcon() {
+    return (
+        <>
+            <rect
+                x={0}
+                y={0}
+                width={20}
+                height={20}
+                stroke="black"
+                fill={SAIS_COLORS.lmsCellHighlight}
+                strokeWidth={2}
+            />
+        </>
+    );
+}
+
+export function LastPlacedSuffixIcon() {
+    return (
+        <>
+            <rect
+                x={0}
+                y={0}
+                width={20}
+                height={20}
+                stroke="black"
+                fill={SAIS_COLORS.lastPlaceCellHighlight}
+                strokeWidth={2}
+            />
+        </>
+    );
+}
+
+export function CurrentInduceSeedIcon() {
+    return (
+        <>
+            <rect
+                x={0}
+                y={0}
+                width={20}
+                height={20}
+                stroke="black"
+                fill={SAIS_COLORS.seedCellHighlight}
                 strokeWidth={2}
             />
         </>

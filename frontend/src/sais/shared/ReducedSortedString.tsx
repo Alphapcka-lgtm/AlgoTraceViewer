@@ -2,7 +2,6 @@ import type {ReducedSortedStringProps} from "./Types.tsx";
 
 export function ReducedSortedString(props: ReducedSortedStringProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
-    const yPositions = props.yPos + props.cellHeight;
     console.log("ReducedSortedString");
     console.log("reduced:", props.reducedSorted);
     console.log("pos:", props.lmsPositions);
@@ -49,47 +48,6 @@ export function ReducedSortedString(props: ReducedSortedStringProps) {
                     </g>
                 ))
             }
-            {/*// sub row the positions in the actual word*/}
-            {/*<rect*/}
-            {/*    id={`reduced_sorted_positions_name_rect`}*/}
-            {/*    x={props.xOffsetStart}*/}
-            {/*    y={yPositions}*/}
-            {/*    width={props.nameColWidth}*/}
-            {/*    height={props.cellHeight}*/}
-            {/*    fill="lightgray"*/}
-            {/*    stroke="black"*/}
-            {/*/>*/}
-            {/*<text*/}
-            {/*    id={`reduced_sorted_positions_name_text`}*/}
-            {/*    x={props.xOffsetStart + props.nameColWidth / 2}*/}
-            {/*    y={yPositions + props.cellHeight * 0.7}*/}
-            {/*    textAnchor="middle"*/}
-            {/*>*/}
-            {/*    Position*/}
-            {/*</text>*/}
-            {/*{*/}
-            {/*    props.reducedSorted.map((p, index) => (*/}
-            {/*        <g id={`reduced_sorted_positions_elem$${index}`}>*/}
-            {/*            <rect*/}
-            {/*                id={`reduced_sorted_positions_elem_rect_${index}`}*/}
-            {/*                x={xCellStart + index * props.cellWidth}*/}
-            {/*                y={yPositions}*/}
-            {/*                width={props.cellWidth}*/}
-            {/*                height={props.cellHeight}*/}
-            {/*                fill="lightgray"*/}
-            {/*                stroke="black"*/}
-            {/*            />*/}
-            {/*            <text*/}
-            {/*                id={`reduced_position_elem_text_${index}`}*/}
-            {/*                x={xCellStart + index * props.cellWidth + props.cellWidth / 2}*/}
-            {/*                y={yPositions + props.cellHeight * 0.7}*/}
-            {/*                textAnchor="middle"*/}
-            {/*            >*/}
-            {/*                {props.lmsPositions[p]}*/}
-            {/*            </text>*/}
-            {/*        </g>*/}
-            {/*    ))*/}
-            {/*}*/}
         </g>
     )
 }

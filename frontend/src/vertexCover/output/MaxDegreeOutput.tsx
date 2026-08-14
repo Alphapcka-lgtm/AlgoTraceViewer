@@ -1,7 +1,4 @@
-import {
-    createStepLabels, getCurrentTimelineStepIndex,
-    SVG_HEIGHT, SVG_WIDTH
-} from "../../shared/Utils.tsx";
+import {createStepLabels, getCurrentTimelineStepIndex, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
 import {
     animateAdd,
     animateChooseMaxDegreeNode,
@@ -10,7 +7,7 @@ import {
     animateRemoveAndUpdate,
     animateReturn
 } from "../shared/Animations.tsx";
-import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
+import {LegendEntry, NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";

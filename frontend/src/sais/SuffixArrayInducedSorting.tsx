@@ -1,14 +1,15 @@
 import {useState} from "react";
 import {SaisInput} from "./input/SaisInput.tsx";
-import type {SaisRequestDto, SaisResponseDto} from "./shared/Types.tsx";
+import type {SaisRequestDto, SaisResponseDto, StepInfo} from "./shared/Types.tsx";
 import {SaisOutput} from "./output/SaisOutput.tsx";
+import "./SuffixArrayInducedSorting.css"
 
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState(0);
     const [activeLineIds, setActiveLineIds] = useState(["word"]);
-    const [stepDescription, setStepDescription] = useState<string>("");
+    const [stepDescription, setStepDescription] = useState<StepInfo>({title: "", description: ""});
     const [input, setInput] = useState<SaisRequestDto>({
         source: "",
         timestamp: 0,

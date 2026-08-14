@@ -11,7 +11,7 @@ export function TextRow(props: TextRowProps) {
                     y={props.yPos}
                     width={props.nameColWidth}
                     height={props.cellWidth}
-                    fill="white"
+                    fill="lightgray"
                     stroke="black"
                 />
                 <text

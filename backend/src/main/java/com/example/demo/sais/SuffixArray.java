@@ -53,7 +53,7 @@ public class SuffixArray {
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
                         "inducing lms suffixes: " + c + "(" + i + ") -> " + bucketTails[bucketIndex],
-                        -1));
+                        -1, -1));
             }
             // ... and move the tail pointer down.
             bucketTails[bucketIndex]--;
@@ -164,7 +164,8 @@ public class SuffixArray {
                         bucketHeads[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
                         "inducing L suffixes: " + c + "(" + j + ")" + " -> " + bucketHeads[bucketIndex],
-                        i));
+                        i,
+                        guessedSuffixArray[i]));
             }
 
             // ...and move the head pointer up.
@@ -232,7 +233,8 @@ public class SuffixArray {
                         bucketTails[bucketIndex],
                         Arrays.copyOf(guessedSuffixArray, guessedSuffixArray.length),
                         "inducing S suffixes: " + c + "(" + j + ")" + " -> " + bucketTails[bucketIndex],
-                        i));
+                        i,
+                        guessedSuffixArray[i]));
             }
 
             // ...and move the tail pointer down.
