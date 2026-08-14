@@ -10,14 +10,6 @@ import java.util.*;
 @Service
 public class StaticListVertexCover {
 
-    public static Comparator<NodeDegreePair> NDPComp = (n1, n2) -> {
-        if(n1.node().label().length() == n2.node().label().length()){
-            return n1.node().label().compareTo(n2.node().label());
-        } else {
-            return n1.node().label().length() -  n2.node().label().length();
-        }
-    };
-
     public AnimationResponse solve(VertexCoverRequest request) {
 
         List<AnimationState> intermediateStates = new ArrayList<>();
@@ -33,34 +25,28 @@ public class StaticListVertexCover {
         });
 
         List<NodeDegreePair> initialDegreePairs = neighbourCount.entrySet().stream()
-                .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
-                .sorted(NDPComp)
+                .map(entry -> NodeDegreePair.builder().node(entry.getKey()).degree(entry.getValue()).build())
+                .sorted(Comparator.comparingInt(NodeDegreePair::getDegree).thenComparing(NodeDegreePair::getNode, comparator).reversed())
                 .toList();
+
+        int i = 0;
 
         while (!remainingEdges.isEmpty()) {
 
-            int maxDegree = neighbourCount.values().stream().max(Integer::compareTo).orElse(0);
-
-            List<Node> maxDegreeNodes = neighbourCount.entrySet().stream().filter(e -> e.getValue() == maxDegree).map(Map.Entry::getKey).toList();
-
-            Node maxDegreeNode = maxDegreeNodes.stream().min(comparator::compare).orElseThrow();
+            Node maxDegreeNode = initialDegreePairs.get(i).getNode();
 
             List<Edge> incidentEdges = remainingEdges.stream().filter(edge -> edge.fromId().equals(maxDegreeNode.id()) || edge.toId().equals(maxDegreeNode.id())).toList();
             neighbourCount.put(request.getGraph().getNodeById(maxDegreeNode.id()), 0);
 
             remainingEdges.removeAll(incidentEdges);
 
-            List<NodeDegreePair> degreePairs = neighbourCount.entrySet().stream()
-                    .map(entry -> new NodeDegreePair(entry.getKey(), entry.getValue()))
-                    .sorted(NDPComp)
-                    .toList();
-
             intermediateStates.add(AnimationState.builder()
                     .incidentEdges(incidentEdges)
                     .chosenNodes(List.of(maxDegreeNode))
-                    .degreeMap(degreePairs)
+                    .degreeMap(initialDegreePairs)
                     .build()
             );
+            i++;
         }
         return AnimationResponse.builder()
                 .initialState(request.getGraph())

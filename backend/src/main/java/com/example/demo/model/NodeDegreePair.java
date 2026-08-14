@@ -1,3 +1,11 @@
 package com.example.demo.model;
 
-public record NodeDegreePair(Node node, int degree){}
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+public class NodeDegreePair {
+    Node node;
+    int degree;
+}

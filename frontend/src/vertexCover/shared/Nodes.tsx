@@ -1,13 +1,12 @@
 import {getAlphabetLabel} from "../../shared/Utils.tsx";
-import type {Node} from "../../closestPair/shared/Types.tsx"
-import type {NodesProps} from "./Types.tsx";
+import type {NodesProps, Node} from "./Types.tsx";
+import {COLORS} from "./Utils.tsx";
 
 export function Nodes(props: NodesProps) {
-    const colors = {red: "#be3d2a", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0000CD"}
     return props.nodes.map((n: Node, i: number) => (
         <g
-            id={n.id.toString()}
-            key={n.id + i}
+            id={n.id}
+            key={n.id}
             onMouseDown={(e) => {
                 e.stopPropagation();
                 if (props.onMouseDown) {
@@ -33,18 +32,18 @@ export function Nodes(props: NodesProps) {
                 }
             }}
         >
-            <circle id={"u1" + n.id} key={"u1" + n.id + i} cx={n.x} cy={n.y} r={0} fill="black"/>
-            <circle id={"u2" + n.id} key={"u2" + n.id + i} cx={n.x} cy={n.y} r={0} fill={colors.orange}/>
-            <circle id={"u4" + n.id} key={"u4" + n.id + i} cx={n.x} cy={n.y} r={17} fill="black"/>
-            <circle id={"u5" + n.id} key={"u5" + n.id + i} cx={n.x} cy={n.y} r={15} fill="white"/>
-            <circle id={"u3" + n.id} key={"u3" + n.id + i} cx={n.x} cy={n.y} r={0} fill={colors.orange}/>
+            <circle id={"black_border" + n.id} key={"black_border" + n.id} cx={n.x} cy={n.y} r={0} fill={COLORS.black}/>
+            <circle id={"orange_border" + n.id} key={"orange_border" + n.id} cx={n.x} cy={n.y} r={0} fill={COLORS.orange}/>
+            <circle id={"black_inner_border" + n.id} key={"black_inner_border" + n.id} cx={n.x} cy={n.y} r={17} fill={COLORS.black}/>
+            <circle id={"white_fill" + n.id} key={"white_fill" + n.id} cx={n.x} cy={n.y} r={15} fill={COLORS.white}/>
+            <circle id={"orange_fill" + n.id} key={"orange_fill" + n.id} cx={n.x} cy={n.y} r={0} fill={COLORS.orange}/>
             <text
                 x={n.x}
                 y={n.y}
                 key={"u6" + n.id + i}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill="black"
+                fill={COLORS.black}
                 fontSize="17"
                 pointerEvents="none"
             >

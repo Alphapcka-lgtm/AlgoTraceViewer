@@ -19,23 +19,31 @@
 
 .vertex-cover-degree-table {
     display: flex;
+    flex-direction: column;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+}
+
+.vertex-cover-degree-table__columns {
+    display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 12px;
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
 }
 
 .vertex-cover-degree-column {
     flex: 1;
     font-size: 20px;
+    border: solid 1px;
+    border-radius: var(--radius-sm);
 }
 
 .vertex-cover-degree-cell {
     min-width: 27px;
-    border: solid 1px;
-    border-radius: var(--radius-sm);
     text-align: center;
-    text-shadow: 1px 1px 0px rgba(255, 255, 255, 1);
+    text-shadow: 2px 1px 0 rgba(255, 255, 255, 1);
 }
 
 @media (max-width: 700px) {
