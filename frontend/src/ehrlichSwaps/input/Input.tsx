@@ -1,15 +1,9 @@
 import { IOModeTabs } from "../../shared/IOModeTabs.tsx";
-import type { SwapInputField } from "../EhrlichSwaps.tsx";
+import type {SwapInputProps} from "../shared/Types.tsx";
+import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
+import {PresetSelect} from "../../shared/PresetSelect.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 
-type SwapInputProps = {
-    fields: SwapInputField[];
-    canSubmit: boolean;
-    validationError: string | null;
-    onUpdateValue: (fieldId: number, newValue: string) => void;
-    onDeleteField: (fieldId: number,) => void;
-    onSubmit: () => void;
-    onChangeInput: () => void;
-};
 
 const MIN_INPUT_LENGTH = 1;
 const MAX_INPUT_LENGTH = 6;
@@ -54,6 +48,30 @@ export const SwapInput = (props: SwapInputProps) => {
             {props.validationError !== null && (
                 <p className="swap-input-error" role="alert">{props.validationError}</p>
             )}
+
+
+            <div className="control-row">
+                <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
+
+                <PresetSelect algorithm={"ehrlichSwaps"} setInput={props.onPresetChange} getInput={() => {
+                    console.log(props.fields)
+                    return {inputFields: props.fields, timestamp: Date.now()}
+                }}/>
+
+                <button
+                    className="control-button"
+                    onClick={() => {
+                        props.onReset();
+                    }}
+                >
+                    Reset
+                </button>
+
+                <ImportExportDialog
+                    onImport={props.onImport}
+                    createExportString={props.createExportString}
+                />
+            </div>
         </div>
     );
 };

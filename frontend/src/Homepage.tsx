@@ -84,9 +84,8 @@ function HomeContent(props: HomeContentProps) {
         <section>
             <h1 className="home-headline">Welcome to the Algo Trace Viewer</h1>
             <p className="home-text">
-                <p>Select an algorithm to explore its execution step by step through an interactive visualization.</p>
+                Select an algorithm to explore its execution step by step through an interactive visualization.
             </p>
-
             <div className="algorithm-card-grid">
                 <AlgorithmCard
                     title="Closest Pair"

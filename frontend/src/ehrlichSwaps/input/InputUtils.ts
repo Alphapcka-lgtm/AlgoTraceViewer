@@ -1,4 +1,4 @@
-import type { SwapInputField } from "../EhrlichSwaps.tsx";
+import type {SwapInputField} from "../shared/Types.tsx";
 
 export function removeExtraEmptyFieldAtEnd(fields: SwapInputField[]):SwapInputField[] {
     if (fields.length < 2) return fields;

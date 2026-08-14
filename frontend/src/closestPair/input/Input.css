@@ -1,4 +1,4 @@
-.closest-pair-point-count-control {
+.input-control-slider {
     flex: 1 1 220px;
     display: flex;
     align-items: center;
@@ -10,11 +10,11 @@
     font-weight: 700;
 }
 
-.closest-pair-point-count-label {
+.input-control-label {
     flex: 0 0 auto;
     min-width: 86px;
 }
 
-.closest-pair-point-count-control .timeline-slider {
+.input-control-slider .timeline-slider {
     min-width: 140px;
 }

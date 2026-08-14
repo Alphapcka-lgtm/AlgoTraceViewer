@@ -1,4 +1,7 @@
-import {createStepLabels, getCurrentTimelineStepIndex, SVG_HEIGHT, SVG_WIDTH} from "../../shared/Utils.tsx";
+import {
+    createStepLabels, getCurrentTimelineStepIndex,
+    SVG_HEIGHT, SVG_WIDTH
+} from "../../shared/Utils.tsx";
 import {
     animateAdd,
     animateChooseRandomEdge,
@@ -6,9 +9,8 @@ import {
     animateRemoveRandom,
     animateReturn
 } from "../shared/Animations.tsx";
-import {ArbitraryEdgeIcon, LegendEntry, NodeIcon, RemainingEdgeIcon} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
-import type {SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
+import type {StepType, SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
@@ -19,6 +21,7 @@ import {Nodes} from "../shared/Nodes.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {PSEUDOCODE_RANDOM} from "./PseudoCode.ts";
+import {RandomLegend} from "./Legend.tsx";
 
 const STEP_DURATION = 1.0;
 
@@ -96,6 +99,8 @@ export function RandomOutput(props: SVGOutputProps) {
         };
     }, {dependencies: [props.output.timestamp]});
 
+    const stepType: StepType = timelineSteps[props.cProps.currentStepIndex].stepType
+
     return <div className="algorithm-panel">
         <IOModeTabs
             mode="output"
@@ -121,30 +126,11 @@ export function RandomOutput(props: SVGOutputProps) {
         />
         <div className="step-layout">
             <div className="step-layout-side">
-                <div className="step-info">
-                    <div className="step-info-grid sais-step-summary">
-                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
-                        <div><strong>Vertex Cover Size:</strong> {Math.floor(props.cProps.currentStepIndex / 3) * 2}
-                        </div>
-                    </div>
-                    <div className="step-info-grid vertex-cover-legend-grid">
-                        <LegendEntry
-                            label="Arbitrary Edge e"
-                            value={""}
-                            icon={<ArbitraryEdgeIcon/>}
-                        />
-                        <LegendEntry
-                            label="Vertex Cover C"
-                            value={""}
-                            icon={<NodeIcon/>}
-                        />
-                        <LegendEntry
-                            label="Remaining Edges E'"
-                            value={""}
-                            icon={<RemainingEdgeIcon/>}
-                        />
-                    </div>
-                </div>
+                <RandomLegend
+                    currentStepIndex={props.cProps.currentStepIndex}
+                    variant={props.variant}
+                    maxStepIndex={myLabels.length - 1}
+                />
                 <div className="step-layout-actions">
                     <ImportExportDialog
                         onImport={props.cProps.onImport}
@@ -154,7 +140,7 @@ export function RandomOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={[timelineSteps[props.cProps.currentStepIndex].stepType]}
+                activeLineIds={stepType === "INIT_CE" ? ["INIT_C", "INIT_E"] : [stepType]}
             />
         </div>
     </div>;

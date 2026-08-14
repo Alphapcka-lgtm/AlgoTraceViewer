@@ -4,9 +4,9 @@ import { Output } from "./output/Output.tsx";
 import { getEhrlichSwapSteps} from "./Api.ts";
 import { extractEnteredValues, removeExtraEmptyFieldAtEnd, validateValues} from "./input/InputUtils.ts";
 import "./EhrlichSwaps.css";
-import type {EhrlichSwapStepDTO, SwapInputField} from "./shared/Types.tsx";
-import type {CommonOutputProps} from "../shared/Types.tsx";
-import { encodeExportState} from "../shared/Utils.tsx";
+import type {EhrlichSwapsRequest, EhrlichSwapStepDTO, SwapInputField} from "./shared/Types.tsx";
+import type {AnimationRequest, CommonOutputProps, ExportState} from "../shared/Types.tsx";
+import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 
 const MAX_CELL_COUNT = 6;
 
@@ -98,6 +98,28 @@ export default function EhrlichSwaps () {
     const handleChangeInput = (): void => {setModeState("input");};
     const canSubmit = extractEnteredValues(fields).length > 1;
 
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported: ExportState = decodeExportState(encoded);
+            if (imported.algorithm !== "ehrlichSwaps") return;
+            setProgress(imported.progress);
+            setFields(imported.input);
+            await handleSubmit()
+        } catch (error) {
+            console.error("Invalid import string", error);
+        }
+    };
+
+    const handlePresetChange = (input: AnimationRequest) => {
+        const myInput =  input as EhrlichSwapsRequest;
+        setFields(myInput.inputFields);
+    }
+
+    const handleReset = () => {
+        nextFieldId.current = 1;
+        setFields([{ id: 0, value: "" }]);
+    };
+
     if (modeState === "input") {
         return (
             <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
@@ -109,6 +131,11 @@ export default function EhrlichSwaps () {
                     onDeleteField={deleteField}
                     onSubmit={handleSubmit}
                     onChangeInput={handleChangeInput}
+                    onImport={handleImport}
+                    createExportString={createExportString}
+                    onPresetChange={handlePresetChange}
+                    onReset={handleReset}
+
                 />
             </div>
         );

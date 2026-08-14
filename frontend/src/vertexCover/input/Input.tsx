@@ -137,6 +137,8 @@ export function Input(props: SVGInputProps) {
         <InputControls
             setInput={props.setInput}
             input={props.input}
+            setDensityFactor={props.setDensityFactor}
+            densityFactor={props.densityFactor}
             setInteraction={setInteraction}
             createExportString={props.createExportString}
             onImport={props.onImport}

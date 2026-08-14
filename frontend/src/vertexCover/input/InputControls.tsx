@@ -2,12 +2,11 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import type {InputControlProps, VertexCoverRequest} from "../shared/Types.tsx";
 import type {Graph} from "../shared/Types.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
-import {useState} from "react";
 import type {AnimationRequest} from "../../shared/Types.tsx";
 import {getFormattedRequest, getRandomEdges, getRandomGraph} from "../shared/Utils.tsx";
+import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 
 export function InputControls(props: InputControlProps) {
-    const [densityFactor, setDensityFactor] = useState<number>(0);
 
     const setRandomGraph = () => {
         const size = document.getElementById("graphSizeInputSlider") as HTMLInputElement;
@@ -22,7 +21,7 @@ export function InputControls(props: InputControlProps) {
                 timestamp: Date.now()
             };
         });
-        setDensityFactor(density.valueAsNumber);
+        props.setDensityFactor(density.valueAsNumber);
     };
 
     const setRandomEdges = () => {
@@ -36,10 +35,10 @@ export function InputControls(props: InputControlProps) {
                 timestamp: Date.now()
             };
         });
-        setDensityFactor(density.valueAsNumber);
+        props.setDensityFactor(density.valueAsNumber);
     };
 
-    const resetInput = () => {
+    const onReset = () => {
         props.setInput({graph: {nodes: [], edges: []}, nodeOrder: [], edgeOrder: [], timestamp: Date.now()});
         props.setInteraction({type: "idle"});
     };
@@ -51,25 +50,43 @@ export function InputControls(props: InputControlProps) {
 
     return <>
         <div className="control-row">
+            <ControlsHelp tab={"input"} algorithm={"vertexCover"}/>
+
+
+            <PresetSelect setInput={setPreset} algorithm={"vertexCover"} getInput={() => getFormattedRequest(props.input)} />
+
+            <button
+                className="control-button"
+                onClick={() => {
+                    onReset();
+                    props.setInteraction({type: "idle"});
+                }}
+            >
+                Reset
+            </button>
+
             <ImportExportDialog
-                createExportString={props.createExportString}
                 onImport={props.onImport}
+                createExportString={props.createExportString}
             />
-            <button onClick={resetInput} className="control-button vertex-cover-reset-button">Reset</button>
         </div>
         <div className="control-row">
-            <PresetSelect setInput={setPreset} algorithm={"vertexCover"} getInput={() => getFormattedRequest(props.input)} />
-            <div className="control-button">
-                <label htmlFor={"graphSizeInputSlider"}>Number of Nodes: {props.input.graph.nodes.length}</label>
-                <input id={"graphSizeInputSlider"} type={"range"} min={0} max={50} step={1}
-                       value={props.input.graph.nodes.length} onInput={setRandomGraph} className="vertex-cover-range-input"/>
-            </div>
-            <div className="control-button">
-                <label htmlFor={"graphDensityInputSlider"}>Density
-                    Factor: {densityFactor.toString().slice(0, 4)}</label>
-                <input id={"graphDensityInputSlider"} type={"range"} min={0} max={1} step={"any"}
-                       value={densityFactor} onInput={setRandomEdges} className="vertex-cover-range-input"/>
-            </div>
+            <label className="input-control-slider control-button">
+                <span className="input-control-label">Nodes: {props.input.graph.nodes.length}</span>
+                <input
+                    className="timeline-slider" id={"graphSizeInputSlider"}
+                    type="range" min={0} max={40} step={1} value={props.input.graph.nodes.length}
+                    onChange={setRandomGraph}
+                />
+            </label>
+            <label className="input-control-slider control-button">
+                <span className="input-control-label">Density: {props.densityFactor.toString().slice(0, 4)}</span>
+                <input
+                    className="timeline-slider" id={"graphDensityInputSlider"}
+                    type="range" min={0} max={1} step={"any"} value={props.densityFactor}
+                    onChange={setRandomEdges}
+                />
+            </label>
         </div>
     </>;
 }

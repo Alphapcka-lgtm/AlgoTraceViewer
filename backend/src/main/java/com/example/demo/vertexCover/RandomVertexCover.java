@@ -1,8 +1,6 @@
 package com.example.demo.vertexCover;
 
 import com.example.demo.model.Edge;
-import com.example.demo.model.Graph;
-import com.example.demo.model.Node;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,13 +10,13 @@ public class RandomVertexCover {
 
     public AnimationResponse solve(VertexCoverRequest request) {
 
+
+        List<Edge> remainingEdges = new ArrayList<>(request.getGraph().getEdges());
+        OrderComparator comparator = new OrderComparator(request.getEdgeOrder());
         List<AnimationState> intermediateStates = new ArrayList<>();
 
-        OrderComparator comparator = new OrderComparator(request.getEdgeOrder());
-        List<Edge> remainingEdges = new ArrayList<>(request.getGraph().getEdges());
-
         while (!remainingEdges.isEmpty()) {
-            Edge chosenEdge = remainingEdges.stream().min(comparator::compare).orElseThrow();
+            Edge chosenEdge = remainingEdges.stream().min(comparator).orElseThrow();
 
             List<Edge> incidentEdges = remainingEdges.stream()
                     .filter(edge ->

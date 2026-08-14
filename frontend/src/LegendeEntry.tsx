@@ -1,8 +1,8 @@
 import type {ReactNode} from "react";
 import type {RingStyle} from "./closestPair/shared/Types.tsx";
-import {colors} from "./vertexCover/output/PseudoCode.ts";
 import {POINT_COLORS} from "./closestPair/shared/Utils.ts";
 import {SAIS_COLORS} from "./sais/output/SaisOutput.tsx";
+import {COLORS} from "./vertexCover/shared/Utils.tsx";
 
 type LegendEntryProps = {
     label: string;
@@ -89,10 +89,10 @@ export function XPointIcon({color, ringStyle = "none", variant = "default"}: XPo
 export function NodeIcon() {
     return (
         <>
-            <circle cx={9} cy={9} r={9} fill="black"/>
-            <circle cx={9} cy={9} r={8} fill={colors.orange}/>
-            <circle cx={9} cy={9} r={7} fill="black"/>
-            <circle cx={9} cy={9} r={6} fill={colors.orange}/>
+            <circle cx={9} cy={9} r={9} fill={COLORS.black}/>
+            <circle cx={9} cy={9} r={8} fill={COLORS.orange}/>
+            <circle cx={9} cy={9} r={7} fill={COLORS.black}/>
+            <circle cx={9} cy={9} r={6} fill={COLORS.orange}/>
         </>
     );
 }
@@ -105,7 +105,7 @@ export function RemainingEdgeIcon() {
                 x2={20}
                 y1={0}
                 y2={20}
-                stroke={colors.blue}
+                stroke={COLORS.blue}
                 strokeWidth={7}
             />
             <line
@@ -113,7 +113,7 @@ export function RemainingEdgeIcon() {
                 x2={20}
                 y1={0}
                 y2={20}
-                stroke="black"
+                stroke={COLORS.black}
                 strokeWidth={2}
             />
         </>
@@ -128,7 +128,7 @@ export function ArbitraryEdgeIcon() {
                 x2={20}
                 y1={0}
                 y2={20}
-                stroke={colors.red}
+                stroke={COLORS.red}
                 strokeWidth={7}
             />
             <line
@@ -136,50 +136,7 @@ export function ArbitraryEdgeIcon() {
                 x2={20}
                 y1={0}
                 y2={20}
-                stroke="black"
-                strokeWidth={2}
-            />
-        </>
-    );
-}
-
-export function NodeDegreeMapIcon() {
-    return (
-        <>
-            <rect
-                x={0}
-                y={0}
-                width={10}
-                height={10}
-                stroke="black"
-                fill="none"
-                strokeWidth={2}
-            />
-            <rect
-                x={10}
-                y={0}
-                width={10}
-                height={10}
-                stroke="black"
-                fill="none"
-                strokeWidth={2}
-            />
-            <rect
-                x={0}
-                y={10}
-                width={10}
-                height={10}
-                stroke="black"
-                fill="none"
-                strokeWidth={2}
-            />
-            <rect
-                x={10}
-                y={10}
-                width={10}
-                height={10}
-                stroke="black"
-                fill="none"
+                stroke={COLORS.black}
                 strokeWidth={2}
             />
         </>

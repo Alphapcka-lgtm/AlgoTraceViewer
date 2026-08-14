@@ -19,3 +19,70 @@
 .algorithm-overview__content p:last-child {
     margin-bottom: 0;
 }
+
+.algorithm-overview__definition {
+    background-color: #f2f2f2;
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.algorithm-overview__definition p:first-child {
+    margin-top: 0;
+}
+
+.algorithm-overview__definition p:last-child {
+    margin-bottom: 0;
+}
+
+.algorithm-overview__source {
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.algorithm-overview__content {
+    height: 220px;
+    overflow-y: auto;
+    line-height: 1.55;
+}
+
+.algorithm-overview__content--expanded {
+    height: auto;
+    overflow-y: visible;
+}
+
+.algorithm-overview__toggle {
+    margin-top: var(--space-sm);
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+.algorithm-overview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.algorithm-overview__header h3 {
+    margin: 0;
+}
+
+.algorithm-overview__toggle {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+.algorithm-overview__sources a {
+    color: inherit;
+}
+.algorithm-overview__section {
+    margin-bottom: 16px;
+}
+
+.algorithm-overview__section h4 {
+    margin: 0 0 8px;
+}

@@ -1,12 +1,5 @@
 import type {Edge, Node, EdgesProps, PreviewEdgeProps} from "./Types.tsx";
-
-const COLORS = {
-    red: "#be3d2a",
-    orange: "#f4a582",
-    white: "#f7f7f7",
-    lightblue: "#92c5de",
-    blue: "#0000CD",
-} as const;
+import {COLORS} from "./Utils.tsx";
 
 const EDGE_CLASS = "vertex-cover-hidden-edge";
 
@@ -28,7 +21,7 @@ export function Edges(props: EdgesProps) {
                     <g key={e.id}>
                         <line
                             {...lineProps}
-                            id={"u0" + e.id}
+                            id={"blue" + e.id}
                             className={EDGE_CLASS}
                             stroke={COLORS.blue}
                             strokeWidth={5}
@@ -37,7 +30,7 @@ export function Edges(props: EdgesProps) {
                         <line
                             {...lineProps}
                             id={e.id}
-                            stroke="black"
+                            stroke={COLORS.black}
                             strokeWidth={2}
                         />
                     </g>
@@ -59,7 +52,7 @@ export function Edges(props: EdgesProps) {
                     <g key={e.id}>
                         <line
                             {...lineProps}
-                            id={"u1" + e.id}
+                            id={"red" + e.id}
                             className={EDGE_CLASS}
                             stroke={COLORS.red}
                             strokeWidth={7}
@@ -84,7 +77,7 @@ export function PreviewEdge(props: PreviewEdgeProps) {
             y1={node.y}
             x2={props.interaction.to.x}
             y2={props.interaction.to.y}
-            stroke="black"
+            stroke={COLORS.black}
             strokeWidth={1}
             strokeDasharray="4"
         />
