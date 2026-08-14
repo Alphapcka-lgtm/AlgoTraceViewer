@@ -96,7 +96,7 @@ function HomeContent(props: HomeContentProps) {
 
                 <AlgorithmCard
                     title="Vertex Cover"
-                    description="bup lup schup"
+                    description="Finds a set of vertices that has each edge of an undirected graph covered"
                     onClick={() => props.onTabChange("vertexCover")}
                 />
 
