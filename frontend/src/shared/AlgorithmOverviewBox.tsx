@@ -144,5 +144,79 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                 </div>
             </section>
         );
+    } else if (props.algoTyp === "ehrlichSwaps") {
+        return (
+            <section className="algorithm-overview">
+                <div className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
+                    <div className="algorithm-overview__header">
+                        <h3>Ehrlich Swaps</h3>
+                        <button
+                            type="button"
+                            onClick={() => setExpanded(value => !value)}
+                            className="control-button algorithm-overview__toggle"
+                        >
+                            {expanded ? <ChevronsDownUp/> : <ChevronsUpDown/>}
+                        </button>
+                    </div>
+
+                    <div className="algorithm-overview__section">
+                        <h4>Problem</h4>
+                        <p>
+                            Given n distinct elements a₀, ..., aₙ₋₁, the goal is to generate all n! possible permutations of these elements.
+                        </p>
+                    </div>
+
+                    <div className="algorithm-overview__section">
+                        <h4>Solution</h4>
+                        <p>
+                            The <strong>Ehrlich Swaps Algorithm</strong> generates each permutation from its
+                            predecessor using a single swap. The Algorithm always swaps the first element a₀ with another element.
+                            These swaps are also called <strong>star transpositions</strong>.
+                        </p>
+                        <p>
+                            The method uses two auxiliary arrays, <strong>b</strong> and <strong>c</strong>.
+                            Initially, bⱼ = j. For each new permutation, a value <strong>k</strong> is
+                            determined and the first element is swapped with the element at position bₖ:
+                            a₀ ↔ a<sub>bₖ</sub>.
+                        </p>
+                        <p>
+                            After the swap, the entries b₁, ..., b<sub>k-1</sub> are reversed. The resulting
+                            b-array determines the positions used by subsequent swaps.
+                        </p>
+                        <p>
+                            The values of k follow a regular pattern. If the swaps are numbered starting
+                            with i = 1, then k is the largest value for which k! divides i.
+                            Therefore, k is at least 1 for every swap, becomes 2 at every multiple of 2!,
+                            3 at every multiple of 3!, and so on.
+                        </p>
+                    </div>
+
+                    <div className="algorithm-overview__section">
+                        <h4>Visualization</h4>
+                        <p>
+                            In the original Ehrlich Swaps Algorithm, the auxiliary array <strong>c</strong> is used
+                            to determine the next value of k. Since c is only needed to generate the
+                            sequence of k-values and is not unique to Ehrlich's method, it is not visualized here.
+                        </p>
+                        <p>
+                            Instead, the visualization assumes a <strong>k-generator</strong> that
+                            directly provides the same k-values. This allows the visualization to focus
+                            on the operations that change the visible state: selecting bₖ, swapping
+                            a₀ ↔ a<sub>bₖ</sub>, and reversing b₁, ..., bₖ₋₁.
+                        </p>
+                        <p>
+                            This abstraction does not change the generated permutations or the swaps
+                            performed by Ehrlich's method. It only replaces the internal calculation of
+                            k through the c-array with its resulting sequence.
+                        </p>
+                    </div>
+
+                    <div className="algorithm-overview__sources">
+                        <span><strong>Source: </strong></span>
+                        <span>Donald E. Knuth — <em>The Art of Computer Programming</em>, Algorithm E (Ehrlich swaps)</span>
+                    </div>
+                </div>
+            </section>
+        );
     }
 }

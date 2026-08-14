@@ -70,11 +70,6 @@ function NavButton(props: NavButtonProps) {
     );
 }
 
-function SuffixArray() {
-    return <h1>suffixarray</h1>;
-}
-
-
 type HomeContentProps = {
     onTabChange: (tab: Tab) => void;
 };
