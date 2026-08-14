@@ -18,7 +18,12 @@ export function SaisInput(props: SaisInputProps) {
     return (
         <div className="algorithm-panel">
             {/* input/output tabs header */}
-            <IOModeTabs mode={"input"} onChangeInput={props.onChangeInput} onSubmit={props.onSubmit} canSubmit={true}/>
+            <IOModeTabs
+                mode={"input"}
+                onChangeInput={props.onChangeInput}
+                onSubmit={props.onSubmit}
+                canSubmit={props.canSubmit}
+            />
             <SaisInputField value={props.value} onUpdateValue={props.onUpdateValue}/>
             {/* input control buttons */}
             <div className="control-row">

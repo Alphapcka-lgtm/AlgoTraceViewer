@@ -4,12 +4,14 @@ import {ChevronsDownUp, ChevronsUpDown} from "lucide-react";
 export type AlgorithmOverviewBoxProps = {
     algoTyp: "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
 };
-export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
+
+export function AlgorithmOverviewBox(props: AlgorithmOverviewBoxProps) {
     const [expanded, setExpanded] = useState(false);
-    if(props.algoTyp === "closestPair") {
+    if (props.algoTyp === "closestPair") {
         return (
             <section className="algorithm-overview">
-                <div className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
+                <div
+                    className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
                     <div className="algorithm-overview__header">
                         <h3>Closest Pair — Sweep Line</h3>
                         <button
@@ -32,37 +34,51 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                         <p>
                             The <strong>sweep-line algorithm</strong>, also called plane sweep,
                             finds the closest pair of points by moving a vertical sweep line from left to right.
-                            One point is processed at a time and is referred to as the current point. <strong>δ</strong> denotes the shortest
+                            One point is processed at a time and is referred to as the current
+                            point. <strong>δ</strong> denotes the shortest
                             Euclidean distance found so far.
                         </p>
                         <p>
-                            Previously processed points inside the <strong>δ-wide active window</strong> form the <strong>active set</strong>,
-                            which is kept ordered by y-coordinate. Only active points need to be considered for a closer pair with the current point.
-                            Once a point leaves the active window, its horizontal distance from the current point is already at least δ.
-                            As the sweep only moves to the right, that point can also be discarded for all future points.
+                            Previously processed points inside the <strong>δ-wide active window</strong> form
+                            the <strong>active set</strong>,
+                            which is kept ordered by y-coordinate. Only active points need to be considered for a closer
+                            pair with the current point.
+                            Once a point leaves the active window, its horizontal distance from the current point is
+                            already at least δ.
+                            As the sweep only moves to the right, that point can also be discarded for all future
+                            points.
                         </p>
                         <p>
                             For the current point, only active points with y-coordinates between
-                            current.y − δ and current.y + δ need to be considered: the distance from each candidate to the current point is calculated and compared with δ.
-                            Together with the horizontal restriction of the active window, this defines a <strong>δ × 2δ candidate window </strong>
+                            current.y − δ and current.y + δ need to be considered: the distance from each candidate to
+                            the current point is calculated and compared with δ.
+                            Together with the horizontal restriction of the active window, this defines a <strong>δ × 2δ
+                            candidate window </strong>
                             to the left of and vertically centered on the current point.
                         </p>
                     </div>
                     <div className="algorithm-overview__section">
                         <h4>Complexity</h4>
                         <p>
-                            The points are first sorted by x-coordinate, which takes O(n log n) time. Using a balanced search tree for the y-ordered active set,
-                            inserting or removing a point takes O(log n), and each of the n points is inserted and removed at most once.
-                            It can also be shown that at most 10 points can lie within the candidate window for each current point,
-                            bounding the number of distance calculations per point by a constant and therefore all distance calculations by O(n).
-                            Since O(n log n) dominates O(n), the algorithm has a time complexity of <strong>O(n log n)</strong> and uses O(n) space.
+                            The points are first sorted by x-coordinate, which takes O(n log n) time. Using a balanced
+                            search tree for the y-ordered active set,
+                            inserting or removing a point takes O(log n), and each of the n points is inserted and
+                            removed at most once.
+                            It can also be shown that at most 10 points can lie within the candidate window for each
+                            current point,
+                            bounding the number of distance calculations per point by a constant and therefore all
+                            distance calculations by O(n).
+                            Since O(n log n) dominates O(n), the algorithm has a time complexity of <strong>O(n log
+                            n)</strong> and uses O(n) space.
                         </p>
                     </div>
                     <p></p>
                     <div className="algorithm-overview__sources">
                         <span><strong>Sources: </strong></span>
-                        <a href="https://www.sciencedirect.com/science/article/abs/pii/0020019088901500" target="_blank" rel="noreferrer">
-                            K. Hinrichs, J. Nievergelt & P. Schorn — Plane-Sweep Solves the Closest Pair Problem Elegantly
+                        <a href="https://www.sciencedirect.com/science/article/abs/pii/0020019088901500" target="_blank"
+                           rel="noreferrer">
+                            K. Hinrichs, J. Nievergelt & P. Schorn — Plane-Sweep Solves the Closest Pair Problem
+                            Elegantly
                         </a>
 
                         <span><strong> · </strong></span>
@@ -82,7 +98,8 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
 
         return (
             <section className="algorithm-overview">
-                <div className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
+                <div
+                    className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
                     <div className="algorithm-overview__header">
                         <h3>Vertex Cover</h3>
                         <button
@@ -93,7 +110,8 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                             {expanded ? <ChevronsDownUp/> : <ChevronsUpDown/>}
                         </button>
                     </div>
-                    <p>In <em>Introduction to Algorithms</em>, a vertex cover and the associated problem are defined as follows.</p>
+                    <p>In <em>Introduction to Algorithms</em>, a vertex cover and the associated problem are defined as
+                        follows.</p>
                     <div className="algorithm-overview__definition">
                         <p>
                             A <strong>vertex cover</strong> of an undirected graph G = (V, E) is a subset V′ ⊆ V
@@ -102,7 +120,8 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                         </p>
                         <p>
                             The <strong>vertex-cover problem</strong> is to find a vertex cover of minimum size
-                            in a given undirected graph. We call such a vertex cover an <strong>optimal vertex cover</strong>.
+                            in a given undirected graph. We call such a vertex cover an <strong>optimal vertex
+                            cover</strong>.
                             This problem is the optimization version of an NP-complete decision problem.
                         </p>
                         <p>
@@ -115,8 +134,10 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                         </p>
                     </div>
                     <p>
-                        The book then presents the random heuristic, which produces a vertex cover at most twice the size
-                        of an optimal vertex cover. On this page, this heuristic can be explored along with two additional approaches.
+                        The book then presents the random heuristic, which produces a vertex cover at most twice the
+                        size
+                        of an optimal vertex cover. On this page, this heuristic can be explored along with two
+                        additional approaches.
                     </p><h3>Random Heuristic</h3>
                     <p>
                         The random heuristic chooses a random edge from the set of remaining edges and adds both
@@ -144,12 +165,13 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                 </div>
             </section>
         );
-    } else if (props.algoTyp === "ehrlichSwaps") {
+    } else if (props.algoTyp === "suffixArray") {
         return (
             <section className="algorithm-overview">
-                <div className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
+                <div
+                    className={`algorithm-overview__content ${expanded ? "algorithm-overview__content--expanded" : ""}`}>
                     <div className="algorithm-overview__header">
-                        <h3>Ehrlich Swaps</h3>
+                        <h3>Suffix Array Induced Sorting (SA-IS)</h3>
                         <button
                             type="button"
                             onClick={() => setExpanded(value => !value)}
@@ -158,72 +180,25 @@ export function AlgorithmOverviewBox(props:AlgorithmOverviewBoxProps) {
                             {expanded ? <ChevronsDownUp/> : <ChevronsUpDown/>}
                         </button>
                     </div>
-
                     <div className="algorithm-overview__section">
-                        <h4>Problem</h4>
                         <p>
-                            Given n distinct elements a<sub>0</sub>, ..., a<sub>n-1</sub>, the goal is to generate all n! possible permutations of these elements.
+                            A suffix array lists all suffixes of a string in lexicographic order. Building it naively
+                            takes <strong>O(n²)</strong> time — SA-IS does it in <strong>O(n)</strong>.
                         </p>
-                    </div>
-
-                    <div className="algorithm-overview__section">
-                        <h4>Solution</h4>
                         <p>
-                            The <strong>Ehrlich Swaps Algorithm</strong> generates each permutation from its
-                            predecessor using a single swap. The algorithm always swaps the first element
-                            a<sub>0</sub> with another element. These swaps are also called{" "}
-                            <strong>star transpositions</strong>.
+                            The core idea is that a small subset of suffixes — called LMS suffixes (Left-Most S-type),
+                            which occur at every L→S transition in the string — can act as anchors. If these are sorted
+                            correctly, every other suffix's position can be induced from them in a single linear scan,
+                            without any further comparisons.
                         </p>
-
                         <p>
-                            The method uses two auxiliary arrays, <strong>b</strong> and <strong>c</strong>.
-                            Initially, b<sub>j</sub> = j. For each new permutation, a value <strong>k</strong> is
-                            determined and the first element is swapped with the element at position
-                            b<sub>k</sub>: a<sub>0</sub> ↔ a<sub>b<sub>k</sub></sub>.
+                            SA-IS works in three phases: first, a rough placement of LMS suffixes followed by two
+                            induction
+                            passes reveals their correct relative order. Second, the sorted LMS suffixes are named and
+                            compressed into a shorter reduced string — if any two share the same name, SA-IS recurses on
+                            that string to resolve the tie. Third, the now-correctly-ordered LMS suffixes seed two final
+                            induction passes that complete the full suffix array.
                         </p>
-
-                        <p>
-                            After the swap, the entries b<sub>1</sub>, ..., b<sub>k-1</sub> are reversed.
-                            The resulting b-array determines the positions used by subsequent swaps.
-                        </p>
-
-                        <p>
-                            The values of k follow a regular pattern. If the swaps are numbered starting
-                            with i = 1, then k is the largest value for which k! divides i.
-                            Therefore, k is at least 1 for every swap, becomes 2 at every multiple of 2!,
-                            3 at every multiple of 3!, and so on.
-                        </p>
-                    </div>
-
-                    <div className="algorithm-overview__section">
-                        <h4>Visualization</h4>
-                        <p>
-                            In the original Ehrlich Swaps Algorithm, the auxiliary array <strong>c</strong> is used
-                            to determine the next value of k. Since c is only needed to generate the
-                            sequence of k-values and is not unique to Ehrlich's method, it is not visualized here.
-                        </p>
-
-                        <p>
-                            Instead, the visualization assumes a <strong>k-generator</strong> that
-                            directly provides the same k-values. This allows the visualization to focus
-                            on the operations that change the visible state: selecting b<sub>k</sub>, swapping
-                            a<sub>0</sub> ↔ a<sub>b<sub>k</sub></sub>, and reversing
-                            b<sub>1</sub>, ..., b<sub>k-1</sub>.
-                        </p>
-
-                        <p>
-                            This abstraction does not change the generated permutations or the swaps
-                            performed by Ehrlich's method. It only replaces the internal calculation of
-                            k through the c-array with its resulting sequence.
-                        </p>
-                    </div>
-
-                    <div className="algorithm-overview__sources">
-                        <span><strong>Source: </strong></span>
-                        <span>
-                        Donald E. Knuth — <em>The Art of Computer Programming</em>,
-                        Algorithm E (Ehrlich swaps)
-                    </span>
                     </div>
                 </div>
             </section>

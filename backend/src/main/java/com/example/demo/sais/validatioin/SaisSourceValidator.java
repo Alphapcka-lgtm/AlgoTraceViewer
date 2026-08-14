@@ -11,7 +11,7 @@ public class SaisSourceValidator implements ConstraintValidator<SaisRequestDtoCo
             return false;
         }
 
-        if (value.length() < 4 || value.length() > 15) {
+        if (value.isBlank() || value.length() > 15) {
             return false;
         }
 
