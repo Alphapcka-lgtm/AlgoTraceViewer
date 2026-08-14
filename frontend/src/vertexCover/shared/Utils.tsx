@@ -91,3 +91,4 @@ function shuffle<T>(array: T[]): void {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
+export const COLORS = {black: "#000000", red: "#be3d2a", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0000CD"}

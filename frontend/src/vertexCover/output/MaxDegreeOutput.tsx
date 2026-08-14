@@ -10,20 +10,20 @@ import {
     animateRemoveAndUpdate,
     animateReturn
 } from "../shared/Animations.tsx";
-import {NodeDegreeMapIcon, NodeIcon, RemainingEdgeIcon, LegendEntry} from "../../LegendeEntry.tsx";
-import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import type {StepType, SVGOutputProps, TimelineStep} from "../shared/Types.tsx";
+import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
 import {IOModeTabs} from "../../shared/IOModeTabs.tsx";
+import {PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
 import {useMemo, useRef, useState} from "react";
 import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import {MaxDegreeLegend} from "./Legend.tsx";
 import {Edges} from "../shared/Edges.tsx";
 import {Nodes} from "../shared/Nodes.tsx";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {PSEUDOCODE_MAX_DEGREE} from "./PseudoCode.ts";
 
 const STEP_DURATION = 1.0;
 
@@ -133,42 +133,11 @@ export function MaxDegreeOutput(props: SVGOutputProps) {
         />
         <div className="step-layout">
             <div className="step-layout-side">
-                <div className="step-info">
-                    <div className="step-info-grid vertex-cover-step-summary">
-                        <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {myLabels.length - 1}</div>
-                        <div><strong>Vertex Cover
-                            Size:</strong> {Math.max(0, Math.floor((props.cProps.currentStepIndex - 1) / 3))}</div>
-                    </div>
-                    <div className="step-info-grid vertex-cover-legend-grid vertex-cover-legend-grid--spaced">
-                        <LegendEntry
-                            label="Node-Degree Map N"
-                            value={""}
-                            icon={<NodeDegreeMapIcon/>}
-                        />
-                        <LegendEntry
-                            label="Vertex Cover C"
-                            value={""}
-                            icon={<NodeIcon/>}
-                        />
-                        <LegendEntry
-                            label="Remaining Edges E'"
-                            value={""}
-                            icon={<RemainingEdgeIcon/>}
-                        />
-                    </div>
-                    <div className="vertex-cover-degree-table">
-                        {props.output.initialDegreeMap.map(ndp => {
-                            return (
-                                <div id={"t1" + ndp.node.id} key={"t1" + ndp.node.id}
-                                     className="vertex-cover-degree-column">
-                                    <div className="vertex-cover-degree-cell">{ndp.node.label}</div>
-                                    <div id={"t2" + ndp.node.id} key={"t1" + ndp.node.id}
-                                         className="vertex-cover-degree-cell"></div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                <MaxDegreeLegend
+                    currentStepIndex={props.cProps.currentStepIndex}
+                    maxStepIndex={myLabels.length - 1}
+                    initialDegreeMap={props.output.initialDegreeMap}
+                />
                 <div className="step-layout-actions">
                     <ImportExportDialog
                         onImport={props.cProps.onImport}

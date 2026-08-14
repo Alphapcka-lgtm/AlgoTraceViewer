@@ -95,5 +95,3 @@ export const PSEUDOCODE_RANDOM: PseudoCodeLine[] = [
         indent: 0
     }
 ];
-
-export const colors = {red: "#be3d2a", orange: "#f4a582", white: "#f7f7f7", lightblue: "#92c5de", blue: "#0000CD"}

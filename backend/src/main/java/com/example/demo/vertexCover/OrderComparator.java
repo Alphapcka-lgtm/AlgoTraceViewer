@@ -4,7 +4,7 @@ import com.example.demo.model.Identifiable;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class OrderComparator {
+public class OrderComparator implements Comparator<Identifiable> {
 
     private final Map<String, Integer> map = new HashMap<>();
 

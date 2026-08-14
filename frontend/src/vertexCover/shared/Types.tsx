@@ -42,7 +42,7 @@ export type AnimationState = {
     degreeMap: NodeDegreePair[]
 };
 
-type NodeDegreePair = {
+export type NodeDegreePair = {
     node: Node,
     degree: number,
 }
@@ -108,3 +108,9 @@ export type StepType =
     | "ADD"
     | "REMOVE"
     | "RETURN";
+
+export type LegendProps = {
+    initialDegreeMap?: NodeDegreePair[];
+    currentStepIndex: number,
+    maxStepIndex: number,
+}
