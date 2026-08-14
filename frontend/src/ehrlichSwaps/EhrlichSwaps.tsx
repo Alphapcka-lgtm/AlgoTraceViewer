@@ -65,9 +65,8 @@ export default function EhrlichSwaps () {
         });
     };
 
-    const handleSubmit = async (): Promise<void> => {
+    const calculateOutput = async (enteredValues: string[]): Promise<void> => {
         setValidationError(null);
-        const enteredValues = extractEnteredValues(fields);
         const validationMessage = validateValues(enteredValues);
         if (validationMessage !== undefined) {
             setValidationError(validationMessage);
@@ -77,18 +76,30 @@ export default function EhrlichSwaps () {
         setLoading(true);
         try {
             const steps = await getEhrlichSwapSteps(enteredValues);
-
             setSubmittedValues(enteredValues);
             setEhrlichSwapsSteps(steps);
-            setModeState("output");
-            setCurrentStepIndex(0);
-            setProgress(0);
         } catch (error) {
             console.error(error);
             setValidationError("Input could not be processed");
         } finally {
             setLoading(false);
         }
+    };
+
+    const inputUnchanged = (values: string[]): boolean =>
+        values.length === submittedValues.length &&
+        values.every((value, index) => value === submittedValues[index]);
+
+    const handleSubmit = async (): Promise<void> => {
+        const enteredValues = extractEnteredValues(fields);
+        if (inputUnchanged(enteredValues)) {
+            setModeState("output");
+            return;
+        }
+        setProgress(0);
+        setCurrentStepIndex(0);
+        await calculateOutput(enteredValues);
+        setModeState("output");
     };
 
     const createExportString = () => {
@@ -98,13 +109,13 @@ export default function EhrlichSwaps () {
     const handleChangeInput = (): void => {setModeState("input");};
     const canSubmit = extractEnteredValues(fields).length > 1;
 
-    const handleImport = async (encoded: string) => {
+    const handleImport = async (encoded: string): Promise<void> => {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm !== "ehrlichSwaps") return;
             setProgress(imported.progress);
             setFields(imported.input);
-            await handleSubmit()
+            await calculateOutput(extractEnteredValues(imported.input));
         } catch (error) {
             console.error("Invalid import string", error);
         }
