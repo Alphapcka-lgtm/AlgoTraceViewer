@@ -39,7 +39,7 @@ export type PseudoCodePanelProps = {
     activeLineIds: string[];
 };
 
-export type AlgorithmType = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
+export type AlgorithmType = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps" | "sais";
 export type Tab = "homepage" | AlgorithmType;
 
 export type HomepageProps = {

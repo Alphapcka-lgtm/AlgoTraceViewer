@@ -20,7 +20,6 @@ import {LmsPositions} from "../shared/LmsPositions.tsx";
 import {CurrentInduceSeedIcon, LastPlacedSuffixIcon, LegendEntry, LmsIcon} from "../../LegendeEntry.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 
-// TODO: export
 const STEP_DURATION = 1.0;
 
 export const SAIS_COLORS = {
