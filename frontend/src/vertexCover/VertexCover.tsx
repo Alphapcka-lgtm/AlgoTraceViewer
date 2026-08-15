@@ -35,7 +35,7 @@ export function VertexCover() {
         timestamp: 0
     });
 
-    const fetchAnimation = async (input: VertexCoverRequest) => {
+    const fetchIntermediateAlgorithmStates = async (input: VertexCoverRequest) => {
         return fetch("http://localhost:8080/api/vertexCover/" + variant, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -52,7 +52,7 @@ export function VertexCover() {
     const submitInput = (inp: VertexCoverRequest) => {
         if (inp.timestamp > output.timestamp) {
             const formattedRequest = getFormattedRequest(inp);
-            fetchAnimation(formattedRequest)
+            fetchIntermediateAlgorithmStates(formattedRequest)
                 .then(() => {
                     setProgress(0);
                     setCurrentStepIndex(0);
@@ -67,7 +67,7 @@ export function VertexCover() {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm === "vertexCover") {
-                fetchAnimation({...imported.input, timestamp: Date.now()})
+                fetchIntermediateAlgorithmStates({...imported.input, timestamp: Date.now()})
                     .then(() => {
                         setProgress(imported.progress);
                         setModeState("output");

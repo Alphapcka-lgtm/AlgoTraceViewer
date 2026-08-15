@@ -42,7 +42,7 @@ export default function SuffixArrayInducedSorting() {
 
     const handleSubmit = async () => {
         if (input.timestamp > output.timestamp) {
-            fetchSais(input)
+            fetchIntermediateAlgorithmStates(input)
                 .then(() => {
                     setProgress(0);
                     setCurrentStepIndex(0);
@@ -54,7 +54,7 @@ export default function SuffixArrayInducedSorting() {
         }
     }
 
-    const fetchSais = async (input: SaisRequestDto) => {
+    const fetchIntermediateAlgorithmStates = async (input: SaisRequestDto) => {
         return fetch("http://localhost:8080/sais", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -74,7 +74,7 @@ export default function SuffixArrayInducedSorting() {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm === "suffixArray") {
-                fetchSais(({...imported.input, timestamp: Date.now()}))
+                fetchIntermediateAlgorithmStates(({...imported.input, timestamp: Date.now()}))
                     .then(() => {
                         setProgress(imported.progress);
                         setModeState("output");

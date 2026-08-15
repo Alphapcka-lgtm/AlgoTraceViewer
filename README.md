@@ -3,8 +3,10 @@
 **AlgoTraceViewer** is an interactive web application for exploring algorithms step by step through visual animations.
 
 Instead of only showing the final result of an algorithm, the application exposes relevant intermediate states and 
-visualizes how the algorithm progresses from its input to its result. Users can navigate through individual steps, 
-play the complete execution as an animation, change the playback speed, or move freely through the timeline.
+visualizes how the algorithm progresses from its input to its result. In the adjacent pseudocode panel the user also see the relevant code lines highlighted.
+Users can navigate through individual steps, play the complete execution as an animation, change the playback speed, or move freely through the timeline.
+Furthermore, a user can share the current state of an animation using an export string that can be imported by other users.
+Inputs can also be saved as presets. 
 
 The project currently contains visualizations for:
 
@@ -19,30 +21,15 @@ The project currently contains visualizations for:
 
 AlgoTraceViewer consists of a React frontend and a Spring Boot backend.
 
-### Frontend
 
-- **React 19**
-- **TypeScript**
-- **Vite**
-- **GSAP** and `@gsap/react` for animations
-- **React Router** for navigation
-- **Lucide React** for icons
-- CSS for styling and algorithm-specific visualizations
-
-### Backend
-
-- **Java 25**
-- **Spring Boot 4**
-- **Spring Web / Spring MVC**
-- **Jakarta Validation**
-- **Maven**
-- **Lombok**
-
-### Deployment
-
-- **Docker**
-- Multi-stage Docker build
-- The production frontend is served as static content by the Spring Boot application
+| Frontend                        | Backend                     | Deployment                                                                              |
+|---------------------------------|-----------------------------|-----------------------------------------------------------------------------------------|
+| **React 19**                    | **Java 25**                 | **Docker**                                                                              |
+| **TypeScript**                  | **Spring Boot 4**           | Multi-stage Docker build                                                                |
+| **Vite**                        | **Spring Web / Spring MVC** | The production frontend is served as static content <br/>by the Spring Boot application |
+| **GSAP** for animations         | **Maven**                   |                                                                                         |
+| **React Router** for navigation | **Lombok**                  |                                                                                         |
+| **Lucide React** for icons      |                             |                                                                                         |
 
 ---
 # General Application Flow
@@ -132,7 +119,7 @@ The application then switches from the input view to the output visualization.
 
 The output components are responsible for translating the data returned by the backend into a visual animation.
 
-For the GSAP-based visualizations, a timeline is created from the intermediate algorithm states.
+For the GSAP-based visualizations, a timeline is created from the intermediate algorithm states. After that the timeline becomes the central object... siehe output controls. 
 
 Conceptually:
 
@@ -179,17 +166,9 @@ For example, a single algorithm iteration can be divided into several visual pha
 
 The current GSAP timeline position is synchronized with React state.
 
-The important shared states are:
+The important shared states are: `progress`
 
-```text
-progress
-```
-
-for the continuous position in the complete animation, and:
-
-```text
-currentStepIndex
-```
+for the continuous position in the complete animation, and: `currentStepIndex`
 
 for the currently reached discrete visualization step.
 
@@ -310,11 +289,7 @@ SaisController
 VertexCoverController
 ```
 
-There is also a separate:
-
-```text
-PresetController
-```
+There is also a separate: `PresetController`
 
 for loading and storing presets.
 
@@ -332,11 +307,7 @@ GET  /api/presets/{algorithm}
 POST /api/presets/{algorithm}
 ```
 
-Preset data is stored in:
-
-```text
-backend/data/presets.json
-```
+Preset data is stored in: `backend/data/presets.json`
 
 Import/export functionality allows a visualization configuration to be restored later.
 
@@ -357,33 +328,17 @@ npm run dev
 
 Vite starts the development server. The backend controllers currently allow requests from the local Vite development origin.
 
-A production frontend build can be created with:
+A production frontend build can be created with:`npm run build`
 
-```bash
-npm run build
-```
-
-The resulting files are written to:
-
-```text
-frontend/dist/
-```
+The resulting files are written to: `frontend/dist/`
 
 ---
 
 ## Backend Development
 
-From the `backend` directory, the Spring Boot application can be built with Maven:
+From the `backend` directory, the Spring Boot application can be built with Maven:`./mvnw clean package`
 
-```bash
-./mvnw clean package
-```
-
-and started with:
-
-```bash
-./mvnw spring-boot:run
-```
+and started with: `./mvnw spring-boot:run`
 
 ---
 
@@ -391,11 +346,7 @@ and started with:
 
 The repository contains a `Dockerfile` as well as helper scripts for building and running the complete application.
 
-The provided:
-
-```text
-build.sh
-```
+The provided:`build.sh`
 
 first builds the React frontend:
 
@@ -413,23 +364,11 @@ frontend/dist
 backend/src/main/resources/static
 ```
 
-Afterwards, the Docker image is built:
+Afterwards, the Docker image is built: `docker build -t my-app .`
 
-```bash
-docker build -t my-app .
-```
+The provided helper script: `./run.sh`
 
-The provided helper script:
-
-```bash
-./run.sh
-```
-
-runs the image with:
-
-```bash
-docker run -p 8080:8080 my-app
-```
+runs the image with: `docker run -p 8080:8080 my-app`
 
 The complete application can then be accessed through port `8080`.
 
@@ -479,3 +418,205 @@ Shared infrastructure handles common concepts such as navigation, playback, prog
 Each algorithm is responsible for defining its own input, computing or receiving its intermediate states, and translating those states into an appropriate visualization.
 
 This structure allows new algorithms to reuse the general visualization framework without forcing fundamentally different algorithms into the same internal representation.
+
+```ts
+function ExampleAlgorithm() {
+    // State that tracks weather input or output mode/tab is activ 
+    const [modeState, setModeState] = useState<"input" | "output">("input");
+    // State that holds the input from the user 
+    const [input, setInput] = useState<ExampleInput>(...);
+    // State that holds the calculated algorithm intermediate states
+    const [steps, setSteps] = useState<ExampleStep[]>([]);
+    // States that hold the discrete and continuous animation progress   
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [progress, setProgress] = useState(0);
+
+    // Request the beckend to calculate the intermediate states from the input 
+    const fetchIntermediateAlgorithmStates = async () => {
+        const steps = await getExampleSteps(input);
+        setSteps(steps);
+    };
+
+    // Handles the switch from input to output tab
+    const handleSubmit = async () => {
+        setProgress(0);
+        setCurrentStepIndex(0);
+        await calculateOutput();
+        setMode("output");
+    };
+    
+    // Similar to handleSubmit, but gets the input and progress from the export string 
+    const handleImport = async (encoded: string) => {
+        try {
+            const imported: ExportState = decodeExportState(encoded);
+            if (imported.algorithm !== "exampleAlgorithm") return;
+            setProgress(imported.progress); 
+            await fetchIntermediateAlgorithmStates(imported.input);
+            setModeState("output");
+        } catch (error) {
+            console.error("Invalid import string", error);
+        }
+    };
+
+    // Props that are used by commen output (sub)components 
+    const cProps: CommonOutputProps = {
+        progress,
+        setProgress,
+        currentStepIndex,
+        setCurrentStepIndex,
+        onChangeInput: () => setMode("input"),
+        ...
+    };
+    
+    // 8. Rendering the Input or Output components
+    return mode === "input"
+        ? <Input ... />
+        : <Output steps={steps} cProps={cProps} />;
+}
+```
+
+```ts
+function ExampleOutput(props: OutputProps) {
+    // State that tracks whether the animation is currently auto-playing
+    const [isPlaying, setIsPlaying] = useState(false);
+    // Reference to the GSAP timeline used by the animation and the shared OutputControls
+    const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
+    // In this case one animation step corresponds to one algorithm intermediate state
+    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
+
+    useGSAP(() => {
+         // The GSAP timeline contains all animations in their execution order.
+        const timeline = gsap.timeline({
+            paused: true, defaults: {duration: STEP_DURATION, ease: "power2.inOut"
+            },
+
+            /*
+             * onUpdate runs whenever the timeline position changes, for example
+             * during autoplay, scrubbing or when moving to another step.
+             *
+             * The continuous timeline position is stored as progress, while
+             * getCurrentTimelineStepIndex maps the current timeline time to the
+             * last reached label and therefore to a discrete visualization step.
+             * 
+             * As a result continuous and disrecte progress are synchronized.
+             */
+            onUpdate: () => {
+                const tl = timelineRef.current;
+                props.cProps.setProgress(tl.progress());
+                const currentStepIndex = getCurrentTimelineStepIndex(tl, labels);
+                props.cProps.setCurrentStepIndex(currentStepIndex);
+            },
+            // Keeps the React playback state synchronized when the timeline reaches its end
+            onComplete: () => {
+                props.cProps.setProgress(1);
+                setIsPlaying(false);
+                timelineRef.current.pause();
+            }
+        });
+
+        /*
+         * Adds the algorithm-specific animations to the timeline.
+         *
+         * Each TimelineStep describes a stable visualization state/phase.
+         * The animation added for a step performs the transition from the
+         * previously reached state to this target state.
+         */
+        timelineSteps.forEach((targetStep, stepIndex) => {
+            //... 
+            
+            /*
+             * A label marks the point at which the target visualization state
+             * has been reached. The labels are later used by OutputControls and
+             * getCurrentTimelineStepIndex to navigate between discrete steps.
+             */
+            timeline.addLabel(labels[stepIndex]);
+        });
+
+        // Store the newly created timeline so OutputControls and callbacks can access it
+        timelineRef.current = timeline;
+
+        /*
+         * Restores the animation position.
+         * Normally progress is 0, but after an import it contains the previously
+         * exported position. 
+         * 
+         * Setting the progress also causes onUpdate to derive
+         * the corresponding currentStepIndex.
+         */
+        timeline.progress(props.cProps.progress).pause();
+
+        setIsPlaying(false);
+
+        // Remove the old timeline when new algorithm output is loaded or the component unmounts
+        return () => {
+            timeline.kill();
+            timelineRef.current = gsap.timeline({paused: true});
+        };
+    }, {
+        dependencies: [props.steps]
+    });
+
+    // The discrete TimelineStep currently reached by the animation
+    const currentTimelineStep = timelineSteps[props.cProps.currentStepIndex];
+    return (
+        <div className="algorithm-panel">
+            {/* Switch back to the algorithm input */}
+            <IOModeTabs
+                mode="output"
+                onChangeInput={props.cProps.onChangeInput}
+                onSubmit={() => {}}
+                canSubmit={false}
+            />
+                
+            <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
+                {/*algorithm-specific animation svg elements ...*/}
+            </svg>
+    
+
+            {/*
+             * Shared controls operate directly on the GSAP timeline.
+             * Play/Pause changes the playback state, Next/Previous move to
+             * timeline labels and the scrubber changes timeline.progress().
+             */}
+            <OutputControls
+                timelineRef={timelineRef}
+                labels={labels}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
+                isPlaying={isPlaying}
+                setIsPlaying={setIsPlaying}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
+            />
+
+            <div className="step-layout">
+                <div className="step-layout-side">
+                    {/* Algorithm-specific information for the current visualization step */}
+                    <Legend
+                        step={currentTimelineStep}
+                        currentStepIndex={props.cProps.currentStepIndex}
+                        totalSteps={props.steps.length-1}
+                    />
+                        
+                    <div className="step-layout-actions">
+                        <ImportExportDialog
+                            onImport={props.cProps.onImport}
+                            createExportString={props.cProps.createExportString}
+                        />
+                    </div>
+                </div>
+
+                {/*
+                 * The shared panel only renders pseudocode.
+                 * Which lines are active is determined from the algorithm-specific
+                 * step type of the current visualization step.
+                 */}
+                <PseudoCodePanel
+                    lines={SWEEP_LINE_PSEUDOCODE}
+                    activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
+                />
+            </div>
+        </div>
+    );
+}
+```
