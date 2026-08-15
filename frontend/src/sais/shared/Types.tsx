@@ -1,4 +1,5 @@
 import type {Dispatch, SetStateAction} from "react";
+import type {CommonOutputProps} from "../../shared/Types.tsx";
 
 export type SaisInputProps = {
     height: number,
@@ -20,17 +21,11 @@ export type SaisInputFieldProps = {
 
 export type SaisOutputProps = {
     output: SaisResponseDto,
-    progress: number,
-    setProgress: Dispatch<SetStateAction<number>>,
-    stepIndex: number,
-    setStepIndex: Dispatch<SetStateAction<number>>,
     activeLineIds: string[],
     setActiveLineIds: Dispatch<SetStateAction<string[]>>,
     stepDescription: StepInfo,
     setStepDescription: Dispatch<SetStateAction<StepInfo>>,
-    onChangeInput: () => void;
-    createExportString: () => string;
-    onImport: (encoded: string) => void;
+    cProps: CommonOutputProps
 }
 
 export type SaisRequestDto = {

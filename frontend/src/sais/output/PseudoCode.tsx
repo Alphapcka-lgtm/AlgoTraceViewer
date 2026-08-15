@@ -1,5 +1,28 @@
 import type {PseudoCodeLine} from "../../shared/Types.tsx";
 
+export const SAIS_COLORS = {
+    bg: "#15161A",
+    panel: "#1C1E24",
+    panelBorder: "#2C2F38",
+    textPrimary: "#EDEDEF",
+    textSecondary: "#9A9CA6",
+    textMuted: "#6B6D78",
+    amber: "#E8A33D",
+    amberBg: "rgba(232,163,61,0.12)",
+    violet: "#9C8CF0",
+    violetBg: "rgba(156,140,240,0.14)",
+    teal: "#5FC9B8",
+    tealBg: "rgba(95,201,184,0.12)",
+    rose: "#E8806B",
+    roseBg: "rgba(232,128,107,0.12)",
+    cellBg: "#23252C",
+    cellEmpty: "#1A1B20",
+    cellHighlight: "#00ff70",
+    seedCellHighlight: "#9C8CF0",
+    lmsCellHighlight: "#FFFF00",
+    lastPlaceCellHighlight: "#ADD8E6",
+};
+
 export const PSEUDOCODE_SAIS: PseudoCodeLine[] = [
     {
         id: "word",

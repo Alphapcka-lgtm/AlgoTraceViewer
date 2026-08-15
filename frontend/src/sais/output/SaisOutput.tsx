@@ -12,7 +12,7 @@ import DrawSVGPlugin from "gsap/DrawSVGPlugin";
 import ScrambleTextPlugin from "gsap/ScrambleTextPlugin";
 import {OutputControls} from "../../shared/OutputControls.tsx";
 import {PseudoCodePanel} from "../../shared/PseudoCodePanel.tsx";
-import {PSEUDOCODE_SAIS} from "./PseudoCode.tsx";
+import {PSEUDOCODE_SAIS, SAIS_COLORS} from "./PseudoCode.tsx";
 import {ReducedString} from "../shared/ReducedString.tsx";
 import {ReducedSortedString} from "../shared/ReducedSortedString.tsx";
 import {EmptySuffixArray} from "../shared/EmptySuffixArray.tsx";
@@ -21,29 +21,6 @@ import {CurrentInduceSeedIcon, LastPlacedSuffixIcon, LegendEntry, LmsIcon} from 
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 
 const STEP_DURATION = 1.0;
-
-export const SAIS_COLORS = {
-    bg: "#15161A",
-    panel: "#1C1E24",
-    panelBorder: "#2C2F38",
-    textPrimary: "#EDEDEF",
-    textSecondary: "#9A9CA6",
-    textMuted: "#6B6D78",
-    amber: "#E8A33D",
-    amberBg: "rgba(232,163,61,0.12)",
-    violet: "#9C8CF0",
-    violetBg: "rgba(156,140,240,0.14)",
-    teal: "#5FC9B8",
-    tealBg: "rgba(95,201,184,0.12)",
-    rose: "#E8806B",
-    roseBg: "rgba(232,128,107,0.12)",
-    cellBg: "#23252C",
-    cellEmpty: "#1A1B20",
-    cellHighlight: "#00ff70",
-    seedCellHighlight: "#9C8CF0",
-    lmsCellHighlight: "#FFFF00",
-    lastPlaceCellHighlight: "#ADD8E6",
-};
 
 export function SaisOutput(props: SaisOutputProps) {
     const data = props.output;
@@ -141,11 +118,11 @@ export function SaisOutput(props: SaisOutputProps) {
             },
             onUpdate: () => {
                 const tl = tlRef.current;
-                props.setProgress(tl.progress()); //für scrubber
+                props.cProps.setProgress(tl.progress()); //für scrubber
 
                 const stepIndex: number = getCurrentTimelineStepIndex(tl, labels);
 
-                props.setStepIndex(stepIndex);
+                props.cProps.setCurrentStepIndex(stepIndex);
             },
             onComplete: () => {
                 setIsPlaying(false);
@@ -215,7 +192,7 @@ export function SaisOutput(props: SaisOutputProps) {
             const indexCell = `#index_row_rect_${step.sourceIndex}`;
             const saPlacedCell = `#s${currentCounter}_cell_${step.bucketIndex}`;
 
-            let originalFill = gsap.getProperty(wordCell, "fill");
+            const originalFill = gsap.getProperty(wordCell, "fill");
 
             timeline.to(indexCell, {fill: SAIS_COLORS.cellHighlight});
             timeline.to(wordCell, {fill: SAIS_COLORS.cellHighlight}, "<");
@@ -512,7 +489,7 @@ export function SaisOutput(props: SaisOutputProps) {
             currentCounter++;
         }
 
-        void timeline.progress(props.progress);
+        void timeline.progress(props.cProps.progress);
         setIsPlaying(false);
 
         return () => {
@@ -527,7 +504,7 @@ export function SaisOutput(props: SaisOutputProps) {
         <div className="algorithm-panel">
             <IOModeTabs
                 mode={"output"}
-                onChangeInput={props.onChangeInput}
+                onChangeInput={props.cProps.onChangeInput}
                 onSubmit={() => {
                 }}
                 canSubmit={false}
@@ -1017,17 +994,17 @@ export function SaisOutput(props: SaisOutputProps) {
             <OutputControls
                 timelineRef={tlRef}
                 labels={labels}
-                currentStep={props.stepIndex}
-                setCurrentStep={props.setStepIndex}
+                currentStep={props.cProps.currentStepIndex}
+                setCurrentStep={props.cProps.setCurrentStepIndex}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                progress={props.progress}
-                setProgress={props.setProgress}
+                progress={props.cProps.progress}
+                setProgress={props.cProps.setProgress}
             />
             {/* step info */}
             <div className="step-info sais-step-info-height">
                 <div className="step-info-grid sais-step-summary">
-                    <div><strong>Step:</strong> {props.stepIndex} / {labels.length - 1}</div>
+                    <div><strong>Step:</strong> {props.cProps.currentStepIndex} / {labels.length - 1}</div>
                 </div>
                 <div className="step-info-grid sais-legend-grid sais-legend-grid--spaced">
                     <LegendEntry label={"Left-Most-S-Type"} value={""} icon={<LmsIcon/>}/>
@@ -1040,7 +1017,7 @@ export function SaisOutput(props: SaisOutputProps) {
                 </div>
             </div>
             <div className="step-layout-actions">
-                <ImportExportDialog onImport={props.onImport} createExportString={props.createExportString}/>
+                <ImportExportDialog onImport={props.cProps.onImport} createExportString={props.cProps.createExportString}/>
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_SAIS}

@@ -15,7 +15,7 @@ import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 import {VariantNavigation} from "./shared/VariantNavigation.tsx";
 
 export function VertexCover() {
-    const [mode, setMode] = useState<"input" | "output">("input");
+    const [modeState, setModeState] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [variant, setVariant] = useState<VertexCoverVariant>("random");
@@ -56,10 +56,10 @@ export function VertexCover() {
                 .then(() => {
                     setProgress(0);
                     setCurrentStepIndex(0);
-                    setMode("output");
+                    setModeState("output");
                 });
         } else {
-            setMode("output");
+            setModeState("output");
         }
     };
 
@@ -70,6 +70,7 @@ export function VertexCover() {
                 fetchAnimation({...imported.input, timestamp: Date.now()})
                     .then(() => {
                         setProgress(imported.progress);
+                        setModeState("output");
                     });
             }
         } catch (error) {
@@ -83,7 +84,7 @@ export function VertexCover() {
     };
 
     const onTabChange = (v: VertexCoverVariant) => {
-        if (mode === "input") {
+        if (modeState === "input") {
             setInput(prev => {
                 return {...prev, timestamp: Date.now()};
             })
@@ -96,7 +97,7 @@ export function VertexCover() {
         setProgress: setProgress,
         currentStepIndex: currentStepIndex,
         setCurrentStepIndex: setCurrentStepIndex,
-        onChangeInput: () => setMode("input"),
+        onChangeInput: () => setModeState("input"),
         createExportString: createExportString,
         onImport: handleImport
     }
@@ -118,7 +119,7 @@ export function VertexCover() {
     return (
         <>
             <div className="algorithm-shell">
-                {mode == "input" ? (
+                {modeState == "input" ? (
                     <>
                         <AlgorithmOverviewBox
                             algoTyp={"vertexCover"}

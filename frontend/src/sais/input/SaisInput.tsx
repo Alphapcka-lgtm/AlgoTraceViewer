@@ -4,6 +4,7 @@ import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {SaisInputField} from "./SaisInputField.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import type {AnimationRequest} from "../../shared/Types.tsx";
+import {AlgorithmOverviewBox} from "../../shared/AlgorithmOverviewBox.tsx";
 
 export function SaisInput(props: SaisInputProps) {
     const setPreset = (input: AnimationRequest) => {
@@ -17,6 +18,7 @@ export function SaisInput(props: SaisInputProps) {
 
     return (
         <div className="algorithm-panel">
+            <AlgorithmOverviewBox algoTyp={"suffixArray"}/>
             {/* input/output tabs header */}
             <IOModeTabs
                 mode={"input"}
@@ -27,7 +29,7 @@ export function SaisInput(props: SaisInputProps) {
             <SaisInputField value={props.value} onUpdateValue={props.onUpdateValue}/>
             {/* input control buttons */}
             <div className="control-row">
-                <PresetSelect algorithm={"sais"} setInput={setPreset} getInput={getInput}/>
+                <PresetSelect algorithm={"suffixArray"} setInput={setPreset} getInput={getInput}/>
                 <ImportExportDialog onImport={props.onImport} createExportString={props.createExportString}/>
             </div>
         </div>

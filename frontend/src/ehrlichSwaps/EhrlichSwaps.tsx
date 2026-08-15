@@ -116,6 +116,7 @@ export default function EhrlichSwaps () {
             setProgress(imported.progress);
             setFields(imported.input);
             await calculateOutput(extractEnteredValues(imported.input));
+            setModeState("output");
         } catch (error) {
             console.error("Invalid import string", error);
         }
