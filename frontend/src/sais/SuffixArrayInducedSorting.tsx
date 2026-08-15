@@ -5,7 +5,6 @@ import {SaisOutput} from "./output/SaisOutput.tsx";
 import "./SuffixArrayInducedSorting.css"
 import type {ExportState} from "../shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
-import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
@@ -105,7 +104,6 @@ export default function SuffixArrayInducedSorting() {
     if (mode === "input") {
         return (
             <>
-                <AlgorithmOverviewBox algoTyp={"suffixArray"}/>
                 <div className="algorithm-shell">
                     <SaisInput height={svgHeight}
                                width={svgWidth}

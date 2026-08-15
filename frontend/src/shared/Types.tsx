@@ -69,3 +69,7 @@ export type PresetSelectProps = {
     setInput: (input: AnimationRequest) => void,
     getInput: () => AnimationRequest;
 };
+
+export type AlgorithmOverviewBoxProps = {
+    algoTyp: AlgorithmType;
+};

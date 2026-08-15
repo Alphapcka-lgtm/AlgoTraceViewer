@@ -5,7 +5,6 @@ import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {AlgorithmOverviewBox} from "../../shared/AlgorithmOverviewBox.tsx";
 
-
 const MIN_INPUT_LENGTH = 1;
 const MAX_INPUT_LENGTH = 6;
 
