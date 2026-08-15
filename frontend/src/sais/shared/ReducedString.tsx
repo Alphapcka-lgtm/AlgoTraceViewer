@@ -3,10 +3,11 @@ import type {ReducedStringProps} from "./Types.tsx";
 export function ReducedString(props: ReducedStringProps) {
     const xCellStart = props.nameColWidth + props.xOffsetStart;
     return (
-        <g id={"reduced_string"} style={{opacity: 0}}>
+        <g id={"reduced_string"} key={"reduced_string"} style={{opacity: 0}}>
             // upper row the reduced word
             <rect
                 id={"reduced_string_name_rect"}
+                key={"reduced_string_name_rect"}
                 x={props.xOffsetStart}
                 y={props.yPos}
                 width={props.nameColWidth}
@@ -16,6 +17,7 @@ export function ReducedString(props: ReducedStringProps) {
             />
             <text
                 id={"reduced_string_name_text"}
+                key={"reduced_string_name_text"}
                 x={props.xOffsetStart + props.nameColWidth / 2}
                 y={props.yPos + props.cellHeight * 0.7}
                 textAnchor="middle"
@@ -27,6 +29,7 @@ export function ReducedString(props: ReducedStringProps) {
                     <g id={`reduced_string_elem_${index}`} key={index}>
                         <rect
                             id={`reduced_string_elem_rect_${index}`}
+                            key={`reduced_string_elem_rect_${index}`}
                             x={xCellStart + index * props.cellWidth}
                             y={props.yPos}
                             width={props.cellWidth}
@@ -36,6 +39,7 @@ export function ReducedString(props: ReducedStringProps) {
                         />
                         <text
                             id={`reduced_string_elem_text_${index}`}
+                            key={`reduced_string_elem_text_${index}`}
                             x={xCellStart + index * props.cellWidth + props.cellWidth / 2}
                             y={props.yPos + props.cellHeight * 0.7}
                             textAnchor="middle"

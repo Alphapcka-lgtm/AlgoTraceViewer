@@ -65,7 +65,7 @@ export default function EhrlichSwaps () {
         });
     };
 
-    const calculateOutput = async (enteredValues: string[]): Promise<void> => {
+    const fetchIntermediateAlgorithmStates = async (enteredValues: string[]): Promise<void> => {
         setValidationError(null);
         const validationMessage = validateValues(enteredValues);
         if (validationMessage !== undefined) {
@@ -98,7 +98,7 @@ export default function EhrlichSwaps () {
         }
         setProgress(0);
         setCurrentStepIndex(0);
-        await calculateOutput(enteredValues);
+        await fetchIntermediateAlgorithmStates(enteredValues);
         setModeState("output");
     };
 
@@ -115,7 +115,7 @@ export default function EhrlichSwaps () {
             if (imported.algorithm !== "ehrlichSwaps") return;
             setProgress(imported.progress);
             setFields(imported.input);
-            await calculateOutput(extractEnteredValues(imported.input));
+            await fetchIntermediateAlgorithmStates(extractEnteredValues(imported.input));
             setModeState("output");
         } catch (error) {
             console.error("Invalid import string", error);
