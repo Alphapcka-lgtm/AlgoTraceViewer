@@ -99,7 +99,8 @@ The exact structure differs slightly between algorithms because their inputs, in
 
 ### Algorithm Component
 
-The main algorithm component acts as the connection between input and output.
+The main algorithm component (located in Algorithm.tsx) acts as the connection between input and output. 
+A generic Algorithm.tsx example can be found at the end. 
 
 It typically manages state such as:
 
@@ -156,9 +157,9 @@ Label 0         Label 1           Label 2
 Step 0          Step 1            Step 2
 ```
 
-A backend state does not necessarily correspond to exactly one timeline step.
-
-For example, a single algorithm iteration can be divided into several visual phases. This is used in Vertex Cover and Ehrlich Swaps to show individual operations of an iteration separately.
+A backend state does not necessarily correspond to exactly one timeline step. 
+For example, Vertex Cover and Ehrlich Swaps create multiple timeline steps for each intermediate state returned by the backend. 
+In contrast, Closest Pair receives a sequence of timeline steps directly from the backend.  
 
 ---
 
@@ -419,38 +420,39 @@ Each algorithm is responsible for defining its own input, computing or receiving
 
 This structure allows new algorithms to reuse the general visualization framework without forcing fundamentally different algorithms into the same internal representation.
 
-```ts
-function ExampleAlgorithm() {
-    // State that tracks weather input or output mode/tab is activ 
+```tsx
+function Algorithm() {
+    // State that tracks whether the input or output mode/tab is active
     const [modeState, setModeState] = useState<"input" | "output">("input");
-    // State that holds the input from the user 
+    // State that holds the input from the user
     const [input, setInput] = useState<ExampleInput>(...);
     // State that holds the calculated algorithm intermediate states
     const [steps, setSteps] = useState<ExampleStep[]>([]);
-    // States that hold the discrete and continuous animation progress   
+    // States that hold the discrete and continuous animation progress
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [progress, setProgress] = useState(0);
 
-    // Request the beckend to calculate the intermediate states from the input 
-    const fetchIntermediateAlgorithmStates = async () => {
-        const steps = await getExampleSteps(input);
-        setSteps(steps);
-    };
+    // Requests the backend to calculate the intermediate states for the given input
+    const fetchIntermediateAlgorithmStates =
+        async (input: ExampleInput) => {
+            const steps = await getExampleSteps(input);
+            setSteps(steps);
+        };
 
-    // Handles the switch from input to output tab
+    // Handles the switch from the input to the output tab
     const handleSubmit = async () => {
         setProgress(0);
         setCurrentStepIndex(0);
-        await calculateOutput();
-        setMode("output");
+        await fetchIntermediateAlgorithmStates(input);
+        setModeState("output");
     };
-    
-    // Similar to handleSubmit, but gets the input and progress from the export string 
+
+    // Similar to handleSubmit, but restores input and progress from an export string
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm !== "exampleAlgorithm") return;
-            setProgress(imported.progress); 
+            setProgress(imported.progress);
             await fetchIntermediateAlgorithmStates(imported.input);
             setModeState("output");
         } catch (error) {
@@ -458,24 +460,28 @@ function ExampleAlgorithm() {
         }
     };
 
-    // Props that are used by commen output (sub)components 
+    // Props that are shared by common output subcomponents
     const cProps: CommonOutputProps = {
         progress,
         setProgress,
         currentStepIndex,
         setCurrentStepIndex,
-        onChangeInput: () => setMode("input"),
+        onChangeInput:
+            () => setModeState("input"),
         ...
     };
-    
-    // 8. Rendering the Input or Output components
-    return mode === "input"
+
+    // Renders either the input or output component depending on the active mode
+    return modeState === "input"
         ? <Input ... />
-        : <Output steps={steps} cProps={cProps} />;
+        : <Output
+            steps={steps}
+            cProps={cProps}
+        />;
 }
 ```
 
-```ts
+```tsx
 function ExampleOutput(props: OutputProps) {
     // State that tracks whether the animation is currently auto-playing
     const [isPlaying, setIsPlaying] = useState(false);
