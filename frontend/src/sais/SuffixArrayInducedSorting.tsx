@@ -77,6 +77,7 @@ export default function SuffixArrayInducedSorting() {
                 fetchSais(({...imported.input, timestamp: Date.now()}))
                     .then(() => {
                         setProgress(imported.progress);
+                        setModeState("output");
                     });
             }
         } catch (error) {

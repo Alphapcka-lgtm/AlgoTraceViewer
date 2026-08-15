@@ -93,6 +93,7 @@ export default function ClosestPair() {
             if (imported.algorithm !== "closestPair") return;
             setProgress(imported.progress);
             await calculateOutput(imported.input);//assign labels wird dann in calculateOutput geamacht ...
+            setModeState("output");
         } catch (error) {
             console.error("Invalid import string", error);
         }
