@@ -29,7 +29,7 @@ export function SaisInput(props: SaisInputProps) {
             <SaisInputField value={props.value} onUpdateValue={props.onUpdateValue}/>
             {/* input control buttons */}
             <div className="control-row">
-                <PresetSelect algorithm={"sais"} setInput={setPreset} getInput={getInput}/>
+                <PresetSelect algorithm={"suffixArray"} setInput={setPreset} getInput={getInput}/>
                 <ImportExportDialog onImport={props.onImport} createExportString={props.createExportString}/>
             </div>
         </div>

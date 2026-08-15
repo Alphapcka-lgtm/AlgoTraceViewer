@@ -26,7 +26,7 @@ export type ExportState =
     | { algorithm: "closestPair", progress: number, input: Point[] }
     | { algorithm: "vertexCover", progress: number, input: VertexCoverRequest }
     | { algorithm: "ehrlichSwaps", progress: number, input: SwapInputField[] }
-    | { algorithm: "sais", progress: number, input: SaisRequestDto };
+    | { algorithm: "suffixArray", progress: number, input: SaisRequestDto };
 
 export type PseudoCodeLine = {
     id: string;
@@ -39,7 +39,7 @@ export type PseudoCodePanelProps = {
     activeLineIds: string[];
 };
 
-export type AlgorithmType = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps" | "sais";
+export type AlgorithmType = "closestPair" | "suffixArray" | "vertexCover" | "ehrlichSwaps";
 export type Tab = "homepage" | AlgorithmType;
 
 export type HomepageProps = {

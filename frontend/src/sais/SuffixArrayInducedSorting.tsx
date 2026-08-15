@@ -73,7 +73,7 @@ export default function SuffixArrayInducedSorting() {
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
-            if (imported.algorithm === "sais") {
+            if (imported.algorithm === "suffixArray") {
                 fetchSais(({...imported.input, timestamp: Date.now()}))
                     .then(() => {
                         setProgress(imported.progress);
@@ -86,7 +86,7 @@ export default function SuffixArrayInducedSorting() {
     }
 
     const createExportString = () => {
-        return encodeExportState({algorithm: "sais", input: input, progress: progress});
+        return encodeExportState({algorithm: "suffixArray", input: input, progress: progress});
     }
 
     const handleChangeInput = () => {
