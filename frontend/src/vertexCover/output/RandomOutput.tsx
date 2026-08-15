@@ -66,7 +66,7 @@ export function RandomOutput(props: SVGOutputProps) {
 
         timelineSteps.forEach((targetStep) => {
             switch (targetStep.stepType) {
-                case "INIT_CE": {
+                case "INIT": {
                     animateInit(timeline, targetStep, props.output);
                     break;
                 }
@@ -140,7 +140,7 @@ export function RandomOutput(props: SVGOutputProps) {
             </div>
             <PseudoCodePanel
                 lines={PSEUDOCODE_RANDOM}
-                activeLineIds={stepType === "INIT_CE" ? ["INIT_C", "INIT_E"] : [stepType]}
+                activeLineIds={stepType === "INIT" ? ["INIT_C", "INIT_E"] : [stepType]}
             />
         </div>
     </div>;
@@ -149,7 +149,7 @@ export function RandomOutput(props: SVGOutputProps) {
 function createRandomVertexCoverOutputSteps(n: number): TimelineStep[] {
     if (n > 0) {
         const steps: TimelineStep[] = [
-            {label: "0", backendStepIndex: -1, stepType: "INIT_CE"},
+            {label: "0", backendStepIndex: -1, stepType: "INIT"},
         ];
         Array.from({length: n}, (_, i) => i).forEach((i) => {
             steps.push({label: String(3 * i + 1), backendStepIndex: i, stepType: "CHOOSE"})

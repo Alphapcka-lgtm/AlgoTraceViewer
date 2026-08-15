@@ -55,7 +55,7 @@ export default function ClosestPair() {
     //bevor die points ans backend geschicket werden, werden die labels neu vergeben, um mögliche gaps zu vermeiden
     // die durch löschen von points entsehen können.
     //Der Output bekommt denselben Timestamp wie der Input, aus dem er berechnet wurde.
-    const calculateOutput = async (submittedPoints: Point[]) => {
+    const fetchIntermediateAlgorithmStates = async (submittedPoints: Point[]) => {
         const labeledPoints = assignLabels(submittedPoints);
         setInputState(prev => ({...prev, points: labeledPoints}));
         setLoading(true);
@@ -76,7 +76,7 @@ export default function ClosestPair() {
         //wenn input neu/verändert bei 0 starten
         setProgress(0);
         setCurrentStepIndex(0);
-        calculateOutput(inputState.points).then(() => setModeState("output"));
+        fetchIntermediateAlgorithmStates(inputState.points).then(() => setModeState("output"));
     };
 
     const handleChangeInput = () => {
@@ -92,7 +92,7 @@ export default function ClosestPair() {
             const imported: ExportState = decodeExportState(encoded);
             if (imported.algorithm !== "closestPair") return;
             setProgress(imported.progress);
-            await calculateOutput(imported.input);//assign labels wird dann in calculateOutput geamacht ...
+            await fetchIntermediateAlgorithmStates(imported.input);//assign labels wird dann in fetchIntermediateAlgorithmStates geamacht ...
             setModeState("output");
         } catch (error) {
             console.error("Invalid import string", error);

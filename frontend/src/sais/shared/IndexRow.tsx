@@ -5,6 +5,7 @@ export function IndexRow(props: IndexRowProps) {
     return (
         <g key="index_row" id="index_row" style={{opacity: 100}}>
             <rect
+                key={"index_row_name_rect"}
                 x={props.xOffsetStart}
                 y={props.yPos}
                 width={props.nameColWidth}
@@ -13,6 +14,7 @@ export function IndexRow(props: IndexRowProps) {
                 stroke="black"
             />
             <text
+                key={"index_row_name_text"}
                 x={props.xOffsetStart + props.nameColWidth / 2}
                 y={props.yPos + props.cellHeight * 0.7}
                 textAnchor="middle"
@@ -25,6 +27,7 @@ export function IndexRow(props: IndexRowProps) {
                     <g key={index}>
                         <rect
                             id={`index_row_rect_${index}`}
+                            key={`index_row_rect_${index}`}
                             x={xCellStart + index * props.cellWidth}
                             y={props.yPos}
                             width={props.cellWidth}
@@ -33,6 +36,7 @@ export function IndexRow(props: IndexRowProps) {
                             stroke="black"
                         />
                         <text
+                            key={`index_row_text_${index}`}
                             x={xCellStart + index * props.cellWidth + props.cellWidth / 2}
                             y={props.yPos + props.cellHeight * 0.7}
                             textAnchor="middle"

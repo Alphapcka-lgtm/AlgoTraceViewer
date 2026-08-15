@@ -124,7 +124,6 @@ export type BucketRowProps = {
     xOffsetStart: number,
     yPos: number,
     nameColWidth: number,
-    strokeWidth: number,
 }
 
 export type TypesRowProps = {
@@ -135,7 +134,6 @@ export type TypesRowProps = {
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
-    strokeWidth: number,
 }
 
 export type TextRowProps = {
@@ -146,7 +144,6 @@ export type TextRowProps = {
     typeMap: TypeMapDto,
     source: string,
     nameColWidth: number,
-    strokeWidth: number,
 }
 
 export type IndexRowProps = {
@@ -156,7 +153,6 @@ export type IndexRowProps = {
     yPos: number,
     source: string,
     nameColWidth: number,
-    strokeWidth: number,
 }
 
 export type ReducedStringProps = {

@@ -79,7 +79,6 @@ export function SaisOutput(props: SaisOutputProps) {
     const rowNameColWidth = 80;
     const xOffsetNamingStuff = xOffsetLeftCol + rowNameColWidth;
     const reducedNameColWidth = 80;
-    const strokeWidth = 1;
     const saYPosition = 150;
 
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -500,6 +499,9 @@ export function SaisOutput(props: SaisOutputProps) {
 
     let yOffset = 160;
     let counter = 0
+    // calculate max height of svg to avoid elements out of the svg bounds
+    const svgMaxHeight = yOffset + 40 * props.output.lmsOrder.length + 100 + cellHeight + 10;
+    const svgHeight = Math.max(SVG_HEIGHT, svgMaxHeight);
     return (
         <div className="algorithm-panel">
             <IOModeTabs
@@ -512,7 +514,7 @@ export function SaisOutput(props: SaisOutputProps) {
 
             <svg
                 className="algorithm-canvas"
-                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+                viewBox={`0 0 ${SVG_WIDTH} ${svgHeight}`}
                 preserveAspectRatio="xMidYMid meet"
             >
                 {/* initial state with indexes and buckets */}
@@ -523,7 +525,6 @@ export function SaisOutput(props: SaisOutputProps) {
                     yPos={30}
                     source={props.output.source}
                     nameColWidth={rowNameColWidth}
-                    strokeWidth={strokeWidth}
                 />
                 <TextRow
                     cellWidth={cellWidth}
@@ -533,7 +534,6 @@ export function SaisOutput(props: SaisOutputProps) {
                     typeMap={props.output.typeMapDto}
                     source={props.output.source}
                     nameColWidth={rowNameColWidth}
-                    strokeWidth={strokeWidth}
                 />
                 <TypesRow
                     cellWidth={cellWidth}
@@ -543,7 +543,6 @@ export function SaisOutput(props: SaisOutputProps) {
                     typeMap={props.output.typeMapDto}
                     source={props.output.source}
                     nameColWidth={rowNameColWidth}
-                    strokeWidth={strokeWidth}
                 />
                 {counter++}
                 <BucketsRow
@@ -553,7 +552,6 @@ export function SaisOutput(props: SaisOutputProps) {
                     xOffsetStart={xOffsetLeftCol}
                     yPos={120}
                     nameColWidth={rowNameColWidth}
-                    strokeWidth={strokeWidth}
                 />
                 {counter++}
 
@@ -576,6 +574,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             <g id={"lms_guess_" + index} key={"lms_guess_" + index}>
                                 <rect
                                     id={`s${counter}_cell_${index}`}
+                                    key={`s${counter}_cell_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -586,6 +585,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     // style={{opacity: 0}}
                                 />
                                 <text
+                                    key={`s${counter}_cell_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -595,7 +595,6 @@ export function SaisOutput(props: SaisOutputProps) {
                                 </text>
                             </g>
                         );
-                        // counter++;
                     }
 
                     const complete = (
@@ -615,6 +614,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             <g id={"L_induce_guess_" + index} key={"L_induce_guess_" + index}>
                                 <rect
                                     id={`s${counter}_cell_${index}`}
+                                    key={`s${counter}_cell_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -625,6 +625,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     // style={{opacity: 0}}
                                 />
                                 <text
+                                    key={`s${counter}_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -654,6 +655,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             <g id={"S_induce_guess_" + index} key={"S_induce_guess_" + index}>
                                 <rect
                                     id={`s${counter}_cell_${index}`}
+                                    key={`s${counter}_cell_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -662,6 +664,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     stroke="black"
                                 />
                                 <text
+                                    key={`s${counter}_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -686,6 +689,7 @@ export function SaisOutput(props: SaisOutputProps) {
                     {props.output.guessedSa.map((offset, index) => (
                         <g key={index}>
                             <rect
+                                key={`s${counter}_rect_${index}`}
                                 x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                 y={saYPosition}
                                 width={cellWidth}
@@ -695,6 +699,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                 stroke="black"
                             />
                             <text
+                                key={`s${counter}_text_${index}`}
                                 x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                 y={saYPosition + cellHeight * 0.7}
                                 textAnchor="middle"
@@ -791,15 +796,16 @@ export function SaisOutput(props: SaisOutputProps) {
                 {/* arrow */}
                 <g
                     id={`sorting_arrow`}
+                    key={`sorting_arrow`}
                     transform={`translate(${xOffsetNamingStuff + props.output.reduced.length * (cellWidth + 1) + 5 + reducedNameColWidth}, ${yOffset + 100 + cellHeight / 2 - 11})`}
                     style={{opacity: 0}}
                 >
                     <path
                         d={`M0 12H${20 + arrowLen}M${20 + arrowLen} 12L${16 + arrowLen} 8M${20 + arrowLen} 12L${16 + arrowLen} 16`}
                         stroke="#000000"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
                 </g>
 
@@ -832,9 +838,10 @@ export function SaisOutput(props: SaisOutputProps) {
                         const elements = [];
                         for (let index = 0; index < step.resultingSa.length; index++) {
                             elements.push(
-                                <g id={`s${counter}_cell_${index}`}>
+                                <g id={`s${counter}_cell_${index}`} key={`s${counter}_cell_${index}`}>
                                     <rect
                                         id={`s${counter}_rect_${index}`}
+                                        key={`s${counter}_rect_${index}`}
                                         x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                         y={saYPosition}
                                         width={cellWidth}
@@ -844,6 +851,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     />
                                     <text
                                         id={`s${counter}_text_${index}`}
+                                        key={`s${counter}_text_${index}`}
                                         x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                         y={saYPosition + cellHeight * 0.7}
                                         textAnchor="middle"
@@ -854,7 +862,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             );
                         }
                         const complete = (
-                            <g id={`s${counter}`} style={{opacity: 0}}>
+                            <g id={`s${counter}`} key={`s${counter}`} style={{opacity: 0}}>
                                 {elements}
                             </g>
                         );
@@ -871,6 +879,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             <g id={"final_l_induce_ele_" + index} key={"final_l_induce_ele_" + index}>
                                 <rect
                                     id={`s${counter}_rect_${index}`}
+                                    key={`s${counter}_rect_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -880,6 +889,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     stroke="black"
                                 />
                                 <text
+                                    key={`s${counter}_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -906,6 +916,7 @@ export function SaisOutput(props: SaisOutputProps) {
                             <g id={"final_s_index_ele" + index} key={"final_s_index_ele" + index}>
                                 <rect
                                     id={`s${counter}_rect_${index}`}
+                                    key={`s${counter}_rect_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -914,6 +925,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                     stroke="black"
                                 />
                                 <text
+                                    key={`s${counter}_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellWidth / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -924,7 +936,7 @@ export function SaisOutput(props: SaisOutputProps) {
                         );
                     }
                     const complete = (
-                        <g id={"s" + counter} k={"s" + counter} style={{opacity: 0}}>
+                        <g id={"s" + counter} key={"s" + counter} style={{opacity: 0}}>
                             {elements}
                         </g>
                     )
@@ -932,12 +944,13 @@ export function SaisOutput(props: SaisOutputProps) {
                     return complete;
                 })}
                 {/* final suffix */}
-                <g id={"final_suffixes"} style={{opacity: 0}}>
+                <g id={"final_suffixes"} key={"final_suffixes"} style={{opacity: 0}}>
                     {
                         props.output.sa.map((offset, index) => (
-                            <g id={`final_sa_cell_${index}`}>
+                            <g id={`final_sa_cell_${index}`} key={`final_sa_cell_${index}`}>
                                 <rect
                                     id={`final_sa_rect_${index}`}
+                                    key={`final_sa_rect_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth}
                                     y={saYPosition}
                                     width={cellWidth}
@@ -947,6 +960,7 @@ export function SaisOutput(props: SaisOutputProps) {
                                 />
                                 <text
                                     id={`final_sa_text_${index}`}
+                                    key={`final_sa_text_${index}`}
                                     x={xOffsetLeftCol + rowNameColWidth + index * cellWidth + cellHeight / 2}
                                     y={saYPosition + cellHeight * 0.7}
                                     textAnchor="middle"
@@ -959,7 +973,7 @@ export function SaisOutput(props: SaisOutputProps) {
                     {
                         props.output.sa.map((offset, index) => {
                             const y = 50;
-                            const group = (<g id={`suffix${index}`} key={`suffix${index}`} style={{opacity: 1}}>
+                            return (<g id={`suffix${index}`} key={`suffix${index}`} style={{opacity: 1}}>
                                     <text
                                         x={xOffsetRightCol + rowNameColWidth + 20}
                                         y={y + index * 30}
@@ -983,7 +997,6 @@ export function SaisOutput(props: SaisOutputProps) {
                                     </text>
                                 </g>
                             );
-                            return group;
                         })
                     }
                 </g>
