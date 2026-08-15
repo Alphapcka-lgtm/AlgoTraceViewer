@@ -9,7 +9,7 @@ import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
-    const [stepIndex, setStepIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [activeLineIds, setActiveLineIds] = useState(["word"]);
     const [stepDescription, setStepDescription] = useState<StepInfo>({title: "", description: ""});
     const [input, setInput] = useState<SaisRequestDto>({
@@ -45,7 +45,7 @@ export default function SuffixArrayInducedSorting() {
             fetchSais(input)
                 .then(() => {
                     setProgress(0);
-                    setStepIndex(0);
+                    setCurrentStepIndex(0);
                     setModeState("output");
                 })
                 .catch((error) => alert(error));
@@ -124,18 +124,22 @@ export default function SuffixArrayInducedSorting() {
 
     return (
         <div className="algorithm-shell">
-            <SaisOutput output={output}
-                        progress={progress}
-                        setProgress={setProgress}
-                        stepIndex={stepIndex}
-                        setStepIndex={setStepIndex}
-                        activeLineIds={activeLineIds}
-                        setActiveLineIds={setActiveLineIds}
-                        stepDescription={stepDescription}
-                        setStepDescription={setStepDescription}
-                        onChangeInput={handleChangeInput}
-                        createExportString={createExportString}
-                        onImport={handleImport}
+
+            <SaisOutput
+                output={output}
+                activeLineIds={activeLineIds}
+                setActiveLineIds={setActiveLineIds}
+                stepDescription={stepDescription}
+                setStepDescription={setStepDescription}
+                cProps = {{
+                    progress: progress,
+                    setProgress: setProgress,
+                    currentStepIndex: currentStepIndex,
+                    setCurrentStepIndex: setCurrentStepIndex,
+                    onChangeInput: handleChangeInput,
+                    createExportString: createExportString,
+                    onImport: handleImport
+                }}
             />
         </div>
     );
