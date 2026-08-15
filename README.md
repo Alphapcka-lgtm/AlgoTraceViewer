@@ -2,11 +2,9 @@
 
 **AlgoTraceViewer** is an interactive web application for exploring algorithms step by step through visual animations.
 
-Instead of only showing the final result of an algorithm, the application exposes relevant intermediate states and 
-visualizes how the algorithm progresses from its input to its result. In the adjacent pseudocode panel the user also see the relevant code lines highlighted.
-Users can navigate through individual steps, play the complete execution as an animation, change the playback speed, or move freely through the timeline.
-Furthermore, a user can share the current state of an animation using an export string that can be imported by other users.
-Inputs can also be saved as presets. 
+Instead of only showing the final result, the application exposes relevant intermediate states and visualizes how the algorithm progresses from its input to its result. In the adjacent pseudocode panel, the currently relevant code lines are highlighted. Users can navigate through individual steps, play the complete execution, change the playback speed, or move freely through the timeline.
+
+Animation states can be shared through export strings and restored through the import function. Inputs can also be saved as presets.
 
 The project currently contains visualizations for:
 
@@ -19,22 +17,65 @@ The project currently contains visualizations for:
 
 ## Technologies
 
-AlgoTraceViewer consists of a React frontend and a Spring Boot backend.
+| Frontend | Backend |
+|---|---|
+| React 19 | Java 25 |
+| TypeScript | Spring Boot 4 |
+| Vite | Spring Web / Spring MVC |
+| GSAP | Maven |
+| React Router | Lombok |
+| Lucide React | |
 
-
-| Frontend                        | Backend                     | Deployment                                                                              |
-|---------------------------------|-----------------------------|-----------------------------------------------------------------------------------------|
-| **React 19**                    | **Java 25**                 | **Docker**                                                                              |
-| **TypeScript**                  | **Spring Boot 4**           | Multi-stage Docker build                                                                |
-| **Vite**                        | **Spring Web / Spring MVC** | The production frontend is served as static content <br/>by the Spring Boot application |
-| **GSAP** for animations         | **Maven**                   |                                                                                         |
-| **React Router** for navigation | **Lombok**                  |                                                                                         |
-| **Lucide React** for icons      |                             |                                                                                         |
+The application can be built and deployed as a Docker image. In production, the compiled frontend is served as static content by Spring Boot.
 
 ---
-# General Application Flow
 
-Although the algorithms operate on very different data structures, they follow a similar general flow.
+## Project Structure
+
+```text
+.
+├── frontend/
+│   └── src/
+│       ├── closestPair/
+│       ├── vertexCover/
+│       ├── ehrlichSwaps/
+│       ├── sais/
+│       └── shared/
+├── backend/
+│   └── src/main/java/
+├── Dockerfile
+├── build.sh
+└── run.sh
+```
+
+Algorithm-specific frontend code is grouped by algorithm. Reusable UI and animation infrastructure is located in `frontend/src/shared`.
+
+A frontend algorithm module usually follows this structure:
+
+```text
+algorithm/
+├── Algorithm.tsx
+├── Api.ts
+├── input/
+│   └── Input.tsx
+├── output/
+│   ├── Output.tsx
+│   ├── PseudoCode.ts
+│   └── ...
+└── shared/
+    ├── Types.ts
+    └── ...
+```
+
+The exact structure differs slightly between algorithms because their inputs, intermediate states, and visualizations are different.
+
+---
+
+## Architecture
+
+### General Application Flow
+
+Although the algorithms operate on different data structures, they follow the same basic flow:
 
 ```text
 User Input
@@ -64,199 +105,24 @@ Build GSAP Timeline
 Interactive Visualization
 ```
 
-The backend therefore does not simply return the final result of an algorithm.
+The backend computes the algorithm and records relevant intermediate states. The frontend turns these states into an interactive visualization.
 
-Instead, it records intermediate states that contain the information required to reconstruct and visualize the execution.
+### Frontend
 
-The frontend converts these states into animations and connects them to common controls for playback and step-by-step navigation.
+A frontend algorithm module is usually split into four main responsibilities:
 
----
+- `Algorithm.tsx` coordinates input, output, backend requests, and shared animation state.
+- `input/` contains the algorithm-specific input UI.
+- `Api.ts` communicates with the corresponding backend endpoint.
+- `output/` converts the returned intermediate states into a visual animation.
 
-# Frontend
-## Algorithm Modules
+The main algorithm component typically stores the current input, backend output, active input/output tab, discrete animation step, and continuous animation progress.
 
-An algorithm module generally contains several responsibilities:
+When the user starts an algorithm, the frontend sends the input to the backend, stores the returned intermediate states, resets the animation state, and switches to the output view.
 
-```text
-algorithm/
-├── Algorithm.tsx
-├── Api.ts
-│
-├── input/
-│   └── Input.tsx
-│
-├── output/
-│   ├── Output.tsx
-│   ├── PseudoCode.ts
-│   └── ...
-│
-└── shared/
-    ├── Types.ts
-    └── ...
-```
+### Backend
 
-The exact structure differs slightly between algorithms because their inputs, intermediate states, and visualizations are different.
-
-### Algorithm Component
-
-The main algorithm component (located in Algorithm.tsx) acts as the connection between input and output. 
-A generic Algorithm.tsx example can be found at the end. 
-
-It typically manages state such as:
-
-- the current input,
-- the response received from the backend,
-- whether the input or output view is active,
-- the current animation step,
-- the current animation progress.
-
-When the user starts an algorithm, the component sends the input to the corresponding backend endpoint and stores the returned animation data.
-
-The application then switches from the input view to the output visualization.
-
----
-
-# Animation and Output Logic
-
-The output components are responsible for translating the data returned by the backend into a visual animation.
-
-For the GSAP-based visualizations, a timeline is created from the intermediate algorithm states. After that the timeline becomes the central object... siehe output controls. 
-
-Conceptually:
-
-```text
-Backend States
-      │
-      ▼
-Output Component
-      │
-      ▼
-GSAP Timeline
-      │
-      ├── animation
-      ├── label
-      ├── animation
-      ├── label
-      ├── animation
-      └── label
-```
-
-Timeline labels represent discrete semantic steps of the visualization.
-
-This allows the continuous GSAP timeline to be connected to the discrete steps of an algorithm.
-
-```text
-Timeline
-
-0s              1.4s              3.1s
-│                 │                 │
-▼                 ▼                 ▼
-Label 0         Label 1           Label 2
-│                 │                 │
-▼                 ▼                 ▼
-Step 0          Step 1            Step 2
-```
-
-A backend state does not necessarily correspond to exactly one timeline step. 
-For example, Vertex Cover and Ehrlich Swaps create multiple timeline steps for each intermediate state returned by the backend. 
-In contrast, Closest Pair receives a sequence of timeline steps directly from the backend.  
-
----
-
-## Timeline Synchronization
-
-The current GSAP timeline position is synchronized with React state.
-
-The important shared states are: `progress`
-
-for the continuous position in the complete animation, and: `currentStepIndex`
-
-for the currently reached discrete visualization step.
-
-During timeline updates, the current time is compared with the timeline labels.
-
-```text
-GSAP Timeline
-      │
-      │ onUpdate
-      ▼
-current timeline time
-      │
-      ▼
-find latest reached label
-      │
-      ▼
-currentStepIndex
-```
-
-The resulting step index is then used by other parts like the stepinfo or the Pseudocode.
-This keeps the animation, textual explanation, and highlighted pseudocode synchronized.
-
----
-
-# Output Controls
-
-Reusable animation controls. They provide common functionality such as:
-
-- Play / Pause
-- Previous step
-- Next step
-- Reset
-- Timeline scrubbing
-- Playback speed
-
-The controls are intentionally independent of a specific algorithm.
-Instead of directly manipulating algorithm data, they operate on the GSAP timeline.
-For example, moving to the next step conceptually works as follows:
-
-```text
-Next
- │
- ▼
-Determine next timeline label
- │
- ▼
-GSAP tweenTo(label)
- │
- ▼
-Timeline moves to that position
- │
- ▼
-onUpdate
- │
- ▼
-currentStepIndex + progress
- │
- ▼
-React UI updates
-```
-This makes the timeline the central source for the current temporal state of the visualization.
-
----
-
-# Shared Frontend Components
-
-Reusable UI and visualization infrastructure. Important components include:
-
-```text
-AlgorithmOverviewBox.tsx
-ControlsHelpDialog.tsx
-IOModeTabs.tsx
-ImportExportDialog.tsx
-OutputControls.tsx
-PresetSelect.tsx
-PseudoCodePanel.tsx
-Types.tsx
-Utils.tsx
-```
-
-The goal is to provide infrastructure that can also be used when additional algorithms are added.
-
-Algorithm-specific rendering and algorithm-specific data should remain inside the corresponding algorithm module.
-
-# Backend
-It is a Spring Boot application that exposes REST endpoints for the different algorithms.
-A typical request follows this structure:
+The backend is a Spring Boot application that exposes REST endpoints for the different algorithms.
 
 ```text
 HTTP Request
@@ -271,54 +137,164 @@ Algorithm / Service
 Intermediate States
      │
      ▼
-DTO / AnimationResponse
+DTO / Animation Response
      │
      ▼
 JSON Response
 ```
 
----
+Controllers handle the HTTP request and pass the input to the algorithm-specific service or implementation. The algorithm performs the computation and records intermediate states that are needed by the frontend.
 
-## Controllers
+The backend intentionally returns more than the final result because the frontend needs these states to reconstruct the execution visually.
 
-The main algorithm controllers are:
+### Animation Model
+
+For the GSAP-based visualizations, the output component builds a timeline from the intermediate states. Once created, this timeline becomes the central source for animation playback and navigation.
 
 ```text
-ClosestPairController
-EhrlichSwapsController
-SaisController
-VertexCoverController
+Backend States
+      │
+      ▼
+Output Component
+      │
+      ▼
+GSAP Timeline
+      │
+      ├────────────► OutputControls
+      │
+      └─ onUpdate
+            │
+            ├── progress
+            └── currentStepIndex
+                    │
+                    ├── Legend / Step Info
+                    └── Pseudocode
 ```
 
-There is also a separate: `PresetController`
+Timeline labels connect the continuous GSAP timeline with discrete visualization steps.
 
-for loading and storing presets.
+```text
+0s              1.4s              3.1s
+│                 │                 │
+▼                 ▼                 ▼
+Label 0         Label 1           Label 2
+│                 │                 │
+▼                 ▼                 ▼
+Step 0          Step 1            Step 2
+```
 
-The controllers should mainly handle the HTTP-facing part of the application. The actual algorithm logic is kept in the corresponding services or algorithm classes.
+A **timeline step** represents a discrete, stable visualization state. One backend state may map to one or multiple timeline steps.
+
+For Closest Pair, the backend intermediate states already have the same granularity as the frontend timeline steps, so the mapping is one-to-one. Vertex Cover and Ehrlich Swaps split one backend state into multiple visualization steps when several operations should be shown separately.
+
+### Timeline Synchronization
+
+Two React states connect the GSAP timeline with the rest of the UI:
+
+- `progress` represents the continuous position of the complete timeline in the range `[0, 1]`.
+- `currentStepIndex` represents the latest discrete visualization step reached by the timeline.
+
+Whenever the timeline position changes, GSAP runs `onUpdate`.
+
+```text
+timeline.progress()
+        │
+        ▼
+     progress
+
+timeline.time()
+        │
+        ▼
+compare with labels
+        │
+        ▼
+currentStepIndex
+```
+
+`getCurrentTimelineStepIndex` compares the current timeline time with the label positions and returns the latest reached step. This keeps the animation, step information, and highlighted pseudocode synchronized.
+
+### Output Controls
+
+`OutputControls` is shared between algorithms and does not need to understand algorithm-specific data. It operates on the GSAP timeline and its labels.
+
+- Play / Pause → starts or pauses the timeline.
+- Next / Previous → moves to the neighboring timeline label.
+- Scrubbing → changes `timeline.progress(...)`.
+- Reset → moves the timeline back to the beginning.
+
+For example, moving to the next step works like this:
+
+```text
+Next
+ │
+ ▼
+Determine next label
+ │
+ ▼
+GSAP tweenTo(label)
+ │
+ ▼
+Timeline moves
+ │
+ ▼
+onUpdate
+ │
+ ▼
+progress + currentStepIndex
+ │
+ ▼
+React UI updates
+```
+
+The controls change the timeline first. The timeline then updates the React state through `onUpdate`.
+
+### Shared Frontend Components
+
+Important shared components include:
+
+- `OutputControls.tsx` – controls playback and timeline navigation.
+- `IOModeTabs.tsx` – switches between input and output views.
+- `PseudoCodePanel.tsx` – renders pseudocode and highlighted lines.
+- `ImportExportDialog.tsx` – shares and restores visualization states.
+- `PresetSelect.tsx` – loads and stores reusable inputs.
+- `AlgorithmOverviewBox.tsx` – shows general information about an algorithm.
+
+Algorithm-specific rendering, animation logic, and data should stay inside the corresponding algorithm module.
 
 ---
-# Presets and Import / Export
 
-The application supports presets as well as importing and exporting visualization states.
+## Presets and Import / Export
 
-Presets are handled through the backend using:
+### Presets
+
+Presets store reusable algorithm inputs and are persisted by the backend.
 
 ```text
 GET  /api/presets/{algorithm}
 POST /api/presets/{algorithm}
 ```
 
-Preset data is stored in: `backend/data/presets.json`
+Preset data is stored in `backend/data/presets.json`.
 
-Import/export functionality allows a visualization configuration to be restored later.
+### Import / Export
 
-Besides the algorithm input, the animation progress can be stored so that the timeline can be reconstructed at approximately the same position.
+Export strings store the algorithm input together with the current animation progress. Importing the string restores the input, recalculates the intermediate states, and moves the new timeline to the saved progress.
+
+```text
+Export
+  │
+  ├── algorithm
+  ├── input
+  └── progress
+```
+
+This allows users to share a visualization state without storing the complete GSAP timeline.
 
 ---
 
-# Building and Running
+## Development
 
-## Frontend Development
+### Frontend
 
 From the `frontend` directory:
 
@@ -327,98 +303,81 @@ npm install
 npm run dev
 ```
 
-Vite starts the development server. The backend controllers currently allow requests from the local Vite development origin.
-
-A production frontend build can be created with:`npm run build`
-
-The resulting files are written to: `frontend/dist/`
-
----
-
-## Backend Development
-
-From the `backend` directory, the Spring Boot application can be built with Maven:`./mvnw clean package`
-
-and started with: `./mvnw spring-boot:run`
-
----
-
-# Docker
-
-The repository contains a `Dockerfile` as well as helper scripts for building and running the complete application.
-
-The provided:`build.sh`
-
-first builds the React frontend:
+Create a production build with:
 
 ```bash
-cd frontend
 npm run build
 ```
 
-The generated frontend is then copied into the Spring Boot static resources:
+The generated files are written to `frontend/dist/`.
 
-```text
-frontend/dist
-        │
-        ▼
-backend/src/main/resources/static
+### Backend
+
+From the `backend` directory:
+
+```bash
+./mvnw clean package
 ```
 
-Afterwards, the Docker image is built: `docker build -t my-app .`
+Start the backend with:
 
-The provided helper script: `./run.sh`
+```bash
+./mvnw spring-boot:run
+```
 
-runs the image with: `docker run -p 8080:8080 my-app`
+### Docker
 
-The complete application can then be accessed through port `8080`.
+The repository contains a `Dockerfile` and helper scripts for building and running the complete application.
 
-In production, React therefore does **not** run as a separate server. The built frontend files are bundled into the Spring Boot application and served as static resources.
+```text
+Frontend build
+      │
+      ▼
+frontend/dist
+      │
+      ▼
+Spring Boot static resources
+      │
+      ▼
+Backend build
+      │
+      ▼
+Docker image
+```
+
+Build the application and Docker image with:
+
+```bash
+./build.sh
+```
+
+Run the image with:
+
+```bash
+./run.sh
+```
+
+The application is then available on port `8080`.
+
+In production, React does not run as a separate server. The built frontend files are included in the Spring Boot application and served as static resources.
 
 ---
+## Adding a New Algorithm
 
-# Adding or Understanding an Algorithm
+A new algorithm usually requires these steps:
 
-When working on an existing algorithm or adding a new one, the easiest way to understand the architecture is to follow the complete data flow:
+1. Define the frontend input and output types.
+2. Implement the backend algorithm and record relevant intermediate states.
+3. Add the backend endpoint.
+4. Add the frontend API request.
+5. Implement the algorithm-specific input component.
+6. Map backend states to timeline steps if needed.
+7. Build the GSAP timeline in the output component.
+8. Reuse the shared controls, pseudocode panel, presets, and import/export infrastructure.
 
-```text
-1. Input Component
-        │
-        ▼
-2. Main Algorithm Component
-        │
-        ▼
-3. Frontend API request
-        │
-        ▼
-4. Backend Controller
-        │
-        ▼
-5. Algorithm / Service
-        │
-        ▼
-6. Intermediate states / DTOs
-        │
-        ▼
-7. Frontend Output Component
-        │
-        ▼
-8. GSAP timeline and labels
-        │
-        ▼
-9. OutputControls
-        │
-        ▼
-10. Step information and pseudocode
-```
+The main distinction is between **shared visualization infrastructure** and **algorithm-specific behavior**. Shared components handle navigation, playback, progress, pseudocode rendering, presets, and import/export. Each algorithm defines its own input, backend states, visual elements, and transitions.
 
-The most important distinction is between **shared visualization components** and **algorithm-specific behavior**.
-
-Shared infrastructure handles common concepts such as navigation, playback, progress, pseudocode presentation, presets, and import/export.
-
-Each algorithm is responsible for defining its own input, computing or receiving its intermediate states, and translating those states into an appropriate visualization.
-
-This structure allows new algorithms to reuse the general visualization framework without forcing fundamentally different algorithms into the same internal representation.
+### Example Algorithm Component
 
 ```tsx
 function Algorithm() {
@@ -480,6 +439,9 @@ function Algorithm() {
         />;
 }
 ```
+
+### Example Output Component
+This simplified example uses a one-to-one mapping between backend states and timeline steps. Some algorithms create several timeline steps from one backend state instead.
 
 ```tsx
 function ExampleOutput(props: OutputProps) {
