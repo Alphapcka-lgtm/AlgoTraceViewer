@@ -2,14 +2,16 @@
 
 **AlgoTraceViewer** is an interactive web application for exploring algorithms step by step through visual animations.
 
-Instead of only showing the final result of an algorithm, the application exposes relevant intermediate states and visualizes how the algorithm progresses from its input to its result. Users can navigate through individual steps, play the complete execution as an animation, change the playback speed, or move freely through the timeline.
+Instead of only showing the final result of an algorithm, the application exposes relevant intermediate states and 
+visualizes how the algorithm progresses from its input to its result. Users can navigate through individual steps, 
+play the complete execution as an animation, change the playback speed, or move freely through the timeline.
 
 The project currently contains visualizations for:
 
-- **Closest Pair** – finds the closest pair of points in two dimensions using a sweep-line algorithm.
-- **Vertex Cover** – visualizes different approaches for computing a vertex cover of a graph.
-- **Ehrlich Swaps** – generates permutations of distinct elements using Ehrlich's swap method.
-- **Suffix Array / SA-IS** – visualizes the construction of a suffix array using induced sorting.
+- **Closest Pair:** finds the closest pair of points in two dimensions using a sweep-line algorithm.
+- **Vertex Cover:** visualizes different approaches for computing a vertex cover of a graph.
+- **Ehrlich Swaps:** generates permutations of distinct elements using Ehrlich's swap method.
+- **Suffix Array / SA-IS:** visualizes the construction of a suffix array using induced sorting.
 
 ---
 

@@ -9,7 +9,7 @@ import {
     SVG_WIDTH, SVG_HEIGHT
 } from "../shared/Utils.tsx";
 import "./ClosestPair.css";
-import type {AnimationRequest, CommonOutputProps, ExportState} from "../shared/Types.tsx";
+import type {AnimationRequest, ExportState} from "../shared/Types.tsx";
 import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 import {getClosestPairSteps} from "./Api.tsx";
 import {assignLabels, createRandomPoints} from "./shared/Utils.ts";
@@ -93,6 +93,7 @@ export default function ClosestPair() {
             if (imported.algorithm !== "closestPair") return;
             setProgress(imported.progress);
             await calculateOutput(imported.input);//assign labels wird dann in calculateOutput geamacht ...
+            setModeState("output");
         } catch (error) {
             console.error("Invalid import string", error);
         }
@@ -147,21 +148,19 @@ export default function ClosestPair() {
         );
     }
 
-    const cProps: CommonOutputProps = {
-        progress: progress,
-        setProgress: setProgress,
-        currentStepIndex: currentStepIndex,
-        setCurrentStepIndex: setCurrentStepIndex,
-        onChangeInput: handleChangeInput,
-        createExportString: createExportString,
-        onImport: handleImport
-    }
-
     return (
         <div className={`algorithm-shell ${loading ? "is-loading" : ""}`}>
             <Output
                 steps={outputState.steps}
-                cProps={cProps}
+                cProps={{
+                    progress: progress,
+                    setProgress: setProgress,
+                    currentStepIndex: currentStepIndex,
+                    setCurrentStepIndex: setCurrentStepIndex,
+                    onChangeInput: handleChangeInput,
+                    createExportString: createExportString,
+                    onImport: handleImport
+                }}
             />
         </div>
     );

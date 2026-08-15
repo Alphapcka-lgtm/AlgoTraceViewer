@@ -5,12 +5,11 @@ import {SaisOutput} from "./output/SaisOutput.tsx";
 import "./SuffixArrayInducedSorting.css"
 import type {ExportState} from "../shared/Types.tsx";
 import {decodeExportState, encodeExportState} from "../shared/Utils.tsx";
-import {AlgorithmOverviewBox} from "../shared/AlgorithmOverviewBox.tsx";
 
 export default function SuffixArrayInducedSorting() {
     const [mode, setModeState] = useState<"input" | "output">("input");
     const [progress, setProgress] = useState<number>(0);
-    const [stepIndex, setStepIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [activeLineIds, setActiveLineIds] = useState(["word"]);
     const [stepDescription, setStepDescription] = useState<StepInfo>({title: "", description: ""});
     const [input, setInput] = useState<SaisRequestDto>({
@@ -46,7 +45,7 @@ export default function SuffixArrayInducedSorting() {
             fetchSais(input)
                 .then(() => {
                     setProgress(0);
-                    setStepIndex(0);
+                    setCurrentStepIndex(0);
                     setModeState("output");
                 })
                 .catch((error) => alert(error));
@@ -74,10 +73,11 @@ export default function SuffixArrayInducedSorting() {
     const handleImport = async (encoded: string) => {
         try {
             const imported: ExportState = decodeExportState(encoded);
-            if (imported.algorithm === "sais") {
+            if (imported.algorithm === "suffixArray") {
                 fetchSais(({...imported.input, timestamp: Date.now()}))
                     .then(() => {
                         setProgress(imported.progress);
+                        setModeState("output");
                     });
             }
         } catch (error) {
@@ -86,7 +86,7 @@ export default function SuffixArrayInducedSorting() {
     }
 
     const createExportString = () => {
-        return encodeExportState({algorithm: "sais", input: input, progress: progress});
+        return encodeExportState({algorithm: "suffixArray", input: input, progress: progress});
     }
 
     const handleChangeInput = () => {
@@ -105,7 +105,6 @@ export default function SuffixArrayInducedSorting() {
     if (mode === "input") {
         return (
             <>
-                <AlgorithmOverviewBox algoTyp={"suffixArray"}/>
                 <div className="algorithm-shell">
                     <SaisInput height={svgHeight}
                                width={svgWidth}
@@ -125,18 +124,22 @@ export default function SuffixArrayInducedSorting() {
 
     return (
         <div className="algorithm-shell">
-            <SaisOutput output={output}
-                        progress={progress}
-                        setProgress={setProgress}
-                        stepIndex={stepIndex}
-                        setStepIndex={setStepIndex}
-                        activeLineIds={activeLineIds}
-                        setActiveLineIds={setActiveLineIds}
-                        stepDescription={stepDescription}
-                        setStepDescription={setStepDescription}
-                        onChangeInput={handleChangeInput}
-                        createExportString={createExportString}
-                        onImport={handleImport}
+
+            <SaisOutput
+                output={output}
+                activeLineIds={activeLineIds}
+                setActiveLineIds={setActiveLineIds}
+                stepDescription={stepDescription}
+                setStepDescription={setStepDescription}
+                cProps = {{
+                    progress: progress,
+                    setProgress: setProgress,
+                    currentStepIndex: currentStepIndex,
+                    setCurrentStepIndex: setCurrentStepIndex,
+                    onChangeInput: handleChangeInput,
+                    createExportString: createExportString,
+                    onImport: handleImport
+                }}
             />
         </div>
     );
