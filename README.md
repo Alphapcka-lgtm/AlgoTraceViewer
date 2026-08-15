@@ -485,75 +485,90 @@ function Algorithm() {
 function ExampleOutput(props: OutputProps) {
     // State that tracks whether the animation is currently auto-playing
     const [isPlaying, setIsPlaying] = useState(false);
+
     // Reference to the GSAP timeline used by the animation and the shared OutputControls
     const timelineRef = useRef<gsap.core.Timeline>(gsap.timeline());
-    // In this case one animation step corresponds to one algorithm intermediate state
-    const myLabels = useMemo(() => createStepLabels(props.steps.length), [props.steps.length]);
+
+    // In this example, one timeline step corresponds directly to one backend intermediate state
+    const labels = useMemo(
+        () => createStepLabels(props.steps.length),
+        [props.steps.length]
+    );
 
     useGSAP(() => {
-         // The GSAP timeline contains all animations in their execution order.
+        // The GSAP timeline contains all algorithm animations in their execution order
         const timeline = gsap.timeline({
-            paused: true, defaults: {duration: STEP_DURATION, ease: "power2.inOut"
+            paused: true,
+            defaults: {
+                duration: STEP_DURATION,
+                ease: "power2.inOut"
             },
 
             /*
              * onUpdate runs whenever the timeline position changes, for example
-             * during autoplay, scrubbing or when moving to another step.
+             * during autoplay, scrubbing, or step navigation.
              *
-             * The continuous timeline position is stored as progress, while
+             * progress stores the continuous position in the complete animation.
              * getCurrentTimelineStepIndex maps the current timeline time to the
-             * last reached label and therefore to a discrete visualization step.
-             * 
-             * As a result continuous and disrecte progress are synchronized.
+             * latest reached label and therefore to a discrete visualization step.
+             *
+             * This keeps continuous and discrete animation progress synchronized.
              */
             onUpdate: () => {
                 const tl = timelineRef.current;
+
                 props.cProps.setProgress(tl.progress());
-                const currentStepIndex = getCurrentTimelineStepIndex(tl, labels);
+
+                const currentStepIndex =
+                    getCurrentTimelineStepIndex(tl, labels);
+
                 props.cProps.setCurrentStepIndex(currentStepIndex);
             },
-            // Keeps the React playback state synchronized when the timeline reaches its end
+
+            // Synchronizes the React state when the animation reaches its end
             onComplete: () => {
                 props.cProps.setProgress(1);
                 setIsPlaying(false);
                 timelineRef.current.pause();
             }
         });
-
+        
         /*
-         * Adds the algorithm-specific animations to the timeline.
+         * Add the algorithm-specific transitions to the timeline.
          *
-         * Each TimelineStep describes a stable visualization state/phase.
-         * The animation added for a step performs the transition from the
-         * previously reached state to this target state.
+         * Each backend step describes a stable target state.
+         * The animation transforms the previous state into the target state.
          */
         timelineSteps.forEach((targetStep, stepIndex) => {
             //... 
             
             /*
-             * A label marks the point at which the target visualization state
-             * has been reached. The labels are later used by OutputControls and
-             * getCurrentTimelineStepIndex to navigate between discrete steps.
+             * The label marks the point at which the target visualization state
+             * has been fully reached.
+             *
+             * Labels connect the continuous GSAP timeline with the discrete
+             * algorithm steps and are also used by OutputControls for navigation.
              */
             timeline.addLabel(labels[stepIndex]);
         });
 
-        // Store the newly created timeline so OutputControls and callbacks can access it
+        // Store the timeline so callbacks and shared OutputControls can access it
         timelineRef.current = timeline;
 
         /*
-         * Restores the animation position.
-         * Normally progress is 0, but after an import it contains the previously
-         * exported position. 
-         * 
-         * Setting the progress also causes onUpdate to derive
-         * the corresponding currentStepIndex.
+         * Restore the animation position.
+         *
+         * Normally progress is 0. After importing a saved state, it contains the
+         * previously exported animation progress.
+         *
+         * Moving the timeline to this position triggers onUpdate, which derives
+         * the corresponding discrete currentStepIndex.
          */
         timeline.progress(props.cProps.progress).pause();
 
         setIsPlaying(false);
 
-        // Remove the old timeline when new algorithm output is loaded or the component unmounts
+        // Clean up the timeline when new output is loaded or the component unmounts
         return () => {
             timeline.kill();
             timelineRef.current = gsap.timeline({paused: true});
@@ -562,27 +577,36 @@ function ExampleOutput(props: OutputProps) {
         dependencies: [props.steps]
     });
 
-    // The discrete TimelineStep currently reached by the animation
+    // Backend step representing the currently reached stable visualization state
     const currentTimelineStep = timelineSteps[props.cProps.currentStepIndex];
     return (
         <div className="algorithm-panel">
-            {/* Switch back to the algorithm input */}
+            {/* Shared navigation between the input and output views */}
             <IOModeTabs
                 mode="output"
                 onChangeInput={props.cProps.onChangeInput}
                 onSubmit={() => {}}
                 canSubmit={false}
             />
-                
-            <svg className="algorithm-canvas" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="xMidYMid meet">
-                {/*algorithm-specific animation svg elements ...*/}
+
+            {/* Algorithm-specific SVG elements manipulated by the GSAP timeline */}
+            <svg
+                className="algorithm-canvas"
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+                preserveAspectRatio="xMidYMid meet"
+            >
+                {/* Algorithm-specific visualization elements ... */}
             </svg>
-    
 
             {/*
-             * Shared controls operate directly on the GSAP timeline.
-             * Play/Pause changes the playback state, Next/Previous move to
-             * timeline labels and the scrubber changes timeline.progress().
+             * Shared controls operate on the GSAP timeline.
+             *
+             * Play/Pause controls timeline playback.
+             * Next/Previous navigate to timeline labels.
+             * The scrubber changes timeline.progress().
+             *
+             * Any resulting timeline movement is synchronized back to React
+             * through the timeline's onUpdate callback.
              */}
             <OutputControls
                 timelineRef={timelineRef}
@@ -597,13 +621,13 @@ function ExampleOutput(props: OutputProps) {
 
             <div className="step-layout">
                 <div className="step-layout-side">
-                    {/* Algorithm-specific information for the current visualization step */}
+                    {/* Algorithm-specific information about the current step */}
                     <Legend
                         step={currentTimelineStep}
                         currentStepIndex={props.cProps.currentStepIndex}
-                        totalSteps={props.steps.length-1}
+                        totalSteps={props.steps.length - 1}
                     />
-                        
+
                     <div className="step-layout-actions">
                         <ImportExportDialog
                             onImport={props.cProps.onImport}
@@ -613,13 +637,17 @@ function ExampleOutput(props: OutputProps) {
                 </div>
 
                 {/*
-                 * The shared panel only renders pseudocode.
-                 * Which lines are active is determined from the algorithm-specific
-                 * step type of the current visualization step.
+                 * The panel itself is shared.
+                 * Only the pseudocode and the mapping from algorithm steps to
+                 * highlighted line IDs are algorithm-specific.
                  */}
                 <PseudoCodePanel
-                    lines={SWEEP_LINE_PSEUDOCODE}
-                    activeLineIds={getActivePseudoCodeLineIds(pseudoCodeStep.stepType)}
+                    lines={EXAMPLE_PSEUDOCODE}
+                    activeLineIds={
+                        getActivePseudoCodeLineIds(
+                            pseudoCodeStep.stepType
+                        )
+                    }
                 />
             </div>
         </div>
