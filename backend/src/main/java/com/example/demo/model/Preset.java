@@ -35,7 +35,7 @@ public class Preset {
             ),
             @JsonSubTypes.Type(
                     value = SaisRequestDto.class,
-                    name = "sais"
+                    name = "suffixArray"
             )
     })
     AnimationRequest request;
