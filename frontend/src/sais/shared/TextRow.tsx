@@ -79,7 +79,6 @@ export function TextRow(props: TextRowProps) {
                                 // fill cell yellow when suffix is lms
                                 fill={(props.typeMap.map[index].isLms) ? "yellow" : "white"}
                                 stroke="black"
-                                strokeWidth={props.strokeWidth}
                             />
                             <text
                                 id={`text_row_text_${index}`}
