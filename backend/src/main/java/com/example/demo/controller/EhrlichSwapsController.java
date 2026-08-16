@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import com.example.demo.ehrlichSwaps.EhrlichSwapsService;
 import com.example.demo.ehrlichSwaps.dto.EhrlichSwapStepDTO;

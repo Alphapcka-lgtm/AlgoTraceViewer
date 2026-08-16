@@ -37,15 +37,23 @@ The application can be built and deployed as a Docker image. In production, the 
 ├── frontend/
 │   └── src/
 │       ├── closestPair/
-│       ├── vertexCover/
 │       ├── ehrlichSwaps/
-│       ├── sais/
-│       └── shared/
+│       ├── shared/
+│       ├── suffixArray/
+│       └── vertexCover/
 ├── backend/
-│   └── src/main/java/
+│   ├── src/main/java/com/example/demo/
+│   │   ├── closestPair/
+│   │   ├── controller/
+│   │   ├── ehrlichSwaps/
+│   │   ├── shared/
+│   │   ├── suffixArray/
+│   │   ├── vertexCover/
+│   │   └── Application.java
+│   └── data/
+│       └── presets.json
 ├── Dockerfile
-├── build.sh
-└── run.sh
+└── Makefile
 ```
 
 Algorithm-specific frontend code is grouped by algorithm. Reusable UI and animation infrastructure is located in `frontend/src/shared`.
@@ -274,7 +282,8 @@ GET  /api/presets/{algorithm}
 POST /api/presets/{algorithm}
 ```
 
-Preset data is stored in `backend/data/presets.json`.
+Preset data is stored in `backend/data/presets.json`. When the Docker container is started with make run, the complete
+`backend/data` directory is mounted into the container so changes persist locally.
 
 ### Import / Export
 
@@ -325,39 +334,47 @@ Start the backend with:
 ./mvnw spring-boot:run
 ```
 
-### Docker
+These commands are useful when developing frontend and backend separately. For building and running the complete
+application, use the Makefile targets below.
 
-The repository contains a `Dockerfile` and helper scripts for building and running the complete application.
+### Docker
+The repository contains a `Dockerfile` and a `Makefile` for building and running the complete application.
+The `Dockerfile` uses a multi-stage build:
 
 ```text
-Frontend build
+Node build stage
       │
-      ▼
-frontend/dist
+      ├── npm ci
+      └── npm run build
+              │
+              ▼
+        frontend/dist
+              │
+              ▼
+Maven build stage
       │
-      ▼
-Spring Boot static resources
-      │
-      ▼
-Backend build
-      │
-      ▼
-Docker image
+      ├── copies the frontend into
+      │   Spring Boot static resources
+      └── builds the backend JAR
+              │
+              ▼
+Java runtime image
 ```
-
 Build the application and Docker image with:
 
 ```bash
 make build
 ```
+This builds both the frontend and backend inside Docker and creates the image algotraceviewer.
 
-Run the image with:
+Run the application with:
 
 ```bash
 make run
 ```
 
-The application is then available on port `8080`.
+The application is exposed on port 8080. The local backend/data directory is mounted into the container so saved presets
+persist outside the container.
 
 In production, React does not run as a separate server. The built frontend files are included in the Spring Boot application and served as static resources.
 

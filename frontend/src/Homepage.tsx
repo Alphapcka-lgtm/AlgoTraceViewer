@@ -4,7 +4,7 @@ import EhrlichSwaps from "./ehrlichSwaps/EhrlichSwaps.tsx";
 import {VertexCover} from "./vertexCover/VertexCover.tsx";
 import type {HomepageProps, Tab} from "./shared/Types.tsx";
 import {Link} from "react-router-dom";
-import SuffixArrayInducedSorting from "./sais/SuffixArrayInducedSorting.tsx";
+import SuffixArrayInducedSorting from "./suffixArray/SuffixArrayInducedSorting.tsx";
 
 export function Homepage(props: HomepageProps) {
     const [activeTab, setActiveTab] = useState<Tab>(props.activeTab);

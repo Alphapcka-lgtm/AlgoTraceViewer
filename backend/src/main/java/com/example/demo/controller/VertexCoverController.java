@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import com.example.demo.vertexCover.*;
 import com.example.demo.vertexCover.dto.AnimationResponse;

@@ -2,7 +2,7 @@ import type {ReactNode} from "react";
 import type {RingStyle} from "./closestPair/shared/Types.tsx";
 import {POINT_COLORS} from "./closestPair/shared/Utils.ts";
 import {COLORS} from "./vertexCover/shared/Utils.tsx";
-import {SAIS_COLORS} from "./sais/output/PseudoCode.tsx";
+import {SAIS_COLORS} from "./suffixArray/output/PseudoCode.tsx";
 
 type LegendEntryProps = {
     label: string;
