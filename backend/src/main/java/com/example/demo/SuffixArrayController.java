@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.sais.SuffixArray;
+import com.example.demo.sais.SAISService;
 import com.example.demo.sais.dto.SaisRequestDto;
 import com.example.demo.sais.dto.SaisResponseDto;
 import jakarta.validation.Valid;
@@ -9,24 +9,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(
-        origins = "http://localhost:5173",
-        allowedHeaders = "*",
-        methods = {RequestMethod.POST}
-)
-public class SaisController {
+@RequestMapping("/api/suffixArray")
+public class SuffixArrayController {
 
-    private SuffixArray suffixArray;
+    private SAISService saisService;
 
     @Autowired
-    public SaisController(SuffixArray suffixArray) {
-        this.suffixArray = suffixArray;
+    public SuffixArrayController(SAISService saisService) {
+        this.saisService = saisService;
     }
 
     @PostMapping("/sais")
     public ResponseEntity<SaisResponseDto> suffixArrayInducedSorting(@Valid @RequestBody SaisRequestDto saisRequestDto) {
-        suffixArray.suffixArray(saisRequestDto.source());
-        final SaisResponseDto response = suffixArray.getResponseData();
+        saisService.suffixArray(saisRequestDto.source());
+        final SaisResponseDto response = saisService.getResponseData();
         return ResponseEntity.ok(response);
     }
 }

@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class SuffixArray {
+public class SAISService {
 
     private static String source;
 
     private final SaisResponseDto.SaisResponseDtoBuilder responseBuilder;
 
-    public SuffixArray() {
+    public SAISService() {
         responseBuilder = SaisResponseDto.builder();
     }
 

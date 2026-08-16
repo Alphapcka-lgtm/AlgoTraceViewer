@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/swaps")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/ehrlichSwaps")
 public class EhrlichSwapsController {
     private final EhrlichSwapsService ehrlichSwapsService;
 
@@ -16,7 +15,7 @@ public class EhrlichSwapsController {
         this.ehrlichSwapsService = ehrlichSwapsRequest;
     }
 
-    @PostMapping("/swap_steps")
+    @PostMapping("/steps")
     public List<EhrlichSwapStepDTO> calculateSwapSteps(@RequestBody List<String> inputValues) {
         return ehrlichSwapsService.ehrlichSwaps(inputValues);
     }

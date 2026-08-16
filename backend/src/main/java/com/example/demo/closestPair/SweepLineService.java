@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ClosestPairService {
+public class SweepLineService {
     //https://arxiv-org.translate.goog/html/2601.05681v1?_x_tr_sl=en&_x_tr_tl=de&_x_tr_hl=de&_x_tr_pto=sge#S2
     //https://arxiv.org/pdf/2601.05681v1
     //https://www.sciencedirect.com/science/article/abs/pii/0020019088901500
