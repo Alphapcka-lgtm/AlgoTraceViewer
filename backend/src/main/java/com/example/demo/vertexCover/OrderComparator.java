@@ -1,5 +1,5 @@
 package com.example.demo.vertexCover;
-import com.example.demo.model.Identifiable;
+import com.example.demo.vertexCover.model.Identifiable;
 
 import java.util.*;
 import java.util.stream.IntStream;

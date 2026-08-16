@@ -1,4 +1,4 @@
-package com.example.demo.sais.dto;
+package com.example.demo.suffixArray.dto;
 
 public record BucketSizeDto(char c, int size) {
 }

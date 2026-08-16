@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.vertexCover.model;
 
 import lombok.Builder;
 import lombok.Value;

@@ -1,6 +1,6 @@
-package com.example.demo.presets;
+package com.example.demo.shared.presets;
 
-import com.example.demo.model.Preset;
+import com.example.demo.shared.Preset;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;

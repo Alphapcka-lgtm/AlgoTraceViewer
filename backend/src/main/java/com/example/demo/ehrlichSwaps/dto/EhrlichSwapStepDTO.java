@@ -1,4 +1,4 @@
-package dto;
+package com.example.demo.ehrlichSwaps.dto;
 
 import java.util.List;
 

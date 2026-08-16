@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.vertexCover.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;

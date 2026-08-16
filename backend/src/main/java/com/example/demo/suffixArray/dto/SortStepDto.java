@@ -1,4 +1,4 @@
-package com.example.demo.sais.dto;
+package com.example.demo.suffixArray.dto;
 
 import lombok.Builder;
 

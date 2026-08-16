@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import com.example.demo.vertexCover.*;
+import com.example.demo.vertexCover.dto.AnimationResponse;
+import com.example.demo.vertexCover.dto.VertexCoverRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

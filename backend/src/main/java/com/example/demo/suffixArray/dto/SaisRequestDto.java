@@ -1,6 +1,6 @@
-package com.example.demo.sais.dto;
+package com.example.demo.suffixArray.dto;
 
-import com.example.demo.model.AnimationRequest;
+import com.example.demo.shared.AnimationRequest;
 import lombok.Builder;
 
 @Builder

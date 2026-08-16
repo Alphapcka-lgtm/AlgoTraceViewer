@@ -1,4 +1,4 @@
-package com.example.demo.sais;
+package com.example.demo.suffixArray;
 
 import java.util.Arrays;
 

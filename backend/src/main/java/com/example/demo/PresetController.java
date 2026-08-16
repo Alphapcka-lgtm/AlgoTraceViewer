@@ -1,6 +1,7 @@
-package com.example.demo.presets;
+package com.example.demo;
 
-import com.example.demo.model.Preset;
+import com.example.demo.shared.Preset;
+import com.example.demo.shared.presets.PresetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

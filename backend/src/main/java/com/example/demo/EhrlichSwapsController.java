@@ -1,7 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.ehrlichSwaps.EhrlichSwapsService;
-import dto.EhrlichSwapStepDTO;
+import com.example.demo.ehrlichSwaps.dto.EhrlichSwapStepDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

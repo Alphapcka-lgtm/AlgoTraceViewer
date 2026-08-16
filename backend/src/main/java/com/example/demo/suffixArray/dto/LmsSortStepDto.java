@@ -1,4 +1,4 @@
-package com.example.demo.sais.dto;
+package com.example.demo.suffixArray.dto;
 
 public record LmsSortStepDto(int sortedReducedIndex,
                              int lmsIndex,

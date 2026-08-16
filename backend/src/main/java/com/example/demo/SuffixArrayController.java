@@ -1,8 +1,8 @@
 package com.example.demo;
 
-import com.example.demo.sais.SAISService;
-import com.example.demo.sais.dto.SaisRequestDto;
-import com.example.demo.sais.dto.SaisResponseDto;
+import com.example.demo.suffixArray.SAISService;
+import com.example.demo.suffixArray.dto.SaisRequestDto;
+import com.example.demo.suffixArray.dto.SaisResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

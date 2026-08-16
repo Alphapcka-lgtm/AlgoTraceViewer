@@ -1,4 +1,4 @@
-package dto;
+package com.example.demo.closestPair.dto;
 
 import com.example.demo.closestPair.CandidateComparison;
 import com.example.demo.closestPair.Point;

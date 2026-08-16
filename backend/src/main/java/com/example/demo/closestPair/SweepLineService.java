@@ -1,5 +1,5 @@
 package com.example.demo.closestPair;
-import dto.AlgorithmStepDTO;
+import com.example.demo.closestPair.dto.AlgorithmStepDTO;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;

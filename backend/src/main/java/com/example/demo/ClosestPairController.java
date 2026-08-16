@@ -2,7 +2,7 @@ package com.example.demo;
 
 import com.example.demo.closestPair.SweepLineService;
 import com.example.demo.closestPair.Point;
-import dto.AlgorithmStepDTO;
+import com.example.demo.closestPair.dto.AlgorithmStepDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -1,9 +1,9 @@
-package com.example.demo.model;
+package com.example.demo.shared;
 
-import com.example.demo.closestPair.ClosestPairRequest;
+import com.example.demo.closestPair.dto.ClosestPairRequest;
 import com.example.demo.ehrlichSwaps.EhrlichSwapsRequest;
-import com.example.demo.sais.dto.SaisRequestDto;
-import com.example.demo.vertexCover.VertexCoverRequest;
+import com.example.demo.suffixArray.dto.SaisRequestDto;
+import com.example.demo.vertexCover.dto.VertexCoverRequest;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;

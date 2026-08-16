@@ -1,6 +1,6 @@
-package com.example.demo.sais.dto;
+package com.example.demo.suffixArray.dto;
 
-import com.example.demo.sais.TypeMap;
+import com.example.demo.suffixArray.TypeMap;
 import lombok.Builder;
 
 import java.util.Objects;

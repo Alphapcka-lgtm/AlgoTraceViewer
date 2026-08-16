@@ -1,7 +1,8 @@
-package com.example.demo.vertexCover;
+package com.example.demo.vertexCover.dto;
 
-import com.example.demo.model.Graph;
-import com.example.demo.model.NodeDegreePair;
+import com.example.demo.vertexCover.model.AnimationState;
+import com.example.demo.vertexCover.model.Graph;
+import com.example.demo.vertexCover.model.NodeDegreePair;
 import lombok.Builder;
 import lombok.Data;
 

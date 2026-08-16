@@ -1,6 +1,6 @@
-package com.example.demo.sais;
+package com.example.demo.suffixArray;
 
-import com.example.demo.sais.dto.*;
+import com.example.demo.suffixArray.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

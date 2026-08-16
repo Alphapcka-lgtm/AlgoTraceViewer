@@ -1,13 +1,9 @@
-package com.example.demo.vertexCover;
+package com.example.demo.vertexCover.model;
 
-import com.example.demo.model.Edge;
-import com.example.demo.model.Node;
-import com.example.demo.model.NodeDegreePair;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder

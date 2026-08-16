@@ -1,7 +1,7 @@
-package com.example.demo.vertexCover;
+package com.example.demo.vertexCover.dto;
 
-import com.example.demo.model.AnimationRequest;
-import com.example.demo.model.Graph;
+import com.example.demo.shared.AnimationRequest;
+import com.example.demo.vertexCover.model.Graph;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
