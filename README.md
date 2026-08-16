@@ -348,13 +348,13 @@ Docker image
 Build the application and Docker image with:
 
 ```bash
-./build.sh
+make build
 ```
 
 Run the image with:
 
 ```bash
-./run.sh
+make run
 ```
 
 The application is then available on port `8080`.
