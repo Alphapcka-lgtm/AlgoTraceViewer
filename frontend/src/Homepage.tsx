@@ -43,11 +43,16 @@ type NavigationBarProps = { activeTab: Tab; onTabChange: (tab: Tab) => void; };
 function NavigationBar(props: NavigationBarProps) {
     return (
         <nav className="home-nav">
-            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/"}/>
-            <NavButton tab="closestPair" label="Closest Pair" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/closestPair"}/>
-            <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
-            <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
-            <NavButton tab="ehrlichSwaps" label="Ehrlich Swaps" activeTab={props.activeTab} onTabChange={props.onTabChange} linkTo={"/ehrlichSwaps"}/>
+            <NavButton tab="homepage" label="Home" activeTab={props.activeTab} onTabChange={props.onTabChange}
+                       linkTo={"/"}/>
+            <NavButton tab="closestPair" label="Closest Pair" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange} linkTo={"/closestPair"}/>
+            <NavButton tab="suffixArray" label="Suffix Array" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange} linkTo={"/suffixArray"}/>
+            <NavButton tab="vertexCover" label="Vertex Cover" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange} linkTo={"/vertexCover"}/>
+            <NavButton tab="ehrlichSwaps" label="Ehrlich Swaps" activeTab={props.activeTab}
+                       onTabChange={props.onTabChange} linkTo={"/ehrlichSwaps"}/>
         </nav>
     );
 }
@@ -86,44 +91,49 @@ function HomeContent(props: HomeContentProps) {
                     title="Closest Pair"
                     description="Finds the closest pair of points in 2D using a sweep-line algorithm."
                     onClick={() => props.onTabChange("closestPair")}
+                    linkTo={"/closestPair"}
                 />
 
                 <AlgorithmCard
                     title="Suffix Array"
                     description="Creates the Suffix Array of a word with the Suffix-Array-Induced-Sorting (sais) algorithm."
                     onClick={() => props.onTabChange("suffixArray")}
+                    linkTo={"/suffixArray"}
                 />
 
                 <AlgorithmCard
                     title="Vertex Cover"
                     description="Finds a set of vertices that has each edge of an undirected graph covered"
                     onClick={() => props.onTabChange("vertexCover")}
+                    linkTo={"/vertexCover"}
                 />
 
                 <AlgorithmCard
                     title="Ehrlich Swaps"
                     description="Generates all permutations of a set of distinct elements."
                     onClick={() => props.onTabChange("ehrlichSwaps")}
+                    linkTo={"/ehrlichSwaps"}
                 />
             </div>
         </section>
     );
 }
 
-type AlgorithmCardProps = {
-    title: string; description: string; onClick: () => void;
-};
+type AlgorithmCardProps = { title: string; description: string; onClick: () => void; linkTo: string };
 
 function AlgorithmCard(props: AlgorithmCardProps) {
     return (
-        <button
-            type="button"
-            onClick={props.onClick}
-            className="algorithm-card"
-        >
-            <h2 className="algorithm-card-title">{props.title}</h2>
-            <p className="algorithm-card-text">{props.description}</p>
-        </button>
+
+        <Link to={props.linkTo} className="home-nav-link">
+            <button
+                type="button"
+                onClick={props.onClick}
+                className="algorithm-card"
+            >
+                <h2 className="algorithm-card-title">{props.title}</h2>
+                <p className="algorithm-card-text">{props.description}</p>
+            </button>
+        </Link>
     );
 }
 
