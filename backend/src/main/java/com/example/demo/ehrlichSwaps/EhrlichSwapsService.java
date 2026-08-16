@@ -1,6 +1,6 @@
 package com.example.demo.ehrlichSwaps;
 
-import dto.EhrlichSwapStepDTO;
+import com.example.demo.ehrlichSwaps.dto.EhrlichSwapStepDTO;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
