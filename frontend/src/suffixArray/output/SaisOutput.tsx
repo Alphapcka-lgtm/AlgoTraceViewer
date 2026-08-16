@@ -500,8 +500,9 @@ export function SaisOutput(props: SaisOutputProps) {
     let yOffset = 160;
     let counter = 0
     // calculate max height of svg to avoid elements out of the svg bounds
-    const svgMaxHeight = yOffset + 40 * props.output.lmsOrder.length + 100 + cellHeight + 10;
-    const svgHeight = Math.max(SVG_HEIGHT, svgMaxHeight);
+    const svgMaxHeightNaming = yOffset + 40 * props.output.lmsOrder.length + 100 + cellHeight + 10;
+    const svgMaxHeightSaDisplay = 30 + (props.output.source.length + 1) * cellHeight + 10;
+    const svgHeight = Math.max(SVG_HEIGHT, svgMaxHeightNaming, svgMaxHeightSaDisplay);
     return (
         <div className="algorithm-panel">
             <IOModeTabs
@@ -970,26 +971,67 @@ export function SaisOutput(props: SaisOutputProps) {
                             </g>
                         ))
                     }
+                    <rect
+                        x={xOffsetRightCol + rowNameColWidth}
+                        y={30}
+                        width={cellWidth}
+                        height={cellHeight}
+                        fill="lightgray"
+                        stroke="black"
+                    />
+                    <text
+                        x={xOffsetRightCol + rowNameColWidth + cellWidth / 2}
+                        y={50}
+                        textAnchor="middle"
+                        fontWeight="bold"
+                    >
+                        j
+                    </text>
+                    <rect
+                        x={xOffsetRightCol + rowNameColWidth + cellWidth}
+                        y={30}
+                        width={props.output.source.length * 10}
+                        height={cellHeight}
+                        fill="lightgray"
+                        stroke="black"
+                    />
+                    <text
+                        x={xOffsetRightCol + rowNameColWidth + cellWidth + 10}
+                        y={50}
+                        textAnchor="start"
+                        fontWeight="bold"
+                    >
+                        SA[i]
+                    </text>
                     {
                         props.output.sa.map((offset, index) => {
-                            const y = 50;
+                            const y = 80;
                             return (<g id={`suffix${index}`} key={`suffix${index}`} style={{opacity: 1}}>
+                                    <rect
+                                        x={xOffsetRightCol + rowNameColWidth}
+                                        y={60 + index * cellHeight}
+                                        width={cellWidth}
+                                        height={cellHeight}
+                                        fill="lightgray"
+                                        stroke="black"
+                                        />
                                     <text
-                                        x={xOffsetRightCol + rowNameColWidth + 20}
-                                        y={y + index * 30}
-                                        textAnchor="start"
+                                        x={xOffsetRightCol + rowNameColWidth + cellWidth / 2}
+                                        y={y + index * cellHeight}
+                                        textAnchor="middle"
                                     >
                                         {index}
                                     </text>
+                                    <rect
+                                        x={xOffsetRightCol + rowNameColWidth + cellWidth}
+                                        y={60 + index * cellHeight}
+                                        width={props.output.source.length * 10}
+                                        height={cellHeight}
+                                        fill="white"
+                                        stroke="black"
+                                        />
                                     <text
-                                        x={xOffsetRightCol + rowNameColWidth + 20 + 30}
-                                        y={y + index * 30}
-                                        textAnchor="start"
-                                    >
-                                        {offset}
-                                    </text>
-                                    <text
-                                        x={xOffsetRightCol + rowNameColWidth + 20 + 60}
+                                        x={xOffsetRightCol + rowNameColWidth + cellWidth + 10}
                                         y={y + index * 30}
                                         textAnchor="start"
                                     >
