@@ -1,7 +1,9 @@
 package com.example.demo.vertexCover;
 
-import com.example.demo.model.Graph;
-import com.example.demo.model.Node;
+import com.example.demo.vertexCover.dto.VertexCoverRequest;
+import com.example.demo.vertexCover.model.Graph;
+import com.example.demo.vertexCover.model.Node;
+import com.example.demo.vertexCover.dto.AnimationResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

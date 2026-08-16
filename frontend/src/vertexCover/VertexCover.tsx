@@ -36,7 +36,7 @@ export function VertexCover() {
     });
 
     const fetchIntermediateAlgorithmStates = async (input: VertexCoverRequest) => {
-        return fetch("http://localhost:8080/api/vertexCover/" + variant, {
+        return fetch("/api/vertexCover/" + variant, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(input),

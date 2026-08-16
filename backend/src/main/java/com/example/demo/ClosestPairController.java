@@ -1,26 +1,25 @@
 package com.example.demo;
 
-import com.example.demo.closestPair.ClosestPairService;
+import com.example.demo.closestPair.SweepLineService;
 import com.example.demo.closestPair.Point;
-import dto.AlgorithmStepDTO;
+import com.example.demo.closestPair.dto.AlgorithmStepDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/closestPair")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ClosestPairController {
 
-    private final ClosestPairService closestPairService;
+    private final SweepLineService sweepLineService;
 
-    public ClosestPairController(ClosestPairService sLineService) {
-        this.closestPairService = sLineService;
+    public ClosestPairController(SweepLineService sLineService) {
+        this.sweepLineService = sLineService;
     }
 
-    @PostMapping("/steps")
+    @PostMapping("/sweepLine")
     public List<AlgorithmStepDTO> calculateSteps(@RequestBody List<Point> points) {
-        return closestPairService.nearestPoints(points);
+        return sweepLineService.nearestPoints(points);
     }
 
 }

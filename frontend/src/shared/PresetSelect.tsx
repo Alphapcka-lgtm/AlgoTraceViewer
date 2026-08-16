@@ -8,7 +8,7 @@ export function PresetSelect(props: PresetSelectProps) {
 
     useEffect(() => {
         const loadPresets = async () => {
-            const response = await fetch(`http://localhost:8080/api/presets/${props.algorithm}`);
+            const response = await fetch(`/api/presets/${props.algorithm}`);
             const data: Preset[] = await response.json();
             setPresets(data);
         };
@@ -43,7 +43,7 @@ export function PresetSelect(props: PresetSelectProps) {
         if (!name) return;
         const preset = {name, algorithm: props.algorithm, request: props.getInput()};
         const response = await fetch(
-            `http://localhost:8080/api/presets/${props.algorithm}`,
+            `/api/presets/${props.algorithm}`,
             {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},

@@ -55,7 +55,7 @@ export default function SuffixArrayInducedSorting() {
     }
 
     const fetchIntermediateAlgorithmStates = async (input: SaisRequestDto) => {
-        return fetch("http://localhost:8080/sais", {
+        return fetch("/api/suffixArray/sais", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(input),
