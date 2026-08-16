@@ -1,6 +1,5 @@
 import { IOModeTabs } from "../../shared/IOModeTabs.tsx";
 import type {SwapInputProps} from "../shared/Types.tsx";
-import {ControlsHelp} from "../../shared/ControlsHelpDialog.tsx";
 import {PresetSelect} from "../../shared/PresetSelect.tsx";
 import {ImportExportDialog} from "../../shared/ImportExportDialog.tsx";
 import {AlgorithmOverviewBox} from "../../shared/AlgorithmOverviewBox.tsx";
@@ -53,8 +52,6 @@ export const SwapInput = (props: SwapInputProps) => {
 
 
             <div className="control-row">
-                <ControlsHelp tab={"input"} algorithm={"closestPair"}/>
-
                 <PresetSelect algorithm={"ehrlichSwaps"} setInput={props.onPresetChange} getInput={() => {
                     console.log(props.fields)
                     return {inputFields: props.fields, timestamp: Date.now()}

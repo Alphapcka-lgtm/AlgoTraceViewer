@@ -2,7 +2,7 @@ import React from "react";
 import type {VertexCoverRequest} from "../vertexCover/shared/Types.tsx";
 import type {ClosestPairRequest, Point} from "../closestPair/shared/Types.tsx"
 import type {EhrlichSwapsRequest, SwapInputField} from "../ehrlichSwaps/shared/Types.tsx";
-import type {SaisRequestDto} from "../sais/shared/Types.tsx";
+import type {SaisRequestDto} from "../suffixArray/shared/Types.tsx";
 
 export type OutputControlsProps = {
     timelineRef: React.RefObject<gsap.core.Timeline>
