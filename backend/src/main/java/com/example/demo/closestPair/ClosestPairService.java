@@ -92,16 +92,20 @@ public class ClosestPairService {
             RemovalResult removalResult = removePointsOutsideActiveSweepWindow(current, xSorted, activePoints, processedPoints, tail, i, candidateSearchDelta);
             tail = removalResult.newTail();
 
+            List<Point> removedPoints = removalResult.removedPoints();
             String advanceDescription;
             if (removalResult.removedAny()) {
-                String removedLabels = removalResult.removedPoints().stream().map(Point::label).collect(Collectors.joining(", "));
+                boolean singular = removedPoints.size() == 1;
+                String removedLabels = removedPoints.stream().map(Point::label).collect(Collectors.joining(", "));
+
                 advanceDescription = current.label() + " is now the current point. "
-                                + removedLabels + " were removed from the active set because they lie "
-                                + "to the left of the δ-wide active window. "
-                                + "They cannot form a closer pair with the current or any future point.";
+                        + removedLabels + (singular ? " was " : " were ") + "removed from the active set because "
+                        + (singular ? "it lies " : "they lie ") + "to the left of the δ-wide active window. "
+                        + (singular ? "It cannot " : "They cannot ")
+                        + "form a closer pair with the current or any future point.";
             } else {
                 advanceDescription = current.label() + " is now the current point. "
-                                + "No active points lie to the left of the δ-wide active window, so none were discarded.";
+                        + "No active points lie to the left of the δ-wide active window, so none were discarded.";
             }
 
             steps.add(new AlgorithmStepDTO(
