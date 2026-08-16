@@ -246,7 +246,8 @@ public class ClosestPairService {
         NavigableSet<Point> candidates = getPointsInYRange(
                 activePoints, current.y() - candidateSearchDelta, current.y() + candidateSearchDelta);
         for (Point candidate : candidates) {
-            // Removes possible extra boundary points ... enforces |current.y - candidate.y| < delta.
+            // Filters out possible extra boundary points included because getPointsInYRange
+            // uses conservative integer bounds by enforcing the exact condition |current.y - candidate.y| < candidateSearchDelta.
             double verticalDistance = Math.abs(current.y() - candidate.y());
             if (verticalDistance >= candidateSearchDelta) continue;
 
@@ -261,7 +262,8 @@ public class ClosestPairService {
         return new CandidateResult(currentBestDistance, currentBestPair, candidateComparisons, foundNewBest);
     }
 
-    // Returns a conservative y-range view from the y-ordered active set.
+    // Requires points to be ordered by (y, x, id)!
+    // Returns a conservative y-range view from the active set. Exact y-distance condition is checked/enforced by the caller.
     private NavigableSet<Point> getPointsInYRange(TreeSet<Point> points, double minY, double maxY) {
         // Point coordinates are integers, but the y-bounds minY and maxY are doubles.
         // floor/ceil create wider boundaries, so some extra points at the boundaries may be included.
