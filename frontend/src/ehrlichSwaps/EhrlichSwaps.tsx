@@ -90,8 +90,14 @@ export default function EhrlichSwaps () {
         values.length === submittedValues.length &&
         values.every((value, index) => value === submittedValues[index]);
 
+
     const handleSubmit = async (): Promise<void> => {
         const enteredValues = extractEnteredValues(fields);
+        const validationMessage = validateValues(enteredValues);
+        if (validationMessage !== undefined) {
+            setValidationError(validationMessage);
+            return;
+        }
         if (inputUnchanged(enteredValues)) {
             setModeState("output");
             return;
@@ -107,7 +113,9 @@ export default function EhrlichSwaps () {
     };
 
     const handleChangeInput = (): void => {setModeState("input");};
-    const canSubmit = extractEnteredValues(fields).length > 1;
+
+    const enteredValues = extractEnteredValues(fields);
+    const canSubmit = validateValues(enteredValues) === undefined;
 
     const handleImport = async (encoded: string): Promise<void> => {
         try {
